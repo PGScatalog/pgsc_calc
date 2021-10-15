@@ -3,11 +3,8 @@
     "homePage": "https://github.com/nf-core/pgscalc",
     "repos": {
         "nf-core/modules": {
-            "fastqc": {
-                "git_sha": "e937c7950af70930d1f34bb961403d9d2aa81c7d"
-            },
-            "multiqc": {
-                "git_sha": "e937c7950af70930d1f34bb961403d9d2aa81c7d"
+            "plink/vcf": {
+                "git_sha": "49da8642876ae4d91128168cd0db4f1c858d7792"
             }
         }
     }
