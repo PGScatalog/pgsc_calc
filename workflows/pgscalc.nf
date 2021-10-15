@@ -4,6 +4,10 @@
 ========================================================================================
 */
 
+def valid_params = [
+    format : ['vcf', 'bgen']
+]
+
 def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 
 // Validate input parameters
@@ -11,20 +15,16 @@ WorkflowPgscalc.initialise(params, log)
 
 // TODO nf-core: Add all file path parameters for the pipeline to the list below
 // Check input path parameters to see if they exist
-def checkPathParamList = [ params.input, params.multiqc_config, params.fasta ]
+def checkPathParamList = [
+    params.input
+]
+
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
 // Check mandatory parameters
-if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
-
-/*
-========================================================================================
-    CONFIG FILES
-========================================================================================
-*/
-
-ch_multiqc_config        = file("$projectDir/assets/multiqc_config.yaml", checkIfExists: true)
-ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config) : Channel.empty()
+// TODO: think about dummy meta val
+if (params.input) { ch_input = [[ id:'test'], file(params.input)] } else { exit 1, 'Genotype input not specified!' }
+if (params.format) { ch_format = params.format } else { exit 1, 'Input format not specified!' } 
 
 /*
 ========================================================================================
@@ -40,10 +40,10 @@ def modules = params.modules.clone()
 //
 include { GET_SOFTWARE_VERSIONS } from '../modules/local/get_software_versions' addParams( options: [publish_files : ['tsv':'']] )
 
-//
+// TODO: do sample sheets make sense for a VCF?
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
-include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( options: [:] )
+// include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( options: [:] )
 
 /*
 ========================================================================================
@@ -51,14 +51,11 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( opti
 ========================================================================================
 */
 
-def multiqc_options   = modules['multiqc']
-multiqc_options.args += params.multiqc_title ? Utils.joinModuleArgs(["--title \"$params.multiqc_title\""]) : ''
-
 //
 // MODULE: Installed directly from nf-core/modules
 //
-include { FASTQC  } from '../modules/nf-core/modules/fastqc/main'  addParams( options: modules['fastqc'] )
-include { MULTIQC } from '../modules/nf-core/modules/multiqc/main' addParams( options: multiqc_options   )
+
+include { PLINK_VCF } from '../modules/nf-core/modules/plink/vcf/main' addParams (options: modules['plink_vcf'] ) 
 
 /*
 ========================================================================================
@@ -66,27 +63,29 @@ include { MULTIQC } from '../modules/nf-core/modules/multiqc/main' addParams( op
 ========================================================================================
 */
 
-// Info required for completion email and summary
-def multiqc_report = []
-
 workflow PGSCALC {
-
     ch_software_versions = Channel.empty()
 
-    //
+    // TODO: decide if we need a samplesheet
     // SUBWORKFLOW: Read in samplesheet, validate and stage input files
     //
-    INPUT_CHECK (
-        ch_input
-    )
+    // INPUT_CHECK (
+    //    ch_input
+    // )
 
     //
-    // MODULE: Run FastQC
+    // MODULE: Run plink ingestion
+    // TODO: modify to subworkflow to liftOver too?
     //
-    FASTQC (
-        INPUT_CHECK.out.reads
+
+    // TODO: check dummy value
+    //ch_input = Channel.from('input_genetic').concat(ch_input)
+    
+    PLINK_VCF (
+        ch_input
     )
-    ch_software_versions = ch_software_versions.mix(FASTQC.out.version.first().ifEmpty(null))
+    
+    ch_software_versions = ch_software_versions.mix(PLINK_VCF.out.versions)
 
     //
     // MODULE: Pipeline reporting
@@ -102,25 +101,6 @@ workflow PGSCALC {
     GET_SOFTWARE_VERSIONS (
         ch_software_versions.map { it }.collect()
     )
-
-    //
-    // MODULE: MultiQC
-    //
-    workflow_summary    = WorkflowPgscalc.paramsSummaryMultiqc(workflow, summary_params)
-    ch_workflow_summary = Channel.value(workflow_summary)
-
-    ch_multiqc_files = Channel.empty()
-    ch_multiqc_files = ch_multiqc_files.mix(Channel.from(ch_multiqc_config))
-    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
-    ch_multiqc_files = ch_multiqc_files.mix(GET_SOFTWARE_VERSIONS.out.yaml.collect())
-    ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
-
-    MULTIQC (
-        ch_multiqc_files.collect()
-    )
-    multiqc_report       = MULTIQC.out.report.toList()
-    ch_software_versions = ch_software_versions.mix(MULTIQC.out.version.ifEmpty(null))
 }
 
 /*
