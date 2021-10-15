@@ -19,7 +19,7 @@
                     "type": "string",
                     "format": "file-path",
                     "mimetype": "text/csv",
-                    "pattern": ".vcf*$",
+                    "pattern": "\\.vcf$|\\.vcf\\.gz$",
                     "schema": "assets/schema_input.json",
                     "description": "Path to genomic data",
                     "help_text": "The input genomic data must be in one of the following formats:\n\n* Variant Call Specification (VCF) format (`.vcf.gz` or `.vcf`)\n* plink 1.9 binary file format (`.bed` / `.bim` / `.fam`)\n\nTo use VCF input data, specify the path of a multi-sample VCF file (e.g. `\"path/to/file.vcf.gz\"`)\n \nTo use plink binary input data, specify the base name and use a wildcard (e.g. `\"path/to/bfiles.*\"`)",
