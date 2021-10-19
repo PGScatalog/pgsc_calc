@@ -19,18 +19,19 @@
                     "type": "string",
                     "format": "file-path",
                     "mimetype": "text/csv",
-                    "pattern": "\\.vcf$|\\.vcf\\.gz$",
                     "schema": "assets/schema_input.json",
                     "description": "Path to genomic data",
-                    "help_text": "The input genomic data must be in one of the following formats:\n\n* Variant Call Specification (VCF) format (`.vcf.gz` or `.vcf`)\n* plink 1.9 binary file format (`.bed` / `.bim` / `.fam`)\n\nTo use VCF input data, specify the path of a multi-sample VCF file (e.g. `\"path/to/file.vcf.gz\"`)\n \nTo use plink binary input data, specify the base name and use a wildcard (e.g. `\"path/to/bfiles.*\"`)",
+                    "help_text": "Path to a directory containing genomic data.\n\nGenomic data should be imputed and quality controlled. \n\nSupported genomic data includes:\n\n* Variant Call Specification (VCF) format (`.vcf.gz`)\n* plink 1.9 binary file format (`.bed` / `.bim` )\n\n(see `--format` parameter). ",
                     "fa_icon": "fas fa-file-csv"
                 },
                 "format": {
                     "type": "string",
                     "description": "Genomic data input format",
                     "enum": [
-                        "vcf"
-                    ]
+                        "vcf",
+                        "bfile"
+                    ],
+                    "help_text": ""
                 },
                 "outdir": {
                     "type": "string",

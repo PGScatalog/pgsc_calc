@@ -4,39 +4,57 @@
 
 params.options = [:]
 
-include { SAMPLESHEET_CHECK } from '../../modules/local/samplesheet_check' addParams( options: params.options )
+// TODO: should we even use a samplesheet?
+// include { SAMPLESHEET_CHECK } from '../../modules/local/samplesheet_check' addParams( options: params.options )
 
 workflow INPUT_CHECK {
     take:
-    samplesheet // file: /path/to/samplesheet.csv
+    input
+    format
 
     main:
-    SAMPLESHEET_CHECK ( samplesheet )
-        .splitCsv ( header:true, sep:',' )
-        .map { create_fastq_channels(it) }
-        .set { reads }
+    is_vcf_input = format.equals("vcf")
+
+    if (is_vcf_input) {
+        extension = "*.vcf.gz"
+        ch_vcf = Channel.fromPath(input + extension, checkIfExists: true)
+	ch_bfile = Channel.empty()
+    } else {
+        ch_vcf = Channel.empty()
+	ch_bed = Channel.fromPath(input + "*.bed", checkIfExists: true)
+	ch_bim = Channel.fromPath(input + "*.bim", checkIfExists: true)
+	ch_bfile = ch_bed.concat(ch_bim)
+    }
+
+    // Check that inputs didn't get mixed up
+    ch_bfile
+        .subscribe {
+	    if ( "$it".endsWith(".vcf.gz") ) exit 1, "Are you sure you have a bfile? Bad input: $it"
+	    if ( "$it".endsWith(".vcf") ) exit 1, "Are you sure you have a bfile? Bad input: $it"
+        }
+
+    ch_vcf
+        .subscribe {
+            if ( "$it".endsWith(".bed") ) exit 1, "Are you sure you provided a VCF file? Bad input: $it"
+            if ( "$it".endsWith(".bim") ) exit 1, "Are you sure you provided a VCF file? Bad input: $it"
+        }
+
+    ch_vcf
+        .map { vcf ->
+            def meta = [:]
+	    meta.id = vcf.baseName
+	    [meta, vcf] }
+	.set{ ch_vcf }
+
+    ch_bfile
+        .map { bfile ->
+     	    def meta = [:]
+	    meta.id = bfile.baseName
+	    meta.extension = bfile.Extension
+	    [meta, bfile] }
+	.set{ ch_bfile }
 
     emit:
-    reads // channel: [ val(meta), [ reads ] ]
-}
-
-// Function to get list of [ meta, [ fastq_1, fastq_2 ] ]
-def create_fastq_channels(LinkedHashMap row) {
-    def meta = [:]
-    meta.id           = row.sample
-    meta.single_end   = row.single_end.toBoolean()
-
-    def array = []
-    if (!file(row.fastq_1).exists()) {
-        exit 1, "ERROR: Please check input samplesheet -> Read 1 FastQ file does not exist!\n${row.fastq_1}"
-    }
-    if (meta.single_end) {
-        array = [ meta, [ file(row.fastq_1) ] ]
-    } else {
-        if (!file(row.fastq_2).exists()) {
-            exit 1, "ERROR: Please check input samplesheet -> Read 2 FastQ file does not exist!\n${row.fastq_2}"
-        }
-        array = [ meta, [ file(row.fastq_1), file(row.fastq_2) ] ]
-    }
-    return array
+    vcf = ch_vcf // channel: [val(meta), path(vcf)]
+    bfile = ch_bfile // channel: [val(meta), path(bfile)]
 }

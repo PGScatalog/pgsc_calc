@@ -23,8 +23,8 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 
 // Check mandatory parameters
 // TODO: think about dummy meta val
-if (params.input) { ch_input = [[ id:'test'], file(params.input)] } else { exit 1, 'Genotype input not specified!' }
-if (params.format) { ch_format = params.format } else { exit 1, 'Input format not specified!' } 
+if (params.input) { ch_input = file(params.input) } else { exit 1, 'Genotype input not specified!' }
+if (params.format) { ch_format = params.format } else { exit 1, 'Input format not specified!' }
 
 /*
 ========================================================================================
@@ -40,10 +40,10 @@ def modules = params.modules.clone()
 //
 include { GET_SOFTWARE_VERSIONS } from '../modules/local/get_software_versions' addParams( options: [publish_files : ['tsv':'']] )
 
-// TODO: do sample sheets make sense for a VCF?
+//
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
-// include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( options: [:] )
+include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( options: [:] )
 
 /*
 ========================================================================================
@@ -55,7 +55,7 @@ include { GET_SOFTWARE_VERSIONS } from '../modules/local/get_software_versions' 
 // MODULE: Installed directly from nf-core/modules
 //
 
-include { PLINK_VCF } from '../modules/nf-core/modules/plink/vcf/main' addParams (options: modules['plink_vcf'] ) 
+include { PLINK_VCF } from '../modules/nf-core/modules/plink/vcf/main' addParams (options: modules['plink_vcf'] )
 
 /*
 ========================================================================================
@@ -66,26 +66,17 @@ include { PLINK_VCF } from '../modules/nf-core/modules/plink/vcf/main' addParams
 workflow PGSCALC {
     ch_software_versions = Channel.empty()
 
-    // TODO: decide if we need a samplesheet
-    // SUBWORKFLOW: Read in samplesheet, validate and stage input files
+    // TODO: decide if we will support a samplesheet
+    // SUBWORKFLOW: Validate and stage input files
     //
-    // INPUT_CHECK (
-    //    ch_input
-    // )
-
-    //
-    // MODULE: Run plink ingestion
-    // TODO: modify to subworkflow to liftOver too?
-    //
-
-    // TODO: check dummy value
-    //ch_input = Channel.from('input_genetic').concat(ch_input)
-    
-    PLINK_VCF (
-        ch_input
+    INPUT_CHECK (
+        params.input, ch_format
     )
-    
-    ch_software_versions = ch_software_versions.mix(PLINK_VCF.out.versions)
+
+    if (ch_format == "vcf") {
+        PLINK_VCF (INPUT_CHECK.out.vcf)
+        ch_software_versions = ch_software_versions.mix(PLINK_VCF.out.versions.ifEmpty(null))
+    }
 
     //
     // MODULE: Pipeline reporting
