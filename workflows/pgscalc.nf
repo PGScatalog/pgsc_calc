@@ -44,6 +44,7 @@ include { GET_SOFTWARE_VERSIONS } from '../modules/local/get_software_versions' 
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( options: [:] )
+include { SPLIT } from '../subworkflows/local/split' addParams( options: [:] )
 
 /*
 ========================================================================================
@@ -77,6 +78,8 @@ workflow PGSCALC {
         PLINK_VCF (INPUT_CHECK.out.vcf)
         ch_software_versions = ch_software_versions.mix(PLINK_VCF.out.versions.ifEmpty(null))
     }
+    
+    SPLIT(PLINK_VCF.out.bed, PLINK_VCF.out.bim, "chromosome")
 
     //
     // MODULE: Pipeline reporting
