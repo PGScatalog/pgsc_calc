@@ -1,10 +1,14 @@
-#!/usr/bin/mawk -f
+#!/bin/sh
 
 # split a plink bim file (normally per-chromosome)
 # important fields:
 #     - $1: chromosome integer code
 # example:
 #     split_bim.awk < example.bed -v split_mode=chromosome
+# why the weird shell script? portable awk is complicated:
+#     https://unix.stackexchange.com/a/361796
+
+"exec" "awk" "-f" "$0" "$@" && 0 {}
 
 BEGIN {
     if (split_mode == "chromosome") {
@@ -20,13 +24,14 @@ BEGIN {
 # only keep autosomes 
 $1 ~ /[0-9]+$/ {
     if (split_chrom) {
-	print > $1
+	f = $1 ".keep"
+	print > f
     } 
 
     if (split_chunk) {
         if ( NR % 100000 == 1 ) {
 	    x++
-	    f = $1 "_" x
+	    f = $1 "_" x ".keep"
 	    print > f
 	}
     }
