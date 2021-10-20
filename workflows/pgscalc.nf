@@ -4,10 +4,6 @@
 ========================================================================================
 */
 
-def valid_params = [
-    format : ['vcf', 'bgen']
-]
-
 def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 
 // Validate input parameters
@@ -22,9 +18,7 @@ def checkPathParamList = [
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
 // Check mandatory parameters
-// TODO: think about dummy meta val
 if (params.input) { ch_input = file(params.input) } else { exit 1, 'Genotype input not specified!' }
-if (params.format) { ch_format = params.format } else { exit 1, 'Input format not specified!' }
 
 /*
 ========================================================================================
@@ -71,15 +65,15 @@ workflow PGSCALC {
     // SUBWORKFLOW: Validate and stage input files
     //
     INPUT_CHECK (
-        params.input, ch_format
+        ch_input
     )
 
-    if (ch_format == "vcf") {
-        PLINK_VCF (INPUT_CHECK.out.vcf)
-        ch_software_versions = ch_software_versions.mix(PLINK_VCF.out.versions.ifEmpty(null))
-    }
+    // if (ch_format == "vcf") {
+    //    PLINK_VCF (INPUT_CHECK.out.vcf)
+    //    ch_software_versions = ch_software_versions.mix(PLINK_VCF.out.versions.ifEmpty(null))
+    // }
     
-    SPLIT(PLINK_VCF.out.bed, PLINK_VCF.out.bim, "chromosome")
+    // SPLIT(PLINK_VCF.out.bed, PLINK_VCF.out.bim, "chromosome")
 
     //
     // MODULE: Pipeline reporting
