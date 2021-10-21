@@ -11,8 +11,7 @@
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
             "required": [
-                "input",
-                "format"
+                "input"
             ],
             "properties": {
                 "input": {
@@ -20,18 +19,10 @@
                     "format": "file-path",
                     "mimetype": "text/csv",
                     "schema": "assets/schema_input.json",
-                    "description": "Path to genomic data",
-                    "help_text": "Path to a directory containing genomic data.\n\nGenomic data should be imputed and quality controlled. \n\nSupported genomic data includes:\n\n* Variant Call Specification (VCF) format (`.vcf.gz`)\n* plink 1.9 binary file format (`.bed` / `.bim` )\n\n(see `--format` parameter). ",
-                    "fa_icon": "fas fa-file-csv"
-                },
-                "format": {
-                    "type": "string",
-                    "description": "Genomic data input format",
-                    "enum": [
-                        "vcf",
-                        "bfile"
-                    ],
-                    "help_text": ""
+                    "description": "Path to comma-separated file containing information about the samples (a sample sheet)",
+                    "help_text": "You will need to create a design file with information about the samples before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 4 columns, and a header row. See usage docs for a more detailed explanation.",
+                    "fa_icon": "fas fa-file-csv",
+                    "pattern": ".csv$"
                 },
                 "outdir": {
                     "type": "string",

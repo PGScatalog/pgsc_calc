@@ -11,14 +11,9 @@ class WorkflowPgscalc {
         // genomeExistsError(params, log)
 
         if (!params.input) {
-            log.error "Genome input file not specified with e.g. '--input genome.vcf.gz' or via a detectable config file."
+            log.error "Sample sheet input file not specified with e.g. '--input input.csv' or via a detectable config file."
             System.exit(1)
         }
-
-        if (!params.format) {
-	    log.error "Genotype input format not specified with e.g. '--format vcf'"
-	    System.exit(1)
-	}
     }
 
     //
