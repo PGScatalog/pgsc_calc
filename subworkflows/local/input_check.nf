@@ -9,23 +9,30 @@ include { SAMPLESHEET_CHECK } from '../../modules/local/samplesheet_check' addPa
 workflow INPUT_CHECK {
     take:
     samplesheet // file: /path/to/samplesheet.csv
-   
+
     main:
     SAMPLESHEET_CHECK ( samplesheet )
         .csv
-        .splitCsv ( header:true, sep:',' )
+	.splitCsv ( header:true, sep:',' )
         .map { create_variant_channel(it) }
-        .set { var } 
+        .branch {
+            vcf: it[0].is_vcf   
+            bfile: !it[0].is_vcf
+        }
+        .set { ch_input } 
 
-    var.view()
-    
-    ch_bed = Channel.empty()
-    ch_bim = Channel.empty()
-    
+    // branch is like a switch statement, so only one bed / bim was being
+    // returned
+    ch_input.bfile.multiMap { it ->
+	bed: [it[0], it[1][0]]
+	bim: [it[0], it[1][1]]
+        }
+        .set { ch_bfiles }
+        
     emit:
-    vcf = var // channel: [val(meta), path(vcf)]
-    bed = ch_bed // channel: [val(meta), path(bed)]
-    bim = ch_bim // channel: [val(meta), path(bim)]
+    vcf = ch_input.vcf // channel: [val(meta), path(vcf)]
+    bed = ch_bfiles.bed // channel: [val(meta), path(bed)]
+    bim = ch_bfiles.bim // channel: [val(meta), path(bim)]
 }
 
 // function to get a list of:

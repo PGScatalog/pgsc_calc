@@ -68,12 +68,20 @@ workflow PGSCALC {
         ch_input
     )
 
-    // if (ch_format == "vcf") {
-    //    PLINK_VCF (INPUT_CHECK.out.vcf)
-    //    ch_software_versions = ch_software_versions.mix(PLINK_VCF.out.versions.ifEmpty(null))
-    // }
-    
-    // SPLIT(PLINK_VCF.out.bed, PLINK_VCF.out.bim, "chromosome")
+    PLINK_VCF (
+	INPUT_CHECK.out.vcf
+    )
+    ch_software_versions = ch_software_versions.mix(PLINK_VCF.out.versions.ifEmpty(null))
+
+    // plink and input bed / bim channel will always have one element empty
+    // so to make a combined channel just mix the two
+    SPLIT(
+	PLINK_VCF.out.bed.mix(INPUT_CHECK.out.bed),
+	PLINK_VCF.out.bim.mix(INPUT_CHECK.out.bim),
+	"chromosome"
+    )
+    // TODO: get mawk version
+    // ch_software_versions = ch_software_versions.mix(SPLIT.out.versions.ifEmpty(null))
 
     //
     // MODULE: Pipeline reporting
