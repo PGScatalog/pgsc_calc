@@ -40,16 +40,15 @@ def create_variant_channel(LinkedHashMap row) {
     if (meta.is_vcf) {
         if (!file(row.vcf_path).exists()) {
             exit 1, "ERROR: Please check input samplesheet -> VCF file does not exist!\n${row.vcf_path}"
-            array = [ meta, [ file(row.vcf_path) ] ]
 	}
-    }
-    if (!meta.is_vcf) {
+	array = [ meta, [ file(row.vcf_path) ] ]
+    } else {
         if (!file(row.bed_path).exists()) {
-            exit 1, "ERROR: Please check input samplesheet -> Read 2 FastQ file does not exist!\n${row.bed_path}"
+            exit 1, "ERROR: Please check input samplesheet -> bed file does not exist!\n${row.bed_path}"
         }
 	if (!file(row.bim_path).exists()) {
-           exit 1, "ERROR: Please check input samplesheet -> bim file does not exist!\n${row.bim_path}"
-	}	
+            exit 1, "ERROR: Please check input samplesheet -> bim file does not exist!\n${row.bim_path}"
+	}
         array = [ meta, [ file(row.bed_path), file(row.bim_path) ] ]
     }
     return array
