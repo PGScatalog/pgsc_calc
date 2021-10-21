@@ -47,7 +47,7 @@ def check_samplesheet(file_in, file_out):
     sample,path,spec
     chr1,chr1.vcf.gz,vcf
     chr2,chr2.vcf.gz,vcf
-    
+
     TODO: update this
     For an example see:
     https://raw.githubusercontent.com/nf-core/test-datasets/viralrecon/samplesheet/samplesheet_test_illumina_amplicon.csv
@@ -88,6 +88,7 @@ def check_samplesheet(file_in, file_out):
             ## Check sample name entries
             sample, vcf_path, bed_path, bim_path = lspl[: len(HEADER)]
             sample = sample.replace(" ", "_")
+
             if not sample:
                 print_error("Sample entry has not been specified!", "Line", line)
 
@@ -117,7 +118,7 @@ def check_samplesheet(file_in, file_out):
                 sample_info = ["1", vcf_path, bed_path, bim_path]
             else:
                 print_error("Invalid combination of columns provided! Have you got vcf and bed/bim for a sample?", "Line", line)
-                        
+
             ## Create sample mapping dictionary = { sample: [ single_end, fastq_1, fastq_2 ] }
             if sample not in sample_mapping_dict:
                 sample_mapping_dict[sample] = [sample_info]
@@ -135,17 +136,21 @@ def check_samplesheet(file_in, file_out):
             fout.write(",".join(["sample", "is_vcf", "vcf_path", "bed_path", "bim_path"]) + "\n")
 
             is_vcf_set = set()
+
             for sample in sorted(sample_mapping_dict.keys()):
                 [is_vcf_set.add(x[0]) for x in sample_mapping_dict[sample]]
+
             if not (len(is_vcf_set) == 1):
                 print_error("All samples must be in the same format! (e.g. all VCF or all bed / bim)")
 
-                ## Check that multiple runs of the same sample are of the same datatype
-                if not all(x[0] == sample_mapping_dict[sample][0][0] for x in sample_mapping_dict[sample]):
-                    print_error("Multiple runs of a sample must be of the same datatype!", "Sample: {}".format(sample))
+            ## Check that multiple runs of the same sample are of the same datatype
+            if not all(x[0] == sample_mapping_dict[sample][0][0] for x in sample_mapping_dict[sample]):
+                print_error("Multiple runs of a sample must be of the same datatype!", "Sample: {}".format(sample))
 
-                for idx, val in enumerate(sample_mapping_dict[sample]):
-                    fout.write(",".join(sample) + "," + ",".join(val) + "\n")
+            for key, value in sample_mapping_dict.items():
+                row = [key] + [item for sublist in value for item in sublist]
+                fout.write(",".join(row) + "\n")
+
     else:
         print_error("No entries to process!", "Samplesheet: {}".format(file_in))
 
