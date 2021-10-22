@@ -23,7 +23,7 @@ process PLINK_EXTRACT {
     tuple val(meta), path(bed)
     tuple val(meta), path(bim)
     tuple val(meta), path(fam)
-    path(variants)
+    each path(variants)
 
     output:
     tuple val(meta), path("*.bed"), emit: bed
@@ -38,7 +38,7 @@ process PLINK_EXTRACT {
         --extract ${variants} \\
         --threads $task.cpus \\
         --make-bed \\
-        --out data
+        --out ${variants.baseName}
 
     cat <<-END_VERSIONS > versions.yml
     ${getProcessName(task.process)}:
