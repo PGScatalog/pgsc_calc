@@ -23,8 +23,8 @@ process MAWK_SPLITBIM {
     val split_mode
     
     output:
-    path("*.keep")      , emit: variants
-    path "versions.yml" , emit: versions
+    tuple val(meta), path("*.keep"), emit: variants
+    path "versions.yml"            , emit: versions
 
     script:
     def software = getSoftwareName(task.process)
