@@ -76,8 +76,9 @@ workflow PGSCALC {
     // plink and input bed / bim channel will always have one element empty
     // so to make a combined channel just mix the two
     SPLIT(
-	PLINK_VCF.out.bed.mix(INPUT_CHECK.out.bed),
-	PLINK_VCF.out.bim.mix(INPUT_CHECK.out.bim),
+	PLINK_VCF.out.bed.concat(INPUT_CHECK.out.bed),
+	PLINK_VCF.out.bim.concat(INPUT_CHECK.out.bim),
+	PLINK_VCF.out.fam.concat(INPUT_CHECK.out.fam),
 	"chromosome"
     )
     // TODO: get mawk version
