@@ -1,10 +1,10 @@
 // Import generic module functions
-include { initOptions; saveFiles; getSoftwareName } from './functions'
+include { initOptions; saveFiles; getSoftwareName; getProcessName } from './functions'
 
 params.options = [:]
 options        = initOptions(params.options)
 
-process SPLIT_BIM {
+process MAWK_SPLITBIM {
     tag "$meta.id"
     label 'process_low'
     publishDir "${params.outdir}",
@@ -33,8 +33,8 @@ process SPLIT_BIM {
     split_bim.awk < ${bim} -v split_mode=${split_mode}
 
     cat <<-END_VERSIONS > versions.yml
-    ${getSoftwareName(task.process)}:
-        \$(echo \$(mawk -W version 2>&1) | sed 's/^mawk //;s/ 2020.*//')
+    ${getProcessName(task.process)}:
+        ${getSoftwareName(task.process)}: \$(echo \$(mawk -W version 2>&1) | cut -f 2 -d ' ')
     END_VERSIONS
     """
 }
