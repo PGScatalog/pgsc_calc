@@ -61,6 +61,9 @@ def create_variant_channel(LinkedHashMap row) {
 	if (!file(row.fam_path).exists()) {
             exit 1, "ERROR: Please check input samplesheet -> fam file does not exist!\n${row.fam_path}"
 	}
+	if (file(row.bed_path).getBaseName() != row.sample) {
+	    exit 1, "ERROR: Please check input samplesheet -> sample id doesn't match bfile base name\n${row.sample} ${row.bed_path}"
+	}
         array = [ meta, [ file(row.bed_path), file(row.bim_path), file(row.fam_path) ] ]
     }
     return array
