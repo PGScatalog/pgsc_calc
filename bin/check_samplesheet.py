@@ -33,20 +33,20 @@ def print_error(error, context="Line", context_str=""):
     print(error_str)
     sys.exit(1)
 
+def check_extension(path, extension, line):
+    if path:
+        if not path.endswith(extension):
+            print_error("Incorrect file extension: {} file must have extension {}".format(path, extension),
+                        "Line", line)
 
 def check_samplesheet(file_in, file_out):
     """
     This function checks that the samplesheet follows the following structure:
 
-    sample,path,spec
-    dataset1,dataset1.bed,bed
-    dataset1,dataset1.bim,bim
+    sample,path,vcf_path,bed_path,bim_path,fam_path
+    dataset1,,dataset1.bed,dataset1.bim,dataset1.fam
 
-    OR:
-
-    sample,path,spec
-    chr1,chr1.vcf.gz,vcf
-    chr2,chr2.vcf.gz,vcf
+    Where vcf_path and bed/bim/fam_path are mutually exclusive
 
     TODO: update this
     For an example see:
@@ -60,7 +60,7 @@ def check_samplesheet(file_in, file_out):
         ## Check header
         MIN_COLS = 2
         # TODO nf-core: Update the column names for the input samplesheet
-        HEADER = ["sample", "vcf_path", "bed_path", "bim_path"]
+        HEADER = ["sample", "vcf_path", "bed_path", "bim_path", "fam_path"]
         header = [x.strip('"') for x in fin.readline().strip().split(",")]
         if header[: len(HEADER)] != HEADER:
             print("ERROR: Please check samplesheet header -> {} != {}".format(",".join(header), ",".join(HEADER)))
@@ -86,36 +86,28 @@ def check_samplesheet(file_in, file_out):
                 )
 
             ## Check sample name entries
-            sample, vcf_path, bed_path, bim_path = lspl[: len(HEADER)]
+            sample, vcf_path, bed_path, bim_path, fam_path = lspl[: len(HEADER)]
             sample = sample.replace(" ", "_")
 
             if not sample:
                 print_error("Sample entry has not been specified!", "Line", line)
 
             ## Check file extensions
-            for path in [vcf_path, bed_path, bim_path]:
+            for path in [vcf_path, bed_path, bim_path, fam_path]:
                 if path:
                     if path.find(" ") != -1:
                         print_error("File path contains spaces!", "Line", line)
-            for path in bed_path:
-                if not bed_path.endswith(".bed"):
-                    print_error(".bed file does not have extension .bed",
-                                "Line", line)
-            for path in bim_path:
-                if not bim_path.endswith(".bim"):
-                    print_error("bim file does not have extension .bim",
-                                "Line", line)
-            for path in vcf_path:
-                if not vcf_path.endswith(".vcf.gz"):
-                    print_error("VCF file does not have extension .vcf.gz",
-                                "Line", line)
+
+            
+            [check_extension(x, y, z) for x,y,z in zip([bed_path, bim_path, fam_path, vcf_path], [".bed", ".bim", ".fam", ".vcf.gz"], [line] * 4)]
+
 
             ## Auto-detect vcf or bfile
             sample_info = [] # is_vcf, vcf, bed, bim
             if sample and bed_path and bim_path:  ## bfiles
-                sample_info = ["0", vcf_path, bed_path, bim_path]
+                sample_info = ["0", vcf_path, bed_path, bim_path, fam_path]
             elif sample and vcf_path:  ## vcf
-                sample_info = ["1", vcf_path, bed_path, bim_path]
+                sample_info = ["1", vcf_path, bed_path, bim_path, fam_path]
             else:
                 print_error("Invalid combination of columns provided! Have you got vcf and bed/bim for a sample?", "Line", line)
 
@@ -133,7 +125,7 @@ def check_samplesheet(file_in, file_out):
         out_dir = os.path.dirname(file_out)
         make_dir(out_dir)
         with open(file_out, "w") as fout:
-            fout.write(",".join(["sample", "is_vcf", "vcf_path", "bed_path", "bim_path"]) + "\n")
+            fout.write(",".join(["sample", "is_vcf", "vcf_path", "bed_path", "bim_path", "fam_path"]) + "\n")
 
             is_vcf_set = set()
 
@@ -153,8 +145,7 @@ def check_samplesheet(file_in, file_out):
 
     else:
         print_error("No entries to process!", "Samplesheet: {}".format(file_in))
-
-
+        
 def main(args=None):
     args = parse_args(args)
     check_samplesheet(args.FILE_IN, args.FILE_OUT)

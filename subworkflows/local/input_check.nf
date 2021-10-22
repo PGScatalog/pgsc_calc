@@ -26,6 +26,7 @@ workflow INPUT_CHECK {
     ch_input.bfile.multiMap { it ->
 	bed: [it[0], it[1][0]]
 	bim: [it[0], it[1][1]]
+	fam: [it[0], it[1][2]]
         }
         .set { ch_bfiles }
         
@@ -33,11 +34,12 @@ workflow INPUT_CHECK {
     vcf = ch_input.vcf // channel: [val(meta), path(vcf)]
     bed = ch_bfiles.bed // channel: [val(meta), path(bed)]
     bim = ch_bfiles.bim // channel: [val(meta), path(bim)]
+    fam = ch_bfiles.fam // channel: [val(meta), path(fam)]
 }
 
 // function to get a list of:
 // - [ meta, [vcf_path] ] OR
-// - [ meta, [bed_path, bim_path] ]
+// - [ meta, [bed_path, bim_path, fam_path] ]
 def create_variant_channel(LinkedHashMap row) {
     def meta = [:]
     meta.id           = row.sample
@@ -56,7 +58,10 @@ def create_variant_channel(LinkedHashMap row) {
 	if (!file(row.bim_path).exists()) {
             exit 1, "ERROR: Please check input samplesheet -> bim file does not exist!\n${row.bim_path}"
 	}
-        array = [ meta, [ file(row.bed_path), file(row.bim_path) ] ]
+	if (!file(row.fam_path).exists()) {
+            exit 1, "ERROR: Please check input samplesheet -> fam file does not exist!\n${row.fam_path}"
+	}
+        array = [ meta, [ file(row.bed_path), file(row.bim_path), file(row.fam_path) ] ]
     }
     return array
 }
