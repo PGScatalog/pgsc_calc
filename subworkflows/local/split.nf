@@ -7,17 +7,16 @@ params.options = [:]
 include { SPLIT_BIM } from '../../modules/local/split_bim' addParams (options: [:] )
 
 // TODO: submit to nf-core
-include { PLINK_KEEP } from '../../modules/local/plink_keep' addParams (options: [:] )
+include { PLINK_EXTRACT } from '../../modules/local/plink_extract' addParams (options: [:] )
 
 workflow SPLIT {
     take:
     bed
     bim
+    fam
     split_method // chromosome or chunk
 
     main:
     SPLIT_BIM(bim, split_method)
-    // TODO: some channel stuff - tuple of meta, chromosome, and path?
-    
-    //PLINK_KEEP(input, variants)
+    PLINK_EXTRACT(bed, bim, fam, SPLIT_BIM.out.variants)
 }

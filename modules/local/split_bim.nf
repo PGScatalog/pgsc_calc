@@ -23,7 +23,7 @@ process SPLIT_BIM {
     val split_mode
     
     output:
-    path("*.keep")        , emit: variants
+    path("*.keep")      , emit: variants
     path "versions.yml" , emit: versions
 
     script:
