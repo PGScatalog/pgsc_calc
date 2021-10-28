@@ -1,6 +1,12 @@
-# awk program to validate PGS Catalog scoring file
-# Benjamin Wingfield 2021-10-28
-# usage:
+# check_pgscatalog.awk: program to validate a PGS Catalog scoring file
+#
+# Check the structure of the scoring file and extract some required data:
+#     - chr_name and chr_pos
+#     - effect_weight
+#     - effect_allele and (reference_allele or other_allele)
+# Genome build must be GRCh37
+# 
+#   usage:
 #     mawk -v out=output.txt -f check_pgscatalog.awk PGS000379.txt
 BEGIN {
     FS="\t"; OFS="\t"
@@ -35,7 +41,6 @@ NR < header_limit && $0 ~/^#/ {
 }
 
 # check scoring data -----------------------------------------------------------
-
 # set up column names in an array
 # useful because column numbers won't be consistent across files
 # e.g. $2 -> $(data["rsid"])
@@ -68,7 +73,7 @@ $0 !~ /^#/ && NR > header_line {
 	data["reference_allele"]=data["other_allele"]
     }
 
-    # TODO: print validated columns in an consistent format
+    # print validated columns in an consistent format
     print $(data["chr_name"]), $(data["chr_position"]),
 	$(data["effect_allele"]), $(data["reference_allele"]),
 	$(data["effect_weight"]) > out
@@ -82,13 +87,10 @@ END {
 	print "ERROR - This file doesn't look like a valid PGS Catalog file"
     }
     if (build_error) {
-	print "ERROR - Target build and PGS file build doesn't match"
-	print "Target build: "target_build
-        print "PGS Catalog build: "pgs_build
+	print "ERROR - PGS Catalog scoring file must be in build GRCh37"
     }
     if (missing_position_error) {
 	error_required("chr_name or chr_position")
-	print "Currently both are required to match target data by genomic coordinates"
     }
     if (missing_weight_error) {
 	error_required("effect_weight")
