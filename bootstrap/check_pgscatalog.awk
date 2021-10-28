@@ -15,8 +15,8 @@ BEGIN {
     header_limit = 20
 
     if (!out) {
-	missing_output_error = 1
-	exit 1
+        missing_output_error = 1
+        exit 1
     }
 }
 
@@ -30,8 +30,8 @@ NR < header_limit && $0 ~ /^# Original Genome Build/ {
     split($0, build_array, " = ")
     pgs_build=build_array[2]
     if (pgs_build != "GRCh37") {
-       	    build_error = 1
-	    exit 1
+            build_error = 1
+            exit 1
     }
 }
 
@@ -53,53 +53,53 @@ $0 !~ /^#/ && NR == header_line {
 $0 !~ /^#/ && NR > header_line {
     # check mandatory columns
     if (!data["chr_position"] || !data["chr_name"]) {
-	missing_position_error = 1
-	exit 1
+        missing_position_error = 1
+        exit 1
     }
     if (!data["effect_weight"]) {
-	missing_weight_error = 1
-	exit 1
+        missing_weight_error = 1
+        exit 1
     }
     if (!data["effect_allele"]) {
-	missing_effect_error = 1
-	exit 1
+        missing_effect_error = 1
+        exit 1
     }
     if (!data["reference_allele"]) {
-	if (!data["other_allele"]) {
-	    missing_reference_error = 1
-	    exit 1
-	}
-	# overwrite missing reference with other allele column
-	data["reference_allele"]=data["other_allele"]
+        if (!data["other_allele"]) {
+            missing_reference_error = 1
+            exit 1
+        }
+        # overwrite missing reference with other allele column
+        data["reference_allele"]=data["other_allele"]
     }
 
     # print validated columns in an consistent format
     print $(data["chr_name"]), $(data["chr_position"]),
-	$(data["effect_allele"]), $(data["reference_allele"]),
-	$(data["effect_weight"]) > out
+        $(data["effect_allele"]), $(data["reference_allele"]),
+        $(data["effect_weight"]) > out
 }
 
 END {
     if (missing_output_error) {
-	print "Specify an output file path with -v out=output.txt"
+        print "Specify an output file path with -v out=output.txt"
     }
     if (file_error) {
-	print "ERROR - This file doesn't look like a valid PGS Catalog file"
+        print "ERROR - This file doesn't look like a valid PGS Catalog file"
     }
     if (build_error) {
-	print "ERROR - PGS Catalog scoring file must be in build GRCh37"
+        print "ERROR - PGS Catalog scoring file must be in build GRCh37"
     }
     if (missing_position_error) {
-	error_required("chr_name or chr_position")
+        error_required("chr_name or chr_position")
     }
     if (missing_weight_error) {
-	error_required("effect_weight")
+        error_required("effect_weight")
     }
     if (missing_effect_error) {
-	error_required("effect_allele")
+        error_required("effect_allele")
     }
     if (missing_reference_error) {
-	error_required("reference_allele or other_allele")
+        error_required("reference_allele or other_allele")
     }
 }
 
