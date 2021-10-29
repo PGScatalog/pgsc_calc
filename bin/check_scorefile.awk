@@ -1,4 +1,4 @@
-# check_pgscatalog.awk: program to validate a PGS Catalog scoring file
+# check_scorefile.awk: program to validate a PGS Catalog scoring file
 #
 # Check the structure of the scoring file and extract some required data:
 #     - chr_name and chr_pos

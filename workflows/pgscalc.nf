@@ -12,13 +12,15 @@ WorkflowPgscalc.initialise(params, log)
 // TODO nf-core: Add all file path parameters for the pipeline to the list below
 // Check input path parameters to see if they exist
 def checkPathParamList = [
-    params.input
+    params.input,
+    params.scorefile
 ]
 
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
 // Check mandatory parameters
 if (params.input) { ch_input = file(params.input) } else { exit 1, 'Genotype input not specified!' }
+if (params.scorefile) { ch_scorefile = file(params.scorefile) } else { exit 1, 'Score file not specified!' }
 
 /*
 ========================================================================================
@@ -66,6 +68,8 @@ workflow PGSCALC {
     //
     INPUT_CHECK (
         ch_input
+        ch_input,
+        ch_scorefile
     )
 
     PLINK_VCF (

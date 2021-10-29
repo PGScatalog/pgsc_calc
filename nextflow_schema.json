@@ -11,7 +11,8 @@
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
             "required": [
-                "input"
+                "input",
+                "scorefile"
             ],
             "properties": {
                 "input": {
@@ -23,6 +24,10 @@
                     "help_text": "You will need to create a design file with information about the samples before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 4 columns, and a header row. See usage docs for a more detailed explanation.",
                     "fa_icon": "fas fa-file-csv",
                     "pattern": ".csv$"
+                },
+                "scorefile": {
+                    "type": "string",
+                    "description": "Path to a scoring file in PGS Catalog format"
                 },
                 "outdir": {
                     "type": "string",
