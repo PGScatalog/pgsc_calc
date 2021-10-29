@@ -21,16 +21,19 @@ process MAWK_SPLITBIM {
     input:
     tuple val(meta), path(bim)
     val split_mode
-    
+
     output:
     tuple val(meta), path("*.keep"), emit: variants
     path "versions.yml"            , emit: versions
 
+    // specify path with -f manually for portability (mawk can live lots of places)
+    // env won't work with parameters too!
     script:
-    def software = getSoftwareName(task.process)
     def prefix   = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
     """
-    split_bim.awk < ${bim} -v split_mode=${split_mode}
+    mawk -v split_mode=${split_mode} \
+        -f ${projectDir}/bin/split_bim.awk \
+        ${bim}
 
     cat <<-END_VERSIONS > versions.yml
     ${getProcessName(task.process)}:
