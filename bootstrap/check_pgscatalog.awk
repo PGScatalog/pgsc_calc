@@ -5,7 +5,7 @@
 #     - effect_weight
 #     - effect_allele and (reference_allele or other_allele)
 # Genome build must be GRCh37
-# 
+#
 #   usage:
 #     mawk -v out=output.txt -f check_pgscatalog.awk PGS000379.txt
 BEGIN {
@@ -30,12 +30,12 @@ NR < header_limit && $0 ~ /^# Original Genome Build/ {
     split($0, build_array, " = ")
     pgs_build=build_array[2]
     if (pgs_build != "GRCh37") {
-            build_error = 1
-            exit 1
+        build_error = 1
+        exit 1
     }
 }
 
-# assume the column names begin on the line after the header ends 
+# assume the column names begin on the line after the header ends
 NR < header_limit && $0 ~/^#/ {
     header_line=NR+1
 }
@@ -51,6 +51,7 @@ $0 !~ /^#/ && NR == header_line {
 }
 
 $0 !~ /^#/ && NR > header_line {
+    n_var_raw++
     # check mandatory columns
     if (!data["chr_position"] || !data["chr_name"]) {
         missing_position_error = 1
@@ -69,14 +70,22 @@ $0 !~ /^#/ && NR > header_line {
             missing_reference_error = 1
             exit 1
         }
-        # overwrite missing reference with other allele column
-        data["reference_allele"]=data["other_allele"]
+    # overwrite missing reference with other allele column if present
+    data["reference_allele"]=data["other_allele"]
+    }
+
+    if ( $(data["effect_allele"]) ~ "P|N" ) {
+        # just warn and skip line, don't exit
+        hla_warn = 1
+        hla_count++
+        next
     }
 
     # print validated columns in an consistent format
     print $(data["chr_name"]), $(data["chr_position"]),
         $(data["effect_allele"]), $(data["reference_allele"]),
         $(data["effect_weight"]) > out
+    n_var++
 }
 
 END {
@@ -101,6 +110,11 @@ END {
     if (missing_reference_error) {
         error_required("reference_allele or other_allele")
     }
+    if (hla_warn) {
+        printf "WARN - %d HLA variants detected and ignored\n", hla_count > "log"
+    }
+    printf "%d variants read\n", n_var_raw > "log"
+    printf "%d variants written\n", n_var > "log"
 }
 
 function error_required(str) {
