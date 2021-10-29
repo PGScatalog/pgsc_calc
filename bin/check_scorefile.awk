@@ -7,7 +7,7 @@
 # Genome build must be GRCh37
 #
 #   usage:
-#     mawk -v out=output.txt -f check_pgscatalog.awk PGS000379.txt
+#     mawk -v out=output.txt -f check_scorefile.awk PGS000379.txt
 BEGIN {
     FS="\t"; OFS="\t"
     # longest header finishes at line 12 in PGS Catalog 2021-10-28
