@@ -19,10 +19,10 @@ workflow INPUT_CHECK {
         .splitCsv ( header:true, sep:',' )
         .map { create_variant_channel(it) }
         .branch {
-            vcf: it[0].is_vcf   
+            vcf: it[0].is_vcf
             bfile: !it[0].is_vcf
         }
-        .set { ch_input } 
+        .set { ch_input }
 
     // branch is like a switch statement, so only one bed / bim was being
     // returned
@@ -37,12 +37,18 @@ workflow INPUT_CHECK {
     SCOREFILE_CHECK ( scorefile, file("$projectDir/bin/check_scorefile.awk") )
     SCOREFILE_QC ( SCOREFILE_CHECK.out.data, file("$projectDir/bin/qc_scorefile.awk") )
 
+    SAMPLESHEET_CHECK.out.versions
+        .mix(SCOREFILE_CHECK.out.versions)
+        .mix(SCOREFILE_QC.out.versions)
+        .set{ ch_versions }
+
     emit:
     vcf = ch_input.vcf // channel: [val(meta), path(vcf)]
     bed = ch_bfiles.bed // channel: [val(meta), path(bed)]
     bim = ch_bfiles.bim // channel: [val(meta), path(bim)]
     fam = ch_bfiles.fam // channel: [val(meta), path(fam)]
     scorefile = SCOREFILE_QC.out.data
+    versions = ch_versions
 }
 
 // function to get a list of:

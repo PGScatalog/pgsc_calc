@@ -27,6 +27,7 @@ process MAWK_FILE {
 
     script:
     def prefix  = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
+    def softwareName = "mawk" // importing with aliases breaks getSoftwareName
     if( "$datafile" == "${prefix}.txt" ) error "Input and output names are the same, use the suffix option to disambiguate"
     """
     mawk -v out=${prefix}.txt \
@@ -35,7 +36,7 @@ process MAWK_FILE {
 
     cat <<-END_VERSIONS > versions.yml
     ${getProcessName(task.process)}:
-        ${getSoftwareName(task.process)}: \$(echo \$(mawk -W version 2>&1) | cut -f 2 -d ' ')
+        ${softwareName}: \$(echo \$(mawk -W version 2>&1) | cut -f 2 -d ' ')
     END_VERSIONS
     """
 }
