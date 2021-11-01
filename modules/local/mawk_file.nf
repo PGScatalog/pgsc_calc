@@ -1,10 +1,11 @@
 // Import generic module functions
-include { saveFiles; getProcessName; getSoftwareName } from './functions'
+include { initOptions; saveFiles; getSoftwareName; getProcessName } from './functions'
 
 params.options = [:]
+options        = initOptions(params.options)
 
-process SCOREFILE_CHECK {
-    tag "$scorefile"
+process MAWK_FILE {
+    tag "$meta.id"
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'pipeline_info', meta:[:], publish_by_meta:[]) }
@@ -17,18 +18,20 @@ process SCOREFILE_CHECK {
     }
 
     input:
-    path scorefile
+    tuple val(meta), path(datafile)
+    path awk_file
 
     output:
-    path "*.txt"       , emit: scores
+    tuple val(meta), path("*.txt")      , emit: data
     path "versions.yml", emit: versions
-    // specify path with -f manually for portability (mawk can live lots of places)
-    // env won't work with parameters too!
+
     script:
+    def prefix  = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
+    if( "$datafile" == "${prefix}.txt" ) error "Input and output names are the same, use the suffix option to disambiguate"
     """
-    mawk -v out=output.txt \
-        -f ${projectDir}/bin/check_scorefile.awk \
-        ${scorefile}
+    mawk -v out=${prefix}.txt \
+        -f ${awk_file} \
+        ${datafile}
 
     cat <<-END_VERSIONS > versions.yml
     ${getProcessName(task.process)}:

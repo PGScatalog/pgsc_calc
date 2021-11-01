@@ -67,23 +67,22 @@ workflow PGSCALC {
     // SUBWORKFLOW: Validate and stage input files
     //
     INPUT_CHECK (
-        ch_input
         ch_input,
-        ch_scorefile
+        tuple([id: 'test'], ch_scorefile)
     )
 
     PLINK_VCF (
-	INPUT_CHECK.out.vcf
+        INPUT_CHECK.out.vcf
     )
     ch_software_versions = ch_software_versions.mix(PLINK_VCF.out.versions.ifEmpty(null))
 
     // plink and input bed / bim channel will always have one element empty
     // so to make a combined channel just mix the two
     SPLIT(
-	PLINK_VCF.out.bed.concat(INPUT_CHECK.out.bed),
-	PLINK_VCF.out.bim.concat(INPUT_CHECK.out.bim),
-	PLINK_VCF.out.fam.concat(INPUT_CHECK.out.fam),
-	"chromosome"
+        PLINK_VCF.out.bed.concat(INPUT_CHECK.out.bed),
+        PLINK_VCF.out.bim.concat(INPUT_CHECK.out.bim),
+        PLINK_VCF.out.fam.concat(INPUT_CHECK.out.fam),
+        "chromosome"
     )
     // TODO: get mawk version
     // ch_software_versions = ch_software_versions.mix(SPLIT.out.versions.ifEmpty(null))

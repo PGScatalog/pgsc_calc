@@ -5,12 +5,13 @@
 params.options = [:]
 
 include { SAMPLESHEET_CHECK } from '../../modules/local/samplesheet_check' addParams( options: params.options )
-include { SCOREFILE_CHECK } from '../../modules/local/scorefile_check' addParams( options: params.options )
+include { MAWK_FILE as SCOREFILE_CHECK } from '../../modules/local/mawk_file' addParams( options: params.options )
+include { MAWK_FILE as SCOREFILE_QC } from '../../modules/local/mawk_file' addParams( options: [suffix:'.qc'] )
 
 workflow INPUT_CHECK {
     take:
     samplesheet // file: /path/to/samplesheet.csv
-    scorefile // file: /path/to/score_file
+    scorefile // tuple val(id), path(/path/to/score_file)
 
     main:
     SAMPLESHEET_CHECK ( samplesheet )
@@ -32,14 +33,16 @@ workflow INPUT_CHECK {
         }
         .set { ch_bfiles }
 
-    SCOREFILE_CHECK ( scorefile )
+    // manually specify awk program file paths to keep things portable
+    SCOREFILE_CHECK ( scorefile, file("$projectDir/bin/check_scorefile.awk") )
+    SCOREFILE_QC ( SCOREFILE_CHECK.out.data, file("$projectDir/bin/qc_scorefile.awk") )
 
     emit:
     vcf = ch_input.vcf // channel: [val(meta), path(vcf)]
     bed = ch_bfiles.bed // channel: [val(meta), path(bed)]
     bim = ch_bfiles.bim // channel: [val(meta), path(bim)]
     fam = ch_bfiles.fam // channel: [val(meta), path(fam)]
-    scorefile = SCOREFILE_CHECK.out.scores
+    scorefile = SCOREFILE_QC.out.data
 }
 
 // function to get a list of:
