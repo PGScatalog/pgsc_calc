@@ -35,11 +35,13 @@ def modules = params.modules.clone()
 // MODULE: Local to the pipeline
 //
 include { GET_SOFTWARE_VERSIONS } from '../modules/local/get_software_versions' addParams( options: [publish_files : ['tsv':'']] )
+include { PLINK2_RELABEL } from '../modules/local/plink2_relabel' addParams ( options: [:] )
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( options: [:] )
+
 include { SPLIT } from '../subworkflows/local/split' addParams( options: [:] )
 
 /*
@@ -63,27 +65,36 @@ include { PLINK_VCF } from '../modules/nf-core/modules/plink/vcf/main' addParams
 workflow PGSCALC {
     ch_software_versions = Channel.empty()
 
-    // TODO: decide if we will support a samplesheet
+    //
     // SUBWORKFLOW: Validate and stage input files
     //
     INPUT_CHECK (
         ch_input,
         tuple([id: 'test'], ch_scorefile)
     )
+    ch_software_versions = ch_software_versions.mix(INPUT_CHECK.out.versions)
 
     PLINK_VCF (
         INPUT_CHECK.out.vcf
     )
-    ch_software_versions = ch_software_versions.mix(PLINK_VCF.out.versions.ifEmpty(null))
+    ch_software_versions = ch_software_versions.mix(PLINK_VCF.out.versions.first())
 
     // plink and input bed / bim channel will always have one element empty
     // so to make a combined channel just mix the two
-    SPLIT(
+    // TODO: VCF -> bfile -> pfile seems too complicated
+    PLINK2_RELABEL(
         PLINK_VCF.out.bed.concat(INPUT_CHECK.out.bed),
         PLINK_VCF.out.bim.concat(INPUT_CHECK.out.bim),
-        PLINK_VCF.out.fam.concat(INPUT_CHECK.out.fam),
-        "chromosome"
+        PLINK_VCF.out.fam.concat(INPUT_CHECK.out.fam)
     )
+    ch_software_versions = ch_software_versions.mix(PLINK2_RELABEL.out.versions.first())
+
+    // SPLIT(
+    //     PLINK_VCF.out.bed.concat(INPUT_CHECK.out.bed),
+    //     PLINK_VCF.out.bim.concat(INPUT_CHECK.out.bim),
+    //     PLINK_VCF.out.fam.concat(INPUT_CHECK.out.fam),
+    //     "chromosome"
+    // )
     // TODO: get mawk version
     // ch_software_versions = ch_software_versions.mix(SPLIT.out.versions.ifEmpty(null))
 
