@@ -74,13 +74,6 @@ $0 !~ /^#/ && NR > header_line {
     data["reference_allele"]=data["other_allele"]
     }
 
-    if ( $(data["effect_allele"]) ~ "P|N" ) {
-        # just warn and skip line, don't exit
-        hla_warn = 1
-        hla_count++
-        next
-    }
-
     # print validated columns in an consistent format
     print $(data["chr_name"]), $(data["chr_position"]),
         $(data["effect_allele"]), $(data["reference_allele"]),
@@ -109,9 +102,6 @@ END {
     }
     if (missing_reference_error) {
         error_required("reference_allele or other_allele")
-    }
-    if (hla_warn) {
-        printf "WARN - %d HLA variants detected and ignored\n", hla_count > "log"
     }
     printf "%d variants read\n", n_var_raw > "log"
     printf "%d variants written\n", n_var > "log"
