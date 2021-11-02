@@ -35,13 +35,13 @@ def modules = params.modules.clone()
 // MODULE: Local to the pipeline
 //
 include { GET_SOFTWARE_VERSIONS } from '../modules/local/get_software_versions' addParams( options: [publish_files : ['tsv':'']] )
-include { PLINK2_RELABEL } from '../modules/local/plink2_relabel' addParams ( options: [:] )
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( options: [:] )
 
+include { MAKE_COMPATIBLE } from '../subworkflows/local/make_compatible' addParams( options: [:] )
 include { SPLIT } from '../subworkflows/local/split' addParams( options: [:] )
 
 /*
@@ -79,15 +79,16 @@ workflow PGSCALC {
     )
     ch_software_versions = ch_software_versions.mix(PLINK_VCF.out.versions.first())
 
-    // plink and input bed / bim channel will always have one element empty
-    // so to make a combined channel just mix the two
-    // TODO: VCF -> bfile -> pfile seems too complicated
-    PLINK2_RELABEL(
+    //
+    // SUBWORKFLOW: Make scoring file and target genomic data compatible
+    //
+    MAKE_COMPATIBLE(
         PLINK_VCF.out.bed.concat(INPUT_CHECK.out.bed),
         PLINK_VCF.out.bim.concat(INPUT_CHECK.out.bim),
-        PLINK_VCF.out.fam.concat(INPUT_CHECK.out.fam)
+        PLINK_VCF.out.fam.concat(INPUT_CHECK.out.fam),
+        INPUT_CHECK.out.scorefile
     )
-    ch_software_versions = ch_software_versions.mix(PLINK2_RELABEL.out.versions.first())
+    ch_software_versions = ch_software_versions.mix(MAKE_COMPATIBLE.out.versions.first())
 
     // SPLIT(
     //     PLINK_VCF.out.bed.concat(INPUT_CHECK.out.bed),
