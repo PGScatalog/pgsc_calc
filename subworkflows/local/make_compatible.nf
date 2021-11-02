@@ -5,9 +5,17 @@
 //     - Fixing strand issues
 //
 
+// WEIRD ISSUES:
+// comm <(awk 'NR == 1 {next} {print $3}' synthetic.extract.pvar | sort) <(awk -F: 'BEGIN{OFS=":"} $1==22 { print $1,$2 }' variants.txt | sort) -3
+//      22:32756652
+//      22:47986332
+// 2 variants in scoring file but not in extracted output...
+// but they are just missing from the original genetic data, OK
+
 params.options = [:]
 
 include { PLINK2_RELABEL } from '../../modules/local/plink2_relabel' addParams ( options: [:] )
+include { PLINK2_EXTRACT } from '../../modules/local/plink2_extract' addParams ( options: [suffix:'.extract'] )
 
 workflow MAKE_COMPATIBLE {
     take:
@@ -18,7 +26,14 @@ workflow MAKE_COMPATIBLE {
 
     main:
     PLINK2_RELABEL ( bed, bim, fam )
-    // PLINK2_INTERSECT
+    scorefile.view()
+    PLINK2_EXTRACT (
+        PLINK2_RELABEL.out.pgen,
+        PLINK2_RELABEL.out.psam,
+        PLINK2_RELABEL.out.pvar,
+        scorefile.flatten().last() // just the file, not the meta map
+    )
+
     // PLINK2_FIXSTRAND
 
     emit:
