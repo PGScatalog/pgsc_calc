@@ -28,6 +28,7 @@ process CHECK_EXTRACT {
     script:
     """
     mawk \
+        ${options.args} \
         -f ${awk_file} \
         ${extracted} \
         ${variants}

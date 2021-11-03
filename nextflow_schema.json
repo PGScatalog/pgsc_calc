@@ -44,6 +44,19 @@
                 }
             }
         },
+        "compatibility_options": {
+            "title": "Compatibility options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "min_overlap": {
+                    "type": "number",
+                    "default": 0.75,
+                    "description": "Minimum proportion of genes present in both the score file and input target genomic data"
+                }
+            }
+        },
         "reference_genome_options": {
             "title": "Reference genome options",
             "type": "object",
@@ -251,6 +264,9 @@
     "allOf": [
         {
             "$ref": "#/definitions/input_output_options"
+        },
+        {
+            "$ref": "#/definitions/compatibility_options"
         },
         {
             "$ref": "#/definitions/reference_genome_options"

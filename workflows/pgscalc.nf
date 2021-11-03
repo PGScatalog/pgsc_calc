@@ -41,8 +41,12 @@ include { GET_SOFTWARE_VERSIONS } from '../modules/local/get_software_versions' 
 //
 include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( options: [:] )
 
-include { MAKE_COMPATIBLE } from '../subworkflows/local/make_compatible' addParams( options: [:] )
-include { SPLIT } from '../subworkflows/local/split' addParams( options: [:] )
+def check_extract_options = [:]
+if (params.min_overlap) { check_extract_options['args'] = "-v threshold=" + params.min_overlap }
+
+include { MAKE_COMPATIBLE } from '../subworkflows/local/make_compatible' addParams( check_extract_options: check_extract_options )
+
+// include { SPLIT } from '../subworkflows/local/split' addParams( options: [:] )
 
 /*
 ========================================================================================
