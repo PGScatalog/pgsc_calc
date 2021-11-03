@@ -16,6 +16,7 @@ params.options = [:]
 
 include { PLINK2_RELABEL } from '../../modules/local/plink2_relabel' addParams ( options: [:] )
 include { PLINK2_EXTRACT } from '../../modules/local/plink2_extract' addParams ( options: [suffix:'.extract'] )
+include { CHECK_EXTRACT } from '../../modules/local/check_extract' addParams ( options: [:] )
 
 workflow MAKE_COMPATIBLE {
     take:
@@ -33,7 +34,11 @@ workflow MAKE_COMPATIBLE {
         PLINK2_RELABEL.out.pvar,
         scorefile.flatten().last() // just the file, not the meta map
     )
-
+    CHECK_EXTRACT (
+        PLINK2_EXTRACT.out.pvar.flatten().last(),
+        scorefile.flatten().last(),
+        file("$projectDir/bin/check_extract.awk")
+    )
     // PLINK2_FIXSTRAND
 
     emit:
