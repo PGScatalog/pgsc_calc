@@ -11,8 +11,6 @@ include { PLINK2_RELABEL } from '../../modules/local/plink2_relabel' addParams (
 include { PLINK2_EXTRACT } from '../../modules/local/plink2_extract' addParams ( options: [suffix:'.extract'] )
 include { VALIDATE_EXTRACT } from '../../modules/local/validate_extract' addParams ( options: params.validate_extract_options )
 
-println params.validate_extract_options
-
 workflow MAKE_COMPATIBLE {
     take:
     bed
