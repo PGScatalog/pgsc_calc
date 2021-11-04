@@ -4,7 +4,7 @@ include { initOptions; saveFiles; getSoftwareName; getProcessName } from './func
 params.options = [:]
 options        = initOptions(params.options)
 
-process CHECK_EXTRACT {
+process VALIDATE_EXTRACT {
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'pipeline_info', meta:[:], publish_by_meta:[]) }
@@ -22,10 +22,12 @@ process CHECK_EXTRACT {
     path(awk_file)
 
     output:
-    path "extract.log" , emit:log
-    path "versions.yml", emit: versions
+    path "scorefile.txt", emit: scorefile
+    path "extract.log"  , emit: log
+    path "versions.yml" , emit: versions
 
     script:
+    def softwareName = "mawk"
     """
     mawk \
         ${options.args} \
@@ -35,7 +37,7 @@ process CHECK_EXTRACT {
 
     cat <<-END_VERSIONS > versions.yml
     ${getProcessName(task.process)}:
-        ${getSoftwareName(task.process)}: \$(echo \$(mawk -W version 2>&1) | cut -f 2 -d ' ')
+        ${softwareName}: \$(echo \$(mawk -W version 2>&1) | cut -f 2 -d ' ')
     END_VERSIONS
     """
 }
