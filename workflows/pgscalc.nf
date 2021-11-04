@@ -48,6 +48,8 @@ include { MAKE_COMPATIBLE } from '../subworkflows/local/make_compatible' addPara
 
 // include { SPLIT } from '../subworkflows/local/split' addParams( options: [:] )
 
+include { APPLY_SCORE } from '../subworkflows/local/apply_score' addParams ( options: [:] )
+
 /*
 ========================================================================================
     IMPORT NF-CORE MODULES/SUBWORKFLOWS
@@ -78,21 +80,34 @@ workflow PGSCALC {
     )
     ch_software_versions = ch_software_versions.mix(INPUT_CHECK.out.versions)
 
+    //
+    // MODULE: VCF to BFILE
+    //
     PLINK_VCF (
         INPUT_CHECK.out.vcf
     )
-    ch_software_versions = ch_software_versions.mix(PLINK_VCF.out.versions.first())
+    ch_software_versions = ch_software_versions.mix(PLINK_VCF.out.versions)
 
     //
     // SUBWORKFLOW: Make scoring file and target genomic data compatible
     //
-    MAKE_COMPATIBLE(
+    MAKE_COMPATIBLE (
         PLINK_VCF.out.bed.concat(INPUT_CHECK.out.bed),
         PLINK_VCF.out.bim.concat(INPUT_CHECK.out.bim),
         PLINK_VCF.out.fam.concat(INPUT_CHECK.out.fam),
         INPUT_CHECK.out.scorefile
     )
-    ch_software_versions = ch_software_versions.mix(MAKE_COMPATIBLE.out.versions.first())
+    ch_software_versions = ch_software_versions.mix(MAKE_COMPATIBLE.out.versions)
+
+    //
+    // SUBWORKFLOW: Apply a scoring file to target genomic data
+    //
+    APPLY_SCORE (
+        MAKE_COMPATIBLE.out.pgen,
+        MAKE_COMPATIBLE.out.psam,
+        MAKE_COMPATIBLE.out.pvar,
+        MAKE_COMPATIBLE.out.scorefile
+    )
 
     // SPLIT(
     //     PLINK_VCF.out.bed.concat(INPUT_CHECK.out.bed),
@@ -100,8 +115,6 @@ workflow PGSCALC {
     //     PLINK_VCF.out.fam.concat(INPUT_CHECK.out.fam),
     //     "chromosome"
     // )
-    // TODO: get mawk version
-    // ch_software_versions = ch_software_versions.mix(SPLIT.out.versions.ifEmpty(null))
 
     //
     // MODULE: Pipeline reporting
