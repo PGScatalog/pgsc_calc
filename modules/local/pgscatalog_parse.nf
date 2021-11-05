@@ -6,6 +6,7 @@ params.options = [:]
 options        = initOptions(params.options)
 
 process PGSCATALOG_PARSE {
+    tag "$accession"
     label 'process_low'
     label 'error_retry'
     publishDir "${params.outdir}",
