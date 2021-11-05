@@ -27,7 +27,7 @@
 
 BEGIN {
     "date" | getline start_time
-    if (!threshold) {
+    if (threshold < 0 || threshold > 1) {
         missing_threshold = 1
         exit 1
     }
@@ -109,13 +109,15 @@ function flipstrand(nt) {
 function overlap_error() {
     print "ERROR - Your target genomic data seems to overlap poorly with the provided scoring file"
     print "ERROR - Please check the log file for details (extract.log)"
+    print "ERROR - See --min_overlap parameter"
 }
 
 function input_error(type) {
     if (type == "file") {
         print "ERROR - Empty input file"
     } else if (type == "threshold") {
-        print "Please specify a threshold with e.g. -v threshold=0.75"
+        print "Please specify a valid threshold with e.g. -v threshold=0.75"
+        print "Valid range: [0, 1]"
     } else {
         print "Weird input error that should never happen"
     }

@@ -42,7 +42,7 @@ include { GET_SOFTWARE_VERSIONS } from '../modules/local/get_software_versions' 
 include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( options: [:] )
 
 def validate_extract_options = [:]
-if (params.min_overlap) { validate_extract_options['args'] = "-v threshold=" + params.min_overlap }
+validate_extract_options['args'] = "-v threshold=" + params.min_overlap
 
 include { MAKE_COMPATIBLE } from '../subworkflows/local/make_compatible' addParams( validate_extract_options: validate_extract_options )
 
