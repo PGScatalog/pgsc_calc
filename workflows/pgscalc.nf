@@ -13,14 +13,23 @@ WorkflowPgscalc.initialise(params, log)
 // Check input path parameters to see if they exist
 def checkPathParamList = [
     params.input,
-    params.scorefile
 ]
 
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
 // Check mandatory parameters
 if (params.input) { ch_input = file(params.input) } else { exit 1, 'Genotype input not specified!' }
-if (params.scorefile) { ch_scorefile = file(params.scorefile) } else { exit 1, 'Score file not specified!' }
+
+// Set up score channels
+if (!params.accession && params.scorefile) {
+    scorefile = [[id: file(params.scorefile).getName()], file(params.scorefile)]
+    accession = Channel.empty()
+} else if (params.accession && !params.scorefile) {
+    accession = params.accession
+    scorefile = Channel.empty()
+} else {
+    exit 1, 'Please specify only one of --accession or --scorefile'
+}
 
 /*
 ========================================================================================
@@ -35,6 +44,11 @@ def modules = params.modules.clone()
 // MODULE: Local to the pipeline
 //
 include { GET_SOFTWARE_VERSIONS } from '../modules/local/get_software_versions' addParams( options: [publish_files : ['tsv':'']] )
+
+//
+// SUBWORKFLOW: Get scoring file from PGS Catalog
+//
+include { PGSCATALOG } from '../subworkflows/local/pgscatalog' addParams( options: [:] )
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -72,11 +86,21 @@ workflow PGSCALC {
     ch_software_versions = Channel.empty()
 
     //
+    // SUBWORKFLOW: Get scoring file from PGS Catalog accession
+    //
+    PGSCATALOG (
+        accession
+    ) //.out.scorefile
+
+    PGSCATALOG.out.scorefile
+        .mix(scorefile)
+        .set{ ch_scorefile }
+
     // SUBWORKFLOW: Validate and stage input files
     //
     INPUT_CHECK (
         ch_input,
-        tuple([id: 'test'], ch_scorefile)
+        ch_scorefile
     )
     ch_software_versions = ch_software_versions.mix(INPUT_CHECK.out.versions)
 
