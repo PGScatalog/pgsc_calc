@@ -1,15 +1,27 @@
 # check_scorefile.awk: program to validate a PGS Catalog scoring file
 #
-# Check the structure of the scoring file and extract some required data:
+# The main function of this script is to complain loudly and quickly if input
+# data don't follow an expected PGS Catalog format. The script expects the
+# following columns:
+#
 #     - chr_name and chr_pos
 #     - effect_weight
 #     - effect_allele and (reference_allele or other_allele)
-# Genome build must be GRCh37
 #
-#   usage:
+# Original genome build must be GRCh37.
+#
+# usage:
 #     mawk -v out=output.txt -f check_scorefile.awk PGS000379.txt
+#
+# Output is a tab separated scorefile with the format:
+#
+#     CHR | POS | EFFECT_ALLELE | OTHER_ALLELE | EFFECT_WEIGHT
+#
+# and a log file (check.log)
+
 BEGIN {
     FS="\t"; OFS="\t"
+    "date" | getline start_time
     # longest header finishes at line 12 in PGS Catalog 2021-10-28
     # this limit is useful to prevent matching that's not needed
     header_limit = 20
@@ -82,29 +94,39 @@ $0 !~ /^#/ && NR > header_line {
 }
 
 END {
+    # exit in END prevents other rules running
     if (missing_output_error) {
         print "Specify an output file path with -v out=output.txt"
+        exit 1
     }
     if (file_error) {
         print "ERROR - This file doesn't look like a valid PGS Catalog file"
+        exit 1
     }
     if (build_error) {
         print "ERROR - PGS Catalog scoring file must be in build GRCh37"
+        exit 1
     }
     if (missing_position_error) {
         error_required("chr_name or chr_position")
+        exit 1
     }
     if (missing_weight_error) {
         error_required("effect_weight")
+        exit 1
     }
     if (missing_effect_error) {
         error_required("effect_allele")
+        exit 1
     }
     if (missing_reference_error) {
         error_required("reference_allele or other_allele")
+        exit 1
     }
-    printf "%d variants read\n", n_var_raw > "log"
-    printf "%d variants written\n", n_var > "log"
+    # write a pretty log -------------------------------------------------------
+    print "check_scorefile.awk", start_time > "check.log"
+    print "Total variants read", n_var_raw > "check.log"
+    print "Total variants written", n_var > "check.log"
 }
 
 function error_required(str) {

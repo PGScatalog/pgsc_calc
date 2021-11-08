@@ -5,8 +5,8 @@
 params.options = [:]
 
 include { SAMPLESHEET_CHECK } from '../../modules/local/samplesheet_check' addParams( options: params.options )
-include { MAWK_FILE as SCOREFILE_CHECK } from '../../modules/local/mawk_file' addParams( options: params.options )
-include { MAWK_FILE as SCOREFILE_QC } from '../../modules/local/mawk_file' addParams( options: [suffix:'.qc'] )
+include { SCOREFILE_CHECK } from '../../modules/local/scorefile_check' addParams( options: params.options )
+include { SCOREFILE_QC } from '../../modules/local/scorefile_qc' addParams( options: [suffix:'.qc'] )
 
 workflow INPUT_CHECK {
     take:
@@ -34,8 +34,8 @@ workflow INPUT_CHECK {
         .set { ch_bfiles }
 
     // manually specify awk program file paths to keep things portable
-    SCOREFILE_CHECK ( scorefile, file("$projectDir/bin/check_scorefile.awk") )
-    SCOREFILE_QC ( SCOREFILE_CHECK.out.data, file("$projectDir/bin/qc_scorefile.awk") )
+    SCOREFILE_CHECK ( scorefile )
+    SCOREFILE_QC ( SCOREFILE_CHECK.out.data )
 
     SAMPLESHEET_CHECK.out.versions
         .mix(SCOREFILE_CHECK.out.versions)

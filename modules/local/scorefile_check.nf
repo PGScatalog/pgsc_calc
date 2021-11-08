@@ -1,10 +1,10 @@
 // Import generic module functions
-include { initOptions; saveFiles; getSoftwareName; getProcessName } from './functions'
+include { initOptions; saveFiles; getProcessName } from './functions'
 
 params.options = [:]
 options        = initOptions(params.options)
 
-process MAWK_FILE {
+process SCOREFILE_CHECK {
     tag "$meta.id"
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
@@ -19,24 +19,21 @@ process MAWK_FILE {
 
     input:
     tuple val(meta), path(datafile)
-    path awk_file
 
     output:
-    tuple val(meta), path("*.txt")      , emit: data
-    path "versions.yml", emit: versions
+    tuple val(meta), path("*.txt"), emit: data
+    path "versions.yml"           , emit: versions
 
     script:
     def prefix  = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
-    def softwareName = "mawk" // importing with aliases breaks getSoftwareName
-    if( "$datafile" == "${prefix}.txt" ) error "Input and output names are the same, use the suffix option to disambiguate"
     """
     mawk -v out=${prefix}.txt \
-        -f ${awk_file} \
+        -f ${projectDir}/bin/check_scorefile.awk \
         ${datafile}
 
     cat <<-END_VERSIONS > versions.yml
     ${getProcessName(task.process)}:
-        ${softwareName}: \$(echo \$(mawk -W version 2>&1) | cut -f 2 -d ' ')
+        mawk: \$(echo \$(mawk -W version 2>&1) | cut -f 2 -d ' ')
     END_VERSIONS
     """
 }

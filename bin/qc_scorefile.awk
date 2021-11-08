@@ -8,10 +8,13 @@
 #     mawk -v out=output.txt -f qc_scorefile.awk PGS000379.validated.txt
 
 BEGIN {
+    FS="\t"; OFS="\t"
+    "date" | getline start_time
     if (!out) {
         missing_output_error=1
         exit 1
     }
+    print "qc_scorefile.awk", start_time > "qc.log"
 }
 
 # counts number of total lines processed
@@ -53,6 +56,7 @@ BEGIN {
 END {
     if(missing_output_error) {
         print "ERROR - Set output with -v out=<path>"
+        exit 1
     }
     if(!missing_output_error && raw_variants == 0) {
         print "ERROR - Empty input file"
@@ -63,23 +67,21 @@ END {
         exit 1
     }
     if (hla_warn) {
-        printf "WARN - %d HLA variants detected and ignored\n", hla_count > "qc.log"
+        print "WARN - HLA variants detected and ignored", hla_count > "qc.log"
     }
     if (multiallelic_warn) {
-        printf "WARN - %d multiallelic variants detected and ignored\n",
+        print "WARN - multiallelic variants detected and ignored",
             multiallelic_count > "qc.log"
     }
     if (weight_warn) {
-        printf "WARN - %d variants with missing weights ignored\n",
+        print "WARN - variants with missing weights ignored",
             missing_weight_count > "qc.log"
     }
-    if(good_variants > 0) {
-        printf "%d input variants\n", raw_variants > "qc.log"
-        printf "%d unique chr:pos variants \n", unique_variants > "qc.log"
-        printf "%d variants pass QC\n", good_variants > "qc.log"
-        printf "%.2f%% variants pass QC\n",
-            (good_variants / raw_variants * 100) > "qc.log"
-        printf "%d variants fail QC\n",
-            hla_count + multiallelic_count + missing_weight_count > "qc.log"
-    }
+    print "Input variants", raw_variants > "qc.log"
+    print "Unique chr:pos variants", unique_variants > "qc.log"
+    print "Variants pass QC", good_variants > "qc.log"
+    print "% variants pass QC",
+        (good_variants / raw_variants * 100) > "qc.log"
+    print "% variants fail QC",
+        hla_count + multiallelic_count + missing_weight_count > "qc.log"
 }

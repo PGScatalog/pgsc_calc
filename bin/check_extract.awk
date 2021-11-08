@@ -26,7 +26,9 @@
 # Expected output files: scorefile.txt (validated), extract.log (logfile)
 
 BEGIN {
+    FS="\t"; OFS="\t"
     "date" | getline start_time
+
     if (threshold < 0 || threshold > 1) {
         missing_threshold = 1
         exit 1
@@ -68,33 +70,33 @@ END {
         input_error("threshold")
         exit 1
     }
+    # explode loudly -----------------------------------------------------------
+    if (intersected < (threshold * 100)) {
+        overlap_error()
+        exit 1
+    }
 
-    if (NR > 0 && !missing_threshold) { # finished error checking
-        simple_match = extracted_var / original_var
-        intersected =  matched_variant / original_var * 100
-        for (pos in effect) {
-            if(effect[pos] != ref[pos] && effect[pos] != alt[pos]) {
-                effect[pos] = flipstrand(effect[pos])
-                bad_strand++
-            } else {
-                print intersected_id[pos], effect[pos], effect_weight[pos] > "scorefile.txt"
-            }
-        }
-        # write a pretty log! --------------------------------------------------
-        print start_time > "extract.log"
-        printf "%-40s: %d\n", "Total variants in scoring file", original_var > "extract.log"
-        printf "%-40s: %d\n", "Total variants in extracted target data", extracted_var > "extract.log"
-        printf "%-40s: %d\n", "Total unique intersected variants", matched_variant > "extract.log"
-        printf "%-40s: %.2f%%\n", "Percent variants successfully matched", intersected > "extract.log"
-        printf "%-40s: %.2f%%\n", "Minimum overlap set to", threshold * 100 > "extract.log"
-        printf "%-40s: %d\n", "Total effect alleles flipped", bad_strand > "extract.log"
+    simple_match = extracted_var / original_var
+    intersected =  matched_variant / original_var * 100
+    bad_strand = 0
 
-        # explode loudly -------------------------------------------------------
-        if (intersected < (threshold * 100)) {
-            overlap_error()
-            exit 1
+    for (pos in effect) {
+        if(effect[pos] != ref[pos] && effect[pos] != alt[pos]) {
+            effect[pos] = flipstrand(effect[pos])
+            bad_strand++
+        } else {
+            print intersected_id[pos], effect[pos], effect_weight[pos] > "scorefile.txt"
         }
     }
+
+    # write a pretty log! --------------------------------------------------
+    print "check_extract.awk", start_time > "extract.log"
+    print "Total variants in scoring file", original_var > "extract.log"
+    print "Total variants in extracted target data", extracted_var > "extract.log"
+    print "Total unique intersected variants", matched_variant > "extract.log"
+    print "Percent variants successfully matched", intersected > "extract.log"
+    print "Minimum overlap set to", threshold * 100 > "extract.log"
+    print "Total effect alleles flipped", bad_strand > "extract.log"
 }
 
 function flipstrand(nt) {
