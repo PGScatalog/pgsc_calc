@@ -4,7 +4,7 @@ include { initOptions; saveFiles; getSoftwareName; getProcessName } from './func
 params.options = [:]
 options        = initOptions(params.options)
 
-process MAWK_SPLITBIM {
+process SPLIT_BIM {
     tag "$meta.id"
     label 'process_low'
     publishDir "${params.outdir}",
@@ -37,7 +37,7 @@ process MAWK_SPLITBIM {
 
     cat <<-END_VERSIONS > versions.yml
     ${getProcessName(task.process)}:
-        ${getSoftwareName(task.process)}: \$(echo \$(mawk -W version 2>&1) | cut -f 2 -d ' ')
+        mawk: \$(echo \$(mawk -W version 2>&1) | cut -f 2 -d ' ')
     END_VERSIONS
     """
 }
