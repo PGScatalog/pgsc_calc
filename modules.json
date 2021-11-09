@@ -6,6 +6,9 @@
             "gunzip": {
                 "git_sha": "3aacd46da2b221ed47aaa05c413a828538d2c2ae"
             },
+            "plink/extract": {
+                "git_sha": "6bb4a6a7eefdd2c53e15eca51949c05a503523c4"
+            },
             "plink/vcf": {
                 "git_sha": "49da8642876ae4d91128168cd0db4f1c858d7792"
             }
