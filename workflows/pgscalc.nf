@@ -74,8 +74,6 @@ include { APPLY_SCORE } from '../subworkflows/local/apply_score' addParams ( opt
 // MODULE: Installed directly from nf-core/modules
 //
 
-include { PLINK_VCF } from '../modules/nf-core/modules/plink/vcf/main' addParams (options: modules['plink_vcf'] )
-
 /*
 ========================================================================================
     RUN MAIN WORKFLOW
@@ -107,18 +105,14 @@ workflow PGSCALC {
     //
     // MODULE: VCF to BFILE
     //
-    PLINK_VCF (
-        INPUT_CHECK.out.vcf
-    )
-    ch_software_versions = ch_software_versions.mix(PLINK_VCF.out.versions)
 
     //
     // SUBWORKFLOW: Make scoring file and target genomic data compatible
     //
     MAKE_COMPATIBLE (
-        PLINK_VCF.out.bed.concat(INPUT_CHECK.out.bed),
-        PLINK_VCF.out.bim.concat(INPUT_CHECK.out.bim),
-        PLINK_VCF.out.fam.concat(INPUT_CHECK.out.fam),
+        INPUT_CHECK.out.bed,
+        INPUT_CHECK.out.bim,
+        INPUT_CHECK.out.fam,
         INPUT_CHECK.out.scorefile
     )
     ch_software_versions = ch_software_versions.mix(MAKE_COMPATIBLE.out.versions)

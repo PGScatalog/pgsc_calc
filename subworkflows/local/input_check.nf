@@ -2,11 +2,15 @@
 // Check input samplesheet and get read channels
 //
 
+def modules = params.modules.clone()
 params.options = [:]
 
-include { SAMPLESHEET_CHECK } from '../../modules/local/samplesheet_check' addParams( options: params.options )
-include { SCOREFILE_CHECK } from '../../modules/local/scorefile_check' addParams( options: params.options )
-include { SCOREFILE_QC } from '../../modules/local/scorefile_qc' addParams( options: [suffix:'.qc'] )
+include { SAMPLESHEET_CHECK } from '../../modules/local/samplesheet_check'            addParams( options: params.options )
+include { SCOREFILE_CHECK   } from '../../modules/local/scorefile_check'              addParams( options: params.options )
+include { SCOREFILE_QC      } from '../../modules/local/scorefile_qc'                 addParams( options: [suffix:'.qc'] )
+include { SPLIT_BIM         } from '../../modules/local/split_bim'                    addParams( options: params.options )
+include { PLINK_VCF         } from '../../modules/nf-core/modules/plink/vcf/main'     addParams( options: modules['plink_vcf'] )
+include { PLINK_EXTRACT     } from '../../modules/nf-core/modules/plink/extract/main' addParams( options: params.options )
 
 workflow INPUT_CHECK {
     take:
@@ -24,6 +28,9 @@ workflow INPUT_CHECK {
         }
         .set { ch_input }
 
+    PLINK_VCF (
+        ch_input.vcf
+    )
     // branch is like a switch statement, so only one bed / bim was being
     // returned
     ch_input.bfile.multiMap { it ->
@@ -33,7 +40,15 @@ workflow INPUT_CHECK {
         }
         .set { ch_bfiles }
 
-    // manually specify awk program file paths to keep things portable
+    // tuple meta, path
+    SPLIT_BIM(
+        ch_bfiles.bim.concat(PLINK_VCF.out.bim),
+        "chromosome"
+    )
+
+    SPLIT_BIM.out.variants
+        .flatMap { create_chrom_channel(it) }
+        .set { ch_sample_chrom }
     SCOREFILE_CHECK ( scorefile )
     SCOREFILE_QC ( SCOREFILE_CHECK.out.data )
 
@@ -81,4 +96,19 @@ def create_variant_channel(LinkedHashMap row) {
         array = [ meta, [ file(row.bed_path), file(row.bim_path), file(row.fam_path) ] ]
     }
     return array
+}
+
+// function to get a list of sample-chromosome combinations:
+// [[meta], 22.keep, ..., n.keep] -> [[[meta], 22.keep], [[meta], n.keep]]]
+// where each keep file is used to extract variants with plink
+def create_chrom_channel(ArrayList chrom) {
+    meta = chrom.head()
+    variant_files = chrom.tail().flatten()
+    combs = [[meta], variant_files].combinations()
+    // now add chr label to meta map using basename of variant keep file
+    combs.collect { m, it ->
+        def chrom_map = [:]
+        chrom_map.chrom = (it.getName() - ~/\.\w+$/) // removes final .
+        [m + chrom_map, it]
+    }
 }
