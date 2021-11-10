@@ -70,30 +70,41 @@ workflow INPUT_CHECK {
 // - [ meta, [vcf_path] ] OR
 // - [ meta, [bed_path, bim_path, fam_path] ]
 def create_variant_channel(LinkedHashMap row) {
-    def meta = [:]
-    meta.id           = row.sample
-    meta.is_vcf       = row.is_vcf.toBoolean()
+    def meta    = [:]
+    meta.id     = row.sample
+    meta.is_vcf = row.is_vcf.toBoolean()
+    meta.chr    = row.chrom?: false
+
+    if (! file(row.datadir).exists())_{
+        exit 1, "ERROR: Please check input samplesheet -> data directory doesn't exist!"
+    }
+
+    // todo: better way of joining files?
+    bed_path = file(row.datadir + "/" + row.bfile_prefix + ".bed")
+    bim_path = file(row.datadir + "/" + row.bfile_prefix + ".bim")
+    fam_path = file(row.datadir + "/" + row.bfile_prefix + ".fam")
+    vcf_path = file(row.datadir + "/" + row.vcf_path)
 
     def array = []
     if (meta.is_vcf) {
-        if (!file(row.vcf_path).exists()) {
+        if (!vcf_path.exists()) {
             exit 1, "ERROR: Please check input samplesheet -> VCF file does not exist!\n${row.vcf_path}"
         }
-        array = [ meta, [ file(row.vcf_path) ] ]
+        array = [ meta, [ vcf_path ] ]
     } else {
-        if (!file(row.bed_path).exists()) {
-            exit 1, "ERROR: Please check input samplesheet -> bed file does not exist!\n${row.bed_path}"
+        if (!bed_path.exists()) {
+            exit 1, "ERROR: Please check input samplesheet -> bed file does not exist!\n${bed_path}"
         }
-        if (!file(row.bim_path).exists()) {
-            exit 1, "ERROR: Please check input samplesheet -> bim file does not exist!\n${row.bim_path}"
+        if (!bim_path.exists()) {
+            exit 1, "ERROR: Please check input samplesheet -> bim file does not exist!\n${bim_path}"
         }
-        if (!file(row.fam_path).exists()) {
-            exit 1, "ERROR: Please check input samplesheet -> fam file does not exist!\n${row.fam_path}"
+        if (!fam_path.exists()) {
+            exit 1, "ERROR: Please check input samplesheet -> fam file does not exist!\n${fam_path}"
         }
-        if (file(row.bed_path).getBaseName() != row.sample) {
-            exit 1, "ERROR: Please check input samplesheet -> sample id doesn't match bfile base name\n${row.sample} ${row.bed_path}"
+        if (bed_path.getBaseName() != row.sample) {
+            exit 1, "ERROR: Please check input samplesheet -> sample id doesn't match bfile base name\n${row.sample} ${bed_path}"
         }
-        array = [ meta, [ file(row.bed_path), file(row.bim_path), file(row.fam_path) ] ]
+        array = [ meta, [ bed_path, bim_path, fam_path ] ]
     }
     return array
 }
