@@ -5,12 +5,12 @@
 def modules = params.modules.clone()
 params.options = [:]
 
-include { SAMPLESHEET_CHECK } from '../../modules/local/samplesheet_check'            addParams( options: params.options )
-include { SCOREFILE_CHECK   } from '../../modules/local/scorefile_check'              addParams( options: params.options )
-include { SCOREFILE_QC      } from '../../modules/local/scorefile_qc'                 addParams( options: [suffix:'.qc'] )
-include { SPLIT_BIM         } from '../../modules/local/split_bim'                    addParams( options: params.options )
-include { PLINK_VCF         } from '../../modules/nf-core/modules/plink/vcf/main'     addParams( options: modules['plink_vcf'] )
-include { PLINK_EXTRACT     } from '../../modules/nf-core/modules/plink/extract/main' addParams( options: params.options )
+include { SAMPLESHEET_CHECK        } from '../../modules/local/samplesheet_check'            addParams( options: params.options )
+include { SCOREFILE_CHECK          } from '../../modules/local/scorefile_check'              addParams( options: params.options )
+include { SCOREFILE_QC             } from '../../modules/local/scorefile_qc'                 addParams( options: [suffix:'.qc'] )
+include { SPLIT_BIM as SPLIT_CHROM } from '../../modules/local/split_bim'                    addParams( options: params.options )
+include { PLINK_VCF                } from '../../modules/nf-core/modules/plink/vcf/main'     addParams( options: modules['plink_vcf'] )
+include { PLINK_EXTRACT            } from '../../modules/nf-core/modules/plink/extract/main' addParams( options: [:] )
 
 workflow INPUT_CHECK {
     take:
@@ -40,13 +40,23 @@ workflow INPUT_CHECK {
         }
         .set { ch_bfiles }
 
-    // tuple meta, path
-    SPLIT_BIM(
-        ch_bfiles.bim.concat(PLINK_VCF.out.bim),
+    // Split bfiles if [chrom:false]
+    ch_bfiles.bim
+        .mix(PLINK_VCF.out.bim)
+        .branch {
+            to_split: !it.first().chrom
+            splat: it.first().chrom // chrom set in samplesheet
+        }
+        .set { ch_split }
+
+    SPLIT_CHROM (
+        ch_split.to_split,
         "chromosome"
     )
 
-    SPLIT_BIM.out.variants
+    // [meta1, chrom1, chromN] -> [meta1, chrom1]
+    //                            [meta1, chromN]
+    SPLIT_CHROM.out.variants
         .flatMap { create_chrom_channel(it) }
         .set { ch_sample_chrom }
     SCOREFILE_CHECK ( scorefile )
@@ -73,7 +83,7 @@ def create_variant_channel(LinkedHashMap row) {
     def meta    = [:]
     meta.id     = row.sample
     meta.is_vcf = row.is_vcf.toBoolean()
-    meta.chr    = row.chrom?: false
+    meta.chrom  = row.chrom?: false
 
     if (! file(row.datadir).exists())_{
         exit 1, "ERROR: Please check input samplesheet -> data directory doesn't exist!"
@@ -117,9 +127,10 @@ def create_chrom_channel(ArrayList chrom) {
     variant_files = chrom.tail().flatten()
     combs = [[meta], variant_files].combinations()
     // now add chr label to meta map using basename of variant keep file
+    // the variant keep file takes its name from the CHROM column of the VCF
     combs.collect { m, it ->
         def chrom_map = [:]
-        chrom_map.chrom = (it.getName() - ~/\.\w+$/) // removes final .
+        chrom_map.chrom = (it.getName() - ~/\.\w+$/) // removes file extension
         [m + chrom_map, it]
     }
 }
