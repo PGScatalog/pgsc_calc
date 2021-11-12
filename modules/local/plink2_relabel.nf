@@ -19,9 +19,7 @@ process PLINK2_RELABEL {
     }
 
     input:
-    tuple val(meta), path(bed)
-    tuple val(meta), path(bim)
-    tuple val(meta), path(fam)
+    tuple val(meta), path(bed), path(bim), path(fam)
 
     output:
     tuple val(meta), path("*.pgen"), emit: pgen

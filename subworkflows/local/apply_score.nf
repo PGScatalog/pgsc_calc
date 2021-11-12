@@ -7,19 +7,24 @@ include { PLINK2_SCORE } from '../../modules/local/plink2_score' addParams ( opt
 workflow APPLY_SCORE {
     take:
     pgen
-    pvar
     psam
+    pvar
     scorefile
 
     main:
-    // TODO: splitting for big scorefiles
     // TODO: support multiple scorefiles
-    PLINK2_SCORE ( pgen, pvar, psam, scorefile )
+    PLINK2_SCORE (
+        pgen
+            .mix(psam, pvar)
+            .groupTuple(size: 3)
+            .map{ it.flatten() },
+        scorefile
+    )
 
-    PLINK2_SCORE.out.versions
-        .set { ch_versions }
+   PLINK2_SCORE.out.versions
+       .set { ch_versions }
 
-    emit:
-    score = PLINK2_SCORE.out.score
-    versions = ch_versions
+   emit:
+   score = PLINK2_SCORE.out.score
+   versions = ch_versions
 }
