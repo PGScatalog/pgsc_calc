@@ -38,7 +38,7 @@ process PLINK2_EXTRACT {
 
     plink2 \\
         --extract variants.txt \\
-        --pfile ${meta.id} \\
+        --pfile ${pgen.baseName} \\
         --make-pgen \\
         --out ${prefix}
 

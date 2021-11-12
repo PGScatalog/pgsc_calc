@@ -34,7 +34,7 @@ process PLINK2_RELABEL {
     """
     plink2 \\
         --set-all-var-ids @:# \\
-        --bfile ${prefix} \\
+        --bfile ${bed.baseName} \\
         --make-pgen \\
         --out ${prefix}
 
