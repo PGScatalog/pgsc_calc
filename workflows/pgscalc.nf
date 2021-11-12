@@ -22,7 +22,7 @@ if (params.input) { ch_input = file(params.input) } else { exit 1, 'Genotype inp
 
 // Set up score channels
 if (!params.accession && params.scorefile) {
-    scorefile = [[id: file(params.scorefile).getName()], file(params.scorefile)]
+    scorefile = Channel.of([[id: file(params.scorefile).getName()], file(params.scorefile)])
     accession = Channel.empty()
 } else if (params.accession && !params.scorefile) {
     accession = params.accession
@@ -90,8 +90,8 @@ workflow PGSCALC {
         accession
     )
 
-    PGSCATALOG.out.scorefile
-        .mix(scorefile)
+    scorefile
+        .mix( PGSCATALOG.out.scorefile )
         .set{ ch_scorefile }
 
     //

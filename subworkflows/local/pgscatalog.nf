@@ -45,7 +45,9 @@ workflow PGSCATALOG {
     // channel 2: [accession1.txt. accession2.txt]
     // want to combine using some groovy loop (not combine / cross)
     Channel.from(accession)
-        .map { it -> tuple(id: it) }
+    // changing this to [id: it] breaks? wtf?
+    // ah, wd contains $accession.txt, so changing breaks this file weirdly
+        .map { [id: it] }
         .concat(GUNZIP.out.gunzip)
         .buffer( size: 2 )
         .set { ch_scorefile }
