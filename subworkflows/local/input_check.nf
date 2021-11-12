@@ -5,12 +5,11 @@
 def modules = params.modules.clone()
 params.options = [:]
 
-include { SAMPLESHEET_CHECK        } from '../../modules/local/samplesheet_check'            addParams( options: params.options )
-include { SCOREFILE_CHECK          } from '../../modules/local/scorefile_check'              addParams( options: params.options )
-include { SCOREFILE_QC             } from '../../modules/local/scorefile_qc'                 addParams( options: [suffix:'.qc'] )
-include { SPLIT_BIM as SPLIT_CHROM } from '../../modules/local/split_bim'                    addParams( options: params.options )
-include { PLINK_VCF                } from '../../modules/nf-core/modules/plink/vcf/main'     addParams( options: modules['plink_vcf'] )
-include { PLINK_EXTRACT            } from '../../modules/nf-core/modules/plink/extract/main' addParams( options: [:] )
+include { SAMPLESHEET_CHECK              } from '../../modules/local/samplesheet_check'            addParams( options: params.options )
+include { SCOREFILE_CHECK                } from '../../modules/local/scorefile_check'              addParams( options: params.options )
+//include { SCOREFILE_QC                   } from '../../modules/local/scorefile_qc'                 addParams( options: [suffix:'.qc'] )
+include { PLINK_VCF                      } from '../../modules/nf-core/modules/plink/vcf/main'     addParams( options: modules['plink_vcf'] )
+
 
 workflow INPUT_CHECK {
     take:
@@ -31,6 +30,7 @@ workflow INPUT_CHECK {
     PLINK_VCF (
         ch_input.vcf
     )
+
     // branch is like a switch statement, so only one bed / bim was being
     // returned
     ch_input.bfile.multiMap { it ->
@@ -40,39 +40,21 @@ workflow INPUT_CHECK {
         }
         .set { ch_bfiles }
 
-    // Split bfiles if [chrom:false]
-    ch_bfiles.bim
-        .mix(PLINK_VCF.out.bim)
-        .branch {
-            to_split: !it.first().chrom
-            splat: it.first().chrom // chrom set in samplesheet
-        }
-        .set { ch_split }
-
-    SPLIT_CHROM (
-        ch_split.to_split,
-        "chromosome"
-    )
-
-    // [meta1, chrom1, chromN] -> [meta1, chrom1]
-    //                            [meta1, chromN]
-    SPLIT_CHROM.out.variants
-        .flatMap { create_chrom_channel(it) }
-        .set { ch_sample_chrom }
     SCOREFILE_CHECK ( scorefile )
-    SCOREFILE_QC ( SCOREFILE_CHECK.out.data )
+
+    // TODO: move
+//    SCOREFILE_QC ( SCOREFILE_CHECK.out.data )
 
     SAMPLESHEET_CHECK.out.versions
         .mix(SCOREFILE_CHECK.out.versions)
-        .mix(SCOREFILE_QC.out.versions)
+//        .mix(SCOREFILE_QC.out.versions)
         .set{ ch_versions }
 
     emit:
-    vcf = ch_input.vcf // channel: [val(meta), path(vcf)]
-    bed = ch_bfiles.bed // channel: [val(meta), path(bed)]
-    bim = ch_bfiles.bim // channel: [val(meta), path(bim)]
-    fam = ch_bfiles.fam // channel: [val(meta), path(fam)]
-    scorefile = SCOREFILE_QC.out.data
+    bed = ch_bfiles.bed.mix(PLINK_VCF.out.bed) // channel: [val(meta), path(bed)]
+    bim = ch_bfiles.bim.mix(PLINK_VCF.out.bim) // channel: [val(meta), path(bim)]
+    fam = ch_bfiles.fam.mix(PLINK_VCF.out.fam) // channel: [val(meta), path(fam)]
+    scorefile = SCOREFILE_CHECK.out.data
     versions = ch_versions
 }
 
@@ -119,18 +101,3 @@ def create_variant_channel(LinkedHashMap row) {
     return array
 }
 
-// function to get a list of sample-chromosome combinations:
-// [[meta], 22.keep, ..., n.keep] -> [[[meta], 22.keep], [[meta], n.keep]]]
-// where each keep file is used to extract variants with plink
-def create_chrom_channel(ArrayList chrom) {
-    meta = chrom.head()
-    variant_files = chrom.tail().flatten()
-    combs = [[meta], variant_files].combinations()
-    // now add chr label to meta map using basename of variant keep file
-    // the variant keep file takes its name from the CHROM column of the VCF
-    combs.collect { m, it ->
-        def chrom_map = [:]
-        chrom_map.chrom = (it.getName() - ~/\.\w+$/) // removes file extension
-        [m + chrom_map, it]
-    }
-}

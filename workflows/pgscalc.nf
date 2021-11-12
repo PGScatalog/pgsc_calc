@@ -60,7 +60,7 @@ validate_extract_options['args'] = "-v threshold=" + params.min_overlap
 
 include { MAKE_COMPATIBLE } from '../subworkflows/local/make_compatible' addParams( validate_extract_options: validate_extract_options )
 
-// include { SPLIT } from '../subworkflows/local/split' addParams( options: [:] )
+include { SPLIT_GENOMIC } from '../subworkflows/local/split_genomic' addParams( options: [:] )
 
 include { APPLY_SCORE } from '../subworkflows/local/apply_score' addParams ( options: [:] )
 
@@ -88,33 +88,41 @@ workflow PGSCALC {
     //
     PGSCATALOG (
         accession
-    ) //.out.scorefile
+    )
 
     PGSCATALOG.out.scorefile
         .mix(scorefile)
         .set{ ch_scorefile }
 
+    //
     // SUBWORKFLOW: Validate and stage input files
     //
     INPUT_CHECK (
         ch_input,
         ch_scorefile
     )
+
     ch_software_versions = ch_software_versions.mix(INPUT_CHECK.out.versions)
 
     //
-    // MODULE: VCF to BFILE
+    // SUBWORKFLOW: Split genetic data to improve parallelisation --------------
     //
+    SPLIT_GENOMIC (
+        INPUT_CHECK.out.bed,
+        INPUT_CHECK.out.bim,
+        INPUT_CHECK.out.fam
+    )
 
     //
     // SUBWORKFLOW: Make scoring file and target genomic data compatible
     //
     MAKE_COMPATIBLE (
-        INPUT_CHECK.out.bed,
-        INPUT_CHECK.out.bim,
-        INPUT_CHECK.out.fam,
+        SPLIT_GENOMIC.out.bed,
+        SPLIT_GENOMIC.out.bim,
+        SPLIT_GENOMIC.out.fam,
         INPUT_CHECK.out.scorefile
     )
+
     ch_software_versions = ch_software_versions.mix(MAKE_COMPATIBLE.out.versions)
 
     //
@@ -126,13 +134,6 @@ workflow PGSCALC {
         MAKE_COMPATIBLE.out.pvar,
         MAKE_COMPATIBLE.out.scorefile
     )
-
-    // SPLIT(
-    //     PLINK_VCF.out.bed.concat(INPUT_CHECK.out.bed),
-    //     PLINK_VCF.out.bim.concat(INPUT_CHECK.out.bim),
-    //     PLINK_VCF.out.fam.concat(INPUT_CHECK.out.fam),
-    //     "chromosome"
-    // )
 
     //
     // MODULE: Pipeline reporting
