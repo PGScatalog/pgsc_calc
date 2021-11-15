@@ -29,7 +29,8 @@
                     "description": "Path to a scoring file in PGS Catalog format"
                 },
                 "accession": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "A PGS Catalog accession"
                 },
                 "outdir": {
                     "type": "string",
