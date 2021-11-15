@@ -13,9 +13,11 @@ NR==1 {
 NR > 1 {
     # check missing required columns (execute this pattern for each row)--------
     if (! $(f["sample"])) {
+        print "Please check line number", NR
         error_missing_sample = 1
         exit 1
     } else if (! $(f["datadir"])) {
+        print "Please check line number", NR
         error_missing_datadir = 1
         exit 1
     } else if (! $(f["vcf_path"]) && ! $(f["bfile_prefix"])) {
@@ -36,15 +38,15 @@ NR > 1 {
     # file extensions
     if ( $(f["vcf_path"]) != "" && $(f["vcf_path"]) !~ ".vcf.gz$" ) {
         print "Please check line number", NR
-        error_vcf_extension = 1
-        error_extension("vcf_path", $(f["vcf_path"]))
+        printf "ERROR - BAD FILE EXTENSION IN COLUMN %s \n%s\n", "vcf_path", $(f["vcf_path"])
         print "Valid VCF files should end with .vcf.gz"
+        error_vcf_extension = 1
         exit 1
     } else if ( $(f["bfile_prefix"]) == "\\." ) {
         print "Please check line number", NR
-        error_bfile_extension = 1
-        error_extension("bfile_prefix", $(f["bfile_path"]))
+        printf "ERROR - BAD FILE EXTENSION IN COLUMN %s \n%s\n", "bfile_prefix", $(f["bfile_path"])
         print "Did you accidentally include .bed / .bim / .fam ?" # be helpful
+        error_bfile_extension = 1
         exit 1
     }
 
@@ -97,7 +99,10 @@ END {
     }
 
     NR>2 ? empty = 0 : empty = 1
-    if (empty) print "ERROR - EMPTY INPUT SAMPLESHEET"; exit 1
+    if (empty) {
+        print "ERROR - EMPTY INPUT SAMPLESHEET"
+        exit 1
+    }
 
     # check more subtle things for each sample ---------------------------------
     for (i in samples) {
@@ -130,8 +135,4 @@ END {
 function error_required(str) {
     printf "ERROR - MISSING REQUIRED COLUMN IN SAMPLESHEET - %s\n", str
     exit 1
-}
-
-function error_extension(column, ext) {
-    printf "ERROR - BAD FILE EXTENSION IN COLUMN %s \n%s\n", column, ext
 }
