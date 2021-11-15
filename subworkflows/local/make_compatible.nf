@@ -9,7 +9,7 @@ params.validate_extract_options = [:]
 
 include { PLINK2_RELABEL } from '../../modules/local/plink2_relabel' addParams ( options: [:] )
 include { PLINK2_EXTRACT } from '../../modules/local/plink2_extract' addParams ( options: [suffix:'.extract'] )
-include { VALIDATE_EXTRACT } from '../../modules/local/validate_extract' addParams ( options: params.validate_extract_options )
+include { CHECK_OVERLAP } from '../../modules/local/check_overlap' addParams ( options: params.validate_extract_options )
 include { SCOREFILE_QC } from '../../modules/local/scorefile_qc'
 
 workflow MAKE_COMPATIBLE {
@@ -30,11 +30,11 @@ workflow MAKE_COMPATIBLE {
     // TODO: fix this too to work with multiple files
     SCOREFILE_QC(scorefile)
 
-    // TODO: this is broken with big filesssssssssssssssssss
-    VALIDATE_EXTRACT (
-        PLINK2_RELABEL.out.pvar.flatten().last(),
-        SCOREFILE_QC.out.data.flatten().last(),
-        file("$projectDir/bin/check_extract.awk")
+    // TODO:
+    // - automatically concatenate multiple pvar files
+    CHECK_OVERLAP (
+        PLINK2_RELABEL.out.pvar,
+        SCOREFILE_QC.out.data
     )
 
     PLINK2_RELABEL.out.versions
@@ -45,6 +45,6 @@ workflow MAKE_COMPATIBLE {
     pgen = PLINK2_RELABEL.out.pgen
     psam = PLINK2_RELABEL.out.psam
     pvar = PLINK2_RELABEL.out.pvar
-    scorefile = VALIDATE_EXTRACT.out.scorefile // to do [[meta], file]
+    scorefile = CHECK_OVERLAP.out.scorefile
     versions = ch_versions
 }

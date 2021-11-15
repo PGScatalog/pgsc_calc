@@ -4,7 +4,9 @@ include { initOptions; saveFiles; getSoftwareName; getProcessName } from './func
 params.options = [:]
 options        = initOptions(params.options)
 
-process VALIDATE_EXTRACT {
+process CHECK_OVERLAP {
+    tag "$meta.id"
+    label 'process_low'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'pipeline_info', meta:[:], publish_by_meta:[]) }
@@ -17,27 +19,25 @@ process VALIDATE_EXTRACT {
     }
 
     input:
-    path(extracted)
-    path(variants)
-    path(awk_file)
+    tuple val(meta), path(target)
+    tuple val(scoremeta), path(scorefile)
 
     output:
-    path "scorefile.txt", emit: scorefile
-    path "extract.log"  , emit: log
-    path "versions.yml" , emit: versions
+    tuple val(scoremeta), path("*.scorefile"), emit: scorefile
+    path "*.log"                             , emit: log
+    path "versions.yml"                      , emit: versions
 
     script:
-    def softwareName = "mawk"
     """
     mawk \
         ${options.args} \
-        -f ${awk_file} \
-        ${extracted} \
-        ${variants}
-
+        -f ${projectDir}/bin/check_overlap.awk \
+        ${target} \
+        ${scorefile} > ${scoremeta.id}.scorefile
+    mv extract.log ${scoremeta.id}.log
     cat <<-END_VERSIONS > versions.yml
     ${getProcessName(task.process)}:
-        ${softwareName}: \$(echo \$(mawk -W version 2>&1) | cut -f 2 -d ' ')
+        mawk: \$(echo \$(mawk -W version 2>&1) | cut -f 2 -d ' ')
     END_VERSIONS
     """
 }
