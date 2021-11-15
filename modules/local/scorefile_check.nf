@@ -27,7 +27,7 @@ process SCOREFILE_CHECK {
     script:
     def prefix  = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
     """
-    mawk -v out=${prefix}.txt \
+    mawk -v out=${prefix}_checked.txt \
         -f ${projectDir}/bin/check_scorefile.awk \
         ${datafile}
 
