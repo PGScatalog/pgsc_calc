@@ -8,7 +8,11 @@ options        = initOptions(params.options)
 process PGSCATALOG_GET {
     tag "$accession"
     label 'process_low'
-    label 'error_retry'
+    // custom error strategy for network problems
+    time '1m * task.attempt'
+    maxRetries 5
+    errorStrategy { sleep(Math.pow(2, task.attempt) * 200 as long); return 'retry' }
+
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), meta:meta, publish_by_meta:['id']) }
