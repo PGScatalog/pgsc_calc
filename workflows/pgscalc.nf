@@ -22,7 +22,6 @@ if (params.input) { ch_input = file(params.input) } else { exit 1, 'Genotype inp
 
 // Set up score channels
 if (!params.accession && params.scorefile) {
-    scorefile = Channel.of([[id: file(params.scorefile).getName()], file(params.scorefile)])
     scorefile = Channel.of([[accession: file(params.scorefile).getName()], file(params.scorefile)])
     accession = Channel.empty()
 } else if (params.accession && !params.scorefile) {
@@ -111,7 +110,8 @@ workflow PGSCALC {
     SPLIT_GENOMIC (
         INPUT_CHECK.out.bed,
         INPUT_CHECK.out.bim,
-        INPUT_CHECK.out.fam
+        INPUT_CHECK.out.fam,
+        INPUT_CHECK.out.scorefile
     )
 
     //
@@ -121,7 +121,7 @@ workflow PGSCALC {
         SPLIT_GENOMIC.out.bed,
         SPLIT_GENOMIC.out.bim,
         SPLIT_GENOMIC.out.fam,
-        INPUT_CHECK.out.scorefile
+        SPLIT_GENOMIC.out.scorefile
     )
 
     ch_software_versions = ch_software_versions.mix(MAKE_COMPATIBLE.out.versions)

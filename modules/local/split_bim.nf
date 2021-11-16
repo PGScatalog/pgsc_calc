@@ -5,7 +5,6 @@ params.options = [:]
 options        = initOptions(params.options)
 
 process SPLIT_BIM {
-    tag "$meta.id"
     label 'process_low'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
@@ -26,10 +25,7 @@ process SPLIT_BIM {
     tuple val(meta), path("*.keep"), emit: variants
     path "versions.yml"            , emit: versions
 
-    // specify path with -f manually for portability (mawk can live lots of places)
-    // env won't work with parameters too!
     script:
-    def prefix   = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
     """
     mawk -v split_mode=${split_mode} \
         -f ${projectDir}/bin/split_bim.awk \
