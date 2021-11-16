@@ -47,7 +47,7 @@ workflow PGSCATALOG {
     Channel.from(accession)
     // changing this to [id: it] breaks? wtf?
     // ah, wd contains $accession.txt, so changing breaks this file weirdly
-        .map { [id: it] }
+        .map { [accession: it] }
         .concat(GUNZIP.out.gunzip)
         .buffer( size: 2 )
         .set { ch_scorefile }
