@@ -8,8 +8,6 @@ options        = initOptions(params.options)
 process PGSCATALOG_GET {
     tag "$accession"
     label 'process_low'
-    // custom error strategy for network problems
-    time '1m * task.attempt'
     maxRetries 5
     errorStrategy { sleep(Math.pow(2, task.attempt) * 200 as long); return 'retry' }
 
@@ -34,7 +32,10 @@ process PGSCATALOG_GET {
     script:
     """
     sed -i '1s/^/url = /' ${url}
-    curl -q -O -K ${url}
+    curl --connect-timeout 5 \\
+        --speed-time 10 \\
+        --speed-limit 1000 \\
+         -O -K ${url}
 
     cat <<-END_VERSIONS > versions.yml
     ${getProcessName(task.process)}:
