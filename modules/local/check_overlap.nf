@@ -19,8 +19,7 @@ process CHECK_OVERLAP {
     }
 
     input:
-    tuple val(meta), path(target)
-    tuple val(scoremeta), path(scorefile)
+    tuple val(meta), path(target), val(scoremeta), path(scorefile)
 
     output:
     tuple val(scoremeta), path("*.scorefile"), emit: scorefile
@@ -33,8 +32,11 @@ process CHECK_OVERLAP {
         ${options.args} \
         -f ${projectDir}/bin/check_overlap.awk \
         ${target} \
-        ${scorefile} > ${scoremeta.accession}.scorefile
+        ${scorefile}
+    sort -nk 1 scorefile > ${scoremeta.accession}.scorefile
     mv extract.log ${scoremeta.accession}.log
+
+
     cat <<-END_VERSIONS > versions.yml
     ${getProcessName(task.process)}:
         mawk: \$(echo \$(mawk -W version 2>&1) | cut -f 2 -d ' ')

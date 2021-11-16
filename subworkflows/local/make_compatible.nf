@@ -38,9 +38,13 @@ workflow MAKE_COMPATIBLE {
     )
     // TODO:
     // - automatically concatenate multiple pvar files
+
     CHECK_OVERLAP (
-        PLINK2_RELABEL.out.pvar,
-        SCOREFILE_QC.out.data
+        // overlap should be checked once per sample
+        // [[meta], combined_pvar, [scoremeta], scorefile]
+        COMBINE_BIM.out.variants
+            .combine(SCOREFILE_QC.out.data)
+    )
     )
 
     PLINK2_RELABEL.out.versions

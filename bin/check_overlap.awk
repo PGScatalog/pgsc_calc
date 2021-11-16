@@ -78,8 +78,7 @@ END {
             effect[pos] = flipstrand(effect[pos])
             bad_strand++
         } else {
-            good_strand++
-            print intersected_id[pos], effect[pos], effect_weight[pos]
+            print intersected_id[pos], effect[pos], effect_weight[pos] > "scorefile"
         }
     }
 
