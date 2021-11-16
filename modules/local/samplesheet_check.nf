@@ -9,11 +9,11 @@ process SAMPLESHEET_CHECK {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'pipeline_info', meta:[:], publish_by_meta:[]) }
 
-    conda (params.enable_conda ? "conda-forge::python=3.8.3" : null)
+    conda (params.enable_conda ? "bioconda::mawk=1.3.4" : null)
     if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
-        container "https://depot.galaxyproject.org/singularity/python:3.8.3"
+        container "https://depot.galaxyproject.org/singularity/mawk:1.3.4--h779adbc_4"
     } else {
-        container "quay.io/biocontainers/python:3.8.3"
+        container "quay.io/biocontainers/mawk:1.3.4--h779adbc_4"
     }
 
     input:
@@ -23,15 +23,15 @@ process SAMPLESHEET_CHECK {
     path '*.csv'       , emit: csv
     path "versions.yml", emit: versions
 
-    script: // This script is bundled with the pipeline, in nf-core/pgscalc/bin/
+    script:
     """
-    check_samplesheet.py \\
-        $samplesheet \\
-        samplesheet.valid.csv
+    mawk \\
+        -f ${projectDir}/bin/check_samplesheet.awk \\
+        $samplesheet
 
     cat <<-END_VERSIONS > versions.yml
     ${getProcessName(task.process)}:
-        python: \$(python --version | sed 's/Python //g')
+        mawk: \$(echo \$(mawk -W version 2>&1) | cut -f 2 -d ' ')
     END_VERSIONS
     """
 }
