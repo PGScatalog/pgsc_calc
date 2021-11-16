@@ -34,7 +34,7 @@ process PLINK2_RELABEL {
         --set-all-var-ids @:# \\
         --bfile ${bed.baseName} \\
         --make-pgen \\
-        --out ${prefix}
+        --out ${prefix}_${meta.chrom}
 
     cat <<-END_VERSIONS > versions.yml
     ${getProcessName(task.process)}:
