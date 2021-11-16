@@ -67,9 +67,11 @@ NR > 1 {
     # keep track of useful things per sample -----------------------------------
     if ( $(f["vcf_path"]) ) {
         is_vcf[$(f["sample"]) ":" NR ] = 1
+        n_vcf[$(f["sample"])]++
     } else {
         is_vcf[$(f["sample"]) ":" NR ] = 0
     }
+
     chrom[$(f["chrom"])]=1 # unique list of chromosomes encountered for everybody
     samples[$(f["sample"])]++
     sample_chrom[$(f["sample"])":"$(f["chrom"])]++
@@ -106,19 +108,16 @@ END {
 
     # check more subtle things for each sample ---------------------------------
     for (i in samples) {
-        for (j in is_vcf) {
-            n_vcf[i] += is_vcf[j] # count of vcf files per sample
-        }
         # check multiple samples are of the same datatype
         if (n_vcf[i] != samples[i]) {
-            print "ERROR - Samples with sample sample ID not of same datatype"
+            printf "ERROR - Samples with sample ID %s not of same datatype\n", samples[i]
             print "Did you mix vcf_path and bfile_prefix?"
             exit 1
         }
         # check a sample has unique chromosomes
         for (k in chrom) {
             if (sample_chrom[i":"k] > 1) {
-                printf "ERROR - Duplicate chromosomes detected in sample %s", i
+                printf "ERROR - Duplicate chromosomes detected in sample %s\n", i
                 print "Check column chrom"
                 exit 1
             }
