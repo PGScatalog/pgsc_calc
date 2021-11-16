@@ -5,7 +5,6 @@
 params.options = [:]
 
 include { SPLIT_BIM as SPLIT_CHROM       } from '../../modules/local/split_bim'                    addParams( options: params.options )
-include { SPLIT_BIM as SPLIT_SCOREFILE   } from '../../modules/local/split_bim'                    addParams( options: params.options )
 include { PLINK_EXTRACT as EXTRACT_CHROM } from '../../modules/nf-core/modules/plink/extract/main' addParams( options: [suffix:'.extract'] )
 
 workflow SPLIT_GENOMIC {
@@ -66,25 +65,15 @@ workflow SPLIT_GENOMIC {
         }
         .set { ch_bfiles_splat } // all bfiles that don't need to be split
 
-    // Split scorefile by chrom ------------------------------------------------
-    SPLIT_SCOREFILE(scorefile, "chromosome")
-
-    // now get a flat list like:
-    //     [[id:PGS001229, chrom: 22], scorefile]
-    SPLIT_SCOREFILE.out.variants
-        .flatMap { create_chrom_channel(it) }
-        .set { ch_scorefiles }
-
     emit:
     bed = ch_bfiles_splat.bed.mix( EXTRACT_CHROM.out.bed )
     bim = ch_bfiles_splat.bim.mix( EXTRACT_CHROM.out.bim )
     fam = ch_bfiles_splat.fam.mix( EXTRACT_CHROM.out.fam )
-    scorefile = ch_scorefiles
+    scorefile = scorefile
 }
 
 // function to get a list of sample-chromosome combinations:
 // [[meta], 22.keep, ..., n.keep] -> [[[meta], 22.keep], [[meta], n.keep]]]
-// where each keep file is used to extract variants with plink
 def create_chrom_channel(ArrayList chrom) {
     meta = chrom.head()
     variant_files = chrom.tail().flatten()

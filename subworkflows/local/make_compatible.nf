@@ -54,7 +54,22 @@ workflow MAKE_COMPATIBLE {
         COMBINE_BIM.out.variants
             .combine(SCOREFILE_QC.out.data)
     )
+
+    SCOREFILE_SPLIT (
+        // scorefile split should only happen once per unique accession
+        CHECK_OVERLAP.out.scorefile
+            .unique { it.head().accession },
+        "chromosome"
     )
+
+    // generate a list of chromosome split scorefile - sampleID combinations ---
+    // then emit a flat list of split scorefiles
+    PLINK2_RELABEL.out.pgen
+        .map { it.head().take(1) }
+        .unique() // a unique list of all sample IDs e.g. [id:1]
+        .combine(SCOREFILE_SPLIT.out.scorefile) // [[meta], [scoremeta], [[split_score_1], ...]]
+        .flatMap { create_scorefile_channel([it[0] << it[1], it[2]]) } // combine meta and scoremeta
+        .set { ch_scorefile } // flat list [[accession:PGS001229, chrom: 22, id: 1], scorefile]
 
     PLINK2_RELABEL.out.versions
 //        .mix(VALIDATE_EXTRACT.out.versions)
@@ -64,6 +79,21 @@ workflow MAKE_COMPATIBLE {
     pgen = PLINK2_RELABEL.out.pgen
     psam = PLINK2_RELABEL.out.psam
     pvar = PLINK2_RELABEL.out.pvar
-    scorefile = CHECK_OVERLAP.out.scorefile
+    scorefile = ch_scorefile
     versions = ch_versions
+}
+
+// function to get a list of sample-chromosome combinations:
+// [[meta], 22.keep, ..., n.keep] -> [[[meta], 22.keep], [[meta], n.keep]]]
+def create_scorefile_channel(ArrayList chrom) {
+    meta = chrom.head()
+    variant_files = chrom.tail().flatten()
+    combs = [[meta], variant_files].combinations()
+    // now add chr label to meta map using basename of variant keep file
+    // the variant keep file takes its name from the CHROM column of the VCF
+    combs.collect { m, it ->
+        def chrom_map = [:]
+        chrom_map.chrom = (it.getName() - ~/\.\w+$/) // removes file extension
+        [m + chrom_map, it].flatten()
+    }
 }
