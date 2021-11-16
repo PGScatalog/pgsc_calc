@@ -25,7 +25,7 @@ process SCOREFILE_QC {
     path "versions.yml"           , emit: versions
 
     script:
-    def prefix  = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
+    def prefix  = "${meta.accession}"
     """
     mawk -v out=${prefix}.txt \
         -f ${projectDir}/bin/qc_scorefile.awk \

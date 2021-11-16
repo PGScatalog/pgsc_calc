@@ -25,7 +25,7 @@ process SCOREFILE_CHECK {
     path "versions.yml"           , emit: versions
 
     script:
-    def prefix  = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
+    def prefix  = "${meta.accession}"
     """
     mawk -v out=${prefix}_checked.txt \
         -f ${projectDir}/bin/check_scorefile.awk \

@@ -33,8 +33,8 @@ process CHECK_OVERLAP {
         ${options.args} \
         -f ${projectDir}/bin/check_overlap.awk \
         ${target} \
-        ${scorefile} > ${scoremeta.id}.scorefile
-    mv extract.log ${scoremeta.id}.log
+        ${scorefile} > ${scoremeta.accession}.scorefile
+    mv extract.log ${scoremeta.accession}.log
     cat <<-END_VERSIONS > versions.yml
     ${getProcessName(task.process)}:
         mawk: \$(echo \$(mawk -W version 2>&1) | cut -f 2 -d ' ')
