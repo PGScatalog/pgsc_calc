@@ -121,9 +121,12 @@ END {
                 print "Check column chrom"
                 exit 1
             }
+            if (k != "") { # skip null chromosomen
+                (sample_chrom[i":"k]) ? chrom_specified = 1 : chrom_specified = 0
+            }
         }
         # check a sample doesn't mix null with named chromosomes
-        if (sample_chrom[i":"""] != 0) {
+        if (sample_chrom[i":"""] > 0 && chrom_specified) {
             printf "ERROR - Both null and named chromosomes detected in sample %s\n", i
             print "Only use blank chromosome if data have not been split by chromosome"
             exit 1
