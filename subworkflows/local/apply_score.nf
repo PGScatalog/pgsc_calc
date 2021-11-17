@@ -3,6 +3,7 @@
 //
 
 include { PLINK2_SCORE } from '../../modules/local/plink2_score' addParams ( options: [:] )
+include { COMBINE_SCORES } from '../../modules/local/combine_scores'
 
 workflow APPLY_SCORE {
     take:
@@ -25,7 +26,15 @@ workflow APPLY_SCORE {
         ch_apply
     )
 
-    // combine scores now per sample...
+    COMBINE_SCORES (
+        PLINK2_SCORE.out.score
+        // TODO: size may vary per sample, make sure groupTuple has size:
+        // https://github.com/nextflow-io/nextflow/issues/796
+        // otherwise it will be much slower
+            .map { [it.head().take(1), it.tail() ] }  // group just by ID TODO: check tail()
+            .groupTuple()
+            .map { [it.head(), it.tail().flatten()] } // [[meta], [path1, pathn]]
+    )
 
 //   PLINK2_SCORE.out.versions
 //       .set { ch_versions }
@@ -34,6 +43,3 @@ workflow APPLY_SCORE {
    score = PLINK2_SCORE.out.score
    versions = ch_versions
 }
-
-// A function to update a scoremeta with sample ID
-//     [[id:1], [scoremeta], scorefile]

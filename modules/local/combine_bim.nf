@@ -27,7 +27,7 @@ process COMBINE_BIM {
     script:
     """
     mawk \\
-        'FNR == 1 && NR != 1 { while (/^#CHROM/) next }
+        'FNR == 1 && NR != 1 { next }
         { print }' ${bims} > ${meta.id}.combined
 
     cat <<-END_VERSIONS > versions.yml
