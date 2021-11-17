@@ -66,10 +66,16 @@ workflow MAKE_COMPATIBLE {
     // then emit a flat list of split scorefiles
     PLINK2_RELABEL.out.pgen
         .map { it.head().take(1) }
-        .unique() // a unique list of all sample IDs e.g. [id:1]
+        .unique { it.id } // unique flat list of sample IDs [id:1], [id:n]
         .combine(SCOREFILE_SPLIT.out.scorefile) // [[meta], [scoremeta], [[split_score_1], ...]]
         .flatMap { create_scorefile_channel([it[0] << it[1], it[2]]) } // combine meta and scoremeta
         .set { ch_scorefile } // flat list [[accession:PGS001229, chrom: 22, id: 1], scorefile]
+
+    // debugging ---------------------------------------------------------------
+    PLINK2_RELABEL.out.pgen.dump(tag: 'compatible_pgen')
+    PLINK2_RELABEL.out.psam.dump(tag: 'compatible_psam')
+    PLINK2_RELABEL.out.pvar.dump(tag: 'compatible_pvar')
+    ch_scorefile.dump(tag: 'compatible_scorefile')
 
     PLINK2_RELABEL.out.versions
 //        .mix(VALIDATE_EXTRACT.out.versions)

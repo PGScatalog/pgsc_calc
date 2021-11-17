@@ -19,8 +19,7 @@ process PLINK2_SCORE {
     }
 
     input:
-    tuple val(meta), path(pgen), path(psam), path(pvar)
-    tuple val(scoremeta), path(scorefile)
+    tuple val(meta), path(pgen), path(psam), path(pvar), val(scoremeta), path(scorefile)
 
     output:
     tuple val(meta), path("*.sscore"), emit: score
