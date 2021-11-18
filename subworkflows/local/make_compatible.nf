@@ -27,7 +27,7 @@ workflow MAKE_COMPATIBLE {
     PLINK2_RELABEL (
         bed
             .mix(bim, fam)
-            .groupTuple()
+            .groupTuple(size: 3) // order doesn't matter for plink
             .map { it.flatten() }
     )
 
