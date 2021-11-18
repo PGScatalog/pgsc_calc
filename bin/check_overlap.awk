@@ -57,6 +57,8 @@ lines[$1":"$2] {
 }
 
 END {
+    intersected =  matched_variant / original_var * 100
+
     # error checking -----------------------------------------------------------
     if (NR == 0 || FNR == 0) {
         input_error("file")
@@ -69,6 +71,8 @@ END {
     # !!! explode loudly !!!
     if (intersected < (threshold * 100)) {
         overlap_error()
+        printf "%.2f%% is minimum overlap\n", (threshold * 100)
+        printf "%.2f%% variants matched\n", intersected
         exit 1
     }
 
@@ -83,7 +87,6 @@ END {
     }
 
     # write a pretty log! ------------------------------------------------------
-    intersected =  matched_variant / original_var * 100
     if (!bad_strand) bad_strand = 0
 
     print "check_extract.awk", start_time > "extract.log"
@@ -107,7 +110,6 @@ function flipstrand(nt) {
 
 function overlap_error() {
     print "ERROR - Your target genomic data seems to overlap poorly with the provided scoring file"
-    print "ERROR - Please check the log file for details (extract.log)"
     print "ERROR - See --min_overlap parameter"
 }
 

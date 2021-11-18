@@ -147,9 +147,9 @@ workflow PGSCALC {
         .collect()
         .set { ch_software_versions }
 
-    GET_SOFTWARE_VERSIONS (
-        ch_software_versions.map { it }.collect()
-    )
+//    GET_SOFTWARE_VERSIONS (
+//        ch_software_versions.map { it }.collect()
+//    )
 }
 
 /*
