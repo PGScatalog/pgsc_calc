@@ -69,6 +69,7 @@ NR > 1 {
         is_vcf[$(f["sample"]) ":" NR ] = 1
         n_vcf[$(f["sample"])]++
     } else {
+        n_bfiles[$(f["sample"])]++
         is_vcf[$(f["sample"]) ":" NR ] = 0
     }
 
@@ -100,7 +101,7 @@ END {
         exit 1
     }
 
-    NR>2 ? empty = 0 : empty = 1
+    NR>1 ? empty = 0 : empty = 1
     if (empty) {
         print "ERROR - EMPTY INPUT SAMPLESHEET"
         exit 1
@@ -109,7 +110,7 @@ END {
     # check more subtle things for each sample ---------------------------------
     for (i in samples) {
         # check multiple samples are of the same datatype
-        if (n_vcf[i] != samples[i]) {
+        if (n_vcf[i] != samples[i] && n_bfiles[i] != samples[i]) {
             printf "ERROR - Samples with sample ID %s not of same datatype\n", samples[i]
             print "Did you mix vcf_path and bfile_prefix?"
             exit 1
