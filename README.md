@@ -1,5 +1,9 @@
 # `pgsc_calc`: PGS Catalog calculator
 
+:rotating_light: This pipeline is under active development and may break at any time :rotating_light:
+
+:rotating_light: We will tag stable-ish releases ASAP :rotating_light:
+
 ## Introduction
 
 `pgsc_calc` is a bioinformatics best-practice analysis pipeline for applying
