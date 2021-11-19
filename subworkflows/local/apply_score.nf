@@ -34,8 +34,8 @@ workflow APPLY_SCORE {
         .groupTuple()
         .map { [it.head(), it.tail().flatten()] } // [[meta], [path1, pathn]]
         .branch {
-            split: (it.size() > 2)
-            splat: (it.size() == 2)
+            split: (it.flatten().size() > 2)
+            splat: (it.flatten().size() == 2)
         }
         .set { scores }
 
@@ -47,10 +47,7 @@ workflow APPLY_SCORE {
         .mix(scores.splat)
         .set{ combined_scores }
 
-//   PLINK2_SCORE.out.versions
-//       .set { ch_versions }
-
-   emit:
-   score = combined_scores
-   versions = ch_versions
+    emit:
+    score = combined_scores
+    versions = ch_versions
 }
