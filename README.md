@@ -61,7 +61,7 @@ pgscatalog/pgsc_calc was originally written by Benjamin Wingfield with input fro
 - Laurent Gil
 
 NOTE: the pipeline is distributed and makes use of datasets (e.g. 1000 Genomes and CINECA synthetic data) that 
-are provided under specific data licenses (see the [assets](assets/) directory README for more information). It is up to
+are provided under specific data licenses (see the [assets](assets/README.md) directory README for more information). It is up to
 end-users to ensure that their use conforms to these restrictions. 
 
 <!-- TODO nf-core: If applicable, make list of people who have also contributed
