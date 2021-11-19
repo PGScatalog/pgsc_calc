@@ -75,6 +75,4 @@ This pipeline uses code and infrastructure developed and maintained by the [nf-c
 >
 > Nat Biotechnol. 2020 Feb 13. doi: 10.1038/s41587-020-0439-x.
 
-In addition, references of tools and data used in this pipeline are as follows:
-
-- ...
+In addition, references of tools and data used in this pipeline are described in [`CITATIONS.md`](CITATIONS.md).
