@@ -26,20 +26,31 @@ workflow APPLY_SCORE {
         ch_apply
     )
 
-    COMBINE_SCORES (
-        PLINK2_SCORE.out.score
+    PLINK2_SCORE.out.score
         // TODO: size may vary per sample, make sure groupTuple has size:
         // https://github.com/nextflow-io/nextflow/issues/796
         // otherwise it will be much slower
-            .map { [it.head().take(1), it.tail() ] }  // group just by ID TODO: check tail()
-            .groupTuple()
-            .map { [it.head(), it.tail().flatten()] } // [[meta], [path1, pathn]]
+        .map { [it.head().take(1), it.tail() ] }  // group just by ID TODO: check tail()
+        .groupTuple()
+        .map { [it.head(), it.tail().flatten()] } // [[meta], [path1, pathn]]
+        .branch {
+            split: (it.size() > 2)
+            splat: (it.size() == 2)
+        }
+        .set { scores }
+
+    COMBINE_SCORES (
+        scores.split // only combine separate scores
     )
+
+    COMBINE_SCORES.out.scorefiles
+        .mix(scores.splat)
+        .set{ combined_scores }
 
 //   PLINK2_SCORE.out.versions
 //       .set { ch_versions }
 
    emit:
-   score = PLINK2_SCORE.out.score
+   score = combined_scores
    versions = ch_versions
 }
