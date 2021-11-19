@@ -7,7 +7,6 @@ params.options = [:]
 
 include { SAMPLESHEET_CHECK              } from '../../modules/local/samplesheet_check'            addParams( options: params.options )
 include { SCOREFILE_CHECK                } from '../../modules/local/scorefile_check'              addParams( options: params.options )
-//include { SCOREFILE_QC                   } from '../../modules/local/scorefile_qc'                 addParams( options: [suffix:'.qc'] )
 include { PLINK_VCF                      } from '../../modules/nf-core/modules/plink/vcf/main'     addParams( options: modules['plink_vcf'] )
 
 
@@ -42,12 +41,8 @@ workflow INPUT_CHECK {
 
     SCOREFILE_CHECK ( scorefile )
 
-    // TODO: move
-//    SCOREFILE_QC ( SCOREFILE_CHECK.out.data )
-
     SAMPLESHEET_CHECK.out.versions
         .mix(SCOREFILE_CHECK.out.versions)
-//        .mix(SCOREFILE_QC.out.versions)
         .set{ ch_versions }
 
     emit:

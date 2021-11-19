@@ -20,7 +20,7 @@
                     "mimetype": "text/csv",
                     "schema": "assets/schema_input.json",
                     "description": "Path to comma-separated file containing information about the samples (a sample sheet)",
-                    "help_text": "You will need to create a design file with information about the samples before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 4 columns, and a header row. See usage docs for a more detailed explanation.",
+                    "help_text": "You will need to create a design file with information about the samples before running the pipeline. Use this parameter to specify its location. See usage docs for a more detailed explanation.",
                     "fa_icon": "fas fa-file-csv",
                     "pattern": ".csv$"
                 },
@@ -57,35 +57,6 @@
                     "type": "number",
                     "default": 0.75,
                     "description": "Minimum proportion of genes present in both the score file and input target genomic data"
-                }
-            }
-        },
-        "reference_genome_options": {
-            "title": "Reference genome options",
-            "type": "object",
-            "fa_icon": "fas fa-dna",
-            "description": "Reference genome related files and options required for the workflow.",
-            "properties": {
-                "genome": {
-                    "type": "string",
-                    "description": "Name of iGenomes reference.",
-                    "fa_icon": "fas fa-book",
-                    "help_text": "If using a reference genome configured in the pipeline using iGenomes, use this parameter to give the ID for the reference. This is then used to build the full paths for all required reference genome files e.g. `--genome GRCh38`. \n\nSee the [nf-core website docs](https://nf-co.re/usage/reference_genomes) for more details."
-                },
-                "igenomes_base": {
-                    "type": "string",
-                    "format": "directory-path",
-                    "description": "Directory / URL base for iGenomes references.",
-                    "default": "s3://ngi-igenomes/igenomes",
-                    "fa_icon": "fas fa-cloud-download-alt",
-                    "hidden": true
-                },
-                "igenomes_ignore": {
-                    "type": "boolean",
-                    "description": "Do not load the iGenomes reference config.",
-                    "fa_icon": "fas fa-ban",
-                    "hidden": true,
-                    "help_text": "Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`."
                 }
             }
         },
@@ -270,9 +241,6 @@
         },
         {
             "$ref": "#/definitions/compatibility_options"
-        },
-        {
-            "$ref": "#/definitions/reference_genome_options"
         },
         {
             "$ref": "#/definitions/institutional_config_options"
