@@ -1,4 +1,4 @@
-# nf-core/pgscalc: Citations
+# PGScatalog/pgsc_calc: Citations
 
 ## [nf-core](https://pubmed.ncbi.nlm.nih.gov/32055031/)
 
