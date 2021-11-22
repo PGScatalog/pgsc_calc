@@ -56,7 +56,7 @@
                 "min_overlap": {
                     "type": "number",
                     "default": 0.75,
-                    "description": "Minimum proportion of genes present in both the score file and input target genomic data"
+                    "description": "Minimum proportion of variants present in both the score file and input target genomic data"
                 }
             }
         },

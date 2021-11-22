@@ -1,4 +1,4 @@
-# `pgsc_calc`: PGS Catalog calculator
+# `pgsc_calc`: PGS Catalog Calculator
 
 :rotating_light: This pipeline is under active development and may break at any time :rotating_light:
 
@@ -7,7 +7,7 @@
 ## Introduction
 
 `pgsc_calc` is a bioinformatics best-practice analysis pipeline for applying
-scoring files from the [PGS Catalog](https://www.pgscatalog.org/) to target genotyped samples.
+scoring files from the [Polygenic Score (PGS) Catalog](https://www.pgscatalog.org/) to target genotyped samples.
 
 The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It uses Docker/Singularity containers making installation trivial and results highly reproducible. The [Nextflow DSL2](https://www.nextflow.io/docs/latest/dsl2.html) implementation of this pipeline uses one container per process which makes it much easier to maintain and update software dependencies. Where possible, these processes have been submitted to and installed from [nf-core/modules](https://github.com/nf-core/modules) in order to make them available to all nf-core pipelines, and to everyone within the Nextflow community!
 
@@ -15,8 +15,13 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
 <!-- TODO nf-core: Fill in short bullet-pointed list of the default steps in the pipeline -->
 
-1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
-2. Present QC for raw reads ([`MultiQC`](http://multiqc.info/))
+1. Genotype harmonization
+2. PGS Catalog Scoring file download + variant matching
+3. PGS Cacluation (`plink2 --score`)
+4. ...
+
+### Features In Development
+- Ancestry estimation using reference datasets.
 
 ## Quick Start
 
@@ -46,19 +51,12 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
 ## Documentation
 
-TODO: fix this
-
-The pgscatalog/pgsc_calc pipeline comes with documentation about the pipeline
-usage, parameters, and output.
+IN PROGRESS: The pgscatalog/pgsc_calc pipeline will be distributed with documentation about the pipeline
+usage, parameters, and outputs.
 
 ## Credits
 
-pgscatalog/pgsc_calc was originally written by Benjamin Wingfield with input from other members of the PGS Catalog team:
-
-- Samuel Lambert
-- Aoife McMahon
-- Mike Inouye
-- Laurent Gil
+pgscatalog/pgsc_calc was originally written by Benjamin Wingfield with input from other members of the [PGS Catalog](https://www.pgscatalog.org) team (Samuel Lambert, Aoife McMahon, Michael Inouye, Laurent Gil) and [Inouye lab](https://www.inouyelab.org/home) (Rodrigo Canovas, Scott Ritchie, Jingqin Wu). 
 
 NOTE: the pipeline is distributed and makes use of datasets (e.g. 1000 Genomes and CINECA synthetic data) that 
 are provided under specific data licenses (see the [assets](assets/README.md) directory README for more information). It is up to
