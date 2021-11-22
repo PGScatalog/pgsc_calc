@@ -56,7 +56,7 @@ usage, parameters, and outputs.
 
 ## Credits
 
-pgscatalog/pgsc_calc was originally written by Benjamin Wingfield with input from other members of the [PGS Catalog](https://www.pgscatalog.org) team (Samuel Lambert, Aoife McMahon, Mike Inouye, Laurent Gil) and Inouye lab (Rodrigo Canovas, Scott Ritchie, Jingqin Wu). 
+pgscatalog/pgsc_calc was originally written by Benjamin Wingfield with input from other members of the [PGS Catalog](https://www.pgscatalog.org) team (Samuel Lambert, Aoife McMahon, Michael Inouye, Laurent Gil) and [Inouye lab](https://www.inouyelab.org/home) (Rodrigo Canovas, Scott Ritchie, Jingqin Wu). 
 
 NOTE: the pipeline is distributed and makes use of datasets (e.g. 1000 Genomes and CINECA synthetic data) that 
 are provided under specific data licenses (see the [assets](assets/README.md) directory README for more information). It is up to
