@@ -31,7 +31,7 @@ BEGIN {
     ref_allele=$4
     effect_weight=$5
 
-    if (length(effect_allele) > 1) {
+    if (length(effect_allele) > 1 || length(ref_allele) > 1) {
         multiallelic_warn = 1
         multiallelic_count++
         next # skip line

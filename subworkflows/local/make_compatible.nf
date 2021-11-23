@@ -1,16 +1,15 @@
 //
 // Make the scoring file compatible with the target genomic data by:
 //     - Using a consistent variant labelling format (chr:pos) (PLINK2_RELABEL)
-//     - Intersecting variants by position (PLINK2_EXTRACT)
-//     - Validate intersection overlaps well and fix strand issues (VALIDATE_EXTRACT)
+//     - Match variants across scorefile and target data, flipping if necessary
 //
 
-params.validate_extract_options = [:]
+params.match_variants_options = [:]
 
 include { PLINK2_RELABEL  } from '../../modules/local/plink2_relabel'  addParams ( options: [:] )
 include { PLINK2_EXTRACT  } from '../../modules/local/plink2_extract'  addParams ( options: [suffix:'.extract'] )
 include { COMBINE_BIM     } from '../../modules/local/combine_bim'     addParams ( options: [:] )
-include { CHECK_OVERLAP   } from '../../modules/local/check_overlap'   addParams ( options: params.validate_extract_options )
+include { MATCH_VARIANTS  } from '../../modules/local/match_variants'   addParams ( options: params.match_variants_options )
 include { SCOREFILE_QC    } from '../../modules/local/scorefile_qc'    addParams ( options: [:] )
 include { SCOREFILE_SPLIT } from '../../modules/local/scorefile_split' addParams ( options: [:] )
 
@@ -48,8 +47,8 @@ workflow MAKE_COMPATIBLE {
             .map{ [it.head(), it.tail().flatten()] } // [[meta], [pvar1, ..., pvarn]]
     )
 
-    CHECK_OVERLAP (
-        // overlap should be checked once per sample
+    MATCH_VARIANTS (
+        // variants should be matched once per sample
         // [[meta], combined_pvar, [scoremeta], scorefile]
         COMBINE_BIM.out.variants
             .combine(SCOREFILE_QC.out.data)
@@ -57,7 +56,7 @@ workflow MAKE_COMPATIBLE {
 
     SCOREFILE_SPLIT (
         // scorefile split should only happen once per unique accession
-        CHECK_OVERLAP.out.scorefile
+        MATCH_VARIANTS.out.scorefile
             .unique { it.head().accession },
         "chromosome"
     )

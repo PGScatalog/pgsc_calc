@@ -31,7 +31,7 @@ process PLINK2_RELABEL {
     def prefix = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
     """
     plink2 \\
-        --set-all-var-ids @:# \\
+        --set-all-var-ids '@:#:\$r:\$a' \\
         --bfile ${bed.baseName} \\
         --make-pgen \\
         --out ${prefix}_${meta.chrom}

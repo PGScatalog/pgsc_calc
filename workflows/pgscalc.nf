@@ -50,15 +50,18 @@ include { GET_SOFTWARE_VERSIONS } from '../modules/local/get_software_versions' 
 //
 include { PGSCATALOG } from '../subworkflows/local/pgscatalog' addParams( options: [:] )
 
+def plink_vcf_options = [:]
+plink_vcf_options['args'] = "--keep-allele-order"
+
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( options: [:] )
 
-def validate_extract_options = [:]
-validate_extract_options['args'] = "-v threshold=" + params.min_overlap
+def match_variants_options = [:]
+match_variants_options['args'] = "-v min_overlap=" + params.min_overlap
 
-include { MAKE_COMPATIBLE } from '../subworkflows/local/make_compatible' addParams( validate_extract_options: validate_extract_options )
+include { MAKE_COMPATIBLE } from '../subworkflows/local/make_compatible' addParams( match_variants_options: match_variants_options )
 
 include { SPLIT_GENOMIC } from '../subworkflows/local/split_genomic' addParams( options: [:] )
 
