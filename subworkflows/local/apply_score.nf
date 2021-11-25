@@ -15,11 +15,19 @@ workflow APPLY_SCORE {
     main:
     ch_versions = Channel.empty()
 
+    psam.map {
+        n = -1 // exclude header from sample count
+        it[1].eachLine { n++ }
+        return tuple(it[0], n)
+    }
+        .set { n_samples }
+
     pgen
         .mix(psam, pvar)
         .groupTuple(size: 3, sort: true) // alphabetical  pgen, psam, pvar is nice
         .cross ( scorefile ) { [it.first().id, it.first().chrom] }
         .map{ it.flatten() }  // [[meta], pgen, psam, pvar, [scoremeta], scorefile]
+        .join(n_samples, by: 0, failOnMismatch: true)
         .set { ch_apply } // data to apply scores to
 
     PLINK2_SCORE (

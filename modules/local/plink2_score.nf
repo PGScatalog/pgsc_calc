@@ -19,7 +19,7 @@ process PLINK2_SCORE {
     }
 
     input:
-    tuple val(meta), path(pgen), path(psam), path(pvar), val(scoremeta), path(scorefile)
+    tuple val(meta), path(pgen), path(psam), path(pvar), val(scoremeta), path(scorefile), val(n_samples)
 
     output:
     tuple val(meta), path("*.sscore"), emit: score
@@ -27,15 +27,30 @@ process PLINK2_SCORE {
 
     script:
     def prefix = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
-    """
-    plink2 \\
-        --score ${scorefile} \\
-        --pfile ${pgen.baseName} \\
-        --out ${meta.id}_${meta.chrom}
 
-    cat <<-END_VERSIONS > versions.yml
-    ${getProcessName(task.process)}:
-        ${getSoftwareName(task.process)}: \$(plink2 --version 2>&1 | sed 's/^PLINK v//; s/ 64.*\$//' )
-    END_VERSIONS
-    """
+    if (n_samples < 50)
+        """
+        plink2 \\
+            --score ${scorefile} no-mean-imputation \\
+            --pfile ${pgen.baseName} \\
+            --out ${meta.id}_${meta.chrom} \\
+
+
+        cat <<-END_VERSIONS > versions.yml
+        ${getProcessName(task.process)}:
+            ${getSoftwareName(task.process)}: \$(plink2 --version 2>&1 | sed 's/^PLINK v//; s/ 64.*\$//' )
+        END_VERSIONS
+        """
+    else if (n_samples > 50)
+        """
+        plink2 \\
+            --score ${scorefile} \\
+            --pfile ${pgen.baseName} \\
+            --out ${meta.id}_${meta.chrom}
+
+        cat <<-END_VERSIONS > versions.yml
+        ${getProcessName(task.process)}:
+            ${getSoftwareName(task.process)}: \$(plink2 --version 2>&1 | sed 's/^PLINK v//; s/ 64.*\$//' )
+        END_VERSIONS
+        """
 }
