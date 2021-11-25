@@ -27,7 +27,7 @@ workflow APPLY_SCORE {
         .groupTuple(size: 3, sort: true) // alphabetical  pgen, psam, pvar is nice
         .cross ( scorefile ) { [it.first().id, it.first().chrom] }
         .map{ it.flatten() }  // [[meta], pgen, psam, pvar, [scoremeta], scorefile]
-        .join(n_samples, by: 0, failOnMismatch: true)
+        .join(n_samples, by: 0)
         .set { ch_apply } // data to apply scores to
 
     PLINK2_SCORE (
