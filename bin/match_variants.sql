@@ -9,6 +9,7 @@ CREATE INDEX idx_target ON target ('#CHROM', pos);
 -- matched variants: EA = REF and OA = ALT
 CREATE TABLE matched AS
 SELECT
+    scorefile.chrom || ':' || scorefile.pos || ':' || effect || ':' || other AS id,
     scorefile.chrom,
     scorefile.pos,
     scorefile.effect,
@@ -24,6 +25,7 @@ INNER JOIN target ON scorefile.chrom = target.'#CHROM' AND
 -- matched variants: EA = ALT and OA = REF
 INSERT INTO matched
 SELECT
+    scorefile.chrom || ':' || scorefile.pos || ':' || other || ':' || effect AS id,
     scorefile.chrom,
     scorefile.pos,
     scorefile.effect,
@@ -75,12 +77,21 @@ SELECT
     weight
 FROM
     -- subquery: get a table with flipped effect alleles
-    (SELECT chrom, pos, complement AS effect, weight FROM unmatched
+    (SELECT
+    chrom,
+    pos,
+    complement AS effect,
+    weight
+    FROM unmatched
     INNER JOIN flip
     ON unmatched.effect = flip.nucleotide)
 INNER JOIN
     -- subquery: get a table with flipped other alleles too
-    (SELECT chrom, pos, complement AS other from unmatched
+    (SELECT
+    chrom,
+    pos,
+    complement AS other
+    FROM unmatched
     INNER JOIN flip
     ON unmatched.other = flip.nucleotide)
 USING (chrom, pos);
@@ -90,6 +101,7 @@ USING (chrom, pos);
 INSERT INTO matched
  -- match by EA = REF and OA = ALT
 SELECT
+    flipped.chrom || ':' || flipped.pos || ':' || flipped.effect || ':' || flipped.other AS id,
     flipped.chrom,
     flipped.pos,
     flipped.effect,
@@ -107,6 +119,7 @@ ON
 UNION ALL
 -- match by EA = ALT and OA = REF
 SELECT
+    flipped.chrom || ':' || flipped.pos || ':' || flipped.other || ':' || flipped.effect AS id,
     flipped.chrom,
     flipped.pos,
     flipped.effect,
@@ -127,15 +140,15 @@ ON
 .once matched.scorefile.tmp
 
 SELECT
-    chrom || ':' || pos || ':' || effect || ':' || other AS id,
+    id,
     effect,
     weight
 FROM
     (SELECT
+        id,
         chrom,
         pos,
         effect,
-        other,
         weight
     FROM matched
     ORDER BY chrom, pos);

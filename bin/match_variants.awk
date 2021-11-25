@@ -26,14 +26,19 @@ BEGIN {
         exit 1
     }
 
-    # stage input data with static names for sqlite ----------------------------
-    print "chrom", "pos", "effect", "other", "weight" > "scorefile.txt"
-    printf "cat %s >> scorefile.txt \n", ARGV[1] | "/bin/sh"
-    printf "cp %s target.txt \n", target | "/bin/sh"
+    # stage target data with a static name for sqlite --------------------------
+    printf "cp -d %s target.txt \n", target | "/bin/sh"
     close("/bin/sh")
 }
 
-FILENAME == ARGV[1] { scorefile_variants++ }
+FILENAME == ARGV[1] && NR == 1 {
+    print "chrom", "pos", "effect", "other", "weight" > "scorefile.txt"
+}
+
+FILENAME == ARGV[1] && NR > 1 {
+    print > "scorefile.txt"
+    scorefile_variants++
+}
 
 # this is dumb but it's an easy way to stage the match_variants sql script in
 # a working directory with a static name
