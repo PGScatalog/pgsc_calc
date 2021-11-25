@@ -28,13 +28,10 @@ process MATCH_VARIANTS {
 
     script:
     """
-    mawk -f $projectDir/bin/match_variants.awk \
+    awk -f $projectDir/bin/match_variants.awk \
         $options.args \
         -v target=$target \
-        -v mem=\$(echo $task.memory | sed 's/ //; s/B//') \
-        -v cpu=$task.cpus \
         $scorefile \
-        matched.scorefile.tmp \
-        flipped.matched.scorefile.tmp
+        $projectDir/bin/match_variants.sql
     """
 }
