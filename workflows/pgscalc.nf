@@ -59,7 +59,7 @@ plink_vcf_options['args'] = "--keep-allele-order"
 include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( options: [:] )
 
 def match_variants_options = [:]
-match_variants_options['args'] = "-v min_overlap=" + params.min_overlap
+match_variants_options['args'] = "--min_overlap=" + params.min_overlap
 
 include { MAKE_COMPATIBLE } from '../subworkflows/local/make_compatible' addParams( match_variants_options: match_variants_options )
 

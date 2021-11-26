@@ -11,11 +11,11 @@ process MATCH_VARIANTS {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'pipeline_info', meta:[:], publish_by_meta:[]) }
 
-    conda (params.enable_conda ? "conda-forge::curl=7.79.1" : null) // dummy conda
+    conda (params.enable_conda ? "conda-forge::pandas=1.1.5 sqlite" : null)
     if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
-        container "https://containers.biocontainers.pro/s3/SingImgsRepo/biocontainers/v1.2.0_cv1/biocontainers_v1.2.0_cv1.img"
+        container "https://depot.galaxyproject.org/singularity/pandas:1.1.5"
     } else {
-        container "biocontainers/biocontainers:v1.2.0_cv1" // vanilla biocontainer
+        container "quay.io/biocontainers/pandas:1.1.5"
     }
 
     input:
@@ -28,10 +28,11 @@ process MATCH_VARIANTS {
 
     script:
     """
-    awk -f $projectDir/bin/match_variants.awk \
+    match_variants.py \
         $options.args \
-        -v target=$target \
-        $scorefile \
-        $projectDir/bin/match_variants.sql
+        --scorefile $scorefile \
+        --target $target \
+        --db match.db \
+        --out ${meta.id}.scorefile
     """
 }
