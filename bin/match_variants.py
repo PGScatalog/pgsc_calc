@@ -155,7 +155,7 @@ def get_flipped(con):
     cur = con.cursor()
 
     cur.execute('''
-        CREATE TABLE flipped AS
+        CREATE VIEW flipped AS
         SELECT
             chrom,
             pos,
@@ -286,6 +286,7 @@ def match_variants(args):
     df = export_tables(con)
     report(con, df, args)
     df.to_csv(args.outfile, sep = "\t", index = False)
+    con.close()
 
 if __name__ == "__main__":
     match_variants(args)
