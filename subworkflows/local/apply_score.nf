@@ -4,6 +4,7 @@
 
 include { PLINK2_SCORE } from '../../modules/local/plink2_score' addParams ( options: [:] )
 include { COMBINE_SCORES } from '../../modules/local/combine_scores'
+include { MAKE_REPORT    } from '../../modules/local/make_report'
 
 workflow APPLY_SCORE {
     take:
@@ -54,6 +55,11 @@ workflow APPLY_SCORE {
     COMBINE_SCORES.out.scorefiles
         .mix(scores.splat)
         .set{ combined_scores }
+
+    MAKE_REPORT(
+        combined_scores,
+        Channel.fromPath("$projectDir/bin/report.Rmd", checkIfExists: true)
+    )
 
     emit:
     score = combined_scores

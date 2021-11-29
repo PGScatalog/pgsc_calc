@@ -1,0 +1,25 @@
+---
+title: "PGS Catalog calculator summary report"
+output: html_document
+date: "`r Sys.time()`"
+params:
+  file: dummy.sscore
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Score download
+
+```{r, echo = FALSE}
+xfun::embed_file(params$file)
+```
+
+## Score summary
+
+```{r}
+scores <- read.table(params$file, header = TRUE, comment.char = "")
+head(scores)
+```
+
