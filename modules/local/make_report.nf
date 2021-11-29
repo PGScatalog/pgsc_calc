@@ -20,6 +20,7 @@ process MAKE_REPORT {
     input:
     tuple val(meta), path('results.scorefile')
     path(report)
+    path(logo)
 
     output:
     path "*.html"      , emit: report

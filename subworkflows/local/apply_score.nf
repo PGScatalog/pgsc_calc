@@ -58,7 +58,8 @@ workflow APPLY_SCORE {
 
     MAKE_REPORT(
         combined_scores,
-        Channel.fromPath("$projectDir/bin/report.Rmd", checkIfExists: true)
+        Channel.fromPath("$projectDir/bin/report.Rmd", checkIfExists: true),
+        Channel.fromPath("$projectDir/assets/PGS_Logo.png", checkIfExists: true)
     )
 
     emit:

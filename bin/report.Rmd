@@ -4,19 +4,25 @@ output: html_document
 date: "`r Sys.time()`"
 params:
   file: dummy.sscore
+  img: PGS_Logo.png
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Score download
-
-```{r, echo = FALSE}
-xfun::embed_file(params$file)
+```{r, echo=FALSE}
+htmltools::img(src = knitr::image_uri(params$img),
+               alt = 'logo', 
+               style = 'position:absolute; top:0; right:0; padding:10px;',
+               height = "200px")
 ```
 
 ## Score summary
+
+```{r, echo = FALSE}
+xfun::embed_file(params$file, text = "Download calculated scores")
+```
 
 ```{r}
 scores <- read.table(params$file, header = TRUE, comment.char = "")
