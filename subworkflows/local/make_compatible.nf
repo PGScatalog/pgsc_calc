@@ -23,14 +23,15 @@ workflow MAKE_COMPATIBLE {
     main:
     ch_versions = Channel.empty()
 
-    PLINK2_RELABEL (
-        bed
-            .mix(bim, fam)
-            .groupTuple(size: 3) // order doesn't matter for plink
-            .map { it.flatten() }
-    )
+    bed
+        .mix(bim, fam)
+        .groupTuple(size: 3, sort: true)
+        .map { it.flatten() }
+        .set { pfiles }
 
-    SCOREFILE_QC(scorefile)
+    PLINK2_RELABEL( pfiles )
+
+    SCOREFILE_QC( scorefile )
 
     // -------------------------------------------------------------------------
     // Recombine split bim files to check the overlap between target variants

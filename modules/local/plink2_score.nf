@@ -33,8 +33,7 @@ process PLINK2_SCORE {
         plink2 \\
             --score ${scorefile} no-mean-imputation \\
             --pfile ${pgen.baseName} \\
-            --out ${meta.id}_${meta.chrom} \\
-
+            --out ${meta.id}_${meta.chrom}
 
         cat <<-END_VERSIONS > versions.yml
         ${getProcessName(task.process)}:
