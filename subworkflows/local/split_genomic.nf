@@ -15,6 +15,8 @@ workflow SPLIT_GENOMIC {
     scorefile
 
     main:
+    ch_versions = Channel.empty()
+
     // Split bim if [chrom:false] ----------------------------------------------
     bim
         .branch {
@@ -27,6 +29,8 @@ workflow SPLIT_GENOMIC {
         ch_split.to_split,
         "chromosome"
     )
+
+    ch_versions = ch_versions.mix(SPLIT_CHROM.out.versions.first())
 
     // [meta1, chrom1, chromN] -> [meta1, chrom1]
     //                            [meta1, chromN]
@@ -53,6 +57,7 @@ workflow SPLIT_GENOMIC {
 
     // [meta, bed, bim, fam, variants]
     EXTRACT_CHROM { ch_plink_extract }
+    ch_versions = ch_versions.mix(EXTRACT_CHROM.out.versions.first())
 
     // Now mix split files with pre-split files --------------------------------
     ch_split.splat
@@ -70,6 +75,7 @@ workflow SPLIT_GENOMIC {
     bim = ch_bfiles_splat.bim.mix( EXTRACT_CHROM.out.bim )
     fam = ch_bfiles_splat.fam.mix( EXTRACT_CHROM.out.fam )
     scorefile = scorefile
+    versions = ch_versions
 }
 
 // function to get a list of sample-chromosome combinations:

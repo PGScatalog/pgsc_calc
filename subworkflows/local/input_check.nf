@@ -5,10 +5,9 @@
 def modules = params.modules.clone()
 params.options = [:]
 
-include { SAMPLESHEET_CHECK              } from '../../modules/local/samplesheet_check'            addParams( options: params.options )
-include { SCOREFILE_CHECK                } from '../../modules/local/scorefile_check'              addParams( options: params.options )
-include { PLINK_VCF                      } from '../../modules/nf-core/modules/plink/vcf/main'     addParams( options: modules['plink_vcf'] )
-
+include { SAMPLESHEET_CHECK } from '../../modules/local/samplesheet_check'        addParams( options: params.options )
+include { SCOREFILE_CHECK   } from '../../modules/local/scorefile_check'          addParams( options: params.options )
+include { PLINK_VCF         } from '../../modules/nf-core/modules/plink/vcf/main' addParams( options: modules['plink_vcf'] )
 
 workflow INPUT_CHECK {
     take:
@@ -16,6 +15,8 @@ workflow INPUT_CHECK {
     scorefile // tuple val(id), path(/path/to/score_file)
 
     main:
+    ch_versions = Channel.empty()
+
     SAMPLESHEET_CHECK ( samplesheet )
         .csv
         .splitCsv ( header:true, sep:',' )
@@ -25,10 +26,12 @@ workflow INPUT_CHECK {
             bfile: !it[0].is_vcf
         }
         .set { ch_input }
+    ch_versions = ch_versions.mix(SAMPLESHEET_CHECK.out.versions)
 
     PLINK_VCF (
         ch_input.vcf
     )
+    ch_versions = ch_versions.mix(PLINK_VCF.out.versions.first())
 
     // branch is like a switch statement, so only one bed / bim was being
     // returned
@@ -36,14 +39,11 @@ workflow INPUT_CHECK {
         bed: [it[0], it[1][0]]
         bim: [it[0], it[1][1]]
         fam: [it[0], it[1][2]]
-        }
+    }
         .set { ch_bfiles }
 
     SCOREFILE_CHECK ( scorefile )
-
-    SAMPLESHEET_CHECK.out.versions
-        .mix(SCOREFILE_CHECK.out.versions)
-        .set{ ch_versions }
+    ch_versions = ch_versions.mix(SCOREFILE_CHECK.out.versions.first())
 
     emit:
     bed = ch_bfiles.bed.mix(PLINK_VCF.out.bed) // channel: [val(meta), path(bed)]

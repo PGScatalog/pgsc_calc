@@ -37,7 +37,7 @@ include { PGSCALC } from './workflows/pgscalc'
 //
 // WORKFLOW: Run main nf-core/pgscalc analysis pipeline
 //
-workflow NFCORE_PGSCALC {
+workflow PGSC_CALC {
     PGSCALC ()
 }
 
@@ -52,7 +52,7 @@ workflow NFCORE_PGSCALC {
 // See: https://github.com/nf-core/rnaseq/issues/619
 //
 workflow {
-    NFCORE_PGSCALC ()
+    PGSC_CALC ()
 }
 
 /*

@@ -9,7 +9,6 @@ def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 // Validate input parameters
 WorkflowPgscalc.initialise(params, log)
 
-// TODO nf-core: Add all file path parameters for the pipeline to the list below
 // Check input path parameters to see if they exist
 def checkPathParamList = [
     params.input,
@@ -39,43 +38,15 @@ if (!params.accession && params.scorefile) {
 
 // Don't overwrite global params.modules, create a copy instead and use that within the main script.
 def modules = params.modules.clone()
-
-//
-// MODULE: Local to the pipeline
-//
-include { GET_SOFTWARE_VERSIONS } from '../modules/local/get_software_versions' addParams( options: [publish_files : ['tsv':'']] )
-
-//
-// SUBWORKFLOW: Get scoring file from PGS Catalog
-//
-include { PGSCATALOG } from '../subworkflows/local/pgscatalog' addParams( options: [:] )
-
-def plink_vcf_options = [:]
-plink_vcf_options['args'] = "--keep-allele-order"
-
-//
-// SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
-//
-include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( options: [:] )
-
 def match_variants_options = [:]
 match_variants_options['args'] = "--min_overlap=" + params.min_overlap
 
-include { MAKE_COMPATIBLE } from '../subworkflows/local/make_compatible' addParams( match_variants_options: match_variants_options )
-
-include { SPLIT_GENOMIC } from '../subworkflows/local/split_genomic' addParams( options: [:] )
-
-include { APPLY_SCORE } from '../subworkflows/local/apply_score' addParams ( options: [:] )
-
-/*
-========================================================================================
-    IMPORT NF-CORE MODULES/SUBWORKFLOWS
-========================================================================================
-*/
-
-//
-// MODULE: Installed directly from nf-core/modules
-//
+include { PGSCATALOG           } from '../subworkflows/local/pgscatalog'
+include { INPUT_CHECK          } from '../subworkflows/local/input_check'
+include { MAKE_COMPATIBLE      } from '../subworkflows/local/make_compatible' addParams( match_variants_options: match_variants_options )
+include { SPLIT_GENOMIC        } from '../subworkflows/local/split_genomic'
+include { APPLY_SCORE          } from '../subworkflows/local/apply_score'
+include { DUMPSOFTWAREVERSIONS } from '../modules/local/dumpsoftwareversions'
 
 /*
 ========================================================================================
@@ -84,7 +55,7 @@ include { APPLY_SCORE } from '../subworkflows/local/apply_score' addParams ( opt
 */
 
 workflow PGSCALC {
-    ch_software_versions = Channel.empty()
+    ch_versions = Channel.empty()
 
     //
     // SUBWORKFLOW: Get scoring file from PGS Catalog accession
@@ -105,7 +76,7 @@ workflow PGSCALC {
         ch_scorefile
     )
 
-    ch_software_versions = ch_software_versions.mix(INPUT_CHECK.out.versions)
+    ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 
     //
     // SUBWORKFLOW: Split genetic data to improve parallelisation --------------
@@ -117,6 +88,8 @@ workflow PGSCALC {
         INPUT_CHECK.out.scorefile
     )
 
+    ch_versions = ch_versions.mix(SPLIT_GENOMIC.out.versions)
+
     //
     // SUBWORKFLOW: Make scoring file and target genomic data compatible
     //
@@ -127,7 +100,7 @@ workflow PGSCALC {
         SPLIT_GENOMIC.out.scorefile
     )
 
-    ch_software_versions = ch_software_versions.mix(MAKE_COMPATIBLE.out.versions)
+    ch_versions = ch_versions.mix(MAKE_COMPATIBLE.out.versions)
 
     //
     // SUBWORKFLOW: Apply a scoring file to target genomic data
@@ -139,20 +112,14 @@ workflow PGSCALC {
         MAKE_COMPATIBLE.out.scorefile
     )
 
-    //
-    // MODULE: Pipeline reporting
-    //
-    ch_software_versions
-        .map { it -> if (it) [ it.baseName, it ] }
-        .groupTuple()
-        .map { it[1][0] }
-        .flatten()
-        .collect()
-        .set { ch_software_versions }
+    ch_versions = ch_versions.mix(APPLY_SCORE.out.versions)
 
-//    GET_SOFTWARE_VERSIONS (
-//        ch_software_versions.map { it }.collect()
-//    )
+    //
+    // MODULE: Dump software versions for all tools used in the workflow
+    //
+    DUMPSOFTWAREVERSIONS (
+        ch_versions.unique().collectFile(name: 'collated_versions.yml')
+    )
 }
 
 /*

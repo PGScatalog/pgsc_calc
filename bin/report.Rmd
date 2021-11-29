@@ -29,3 +29,8 @@ scores <- read.table(params$file, header = TRUE, comment.char = "")
 head(scores)
 ```
 
+## Sesssion information
+
+```{r}
+sessionInfo()
+```

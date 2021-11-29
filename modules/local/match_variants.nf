@@ -24,7 +24,7 @@ process MATCH_VARIANTS {
     output:
     tuple val(scoremeta), path("*.scorefile"), emit: scorefile
     path "*.log"                             , emit: log
-//    path "versions.yml"                      , emit: versions
+    path "versions.yml"                      , emit: versions
 
     script:
     """
@@ -34,5 +34,11 @@ process MATCH_VARIANTS {
         --target $target \
         --db match.db \
         --out ${meta.id}.scorefile
+
+    cat <<-END_VERSIONS > versions.yml
+    ${getProcessName(task.process)}:
+        python: \$(echo \$(python -V 2>&1) | cut -f 2 -d ' ')
+        sqlite: \$(echo \$(sqlite3 -version 2>&1) | cut -f 1 -d ' ')
+    END_VERSIONS
     """
 }

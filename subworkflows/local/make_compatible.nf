@@ -31,7 +31,11 @@ workflow MAKE_COMPATIBLE {
 
     PLINK2_RELABEL( pfiles )
 
+    ch_versions = ch_versions.mix(PLINK2_RELABEL.out.versions.first())
+
     SCOREFILE_QC( scorefile )
+
+    ch_versions = ch_versions.mix(SCOREFILE_QC.out.versions.first())
 
     // -------------------------------------------------------------------------
     // Recombine split bim files to check the overlap between target variants
@@ -41,12 +45,15 @@ workflow MAKE_COMPATIBLE {
     // guaranteed to be split at this stage even with mixed input. The order of
     // the combined bim file isn't preserved but it's not necessary for the awk
     // program in CHECK_OVERLAP. The final scorefile is sorted in CHECK_OVERLAP.
-    COMBINE_BIM (
-        PLINK2_RELABEL.out.pvar
-            .map { [it.head().take(2), it.tail()] } // drop chrom from meta for groupTuple
-            .groupTuple()
-            .map{ [it.head(), it.tail().flatten()] } // [[meta], [pvar1, ..., pvarn]]
-    )
+    PLINK2_RELABEL.out.pvar
+        .map { [it.head().take(2), it.tail()] } // drop chrom from meta for groupTuple
+        .groupTuple()
+        .map { [it.head(), it.tail().flatten()] } // [[meta], [pvar1, ..., pvarn]]
+        .set { flat_bims }
+
+    COMBINE_BIM( flat_bims )
+
+    ch_versions = ch_versions.mix(COMBINE_BIM.out.versions)
 
     MATCH_VARIANTS (
         // variants should be matched once per sample
@@ -55,12 +62,16 @@ workflow MAKE_COMPATIBLE {
             .combine(SCOREFILE_QC.out.data)
     )
 
+    ch_versions = ch_versions.mix(MATCH_VARIANTS.out.versions)
+
     SCOREFILE_SPLIT (
         // scorefile split should only happen once per unique accession
         MATCH_VARIANTS.out.scorefile
             .unique { it.head().accession },
         "chromosome"
     )
+
+    ch_versions = ch_versions.mix(SCOREFILE_SPLIT.out.versions.first())
 
     // generate a list of chromosome split scorefile - sampleID combinations ---
     // then emit a flat list of split scorefiles
@@ -70,16 +81,6 @@ workflow MAKE_COMPATIBLE {
         .combine(SCOREFILE_SPLIT.out.scorefile) // [[meta], [scoremeta], [[split_score_1], ...]]
         .flatMap { create_scorefile_channel([it[0] << it[1], it[2]]) } // combine meta and scoremeta
         .set { ch_scorefile } // flat list [[accession:PGS001229, chrom: 22, id: 1], scorefile]
-
-    // debugging ---------------------------------------------------------------
-    PLINK2_RELABEL.out.pgen.dump(tag: 'compatible_pgen')
-    PLINK2_RELABEL.out.psam.dump(tag: 'compatible_psam')
-    PLINK2_RELABEL.out.pvar.dump(tag: 'compatible_pvar')
-    ch_scorefile.dump(tag: 'compatible_scorefile')
-
-    PLINK2_RELABEL.out.versions
-//        .mix(VALIDATE_EXTRACT.out.versions)
-        .set { ch_versions }
 
     emit:
     pgen = PLINK2_RELABEL.out.pgen

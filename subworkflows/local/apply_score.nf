@@ -35,6 +35,8 @@ workflow APPLY_SCORE {
         ch_apply
     )
 
+    ch_versions = ch_versions.mix(PLINK2_SCORE.out.versions)
+
     PLINK2_SCORE.out.score
         // TODO: size may vary per sample, make sure groupTuple has size:
         // https://github.com/nextflow-io/nextflow/issues/796
@@ -52,6 +54,8 @@ workflow APPLY_SCORE {
         scores.split // only combine separate scores
     )
 
+    ch_versions = ch_versions.mix(COMBINE_SCORES.out.versions.first())
+
     COMBINE_SCORES.out.scorefiles
         .mix(scores.splat)
         .set{ combined_scores }
@@ -61,6 +65,8 @@ workflow APPLY_SCORE {
         Channel.fromPath("$projectDir/bin/report.Rmd", checkIfExists: true),
         Channel.fromPath("$projectDir/assets/PGS_Logo.png", checkIfExists: true)
     )
+
+    ch_versions = ch_versions.mix(MAKE_REPORT.out.versions)
 
     emit:
     score = combined_scores

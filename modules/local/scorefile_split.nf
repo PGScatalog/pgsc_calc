@@ -32,6 +32,7 @@ process SCOREFILE_SPLIT {
         -f ${projectDir}/bin/split_bim.awk \
         $scorefile
     sed -i -e 's/\\t/:/' *.keep # restore first column
+
     cat <<-END_VERSIONS > versions.yml
     ${getProcessName(task.process)}:
         mawk: \$(echo \$(mawk -W version 2>&1) | cut -f 2 -d ' ')
