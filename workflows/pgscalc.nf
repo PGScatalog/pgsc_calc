@@ -36,14 +36,9 @@ if (!params.accession && params.scorefile) {
 ========================================================================================
 */
 
-// Don't overwrite global params.modules, create a copy instead and use that within the main script.
-def modules = params.modules.clone()
-def match_variants_options = [:]
-match_variants_options['args'] = "--min_overlap=" + params.min_overlap
-
 include { PGSCATALOG           } from '../subworkflows/local/pgscatalog'
 include { INPUT_CHECK          } from '../subworkflows/local/input_check'
-include { MAKE_COMPATIBLE      } from '../subworkflows/local/make_compatible' addParams( match_variants_options: match_variants_options )
+include { MAKE_COMPATIBLE      } from '../subworkflows/local/make_compatible'
 include { SPLIT_GENOMIC        } from '../subworkflows/local/split_genomic'
 include { APPLY_SCORE          } from '../subworkflows/local/apply_score'
 include { DUMPSOFTWAREVERSIONS } from '../modules/local/dumpsoftwareversions'

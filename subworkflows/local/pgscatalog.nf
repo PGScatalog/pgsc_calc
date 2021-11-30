@@ -2,15 +2,10 @@
 // Get PGSCatalog scoring file from a PGS accession
 //
 
-params.options = [:]
-
-// local modules
-include { PGSCATALOG_API } from '../../modules/local/pgscatalog_api' addParams( options: params.options )
-include { PGSCATALOG_PARSE } from '../../modules/local/pgscatalog_parse' addParams( options: params.options )
-include { PGSCATALOG_GET } from '../../modules/local/pgscatalog_get' addParams( options: params.options )
-
-// NF-CORE
-include { GUNZIP } from '../../modules/nf-core/modules/gunzip/main' addParams (options: [:] )
+include { PGSCATALOG_API } from '../../modules/local/pgscatalog_api'
+include { PGSCATALOG_PARSE } from '../../modules/local/pgscatalog_parse'
+include { PGSCATALOG_GET } from '../../modules/local/pgscatalog_get'
+include { GUNZIP } from '../../modules/nf-core/modules/gunzip/main'
 
 workflow PGSCATALOG {
     take:

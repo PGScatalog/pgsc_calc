@@ -2,10 +2,8 @@
 // Split input file into smaller chunks (typically chromosome)
 //
 
-params.options = [:]
-
-include { SPLIT_BIM as SPLIT_CHROM       } from '../../modules/local/split_bim'                    addParams( options: params.options )
-include { PLINK_EXTRACT as EXTRACT_CHROM } from '../../modules/nf-core/modules/plink/extract/main' addParams( options: [suffix:'.extract'] )
+include { SPLIT_BIM as SPLIT_CHROM       } from '../../modules/local/split_bim'
+include { PLINK_EXTRACT as EXTRACT_CHROM } from '../../modules/nf-core/modules/plink/extract/main'
 
 workflow SPLIT_GENOMIC {
     take:

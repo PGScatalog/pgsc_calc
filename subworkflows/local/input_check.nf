@@ -2,12 +2,9 @@
 // Check input samplesheet and get read channels
 //
 
-def modules = params.modules.clone()
-params.options = [:]
-
-include { SAMPLESHEET_CHECK } from '../../modules/local/samplesheet_check'        addParams( options: params.options )
-include { SCOREFILE_CHECK   } from '../../modules/local/scorefile_check'          addParams( options: params.options )
-include { PLINK_VCF         } from '../../modules/nf-core/modules/plink/vcf/main' addParams( options: modules['plink_vcf'] )
+include { SAMPLESHEET_CHECK } from '../../modules/local/samplesheet_check'
+include { SCOREFILE_CHECK   } from '../../modules/local/scorefile_check'
+include { PLINK_VCF         } from '../../modules/nf-core/modules/plink/vcf/main'
 
 workflow INPUT_CHECK {
     take:
@@ -95,4 +92,3 @@ def create_variant_channel(LinkedHashMap row) {
     }
     return array
 }
-

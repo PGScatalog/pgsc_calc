@@ -1,21 +1,10 @@
-// Import generic module functions
-include { initOptions; saveFiles; getSoftwareName; getProcessName } from './functions'
-
-params.options = [:]
-options        = initOptions(params.options)
-
 process MAKE_REPORT {
     label 'process_low'
-    publishDir "${params.outdir}",
-        mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), meta:meta, publish_by_meta:['id']) }
 
     conda (params.enable_conda ? "bioconda::mawk=1.3.4" : null)
-    if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
-        container "https://depot.galaxyproject.org/singularity/bioconductor-biocworkflowtools:1.20.0--r41hdfd78af_0"
-    } else {
-        container "quay.io/biocontainers/bioconductor-biocworkflowtools:1.20.0--r41hdfd78af_0"
-    }
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/bioconductor-biocworkflowtools:1.20.0--r41hdfd78af_0' :
+        'quay.io/biocontainers/bioconductor-biocworkflowtools:1.20.0--r41hdfd78af_0' }"
 
     input:
     tuple val(meta), path('results.scorefile')
@@ -27,6 +16,8 @@ process MAKE_REPORT {
     path "versions.yml", emit: versions
 
     script:
+    def args = task.ext.args ?: ''
+    def prefix = task.ext.suffix ? "${meta.id}${task.ext.suffix}" : "${meta.id}"
     """
     # dumb workaround symlink & out_dir (rmarkdown)
     # don't want to stageInMode very big score files
@@ -36,7 +27,7 @@ process MAKE_REPORT {
         output_options = list(self_contained=TRUE))'
 
     cat <<-END_VERSIONS > versions.yml
-    ${getProcessName(task.process)}:
+    ${task.process.tokenize(':').last()}:
         R: \$(echo \$(R --version 2>&1) | head -n 1 | cut -f 3 -d ' ')
     END_VERSIONS
     """

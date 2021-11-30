@@ -4,14 +4,12 @@
 //     - Match variants across scorefile and target data, flipping if necessary
 //
 
-params.match_variants_options = [:]
-
-include { PLINK2_RELABEL  } from '../../modules/local/plink2_relabel'  addParams ( options: [:] )
-include { PLINK2_EXTRACT  } from '../../modules/local/plink2_extract'  addParams ( options: [suffix:'.extract'] )
-include { COMBINE_BIM     } from '../../modules/local/combine_bim'     addParams ( options: [:] )
-include { MATCH_VARIANTS  } from '../../modules/local/match_variants'   addParams ( options: params.match_variants_options )
-include { SCOREFILE_QC    } from '../../modules/local/scorefile_qc'    addParams ( options: [:] )
-include { SCOREFILE_SPLIT } from '../../modules/local/scorefile_split' addParams ( options: [:] )
+include { PLINK2_RELABEL  } from '../../modules/local/plink2_relabel'
+include { PLINK2_EXTRACT  } from '../../modules/local/plink2_extract'
+include { COMBINE_BIM     } from '../../modules/local/combine_bim'
+include { MATCH_VARIANTS  } from '../../modules/local/match_variants'
+include { SCOREFILE_QC    } from '../../modules/local/scorefile_qc'
+include { SCOREFILE_SPLIT } from '../../modules/local/scorefile_split'
 
 workflow MAKE_COMPATIBLE {
     take:
