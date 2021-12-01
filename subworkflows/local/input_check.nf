@@ -60,7 +60,7 @@ def create_variant_channel(LinkedHashMap row) {
     meta.chrom  = row.chrom?: false
 
     if (row.datadir) {
-        if (! file(row.datadir).exists())_{
+        if (! file(row.datadir).exists()) {
             exit 1, "ERROR: Please check input samplesheet -> data directory doesn't exist!"
         }
     }
@@ -68,24 +68,11 @@ def create_variant_channel(LinkedHashMap row) {
     def array = []
     if (meta.is_vcf) {
         vcf_path = array_to_file([row.datadir, row.vcf_path])
-        if (!vcf_path.exists()) {
-            exit 1, "ERROR: Please check input samplesheet -> VCF file does not exist!\n${row.vcf_path}"
-        }
         array = [ meta, [ vcf_path ] ]
     } else {
         bed_path = array_to_file([row.datadir, row.bfile_prefix + ".bed"])
         bim_path = array_to_file([row.datadir, row.bfile_prefix + ".bim"])
         fam_path = array_to_file([row.datadir, row.bfile_prefix + ".fam"])
-
-        if (!bed_path.exists()) {
-            exit 1, "ERROR: Please check input samplesheet -> bed file does not exist!\n${bed_path}"
-        }
-        if (!bim_path.exists()) {
-            exit 1, "ERROR: Please check input samplesheet -> bim file does not exist!\n${bim_path}"
-        }
-        if (!fam_path.exists()) {
-            exit 1, "ERROR: Please check input samplesheet -> fam file does not exist!\n${fam_path}"
-        }
         array = [ meta, [ bed_path, bim_path, fam_path ] ]
     }
     return array
@@ -93,6 +80,13 @@ def create_variant_channel(LinkedHashMap row) {
 
 // given an array of strings, return a file object
 def array_to_file(ArrayList x) {
-    x.removeAll(["", null]) // datadir may be null, don't convert to an absolute
-    return file(x.join("/"))
+    x.removeAll(["", null]) // datadir may be null, don't convert to an absolute with join
+    try {
+        return file(x.join("/"), checkIfExists: true)
+    } catch(IOException e) {
+        // point the user to the samplesheet
+        throw new IOException("ERROR: Please check input samplesheet " +
+                              "-> file ${x.join('/')} does not exist\n" +
+                              "(did you correctly specify datadir column?)")
+    }
 }
