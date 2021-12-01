@@ -16,10 +16,6 @@ NR > 1 {
         print "Please check line number", NR
         error_missing_sample = 1
         exit 1
-    } else if (! $(f["datadir"])) {
-        print "Please check line number", NR
-        error_missing_datadir = 1
-        exit 1
     } else if (! $(f["vcf_path"]) && ! $(f["bfile_prefix"])) {
         print "Please check line number", NR
         error_missing_path = 1
@@ -87,8 +83,6 @@ END {
     # explode loudly for obvious problems --------------------------------------
     if (error_missing_sample) {
         error_required("sample")
-    } else if (error_missing_datadir) {
-        error_required("datadir")
     } else if (error_missing_path) {
         error_required("vcf_path or bfile_prefix")
     } else if (error_vcf_extension) {

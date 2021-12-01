@@ -59,23 +59,24 @@ def create_variant_channel(LinkedHashMap row) {
     meta.is_vcf = row.is_vcf.toBoolean()
     meta.chrom  = row.chrom?: false
 
-    if (! file(row.datadir).exists())_{
-        exit 1, "ERROR: Please check input samplesheet -> data directory doesn't exist!"
+    if (row.datadir) {
+        if (! file(row.datadir).exists())_{
+            exit 1, "ERROR: Please check input samplesheet -> data directory doesn't exist!"
+        }
     }
-
-    // todo: better way of joining files?
-    bed_path = file(row.datadir + "/" + row.bfile_prefix + ".bed")
-    bim_path = file(row.datadir + "/" + row.bfile_prefix + ".bim")
-    fam_path = file(row.datadir + "/" + row.bfile_prefix + ".fam")
-    vcf_path = file(row.datadir + "/" + row.vcf_path)
 
     def array = []
     if (meta.is_vcf) {
+        vcf_path = array_to_file([row.datadir, row.vcf_path])
         if (!vcf_path.exists()) {
             exit 1, "ERROR: Please check input samplesheet -> VCF file does not exist!\n${row.vcf_path}"
         }
         array = [ meta, [ vcf_path ] ]
     } else {
+        bed_path = array_to_file([row.datadir, row.bfile_prefix + ".bed"])
+        bim_path = array_to_file([row.datadir, row.bfile_prefix + ".bim"])
+        fam_path = array_to_file([row.datadir, row.bfile_prefix + ".fam"])
+
         if (!bed_path.exists()) {
             exit 1, "ERROR: Please check input samplesheet -> bed file does not exist!\n${bed_path}"
         }
@@ -85,10 +86,13 @@ def create_variant_channel(LinkedHashMap row) {
         if (!fam_path.exists()) {
             exit 1, "ERROR: Please check input samplesheet -> fam file does not exist!\n${fam_path}"
         }
-        if (bed_path.getBaseName() != row.sample) {
-            exit 1, "ERROR: Please check input samplesheet -> sample id doesn't match bfile base name\n${row.sample} ${bed_path}"
-        }
         array = [ meta, [ bed_path, bim_path, fam_path ] ]
     }
     return array
+}
+
+// given an array of strings, return a file object
+def array_to_file(ArrayList x) {
+    x.removeAll(["", null]) // datadir may be null, don't convert to an absolute
+    return file(x.join("/"))
 }
