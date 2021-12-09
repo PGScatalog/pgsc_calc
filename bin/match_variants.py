@@ -27,10 +27,20 @@ def make_tables(con):
     cur.execute('''
         CREATE TABLE scorefile(
             "chrom" TEXT,
-            "pos" TEXT,
+            "pos" INTEGER,
             "effect" TEXT,
             "other" TEXT,
-            "weight" TEXT)
+            "weight" REAL)
+    ''')
+
+    cur.execute('''
+        CREATE TABLE target(
+          "#CHROM" TEXT,
+          "POS" INTEGER,
+          "ID" TEXT,
+          "REF" TEXT,
+          "ALT" TEXT
+        );
     ''')
 
     cur.execute('''
@@ -74,11 +84,11 @@ def import_tables(con, db_path, scorefile_path, target_path):
     ''')
 
     cur.execute('''
-        CREATE INDEX idx_scorefile on scorefile (chrom, pos)
+        CREATE INDEX idx_scorefile on scorefile (pos, chrom)
     ''')
 
     cur.execute('''
-        CREATE INDEX idx_target ON target ('#CHROM', pos)
+        CREATE INDEX idx_target ON target (pos, '#CHROM')
     ''')
 
     con.commit()
