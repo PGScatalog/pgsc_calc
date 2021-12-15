@@ -20,6 +20,13 @@ process PGSCATALOG_API {
     pgs_api=\$(printf 'https://www.pgscatalog.org/rest/score/%s' ${accession})
     curl -s \$pgs_api -o ${accession}.json
 
+    # check for a valid response. empty response: {} = 2 chars
+    if [ \$(wc -m < ${accession}.json) -eq 2 ]
+    then
+        echo "PGS Catalog API error. Is --accession valid?"
+        exit 1
+    fi
+
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
         curl: \$(curl --version 2>&1 | head -n 1 | sed 's/curl //; s/ (x86.*\$//')
