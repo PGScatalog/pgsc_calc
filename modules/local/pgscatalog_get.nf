@@ -13,8 +13,8 @@ process PGSCATALOG_GET {
     tuple val(accession), path(url)
 
     output:
-    path("*.gz")       , emit: scorefile
-    path "versions.yml", emit: versions
+    tuple val(accession), path("scorefile"), emit: scorefile
+    path "versions.yml"                    , emit: versions
 
     script:
     """
@@ -23,9 +23,12 @@ process PGSCATALOG_GET {
         --speed-time 10 \\
         --speed-limit 1000 \\
          -O -K ${url}
+    gunzip -c *.gz > scorefile
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
+        sed: \$(sed --version 2>&1 | head -n 1 | cut -f 4 -d ' ')
+        gzip: \$(gzip --version 2>&1 | head -n 1 | cut -f 2 -d ' ')
         curl: \$(curl --version 2>&1 | head -n 1 | sed 's/curl //; s/ (x86.*\$//')
     END_VERSIONS
     """
