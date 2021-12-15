@@ -22,9 +22,6 @@
 BEGIN {
     FS="\t"; OFS="\t"
     "date" | getline start_time
-    # longest header finishes at line 12 in PGS Catalog 2021-10-28
-    # this limit is useful to prevent matching that's not needed
-    header_limit = 20
 
     if (!out) {
         missing_output_error = 1
@@ -33,13 +30,18 @@ BEGIN {
 }
 
 # check headers ----------------------------------------------------------------
-NR == 1 && $0 !~ /^### PGS CATALOG SCORING FILE/ {
+NR == 1 && $0 !~ /^###PGS CATALOG SCORING FILE/ {
     file_error = 1
     exit 1
 }
 
-NR < header_limit && $0 ~ /^# Original Genome Build/ {
-    split($0, build_array, " = ")
+NR == 2 && $0 !~ /^#format_version=2.0/ {
+    file_error = 1
+    exit 1
+}
+
+/^#genome_build/ {
+    split($0, build_array, "=")
     pgs_build=build_array[2]
     if (pgs_build != "GRCh37") {
         build_error = 1
@@ -48,21 +50,21 @@ NR < header_limit && $0 ~ /^# Original Genome Build/ {
 }
 
 # assume the column names begin on the line after the header ends
-NR < header_limit && $0 ~/^#/ {
-    header_line=NR+1
+/^#/ {
+    header_end++
 }
 
 # check scoring data -----------------------------------------------------------
 # set up column names in an array
 # useful because column numbers won't be consistent across files
 # e.g. $2 -> $(data["rsid"])
-$0 !~ /^#/ && NR == header_line {
+!/^#/ && NR == ( header_end + 1 ) {
     for (i=1; i<=NF; i++) {
         data[$i] = i
     }
 }
 
-$0 !~ /^#/ && NR > header_line {
+$0 !~ /^#/ && NR > header_end {
     n_var_raw++
     # check mandatory columns
     if (!data["chr_position"] || !data["chr_name"]) {
@@ -125,6 +127,7 @@ END {
     }
     # write a pretty log -------------------------------------------------------
     print "check_scorefile.awk", start_time > "check.log"
+    print "Header end line number", header_end + 1  > "check.log"
     print "Total variants read", n_var_raw > "check.log"
     print "Total variants written", n_var > "check.log"
 }
