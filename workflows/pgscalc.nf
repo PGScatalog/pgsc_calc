@@ -1,6 +1,6 @@
 /*
 ========================================================================================
-    VALIDATE INPUTS
+    VALIDATE INPUTS (SAMPLESHEET)
 ========================================================================================
 */
 
@@ -10,14 +10,25 @@ def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 WorkflowPgscalc.initialise(params, log)
 
 // Check input path parameters to see if they exist
-def checkPathParamList = [
-    params.input,
-]
+def checkPathParamList = [params.input, params.scorefile]
 
-for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
+if (params.input && params.json) {
+    exit 1, 'Samplesheet input and JSON input are mutually exclusive'
+}
+
+for (param in checkPathParamList) {
+    if (param && !params.json) {
+        file(param, checkIfExists: true)
+    }
+}
 
 // Check mandatory parameters
-if (params.input) { ch_input = file(params.input) } else { exit 1, 'Genotype input not specified!' }
+if (!params.json && params.input) {
+    ch_input = file(params.input, checkIfExists: true)
+} else {
+    ch_input = Channel.empty()
+    ch_json = params.json
+}
 
 // Set up score channels
 if (!params.accession && params.scorefile) {
@@ -32,12 +43,20 @@ if (!params.accession && params.scorefile) {
 
 /*
 ========================================================================================
+    VALIDATE INPUTS (JSON)
+========================================================================================
+*/
+
+
+/*
+========================================================================================
     IMPORT LOCAL MODULES/SUBWORKFLOWS
 ========================================================================================
 */
 
 include { PGSCATALOG           } from '../subworkflows/local/pgscatalog'
 include { INPUT_CHECK          } from '../subworkflows/local/input_check'
+include { JSON_CHECK           } from '../subworkflows/local/json_check'
 include { MAKE_COMPATIBLE      } from '../subworkflows/local/make_compatible'
 include { SPLIT_GENOMIC        } from '../subworkflows/local/split_genomic'
 include { APPLY_SCORE          } from '../subworkflows/local/apply_score'
@@ -72,6 +91,10 @@ workflow PGSCALC {
     )
 
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
+
+    JSON_CHECK (
+        ch_json
+    )
 
     //
     // SUBWORKFLOW: Split genetic data to improve parallelisation --------------
