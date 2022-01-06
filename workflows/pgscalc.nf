@@ -25,9 +25,10 @@ for (param in checkPathParamList) {
 // Check mandatory parameters
 if (!params.json && params.input) {
     ch_input = file(params.input, checkIfExists: true)
+    ch_json = Channel.empty()
 } else {
     ch_input = Channel.empty()
-    ch_json = params.json
+    ch_json = Channel.from(params.json)
 }
 
 // Set up score channels
@@ -40,13 +41,6 @@ if (!params.accession && params.scorefile) {
 } else {
     exit 1, 'Please specify only one of --accession or --scorefile'
 }
-
-/*
-========================================================================================
-    VALIDATE INPUTS (JSON)
-========================================================================================
-*/
-
 
 /*
 ========================================================================================
@@ -92,17 +86,36 @@ workflow PGSCALC {
 
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 
+    //
+    // SUBWORKFLOW: Validate and stage input files
+    //
     JSON_CHECK (
         ch_json
     )
 
+    ch_versions = ch_versions.mix(JSON_CHECK.out.versions)
+
+    // now mix json input with samplesheet input
+    INPUT_CHECK.out.bed
+        .mix(JSON_CHECK.out.bed)
+        .set{ ch_bed }
+
+    INPUT_CHECK.out.bim
+        .mix(JSON_CHECK.out.bim)
+        .set{ ch_bim }
+
+    INPUT_CHECK.out.fam
+        .mix(JSON_CHECK.out.fam)
+        .set{ ch_fam }
+
     //
     // SUBWORKFLOW: Split genetic data to improve parallelisation --------------
     //
+
     SPLIT_GENOMIC (
-        INPUT_CHECK.out.bed,
-        INPUT_CHECK.out.bim,
-        INPUT_CHECK.out.fam,
+        ch_bed,
+        ch_bim,
+        ch_fam,
         INPUT_CHECK.out.scorefile
     )
 
