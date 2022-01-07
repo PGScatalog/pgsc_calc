@@ -50,12 +50,12 @@ if (!params.accession && params.scorefile) {
 
 include { PGSCATALOG           } from '../subworkflows/local/pgscatalog'
 include { INPUT_CHECK          } from '../subworkflows/local/input_check'
-include { JSON_CHECK           } from '../subworkflows/local/json_check'
 include { MAKE_COMPATIBLE      } from '../subworkflows/local/make_compatible'
 include { SPLIT_GENOMIC        } from '../subworkflows/local/split_genomic'
 include { APPLY_SCORE          } from '../subworkflows/local/apply_score'
 include { DUMPSOFTWAREVERSIONS } from '../modules/local/dumpsoftwareversions'
 
+include { PLINK_VCF as JSON_VCF } from '../modules/nf-core/modules/plink/vcf/main'
 /*
 ========================================================================================
     RUN MAIN WORKFLOW
@@ -86,26 +86,28 @@ workflow PGSCALC {
 
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 
-    //
-    // SUBWORKFLOW: Validate and stage input files
-    //
-    JSON_CHECK (
-        ch_json
-    )
+    // format JSON input but don't do proper validation
+    ch_json
+        .map {
+            [it.meta, file(it.vcf_path, checkIfExists: true)]
+        }
+        .set{json_genomic}
 
-    ch_versions = ch_versions.mix(JSON_CHECK.out.versions)
+    JSON_VCF(json_genomic)
+
+    ch_versions = ch_versions.mix(JSON_VCF.out.versions.first())
 
     // now mix json input with samplesheet input
     INPUT_CHECK.out.bed
-        .mix(JSON_CHECK.out.bed)
+        .mix(JSON_VCF.out.bed)
         .set{ ch_bed }
 
     INPUT_CHECK.out.bim
-        .mix(JSON_CHECK.out.bim)
+        .mix(JSON_VCF.out.bim)
         .set{ ch_bim }
 
     INPUT_CHECK.out.fam
-        .mix(JSON_CHECK.out.fam)
+        .mix(JSON_VCF.out.fam)
         .set{ ch_fam }
 
     //
