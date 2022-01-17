@@ -1,6 +1,6 @@
 # You can use this file to create a conda environment for this pipeline:
 #   conda env create -f environment.yml
-name: pgscatalog-calculator-0.1.1
+name: pgscatalog-calculator-0.1.2dev
 channels:
   - conda-forge
   - bioconda
