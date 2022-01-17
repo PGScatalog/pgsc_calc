@@ -19,7 +19,9 @@ lint:
     - assets/email_template.html
     - assets/email_template.txt
     - assets/sendmail_template.txt
-    - assets/nf-core-pgscatalog/pgsc_calc_logo_light.png  
+    - assets/nf-core-pgscatalog/pgsc_calc_logo_light.png
+    # CI
+    - .github/workflows/branch.yml
     files_unchanged:
       - LICENSE
     nextflow_config: False
