@@ -23,11 +23,13 @@
                 },
                 "scorefile": {
                     "type": "string",
-                    "description": "Path to a scoring file in PGS Catalog format"
+                    "description": "Path to a scoring file in PGS Catalog format",
+                    "fa_icon": "fas fa-file-alt"
                 },
                 "accession": {
                     "type": "string",
-                    "description": "A PGS Catalog accession"
+                    "description": "A PGS Catalog accession",
+                    "pattern": "PGS[0-9]+"
                 },
                 "outdir": {
                     "type": "string",
