@@ -1,0 +1,26 @@
+# custom linting for a non nf-core project
+lint:
+    actions_awsfulltest: False
+    files_exist:
+    # github project things
+    - CODE_OF_CONDUCT.md
+    - .github/CONTRIBUTING.md
+    - .github/ISSUE_TEMPLATE/bug_report.yml
+    - .github/ISSUE_TEMPLATE/config.yml
+    - .github/ISSUE_TEMPLATE/feature_request.yml
+    - .github/PULL_REQUEST_TEMPLATE.md
+    # docs
+    - docs/images/nf-core-pgscatalog/pgsc_calc_logo_light.png
+    - docs/images/nf-core-pgscatalog/pgsc_calc_logo_dark.png
+    - docs/output.md
+    - docs/usage.md
+    - docs/README.md
+    # assets
+    - assets/email_template.html
+    - assets/email_template.txt
+    - assets/sendmail_template.txt
+    - assets/nf-core-pgscatalog/pgsc_calc_logo_light.png  
+    files_unchanged:
+      - LICENSE
+    nextflow_config: False
+
