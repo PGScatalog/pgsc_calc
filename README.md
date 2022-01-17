@@ -4,6 +4,14 @@
 
 :rotating_light: We will tag stable-ish releases ASAP :rotating_light:
 
+[![pgscatalog/pgsc_calc CI](https://github.com/PGScatalog/pgsc_calc/actions/workflows/ci.yml/badge.svg)](https://github.com/PGScatalog/pgsc_calc/actions/workflows/ci.yml)
+[![nf-core linting](https://github.com/PGScatalog/pgsc_calc/actions/workflows/linting.yml/badge.svg)](https://github.com/PGScatalog/pgsc_calc/actions/workflows/linting.yml)
+
+[![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A521.04.0-23aa62.svg?labelColor=000000)](https://www.nextflow.io/)
+[![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
+[![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)
+[![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/docs/)
+
 ## Introduction
 
 `pgsc_calc` is a bioinformatics best-practice analysis pipeline for applying
@@ -21,6 +29,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 4. ...
 
 ### Features In Development
+
 - Ancestry estimation using reference datasets.
 
 ## Quick Start
@@ -35,9 +44,9 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
     nextflow run pgscatalog/pgsc_calc -profile test,<docker/singularity/podman/shifter/charliecloud/conda/institute>
     ```
 
-    > * Please check [nf-core/configs](https://github.com/nf-core/configs#documentation) to see if a custom config file to run nf-core pipelines already exists for your Institute. If so, you can simply use `-profile <institute>` in your command. This will enable either `docker` or `singularity` and set the appropriate execution settings for your local compute environment.
-    > * If you are using `singularity` then the pipeline will auto-detect this and attempt to download the Singularity images directly as opposed to performing a conversion from Docker images. If you are persistently observing issues downloading Singularity images directly due to timeout or network issues then please use the `--singularity_pull_docker_container` parameter to pull and convert the Docker image instead. Alternatively, it is highly recommended to use the [`nf-core download`](https://nf-co.re/tools/#downloading-pipelines-for-offline-use) command to pre-download all of the required containers before running the pipeline and to set the [`NXF_SINGULARITY_CACHEDIR` or `singularity.cacheDir`](https://www.nextflow.io/docs/latest/singularity.html?#singularity-docker-hub) Nextflow options to be able to store and re-use the images from a central location for future pipeline runs.
-    > * If you are using `conda`, it is highly recommended to use the [`NXF_CONDA_CACHEDIR` or `conda.cacheDir`](https://www.nextflow.io/docs/latest/conda.html) settings to store the environments in a central location for future pipeline runs.
+    > - Please check [nf-core/configs](https://github.com/nf-core/configs#documentation) to see if a custom config file to run nf-core pipelines already exists for your Institute. If so, you can simply use `-profile <institute>` in your command. This will enable either `docker` or `singularity` and set the appropriate execution settings for your local compute environment.
+    > - If you are using `singularity` then the pipeline will auto-detect this and attempt to download the Singularity images directly as opposed to performing a conversion from Docker images. If you are persistently observing issues downloading Singularity images directly due to timeout or network issues then please use the `--singularity_pull_docker_container` parameter to pull and convert the Docker image instead. Alternatively, it is highly recommended to use the [`nf-core download`](https://nf-co.re/tools/#downloading-pipelines-for-offline-use) command to pre-download all of the required containers before running the pipeline and to set the [`NXF_SINGULARITY_CACHEDIR` or `singularity.cacheDir`](https://www.nextflow.io/docs/latest/singularity.html?#singularity-docker-hub) Nextflow options to be able to store and re-use the images from a central location for future pipeline runs.
+    > - If you are using `conda`, it is highly recommended to use the [`NXF_CONDA_CACHEDIR` or `conda.cacheDir`](https://www.nextflow.io/docs/latest/conda.html) settings to store the environments in a central location for future pipeline runs.
 
 4. Start running your own analysis!
 
@@ -56,11 +65,11 @@ usage, parameters, and outputs.
 
 ## Credits
 
-pgscatalog/pgsc_calc was originally written by Benjamin Wingfield with input from other members of the [PGS Catalog](https://www.pgscatalog.org) team (Samuel Lambert, Aoife McMahon, Michael Inouye, Laurent Gil) and [Inouye lab](https://www.inouyelab.org/home) (Rodrigo Canovas, Scott Ritchie, Jingqin Wu). 
+pgscatalog/pgsc_calc was originally written by Benjamin Wingfield with input from other members of the [PGS Catalog](https://www.pgscatalog.org) team (Samuel Lambert, Aoife McMahon, Michael Inouye, Laurent Gil) and [Inouye lab](https://www.inouyelab.org/home) (Rodrigo Canovas, Scott Ritchie, Jingqin Wu).
 
-NOTE: the pipeline is distributed and makes use of datasets (e.g. 1000 Genomes and CINECA synthetic data) that 
+NOTE: the pipeline is distributed and makes use of datasets (e.g. 1000 Genomes and CINECA synthetic data) that
 are provided under specific data licenses (see the [assets](assets/README.md) directory README for more information). It is up to
-end-users to ensure that their use conforms to these restrictions. 
+end-users to ensure that their use conforms to these restrictions.
 
 <!-- TODO nf-core: If applicable, make list of people who have also contributed
 -->

@@ -1,8 +1,8 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "https://raw.githubusercontent.com/nf-core/pgscalc/master/nextflow_schema.json",
-    "title": "nf-core/pgscalc pipeline parameters",
-    "description": "This pipeline applies scoring files from the PGS Catalog to genotyped samples",
+    "$id": "https://raw.githubusercontent.com/pgscatalog/pgsc_calc/master/nextflow_schema.json",
+    "title": "pgscatalog/pgsc_calc pipeline parameters",
+    "description": "This pipeline applies scoring files from the PGS Catalog to target genotyped samples",
     "type": "object",
     "definitions": {
         "input_output_options": {
