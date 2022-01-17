@@ -25,4 +25,5 @@ lint:
     files_unchanged:
       - LICENSE
     nextflow_config: False
+    pipeline_name_conventions: False
 
