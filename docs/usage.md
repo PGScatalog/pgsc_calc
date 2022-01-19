@@ -30,8 +30,8 @@ in different populations.
 
 The typical command for running the pipeline is as follows:
 
-```
-bash nextflow run pgscatalog/pgsc_calc --input samplesheet.csv --accession PGS001229 -profile docker
+```bash
+nextflow run pgscatalog/pgsc_calc --input samplesheet.csv --accession PGS001229 -profile docker
 ```
 
 This will launch the pipeline with the `docker` configuration profile. See below
@@ -46,8 +46,8 @@ has been updated since. To make sure that you're running the latest version of
 the pipeline, make sure that you regularly update the cached version of the
 pipeline:
 
-```
-bash nextflow pull pgscatalog/pgsc_calc
+```bash
+nextflow pull pgscatalog/pgsc_calc
 ```
 
 ### Reproducibility
@@ -138,7 +138,7 @@ In some cases, the Nextflow Java virtual machines can start to request a large
 amount of memory.  We recommend adding the following line to your environment to
 limit this (typically in `~/.bashrc` or `~./bash_profile`):
 
-```console
+```bash
 NXF_OPTS='-Xms1g -Xmx4g'
 ```
 
@@ -147,4 +147,3 @@ data. Running large jobs on a login node makes sysadmins sad, so you'll need
 some to [take some additional
 steps](https://www.nextflow.io/blog/2021/5_tips_for_hpc_users.html) to be
 polite.
-
