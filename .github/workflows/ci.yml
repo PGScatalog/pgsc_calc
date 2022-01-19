@@ -1,5 +1,6 @@
-name: pgscatalog/pgsc_calc CI
-# This workflow runs the pipeline with the minimal test dataset to check that it completes without any syntax errors
+name: CI
+# This workflow runs the pipeline with the minimal test dataset to check that it
+# completes without any syntax errors using docker, singularity, and conda
 on:
   push:
     branches:
@@ -20,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        profile: ["docker", "singularity", "conda"]
         # Nextflow versions
         include:
           # Test pipeline minimum Nextflow version
@@ -28,6 +30,8 @@ jobs:
           # Test latest edge release of Nextflow
           - NXF_VER: ''
             NXF_EDGE: '1'
+    env:
+      NXF_ANSI_LOG: false
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2
@@ -41,6 +45,30 @@ jobs:
         run: |
           wget -qO- get.nextflow.io | bash
           sudo mv nextflow /usr/local/bin/
+
+      - name: Set up Singularity
+        if: matrix.profile == 'singularity'
+        uses: eWaterCycle/setup-singularity@v5
+        with:
+          singularity-version: 3.7.1
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
+
+      - name: Setup miniconda
+        if: matrix.profile == 'conda'
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          channels: conda-forge,bioconda,defaults
+          python-version: ${{ matrix.python-version }}
+
+      - name: Conda clean
+        if: matrix.profile == 'conda'
+        run: conda clean -a
+
       - name: Run pipeline with test data
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker
+          nextflow run ${GITHUB_WORKSPACE} -profile test,${{ matrix.profile }}
