@@ -19,7 +19,6 @@ lint:
     - assets/email_template.html
     - assets/email_template.txt
     - assets/sendmail_template.txt
-
     - assets/multiqc_config.yaml
     # CI
     - .github/workflows/branch.yml
@@ -27,6 +26,7 @@ lint:
     - conf/igenomes.config
     files_unchanged:
       - LICENSE
+      - docs/README.md
     nextflow_config: False
     pipeline_name_conventions: False
 
