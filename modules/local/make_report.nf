@@ -1,7 +1,7 @@
 process MAKE_REPORT {
     label 'process_low'
 
-    conda (params.enable_conda ? "bioconda::mawk=1.3.4" : null)
+    conda (params.enable_conda ? "conda-forge::r-tidyverse=1.3.1" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/bioconductor-biocworkflowtools:1.20.0--r41hdfd78af_0' :
         'quay.io/biocontainers/bioconductor-biocworkflowtools:1.20.0--r41hdfd78af_0' }"
