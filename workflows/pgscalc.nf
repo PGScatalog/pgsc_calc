@@ -81,6 +81,7 @@ workflow PGSCALC {
     //
     INPUT_CHECK (
         ch_input,
+        params.format,
         ch_scorefile
     )
 
@@ -138,6 +139,7 @@ workflow PGSCALC {
     //
     // SUBWORKFLOW: Apply a scoring file to target genomic data
     //
+
     APPLY_SCORE (
         MAKE_COMPATIBLE.out.pgen,
         MAKE_COMPATIBLE.out.psam,
