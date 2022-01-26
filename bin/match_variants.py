@@ -295,7 +295,7 @@ def match_variants(args):
     get_flipped(con)
     df = export_tables(con)
     report(con, df, args)
-    df.to_csv(args.outfile, sep = "\t", index = False)
+    df.to_csv(args.outfile, sep = "\t", index = False, header = False)
     con.close()
 
 if __name__ == "__main__":
