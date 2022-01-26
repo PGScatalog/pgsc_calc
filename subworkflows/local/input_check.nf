@@ -14,7 +14,6 @@ workflow INPUT_CHECK {
 
     main:
     ch_versions = Channel.empty()
-    ch_input    = Channel.empty()
 
     if (format.equals("csv")) {
         SAMPLESHEET_JSON(input)
@@ -27,7 +26,7 @@ workflow INPUT_CHECK {
             }
             .set { ch_input }
     } else if (format.equals("json")) {
-        input
+        Channel.from(input)
             .map { json_slurp(it) }
             .branch {
                 vcf: it[0].is_vcf
