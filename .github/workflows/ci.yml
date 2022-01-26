@@ -21,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        test_profile: ["test", "test_json"]
         profile: ["docker", "singularity", "conda"]
         # Nextflow versions
         include:
@@ -71,4 +72,4 @@ jobs:
 
       - name: Run pipeline with test data
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile test,${{ matrix.profile }}
+          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
