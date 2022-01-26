@@ -19,7 +19,7 @@ workflow SPLIT_GENOMIC {
     bim
         .branch {
             to_split: !it.first().chrom
-            splat: it.first().chrom // chrom set in samplesheet
+            splat: it.first().chrom // chrom set in meta map
         }
         .set { ch_split }
 
