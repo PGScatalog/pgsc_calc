@@ -64,18 +64,19 @@ IN PROGRESS: The pgscatalog/pgsc_calc pipeline will be distributed with document
 usage, parameters, and outputs.
 
 ## Credits
-`pgscatalog/pgsc_calc` is developed as part of the [PGS Catalog](https://www.pgscatalog.org/about) project, a collaboration 
-between the University of Cambridge’s Department of Public Health and Primary Care (Michael Inouye, Samuel Lambert) and 
-the European Bioinformatics Institute (Helen Parkinson, Laura Harris). The pipeline seeks to provide a standardized 
-workflow for PGS calculation and ancestry inference implemented in netxflow derived from an existing set of tools/scripts 
-developed by Inouye lab (Rodrigo Canovas, Scott Ritchie, Jingqin Wu) and PGS Catalog teams (Samuel Lambert, Laurent Gil). 
-The adaptation of the codebase and nextflow implementation is written by Benjamin Wingfield with input and supervision 
-from Samuel Lambert (PGS Catalog) and Aoife McMahon (EBI). Development of new features, testing, and code review is 
-ongoing including Inouye lab members (Rodrigo Canovas) and others. A manuscript describing the tool is _in preparation_, in 
-the meantime if you use the tool we ask you to cite the repo and the paper describing the PGS Catalog resource: 
+
+`pgscatalog/pgsc_calc` is developed as part of the [PGS Catalog](https://www.pgscatalog.org/about) project, a collaboration
+between the University of Cambridge’s Department of Public Health and Primary Care (Michael Inouye, Samuel Lambert) and
+the European Bioinformatics Institute (Helen Parkinson, Laura Harris). The pipeline seeks to provide a standardized
+workflow for PGS calculation and ancestry inference implemented in netxflow derived from an existing set of tools/scripts
+developed by Inouye lab (Rodrigo Canovas, Scott Ritchie, Jingqin Wu) and PGS Catalog teams (Samuel Lambert, Laurent Gil).
+The adaptation of the codebase and nextflow implementation is written by Benjamin Wingfield with input and supervision
+from Samuel Lambert (PGS Catalog) and Aoife McMahon (EBI). Development of new features, testing, and code review is
+ongoing including Inouye lab members (Rodrigo Canovas) and others. A manuscript describing the tool is _in preparation_, in
+the meantime if you use the tool we ask you to cite the repo and the paper describing the PGS Catalog resource:
 >PGS Catalog Calculator _(in development)_. PGS Catalog Team. [https://github.com/PGScatalog/pgsc_calc](https://github.com/PGScatalog/pgsc_calc)
 
->Lambert _et al._ (2021) The Polygenic Score Catalog as an open database for reproducibility and systematic evaluation. 
+>Lambert _et al._ (2021) The Polygenic Score Catalog as an open database for reproducibility and systematic evaluation.
 Nature Genetics. 53:420–425 doi:[10.1038/s41588-021-00783-5](https://doi.org/10.1038/s41588-021-00783-5).
 
 NOTE: the pipeline is distributed and makes use of datasets (e.g. 1000 Genomes and CINECA synthetic data) that
