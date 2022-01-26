@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/PGScatalog/pgsc_calc/master/assets/schema_k8s.json",
+  "title": "PGS Catalog Calculator Parameters",
+  "description": "Parameters required to launch an instance of the PGS Catalog Calculator from IGS4EU backend on Embassy cloud",
+  "type": "object",
+  "properties": {
+    "workflow_params": {
+      "description": "An object that contains all runtime parameters",
+      "type": "object",
+      "properties": {
+        "target_genomes": {
+          "description": "An array of file objects containing bgzipped human genetic variant data (variant call format) and metadata.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sample": {
+                "type": "string"
+              },
+              "vcf_path": {
+                "type": "string",
+                "description": "Path to VCF file"
+              },
+              "chrom": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "description": "If target data are split by chromosome, this should specify chromosome number (1-22). If target data are not split, set chrom to null"
+              },
+              "bed": {
+                "type": "string",
+                "description": "Path to plink bed file"
+              },
+              "bim": {
+                "type": "string",
+                "description": "Path to plink bim file"
+              },
+              "fam": {
+                "type": "string",
+                "description": "Path to plink fam file"
+              }
+            },
+            "dependencies": {
+              "bim": {
+                "required": [
+                  "bed",
+                  "fam"
+                ]
+              },
+              "bed": {
+                "required": [
+                  "bim",
+                  "fam"
+                ]
+              },
+              "fam": {
+                "required": [
+                  "bed",
+                  "bim"
+                ]
+              }
+            },
+            "required": [
+              "sample"
+            ],
+            "oneOf": [
+              {
+                "required": [
+                  "bed",
+                  "bim",
+                  "fam"
+                ],
+                "not": {
+                  "required": [
+                    "vcf_path"
+                  ]
+                }
+              },
+              {
+                "allOf": [
+                  {
+                    "not": {
+                      "required": [
+                        "bed"
+                      ]
+                    }
+                  },
+                  {
+                    "not": {
+                      "required": [
+                        "bim"
+                      ]
+                    }
+                  },
+                  {
+                    "not": {
+                      "required": [
+                        "fam"
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "scorefile": {
+          "type": "string",
+          "description": "Path to a PGS Catalog scoring file"
+        },
+        "min_overlap": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+            "maximum": 1,
+          "description": "Minimum proportion of variants in target genomic data matched in the provided scorefile"
+        },
+        "max_memory": {
+          "type": "string",
+          "description": "The maximum memory used by a workflow process (worker pod limit). String uses nextflow format e.g. '4.GB'"
+        },
+        "max_cpus": {
+          "type": "integer",
+          "description": "The maximum number of CPUs used by workflow process (worker pod limit).",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "target_genomes",
+        "scorefile"
+      ]
+    },
+    "nxf_work": {
+      "type": "string",
+      "description": "A path to the nextflow working directory in the ReadWriteMany Persistent Volume Claim shared by the driver and worker pods. Must be a unique path in the PVC not shared by other workflow instances, or weird things will happen."
+    },
+    "id": {
+      "type": "string",
+      "description": "An identifier assigned to the launched workflow instance. It should be universally unique to monitor the status of the launched workflow."
+    }
+  },
+  "required": [
+    "workflow_params",
+    "nxf_work",
+    "id"
+  ]
+}
