@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Welcome to pgsc_calc’s documentation! &#8212; Polygenic Score (PGS) Catalog Calculator  documentation</title>
+    <title>API &#8212; Polygenic Score (PGS) Catalog Calculator  documentation</title>
     
   <link href="_static/css/theme.css" rel="stylesheet">
   <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -34,7 +34,7 @@
     <script src="_static/sphinx-book-theme.9d8b4a8b9bb19db25eeaddc40d639ba2.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Input" href="input.html" />
+    <link rel="prev" title="Input" href="input.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -59,7 +59,7 @@
 <div class="col-12 col-md-3 bd-sidebar site-navigation " id="site-navigation">
     
         <div class="navbar-brand-box">
-    <a class="navbar-brand text-wrap" href="#">
+    <a class="navbar-brand text-wrap" href="index.html">
       
       
       
@@ -71,14 +71,14 @@
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item active">
-        <ul class="nav bd-sidenav">
+        <ul class="current nav bd-sidenav">
  <li class="toctree-l1">
   <a class="reference internal" href="input.html">
    Input
   </a>
  </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="api.html">
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
    API
   </a>
  </li>
@@ -123,7 +123,7 @@
         <!-- ipynb file if we had a myst markdown file -->
         
         <!-- Download raw file -->
-        <a class="dropdown-buttons" href="_sources/index.rst.txt"><button type="button"
+        <a class="dropdown-buttons" href="_sources/api.rst.txt"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
                 data-placement="left">.rst</button></a>
         <!-- Download PDF via print -->
@@ -153,20 +153,19 @@
             </div>
             <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
- <li class="toc-h1 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#">
-   Welcome to
-   <code class="docutils literal notranslate">
-    <span class="pre">
-     pgsc_calc
-    </span>
-   </code>
-   ’s documentation!
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#specifying-target-genomes-with-json">
+   Specifying target genomes with JSON
   </a>
  </li>
- <li class="toc-h1 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#indices-and-tables">
-   Indices and tables
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#specifying-workflow-parameters-with-json">
+   Specifying workflow parameters with JSON
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#json-schema">
+   JSON schema
   </a>
  </li>
 </ul>
@@ -179,7 +178,7 @@
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Welcome to pgsc_calc’s documentation!</h1>
+                <h1>API</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
@@ -189,20 +188,19 @@
                         </div>
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
- <li class="toc-h1 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#">
-   Welcome to
-   <code class="docutils literal notranslate">
-    <span class="pre">
-     pgsc_calc
-    </span>
-   </code>
-   ’s documentation!
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#specifying-target-genomes-with-json">
+   Specifying target genomes with JSON
   </a>
  </li>
- <li class="toc-h1 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#indices-and-tables">
-   Indices and tables
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#specifying-workflow-parameters-with-json">
+   Specifying workflow parameters with JSON
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#json-schema">
+   JSON schema
   </a>
  </li>
 </ul>
@@ -214,37 +212,46 @@
             
               <div>
                 
-  <div class="section" id="welcome-to-pgsc-calc-s-documentation">
-<h1>Welcome to <code class="docutils literal notranslate"><span class="pre">pgsc_calc</span></code>’s documentation!<a class="headerlink" href="#welcome-to-pgsc-calc-s-documentation" title="Permalink to this headline">¶</a></h1>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="input.html">Input</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="input.html#json">JSON</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api.html#specifying-target-genomes-with-json">Specifying target genomes with JSON</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#specifying-workflow-parameters-with-json">Specifying workflow parameters with JSON</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#json-schema">JSON schema</a></li>
-</ul>
-</li>
-</ul>
+  <div class="section" id="api">
+<h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">pgsc_calc</span></code> is designed to be used in a terminal, but can also be launched
+programmatically on a Kubernetes cluster. To simplify this process,
+<code class="docutils literal notranslate"><span class="pre">pgsc_calc</span></code> supports specifying target genomes and runtime parameters using
+JSON.</p>
+<div class="section" id="specifying-target-genomes-with-json">
+<h2>Specifying target genomes with JSON<a class="headerlink" href="#specifying-target-genomes-with-json" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;target_genomes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="nt">&quot;sample&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;example&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">      </span><span class="nt">&quot;vcf_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;path.vcf.gz&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">      </span><span class="nt">&quot;chrom&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">22</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="p">]</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">pgsc_calc</span></code> is a bioinformatics best-practice analysis pipeline for applying
-scoring files from the <a class="reference external" href="https://www.pgscatalog.org/">Polygenic Score (PGS)
-Catalog</a> to target genotyped samples.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This project is under active development and may break at any time.</p>
-</div>
-</div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<p>Target genomes are specified as a JSON array. Each element of the array must:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+<li><p>Contain an experiment identifier (“<code class="docutils literal notranslate"><span class="pre">sample</span></code>”). If genomic data are split
+across multiple files (e.g. per chromosome), then this identifier must be the
+same across split files</p></li>
+<li><p>Contain a path to a block gzipped Variant Call Format file (“<code class="docutils literal notranslate"><span class="pre">vcf_path</span></code>”)</p></li>
+<li><p>Specify which chromosome the variants come from (“<code class="docutils literal notranslate"><span class="pre">chrom</span></code>”). If the data are
+not split, then chrom can be null.</p></li>
 </ul>
+<p>The target genome array must contain at least one item, and each item must be
+unique.</p>
+<p>This JSON data must be saved to a file and used with the workflow parameter
+<code class="docutils literal notranslate"><span class="pre">--input</span></code> in combination with <code class="docutils literal notranslate"><span class="pre">--format</span> <span class="pre">json</span></code>. The file extension should end
+with <code class="docutils literal notranslate"><span class="pre">.json</span></code>.</p>
+</div>
+<div class="section" id="specifying-workflow-parameters-with-json">
+<h2>Specifying workflow parameters with JSON<a class="headerlink" href="#specifying-workflow-parameters-with-json" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="json-schema">
+<h2>JSON schema<a class="headerlink" href="#json-schema" title="Permalink to this headline">¶</a></h2>
+</div>
 </div>
 
 
@@ -252,13 +259,13 @@ Catalog</a> to target genotyped samples.</p>
               
             
                 <!-- Previous / next buttons -->
-<div class='prev-next-area'>
-    <a class='right-next' id="next-link" href="input.html" title="next page">
-    <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Input</p>
-    </div>
-    <i class="fas fa-angle-right"></i>
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="input.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Input</p>
+        </div>
     </a>
 </div>
             
