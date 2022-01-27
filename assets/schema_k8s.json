@@ -5,109 +5,40 @@
   "description": "Parameters required to launch an instance of the PGS Catalog Calculator from IGS4EU backend on Embassy cloud",
   "type": "object",
   "properties": {
-    "workflow_params": {
-      "description": "An object that contains all runtime parameters",
+    "target_genomes": {
+      "description": "An array of file objects containing bgzipped human genetic variant data (variant call format) and metadata.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sample": {
+            "type": "string"
+          },
+          "vcf_path": {
+            "type": "string",
+            "description": "Path to VCF file"
+          },
+          "chrom": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "If target data are split by chromosome, this should specify chromosome number (1-22). If target data are not split, set chrom to null"
+          }
+        },
+        "required": [
+          "sample",
+          "vcf_path",
+          "chrom"
+        ]
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "nxf_params_file": {
+      "description": "An object that contains parameters",
       "type": "object",
       "properties": {
-        "target_genomes": {
-          "description": "An array of file objects containing bgzipped human genetic variant data (variant call format) and metadata.",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "sample": {
-                "type": "string"
-              },
-              "vcf_path": {
-                "type": "string",
-                "description": "Path to VCF file"
-              },
-              "chrom": {
-                "type": [
-                  "integer",
-                  "null"
-                ],
-                "description": "If target data are split by chromosome, this should specify chromosome number (1-22). If target data are not split, set chrom to null"
-              },
-              "bed": {
-                "type": "string",
-                "description": "Path to plink bed file"
-              },
-              "bim": {
-                "type": "string",
-                "description": "Path to plink bim file"
-              },
-              "fam": {
-                "type": "string",
-                "description": "Path to plink fam file"
-              }
-            },
-            "dependencies": {
-              "bim": {
-                "required": [
-                  "bed",
-                  "fam"
-                ]
-              },
-              "bed": {
-                "required": [
-                  "bim",
-                  "fam"
-                ]
-              },
-              "fam": {
-                "required": [
-                  "bed",
-                  "bim"
-                ]
-              }
-            },
-            "required": [
-              "sample"
-            ],
-            "oneOf": [
-              {
-                "required": [
-                  "bed",
-                  "bim",
-                  "fam"
-                ],
-                "not": {
-                  "required": [
-                    "vcf_path"
-                  ]
-                }
-              },
-              {
-                "allOf": [
-                  {
-                    "not": {
-                      "required": [
-                        "bed"
-                      ]
-                    }
-                  },
-                  {
-                    "not": {
-                      "required": [
-                        "bim"
-                      ]
-                    }
-                  },
-                  {
-                    "not": {
-                      "required": [
-                        "fam"
-                      ]
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          "minItems": 1,
-          "uniqueItems": true
-        },
         "scorefile": {
           "type": "string",
           "description": "Path to a PGS Catalog scoring file"
@@ -115,7 +46,7 @@
         "min_overlap": {
           "type": "number",
           "exclusiveMinimum": 0,
-            "maximum": 1,
+          "maximum": 1,
           "description": "Minimum proportion of variants in target genomic data matched in the provided scorefile"
         },
         "max_memory": {
@@ -129,7 +60,6 @@
         }
       },
       "required": [
-        "target_genomes",
         "scorefile"
       ]
     },
@@ -143,7 +73,8 @@
     }
   },
   "required": [
-    "workflow_params",
+    "target_genomes",
+    "nxf_params_file",
     "nxf_work",
     "id"
   ]
