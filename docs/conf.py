@@ -17,9 +17,9 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'PGS Catalog Calculator'
-copyright = '2022, Benjamin Wingfield'
-author = 'Benjamin Wingfield'
+project = 'Polygenic Score (PGS) Catalog Calculator'
+copyright = '2022, PGS Catalog team'
+author = 'Polygenic Score (PGS) Catalog team'
 
 
 # -- General configuration ---------------------------------------------------
