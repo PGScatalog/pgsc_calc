@@ -3,10 +3,10 @@ Installation
 
 ``pgsc_calc`` is made with Nextflow and the nf-core framework. Nextflow needs to
 be present on the computer where you want to launch the analysis. The latest
-installation `instructions are available`_ here. The only hard requirement for
+installation `instructions are available here`_. The only hard requirement for
 Nextflow is an Unix operating system and Java:
 
-.. _`instructions are available`: https://www.nextflow.io/docs/latest/getstarted.html#installation
+.. _`instructions are available here`: https://www.nextflow.io/docs/latest/getstarted.html#installation
 
 .. code-block:: bash
 
@@ -73,3 +73,13 @@ to do anything else. This process requires an internet connection.
 
 If you would like to run the workflow on a computer with no internet connection,
 please see the :doc:`offline instructions<offline>`.
+
+To test everything is working well, run:
+
+.. code-block:: bash
+
+    nextflow run pgscatalog/pgsc_calc -profile test,docker
+
+Replacing ``docker`` with ``singularity`` or ``conda`` as needed. This will
+download the workflow and run it using a small test dataset. If this runs
+without any errors, you're ready to try :doc:`your own data<usage>`. 

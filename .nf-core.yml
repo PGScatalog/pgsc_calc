@@ -14,6 +14,9 @@ lint:
     # docs
     - docs/images/nf-core-pgscatalog/pgsc_calc_logo_light.png
     - docs/images/nf-core-pgscatalog/pgsc_calc_logo_dark.png
+    - docs/output.md
+    - docs/README.md
+    - docs/usage.md
     # assets
     - assets/nf-core-pgscatalog/pgsc_calc_logo_light.png
     - assets/email_template.html

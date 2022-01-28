@@ -1,39 +1,74 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "https://raw.githubusercontent.com/nf-core/pgscalc/master/assets/schema_input.json",
-    "title": "nf-core/pgscalc pipeline - params.input schema",
-    "description": "Schema for the file provided with params.input",
-    "type": "array",
-    "items": {
-        "type": "object",
-        "properties": {
-            "sample": {
-                "type": "string",
-                "pattern": "^\\S+$",
-                "errorMessage": "Sample name must be provided and cannot contain spaces"
-            },
-            "fastq_1": {
-                "type": "string",
-                "pattern": "^\\S+\\.f(ast)?q\\.gz$",
-                "errorMessage": "FastQ file for reads 1 must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
-            },
-            "fastq_2": {
-                "errorMessage": "FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'",
-                "anyOf": [
-                    {
-                        "type": "string",
-                        "pattern": "^\\S+\\.f(ast)?q\\.gz$"
-                    },
-                    {
-                        "type": "string",
-                        "maxLength": 0
-                    }
-                ]
-            }
-        },
-        "required": [
-            "sample",
-            "fastq_1"
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://raw.githubusercontent.com/pgscatalog/pgsc_calc/master/assets/schema_input.json",
+  "title": "Input schema",
+  "description": "Schema for the file provided with params.input",
+  "type": "array",
+  "uniqueItems": true,
+  "minItems": 1,
+  "items": {
+    "type": "object",
+    "properties": {
+      "sample": {
+        "type": "string",
+        "pattern": "^\\S+$",
+        "errorMessage": "Sample name must be provided and cannot contain spaces"
+      },
+      "vcf_path": {
+        "type": "string",
+        "pattern": "^\\S+\\.vcf\\.gz$",
+        "errorMessage": "VCF path must end with .vcf.gz, mutually exclusive with bfile_path",
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^\\S+\\.vcf\\.gz$"
+          },
+          {
+            "type": "string",
+            "maxLength": 0
+          }
         ]
+      },
+      "bfile_path": {
+        "errorMessage": "Plink 1 binary fileset prefix, must not end with bed / bim / fam, mutually exclusive with vcf_path",
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^\\S+$"
+          },
+          {
+            "type": "string",
+            "maxLength": 0
+          }
+        ]
+      },
+      "chrom": {
+        "errorMessage": "Plink 1 binary fileset prefix, must not end with bed / bim / fam, mutually exclusive with vcf_path",
+        "anyOf": [
+          {
+            "type": "null"
+          },
+          {
+            "type": "integer",
+            "exclusiveMinimum": 1,
+            "maximum": 22
+          }
+        ]
+      }
+    },
+    "required": [
+      "sample",
+      "chrom"
+    ],
+    "not": {
+      "anyOf": [
+        {
+          "required": [
+            "vcf_path",
+            "bfile_path"
+          ]
+        }
+      ]
     }
+  }
 }
