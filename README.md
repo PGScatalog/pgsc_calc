@@ -83,6 +83,11 @@ NOTE: the pipeline is distributed and makes use of datasets (e.g. 1000 Genomes a
 are provided under specific data licenses (see the [assets](assets/README.md) directory README for more information). It is up to
 end-users to ensure that their use conforms to these restrictions.
 
+This work has received funding from EMBL-EBI core funds, the Baker Institute,
+the University of Cambridge, Health Data Research UK (HDRUK), and the European
+Union’s Horizon 2020 research and innovation programme under grant agreement No
+101016775 INTERVENE.
+
 <!-- TODO nf-core: If applicable, make list of people who have also contributed
 -->
 

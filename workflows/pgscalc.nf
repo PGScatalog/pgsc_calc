@@ -10,26 +10,14 @@ def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 WorkflowPgscalc.initialise(params, log)
 
 // Check input path parameters to see if they exist
-def checkPathParamList = [params.input, params.scorefile]
-
-if (params.input && params.json) {
-    exit 1, 'Samplesheet input and JSON input are mutually exclusive'
-}
+def checkPathParamList = [params.input]
 
 for (param in checkPathParamList) {
-    if (param && !params.json) {
-        file(param, checkIfExists: true)
-    }
+    file(param, checkIfExists: true)
 }
 
 // Check mandatory parameters
-if (!params.json && params.input) {
-    ch_input = file(params.input, checkIfExists: true)
-    ch_json = Channel.empty()
-} else {
-    ch_input = Channel.empty()
-    ch_json = Channel.from(params.json)
-}
+ch_input = file(params.input, checkIfExists: true)
 
 // Set up score channels
 if (!params.accession && params.scorefile) {
@@ -55,7 +43,6 @@ include { SPLIT_GENOMIC        } from '../subworkflows/local/split_genomic'
 include { APPLY_SCORE          } from '../subworkflows/local/apply_score'
 include { DUMPSOFTWAREVERSIONS } from '../modules/local/dumpsoftwareversions'
 
-include { PLINK_VCF as JSON_VCF } from '../modules/nf-core/modules/plink/vcf/main'
 /*
 ========================================================================================
     RUN MAIN WORKFLOW
@@ -81,43 +68,20 @@ workflow PGSCALC {
     //
     INPUT_CHECK (
         ch_input,
+        params.format,
         ch_scorefile
     )
 
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
-
-    // format JSON input but don't do proper validation
-    ch_json
-        .map {
-            [it.meta, file(it.vcf_path, checkIfExists: true)]
-        }
-        .set{json_genomic}
-
-    JSON_VCF(json_genomic)
-
-    ch_versions = ch_versions.mix(JSON_VCF.out.versions.first())
-
-    // now mix json input with samplesheet input
-    INPUT_CHECK.out.bed
-        .mix(JSON_VCF.out.bed)
-        .set{ ch_bed }
-
-    INPUT_CHECK.out.bim
-        .mix(JSON_VCF.out.bim)
-        .set{ ch_bim }
-
-    INPUT_CHECK.out.fam
-        .mix(JSON_VCF.out.fam)
-        .set{ ch_fam }
 
     //
     // SUBWORKFLOW: Split genetic data to improve parallelisation --------------
     //
 
     SPLIT_GENOMIC (
-        ch_bed,
-        ch_bim,
-        ch_fam,
+        INPUT_CHECK.out.bed,
+        INPUT_CHECK.out.bim,
+        INPUT_CHECK.out.fam,
         INPUT_CHECK.out.scorefile
     )
 
@@ -138,6 +102,7 @@ workflow PGSCALC {
     //
     // SUBWORKFLOW: Apply a scoring file to target genomic data
     //
+
     APPLY_SCORE (
         MAKE_COMPATIBLE.out.pgen,
         MAKE_COMPATIBLE.out.psam,

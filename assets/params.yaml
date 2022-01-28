@@ -1,3 +1,0 @@
-input: 'assets/samplesheet.csv'
-scorefile: 'assets/PGS001229_22.txt'
-outdir: 'results'

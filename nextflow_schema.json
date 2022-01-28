@@ -19,7 +19,7 @@
                     "description": "Path to comma-separated file containing information about the samples (a sample sheet)",
                     "help_text": "You will need to create a design file with information about the samples before running the pipeline. Use this parameter to specify its location. See usage docs for a more detailed explanation.",
                     "fa_icon": "fas fa-file-csv",
-                    "pattern": ".csv$"
+                    "pattern": ".csv$|.json$"
                 },
                 "scorefile": {
                     "type": "string",
@@ -250,5 +250,11 @@
         {
             "$ref": "#/definitions/generic_options"
         }
-    ]
+    ],
+    "properties": {
+        "format": {
+            "type": "string",
+            "default": "csv"
+        }
+    }
 }
