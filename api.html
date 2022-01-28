@@ -34,7 +34,8 @@
     <script src="_static/sphinx-book-theme.9d8b4a8b9bb19db25eeaddc40d639ba2.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Input" href="input.html" />
+    <link rel="next" title="Offline usage" href="offline.html" />
+    <link rel="prev" title="Troubleshooting" href="troubleshooting.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -73,13 +74,38 @@
     <div class="bd-toc-item active">
         <ul class="current nav bd-sidenav">
  <li class="toctree-l1">
+  <a class="reference internal" href="install.html">
+   Installation
+  </a>
+ </li>
+ <li class="toctree-l1">
   <a class="reference internal" href="input.html">
    Input
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="usage.html">
+   Usage
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="troubleshooting.html">
+   Troubleshooting
   </a>
  </li>
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
    API
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="offline.html">
+   Offline usage
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="glossary.html">
+   Glossary
   </a>
  </li>
 </ul>
@@ -154,18 +180,42 @@
             <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#specifying-target-genomes-with-json">
-   Specifying target genomes with JSON
+  <a class="reference internal nav-link" href="#minimal-example">
+   Minimal example
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#specifying-target-genomes-with-json">
+     Specifying target genomes with JSON
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#specifying-workflow-parameters-with-json">
+     Specifying workflow parameters with JSON
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#api-call">
+     API call
+    </a>
+   </li>
+  </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#specifying-workflow-parameters-with-json">
-   Specifying workflow parameters with JSON
+  <a class="reference internal nav-link" href="#schema">
+   Schema
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#pgs-catalog-calculator-parameters">
+     PGS Catalog Calculator Parameters
+    </a>
+   </li>
+  </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#json-schema">
-   JSON schema
+  <a class="reference internal nav-link" href="#implementation-details">
+   Implementation details
   </a>
  </li>
 </ul>
@@ -189,18 +239,42 @@
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#specifying-target-genomes-with-json">
-   Specifying target genomes with JSON
+  <a class="reference internal nav-link" href="#minimal-example">
+   Minimal example
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#specifying-target-genomes-with-json">
+     Specifying target genomes with JSON
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#specifying-workflow-parameters-with-json">
+     Specifying workflow parameters with JSON
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#api-call">
+     API call
+    </a>
+   </li>
+  </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#specifying-workflow-parameters-with-json">
-   Specifying workflow parameters with JSON
+  <a class="reference internal nav-link" href="#schema">
+   Schema
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#pgs-catalog-calculator-parameters">
+     PGS Catalog Calculator Parameters
+    </a>
+   </li>
+  </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#json-schema">
-   JSON schema
+  <a class="reference internal nav-link" href="#implementation-details">
+   Implementation details
   </a>
  </li>
 </ul>
@@ -214,20 +288,28 @@
                 
   <div class="section" id="api">
 <h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
-<p><code class="docutils literal notranslate"><span class="pre">pgsc_calc</span></code> is designed to be used in a terminal, but can also be launched
-programmatically on a Kubernetes cluster. To simplify this process,
-<code class="docutils literal notranslate"><span class="pre">pgsc_calc</span></code> supports specifying target genomes and runtime parameters using
-JSON.</p>
+<p><code class="docutils literal notranslate"><span class="pre">pgsc_calc</span></code> has two main use cases:</p>
+<ul class="simple">
+<li><p>A bioinformatician or data scientist wants to calculate some polygenic scores
+using an Unixy operating system and a terminal</p></li>
+<li><p>A normal person (e.g. a biologist or other researcher) wants to calculate some
+polygenic scores using a web browser</p></li>
+</ul>
+<p>To simplify the second use case, the workflow is designed to be launched
+programmatically on a <a class="reference external" href="http://www.embassycloud.org/">private cloud</a> using an API. API parameters are specified
+using JSON. The web platform is still under development.</p>
+<div class="section" id="minimal-example">
+<h2>Minimal example<a class="headerlink" href="#minimal-example" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="specifying-target-genomes-with-json">
-<h2>Specifying target genomes with JSON<a class="headerlink" href="#specifying-target-genomes-with-json" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="nt">&quot;target_genomes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
-<span class="w">    </span><span class="p">{</span><span class="w"></span>
-<span class="w">      </span><span class="nt">&quot;sample&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;example&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">      </span><span class="nt">&quot;vcf_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;path.vcf.gz&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">      </span><span class="nt">&quot;chrom&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">22</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="w">  </span><span class="p">]</span><span class="w"></span>
+<h3>Specifying target genomes with JSON<a class="headerlink" href="#specifying-target-genomes-with-json" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;target_genomes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="nt">&quot;sample&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;example&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="nt">&quot;vcf_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/path/to/genome.vcf.gz&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="nt">&quot;chrom&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">22</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">]</span><span class="w"></span>
 <span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
@@ -247,10 +329,210 @@ unique.</p>
 with <code class="docutils literal notranslate"><span class="pre">.json</span></code>.</p>
 </div>
 <div class="section" id="specifying-workflow-parameters-with-json">
-<h2>Specifying workflow parameters with JSON<a class="headerlink" href="#specifying-workflow-parameters-with-json" title="Permalink to this headline">¶</a></h2>
+<h3>Specifying workflow parameters with JSON<a class="headerlink" href="#specifying-workflow-parameters-with-json" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;nxf_params_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;scorefile&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/path/to/scorefile.txt&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;json&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
 </div>
-<div class="section" id="json-schema">
-<h2>JSON schema<a class="headerlink" href="#json-schema" title="Permalink to this headline">¶</a></h2>
+<p>Some other parameters need to be set for the workflow to run, which are
+specified in a simple JSON object. This object can be complex, because many
+optional parameters can be set here. A minimal workflow parameter object must
+contain:</p>
+<ul class="simple">
+<li><p>The path to a <a class="reference internal" href="glossary.html#term-Scoring-file"><span class="xref std std-term">scoring file</span></a> OR</p></li>
+<li><p>An <a class="reference internal" href="glossary.html#term-accession"><span class="xref std std-term">accession</span></a> in the <a class="reference internal" href="glossary.html#term-PGS-Catalog"><span class="xref std std-term">PGS Catalog</span></a> (replace <code class="docutils literal notranslate"><span class="pre">--accession</span></code> with
+scorefile)</p></li>
+<li><p>The format must be “json”</p></li>
+</ul>
+<p>The <span class="xref std std-ref">JSON schema</span> specifies optional parameters in full.</p>
+</div>
+<div class="section" id="api-call">
+<h3>API call<a class="headerlink" href="#api-call" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;target_genomes&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;sample&quot;</span><span class="p">:</span> <span class="s2">&quot;example&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;vcf_path&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/genome.vcf.gz&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;chrom&quot;</span><span class="p">:</span> <span class="mi">22</span>
+        <span class="p">}</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;nxf_params_file&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;scorefile&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/scorefile.txt&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;json&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;nxf_work&quot;</span><span class="p">:</span> <span class="s2">&quot;/workspace/unique_work_directory/&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;unique_id&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The complete call also includes some nextflow configuration. The workflow is
+assigned a unique identifier at launch to monitor its progress. Nextflow has
+some requirements for the Kubernetes executor, so the work
+directory must be unique and be in a <a class="reference external" href="https://www.nextflow.io/docs/latest/kubernetes.html#requirements">ReadWriteMany persistent volume claim</a> that
+is accessible by the <a class="reference internal" href="glossary.html#term-driver-pod"><span class="xref std std-term">driver pod</span></a> and all <a class="reference internal" href="glossary.html#term-worker-pods"><span class="xref std std-term">worker pods</span></a>.</p>
+</div>
+</div>
+<div class="section" id="schema">
+<h2>Schema<a class="headerlink" href="#schema" title="Permalink to this headline">¶</a></h2>
+<p>This documentation is useful for a human, but not a computer, so we wrote a
+document (<a class="reference external" href="https://raw.githubusercontent.com/PGScatalog/pgsc_calc/master/assets/schema_k8s.json">a JSON schema</a>) that describes the data format. The schema is used
+to automatically validate data submitted to the workflow via the API.</p>
+<div class="section" id="pgs-catalog-calculator-parameters">
+<h3>PGS Catalog Calculator Parameters<a class="headerlink" href="#pgs-catalog-calculator-parameters" title="Permalink to this headline">¶</a></h3>
+<table class="table">
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td colspan="5"><p><a class="reference external" href="https://raw.githubusercontent.com/PGScatalog/pgsc_calc/master/assets/schema_k8s.json">https://raw.githubusercontent.com/PGScatalog/pgsc_calc/master/assets/schema_k8s.json</a></p></td>
+</tr>
+<tr class="row-even"><td colspan="5"><p>Parameters required to launch an instance of the PGS Catalog Calculator from IGS4EU backend on Embassy cloud</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td colspan="4"><p><em>object</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="5"><p>properties</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="11"><ul class="simple">
+<li><p><strong>target_genomes</strong></p></li>
+</ul>
+</td>
+<td colspan="4"><p>An array of file objects containing bgzipped human genetic variant data (variant call format) and metadata.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td colspan="3"><p><em>array</em></p></td>
+</tr>
+<tr class="row-odd"><td rowspan="7"><p>items</p></td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>object</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p>properties</p></td>
+</tr>
+<tr class="row-odd"><td><ul class="simple">
+<li><p><strong>sample</strong></p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><ul class="simple">
+<li><p><strong>vcf_path</strong></p></li>
+</ul>
+</td>
+<td colspan="2"><p>Path to VCF file</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><ul class="simple">
+<li><p><strong>chrom</strong></p></li>
+</ul>
+</td>
+<td colspan="2"><p>If target data are split by chromosome, this should specify chromosome number (1-22). If target data are not split, set chrom to null</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>integer</em> / <em>null</em></p></td>
+</tr>
+<tr class="row-even"><td><p>minItems</p></td>
+<td colspan="3"><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>uniqueItems</p></td>
+<td colspan="3"><p>True</p></td>
+</tr>
+<tr class="row-even"><td rowspan="14"><ul class="simple">
+<li><p><strong>nxf_params_file</strong></p></li>
+</ul>
+</td>
+<td colspan="4"><p>An object that contains parameters</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td colspan="3"><p><em>object</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="4"><p>properties</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><ul class="simple">
+<li><p><strong>scorefile</strong></p></li>
+</ul>
+</td>
+<td colspan="3"><p>Path to a PGS Catalog scoring file</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td rowspan="4"><ul class="simple">
+<li><p>min_overlap</p></li>
+</ul>
+</td>
+<td colspan="3"><p>Minimum proportion of variants in target genomic data matched in the provided scorefile</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td colspan="2"><p><em>number</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>maximum</p></td>
+<td colspan="2"><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>exclusiveMinimum</p></td>
+<td colspan="2"><p>0</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><ul class="simple">
+<li><p>max_memory</p></li>
+</ul>
+</td>
+<td colspan="3"><p>The maximum memory used by a workflow process (worker pod limit). String uses nextflow format e.g. ‘4.GB’</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td rowspan="3"><ul class="simple">
+<li><p>max_cpus</p></li>
+</ul>
+</td>
+<td colspan="3"><p>The maximum number of CPUs used by workflow process (worker pod limit).</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td colspan="2"><p><em>integer</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>minimum</p></td>
+<td colspan="2"><p>1</p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><ul class="simple">
+<li><p><strong>nxf_work</strong></p></li>
+</ul>
+</td>
+<td colspan="4"><p>A path to the nextflow working directory in the ReadWriteMany Persistent Volume Claim shared by the driver and worker pods. Must be a unique path in the PVC not shared by other workflow instances, or weird things will happen.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td colspan="3"><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><ul class="simple">
+<li><p><strong>id</strong></p></li>
+</ul>
+</td>
+<td colspan="4"><p>An identifier assigned to the launched workflow instance. It should be universally unique to monitor the status of the launched workflow.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td colspan="3"><p><em>string</em></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="implementation-details">
+<h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+<p>The API is designed using an event-driven approach with <a class="reference external" href="https://argoproj.github.io/argo-events/">Argo
+Events</a>. Briefly, a sensor constantly listens on a Kubernetes cluster for Kafka
+messages to launch the pipeline. Once the message is received, a nextflow driver
+pod is created and the workflow is executed using the <a class="reference external" href="https://www.nextflow.io/docs/latest/kubernetes.html">K8S executor</a>. The
+status of the workflow instance is reported using Nextflow’s <a class="reference external" href="https://www.nextflow.io/docs/latest/tracing.html#weblog-via-http">weblog</a> and
+a second sensor.</p>
 </div>
 </div>
 
@@ -260,12 +542,19 @@ with <code class="docutils literal notranslate"><span class="pre">.json</span></
             
                 <!-- Previous / next buttons -->
 <div class='prev-next-area'> 
-    <a class='left-prev' id="prev-link" href="input.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="troubleshooting.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Input</p>
+            <p class="prev-next-title">Troubleshooting</p>
         </div>
+    </a>
+    <a class='right-next' id="next-link" href="offline.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Offline usage</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
     </a>
 </div>
             
