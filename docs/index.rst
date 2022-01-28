@@ -7,10 +7,15 @@ Welcome to ``pgsc_calc``'s documentation!
 ==================================================
 
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 2
 
-   input
-   api
+    install
+    input
+    usage
+    troubleshooting
+    api
+    offline
+    glossary
 
 
 ``pgsc_calc`` is a bioinformatics best-practice analysis pipeline for applying
