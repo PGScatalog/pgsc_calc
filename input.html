@@ -24,6 +24,7 @@
     
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-book-theme.css?digest=84ace793992934648b4de8eed757e5a2" />
+    <link rel="stylesheet" type="text/css" href="_static/twemoji.css" />
     
   <link rel="preload" as="script" href="_static/js/index.be7d3bbb2ef33a8344ce.js">
 
@@ -31,6 +32,8 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js"></script>
+    <script src="_static/twemoji.js"></script>
     <script src="_static/sphinx-book-theme.9d8b4a8b9bb19db25eeaddc40d639ba2.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -86,6 +89,16 @@
  <li class="toctree-l1">
   <a class="reference internal" href="usage.html">
    Usage
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="parameters.html">
+   Parameters
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="output.html">
+   Output
   </a>
  </li>
  <li class="toctree-l1">
@@ -180,8 +193,20 @@
             <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#json">
-   JSON
+  <a class="reference internal nav-link" href="#samplesheet">
+   Samplesheet
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#input-schema">
+     Input schema
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#scoring-file">
+   Scoring file
   </a>
  </li>
 </ul>
@@ -205,8 +230,20 @@
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#json">
-   JSON
+  <a class="reference internal nav-link" href="#samplesheet">
+   Samplesheet
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#input-schema">
+     Input schema
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#scoring-file">
+   Scoring file
   </a>
  </li>
 </ul>
@@ -220,9 +257,161 @@
                 
   <div class="section" id="input">
 <h1>Input<a class="headerlink" href="#input" title="Permalink to this headline">¶</a></h1>
-<p>You need some stuff</p>
-<div class="section" id="json">
-<h2>JSON<a class="headerlink" href="#json" title="Permalink to this headline">¶</a></h2>
+<p>To calculate a polygenic score, you need to provide the workflow with two
+inputs:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="glossary.html#term-target-genomic-data"><span class="xref std std-term">target genomic data</span></a></p></li>
+<li><p>a <a class="reference internal" href="glossary.html#term-Scoring-file"><span class="xref std std-term">scoring file</span></a></p></li>
+</ul>
+<p>At its simplest, target genomic data might be a single <a class="reference internal" href="glossary.html#term-VCF"><span class="xref std std-term">VCF</span></a> file. Larger
+and more complex datasets might be split across multiple files. There are two
+ways to specify the structure of target genomic data:</p>
+<ul class="simple">
+<li><p>A <a class="reference internal" href="glossary.html#term-CSV"><span class="xref std std-term">CSV</span></a> file (a “samplesheet”)</p></li>
+<li><p>A <a class="reference internal" href="glossary.html#term-JSON"><span class="xref std std-term">JSON</span></a> file</p></li>
+</ul>
+<p>Most people should use a CSV file, because they are easy to work with using
+Excel or similar spreadsheet software. The use of samplesheets is quite popular
+across <a class="reference external" href="https://nf-co.re/">nf-core</a> pipelines.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Genomic data must currently be in build 37, but we’re working to
+support other builds ASAP</p>
+</div>
+<div class="section" id="samplesheet">
+<h2>Samplesheet<a class="headerlink" href="#samplesheet" title="Permalink to this headline">¶</a></h2>
+<p>The samplesheet method is specified using the <code class="docutils literal notranslate"><span class="pre">--input</span></code> parameter. The
+<code class="docutils literal notranslate"><span class="pre">--format</span></code> parameter defaults to “csv”, so you don’t need to set it unless you
+are using JSON.</p>
+<table class="colwidths-given table" id="id1">
+<caption><span class="caption-text">Example samplesheet</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>sample</p></th>
+<th class="head"><p>vcf_path</p></th>
+<th class="head"><p>bfile_path</p></th>
+<th class="head"><p>chrom</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>cineca_synthetic_subset</p></td>
+<td></td>
+<td><p>path/to/bfile_prefix</p></td>
+<td><p>22</p></td>
+</tr>
+<tr class="row-odd"><td><p>cineca_synthetic_subset_vcf</p></td>
+<td><p>path/to/vcf.gz</p></td>
+<td></td>
+<td><p>22</p></td>
+</tr>
+</tbody>
+</table>
+<p>A template is <a class="reference external" href="https://github.com/PGScatalog/pgsc_calc/tree/master/assets/examples/example_data">available here</a>.</p>
+<p>There are four mandatory columns. Two columns, <strong>vcf_path</strong> and <strong>bfile_path</strong>,
+are mutually exclusive and specify the genomic files:</p>
+<ul class="simple">
+<li><p><strong>sample</strong>: A text string containing the name of a sample/experiment, which
+can be split across multiple files. Scores generated from files with the same
+sample name are cominbed in later stages of the analysis.</p></li>
+<li><p><strong>vcf_path</strong>: A text string of a file path pointing to a multi-sample
+<a class="reference internal" href="glossary.html#term-VCF"><span class="xref std std-term">VCF</span></a> file. File names must be unique.</p></li>
+<li><p><strong>bfile_path</strong>: A text string of a file path pointing to the prefix of a plink
+binary fileset. For example, if a binary fileset consists of plink.bed,
+plink.bim, and plink.fam then the prefix would be “plink”. Must be unique.</p></li>
+<li><p><strong>chrom</strong>: An integer, range 1-22. If the target genomic data contains
+multiple chromosomes, leave empty.</p></li>
+</ul>
+<p>The documentation below is automatically generated from the input schema and
+contains additional technical detail.</p>
+<div class="section" id="input-schema">
+<h3>Input schema<a class="headerlink" href="#input-schema" title="Permalink to this headline">¶</a></h3>
+<table class="table">
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td colspan="5"><p><a class="reference external" href="https://raw.githubusercontent.com/pgscatalog/pgsc_calc/master/assets/schema_input.json">https://raw.githubusercontent.com/pgscatalog/pgsc_calc/master/assets/schema_input.json</a></p></td>
+</tr>
+<tr class="row-even"><td colspan="5"><p>Schema for the file provided with params.input</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td colspan="4"><p><em>array</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="10"><p>items</p></td>
+<td><p>type</p></td>
+<td colspan="3"><p><em>object</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="4"><p>properties</p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><ul class="simple">
+<li><p><strong>sample</strong></p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>pattern</p></td>
+<td colspan="2"><p>^\S+$</p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><ul class="simple">
+<li><p><strong>fastq_1</strong></p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>pattern</p></td>
+<td colspan="2"><p>^\S+\.f(ast)?q\.gz$</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>fastq_2</p></li>
+</ul>
+</td>
+<td rowspan="4"><p>anyOf</p></td>
+<td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>pattern</p></td>
+<td><p>^\S+\.f(ast)?q\.gz$</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>maxLength</p></td>
+<td><p>0</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="scoring-file">
+<h2>Scoring file<a class="headerlink" href="#scoring-file" title="Permalink to this headline">¶</a></h2>
+<p>Scoring files can be specified with <code class="docutils literal notranslate"><span class="pre">--scorefile</span></code>, which must be a string of a
+file path. Scorefiles must be:</p>
+<ul class="simple">
+<li><p>PGS Catalog <a class="reference external" href="https://www.pgscatalog.org/downloads/#scoring_header">scoring file format v2.0</a></p></li>
+<li><p>Genome build 37</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We’re adding support for custom scoring files, multiple scoring files,
+and build conversion very soon!</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">--accession</span></code> can be used to automatically fetch a scorefile via the
+PGS Catalog API. The <code class="docutils literal notranslate"><span class="pre">--accession</span></code> and <code class="docutils literal notranslate"><span class="pre">-scorefile</span></code> parameters are
+mututally exclusive.</p>
+</div>
 </div>
 </div>
 

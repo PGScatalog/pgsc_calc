@@ -24,6 +24,7 @@
     
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-book-theme.css?digest=84ace793992934648b4de8eed757e5a2" />
+    <link rel="stylesheet" type="text/css" href="_static/twemoji.css" />
     
   <link rel="preload" as="script" href="_static/js/index.be7d3bbb2ef33a8344ce.js">
 
@@ -31,6 +32,8 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js"></script>
+    <script src="_static/twemoji.js"></script>
     <script src="_static/sphinx-book-theme.9d8b4a8b9bb19db25eeaddc40d639ba2.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -86,6 +89,16 @@
  <li class="toctree-l1">
   <a class="reference internal" href="usage.html">
    Usage
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="parameters.html">
+   Parameters
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="output.html">
+   Output
   </a>
  </li>
  <li class="toctree-l1">
@@ -207,8 +220,8 @@
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#pgs-catalog-calculator-parameters">
-     PGS Catalog Calculator Parameters
+    <a class="reference internal nav-link" href="#pgs-catalog-calculator-api-parameters">
+     PGS Catalog Calculator API Parameters
     </a>
    </li>
   </ul>
@@ -266,8 +279,8 @@
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#pgs-catalog-calculator-parameters">
-     PGS Catalog Calculator Parameters
+    <a class="reference internal nav-link" href="#pgs-catalog-calculator-api-parameters">
+     PGS Catalog Calculator API Parameters
     </a>
    </li>
   </ul>
@@ -348,7 +361,7 @@ contain:</p>
 scorefile)</p></li>
 <li><p>The format must be “json”</p></li>
 </ul>
-<p>The <span class="xref std std-ref">JSON schema</span> specifies optional parameters in full.</p>
+<p>The JSON <a class="reference internal" href="#schema"><span class="std std-ref">Schema</span></a> specifies optional parameters in full.</p>
 </div>
 <div class="section" id="api-call">
 <h3>API call<a class="headerlink" href="#api-call" title="Permalink to this headline">¶</a></h3>
@@ -379,10 +392,10 @@ is accessible by the <a class="reference internal" href="glossary.html#term-driv
 <div class="section" id="schema">
 <h2>Schema<a class="headerlink" href="#schema" title="Permalink to this headline">¶</a></h2>
 <p>This documentation is useful for a human, but not a computer, so we wrote a
-document (<a class="reference external" href="https://raw.githubusercontent.com/PGScatalog/pgsc_calc/master/assets/schema_k8s.json">a JSON schema</a>) that describes the data format. The schema is used
+document (<a class="reference external" href="https://json-schema.org/">a JSON schema</a>) that describes the data format. The schema is used
 to automatically validate data submitted to the workflow via the API.</p>
-<div class="section" id="pgs-catalog-calculator-parameters">
-<h3>PGS Catalog Calculator Parameters<a class="headerlink" href="#pgs-catalog-calculator-parameters" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="pgs-catalog-calculator-api-parameters">
+<h3>PGS Catalog Calculator API Parameters<a class="headerlink" href="#pgs-catalog-calculator-api-parameters" title="Permalink to this headline">¶</a></h3>
 <table class="table">
 <colgroup>
 <col style="width: 20%" />
@@ -394,7 +407,7 @@ to automatically validate data submitted to the workflow via the API.</p>
 <tbody>
 <tr class="row-odd"><td colspan="5"><p><a class="reference external" href="https://raw.githubusercontent.com/PGScatalog/pgsc_calc/master/assets/schema_k8s.json">https://raw.githubusercontent.com/PGScatalog/pgsc_calc/master/assets/schema_k8s.json</a></p></td>
 </tr>
-<tr class="row-even"><td colspan="5"><p>Parameters required to launch an instance of the PGS Catalog Calculator from IGS4EU backend on Embassy cloud</p></td>
+<tr class="row-even"><td colspan="5"><p>Parameters required to launch an instance of the PGS Catalog Calculator from K8s cluster on Embassy cloud</p></td>
 </tr>
 <tr class="row-odd"><td><p>type</p></td>
 <td colspan="4"><p><em>object</em></p></td>
@@ -532,7 +545,7 @@ Events</a>. Briefly, a sensor constantly listens on a Kubernetes cluster for Kaf
 messages to launch the pipeline. Once the message is received, a nextflow driver
 pod is created and the workflow is executed using the <a class="reference external" href="https://www.nextflow.io/docs/latest/kubernetes.html">K8S executor</a>. The
 status of the workflow instance is reported using Nextflow’s <a class="reference external" href="https://www.nextflow.io/docs/latest/tracing.html#weblog-via-http">weblog</a> and
-a second sensor.</p>
+a second sensor. We didn’t have Nextflow Tower at the time.</p>
 </div>
 </div>
 

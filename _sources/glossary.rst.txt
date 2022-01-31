@@ -2,8 +2,21 @@ Glossary
 ========
 
 .. glossary::
+
      accession
          A unique and stable identifier
+
+     target genomic data
+         Some genomes
+
+     VCF
+         Variant Call Format
+
+     JSON
+         Javascript object notation
+
+     CSV
+         Comma separated values
 
      polygenic score
          A `polygenic score`_ (PGS) aggregates the effects of many genetic variants

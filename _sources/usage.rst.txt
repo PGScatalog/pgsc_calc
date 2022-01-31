@@ -1,2 +1,15 @@
 Usage
 =====
+
+This page describes some typical use cases of the workflow.
+
+.. warning:: genome build
+   
+Calculating scores with a VCF file
+----------------------------------
+
+Calculating scores with multiple VCF files
+------------------------------------------
+
+Calculating scores with plink bfiles
+------------------------------------
