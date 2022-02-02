@@ -46,7 +46,8 @@ Specifying workflow parameters with JSON
   :language: JSON
 
 Some other parameters need to be set for the workflow to run, which are
-specified in a simple JSON object. This object can be complex, because many
+specified in a simple JSON object. Nextflow supports setting parameters via JSON
+with the ``-params-file`` flag. This object can be complex, because many
 optional parameters can be set here. A minimal workflow parameter object must
 contain:
 

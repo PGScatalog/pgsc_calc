@@ -187,6 +187,29 @@
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#report">
+   Report
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#logs">
+   Logs
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#pipeline-information">
+   Pipeline information
+  </a>
+ </li>
+</ul>
+
+            </nav>
         </div>
     </div>
 </div>
@@ -199,6 +222,29 @@
                 <div id="print-main-content">
                     <div id="jb-print-toc">
                         
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#report">
+   Report
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#logs">
+   Logs
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#pipeline-information">
+   Pipeline information
+  </a>
+ </li>
+</ul>
+
+                        </nav>
                     </div>
                 </div>
             </div>
@@ -207,7 +253,42 @@
                 
   <div class="section" id="output">
 <h1>Output<a class="headerlink" href="#output" title="Permalink to this headline">¶</a></h1>
-<p>Some results!</p>
+<p>The location of the output directory is set by the <code class="docutils literal notranslate"><span class="pre">--outdir</span></code> parameter. By
+default, the results are stored in <code class="docutils literal notranslate"><span class="pre">./results/</span></code>. The results have the following
+structure:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ tree -L <span class="m">1</span> results/
+results/
+├── combine
+├── dumpsoftwareversions
+├── make
+├── match
+├── pipeline_info
+├── plink2
+├── samplesheet
+└── scorefile
+</pre></div>
+</div>
+<div class="section" id="report">
+<h2>Report<a class="headerlink" href="#report" title="Permalink to this headline">¶</a></h2>
+<p>A summary report is available in the <cite>make/</cite> directory. It should open in a web
+browser.</p>
+<p>The report contains polygenic scores for an extract of samples. The full
+polygenic scores can be downloaded by clicking “Download calculated scores”. The
+text file is in <a class="reference external" href="http://www.cog-genomics.org/plink/2.0/formats#sscore">plink .sscore format</a>.</p>
+</div>
+<div class="section" id="logs">
+<h2>Logs<a class="headerlink" href="#logs" title="Permalink to this headline">¶</a></h2>
+<p>Logs that describe each stage of the workflow are available in the other
+directories. These might be useful to check the number of variants present in
+your target genomic data that are found in the scoring file, for example (see
+<code class="docutils literal notranslate"><span class="pre">match/</span></code>).</p>
+</div>
+<div class="section" id="pipeline-information">
+<h2>Pipeline information<a class="headerlink" href="#pipeline-information" title="Permalink to this headline">¶</a></h2>
+<p>Execution reports are available in the <code class="docutils literal notranslate"><span class="pre">pipeline_info</span></code> directory. These
+reports describe the amount of resources (time / memory / CPU) used by each
+stage of the workflow.</p>
+</div>
 </div>
 
 

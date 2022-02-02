@@ -313,6 +313,13 @@ aren’t tested.</p>
 to do anything else. This process requires an internet connection.</p>
 <p>If you would like to run the workflow on a computer with no internet connection,
 please see the <a class="reference internal" href="offline.html"><span class="doc">offline instructions</span></a>.</p>
+<p>To test everything is working well, run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nextflow run pgscatalog/pgsc_calc -profile test,docker
+</pre></div>
+</div>
+<p>Replacing <code class="docutils literal notranslate"><span class="pre">docker</span></code> with <code class="docutils literal notranslate"><span class="pre">singularity</span></code> or <code class="docutils literal notranslate"><span class="pre">conda</span></code> as needed. This will
+download the workflow and run it using a small test dataset. If this runs
+without any errors, you’re ready to try <a class="reference internal" href="usage.html"><span class="doc">your own data</span></a>.</p>
 </div>
 </div>
 

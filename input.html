@@ -346,7 +346,7 @@ contains additional technical detail.</p>
 <tr class="row-odd"><td><p>type</p></td>
 <td colspan="4"><p><em>array</em></p></td>
 </tr>
-<tr class="row-even"><td rowspan="10"><p>items</p></td>
+<tr class="row-even"><td rowspan="19"><p>items</p></td>
 <td><p>type</p></td>
 <td colspan="3"><p><em>object</em></p></td>
 </tr>
@@ -362,18 +362,31 @@ contains additional technical detail.</p>
 <tr class="row-odd"><td><p>pattern</p></td>
 <td colspan="2"><p>^\S+$</p></td>
 </tr>
-<tr class="row-even"><td rowspan="2"><ul class="simple">
-<li><p><strong>fastq_1</strong></p></li>
+<tr class="row-even"><td rowspan="6"><ul class="simple">
+<li><p>vcf_path</p></li>
 </ul>
 </td>
 <td><p>type</p></td>
 <td colspan="2"><p><em>string</em></p></td>
 </tr>
 <tr class="row-odd"><td><p>pattern</p></td>
-<td colspan="2"><p>^\S+\.f(ast)?q\.gz$</p></td>
+<td colspan="2"><p>^\S+\.vcf\.gz$</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><p>anyOf</p></td>
+<td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>pattern</p></td>
+<td><p>^\S+\.vcf\.gz$</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>maxLength</p></td>
+<td><p>0</p></td>
 </tr>
 <tr class="row-even"><td rowspan="4"><ul class="simple">
-<li><p>fastq_2</p></li>
+<li><p>bfile_path</p></li>
 </ul>
 </td>
 <td rowspan="4"><p>anyOf</p></td>
@@ -381,13 +394,38 @@ contains additional technical detail.</p>
 <td><p><em>string</em></p></td>
 </tr>
 <tr class="row-odd"><td><p>pattern</p></td>
-<td><p>^\S+\.f(ast)?q\.gz$</p></td>
+<td><p>^\S+$</p></td>
 </tr>
 <tr class="row-even"><td><p>type</p></td>
 <td><p><em>string</em></p></td>
 </tr>
 <tr class="row-odd"><td><p>maxLength</p></td>
 <td><p>0</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p><strong>chrom</strong></p></li>
+</ul>
+</td>
+<td rowspan="4"><p>anyOf</p></td>
+<td><p>type</p></td>
+<td><p><em>null</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>integer</em></p></td>
+</tr>
+<tr class="row-even"><td><p>maximum</p></td>
+<td><p>22</p></td>
+</tr>
+<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td colspan="4"><p>not</p></td>
+</tr>
+<tr class="row-odd"><td><p>minItems</p></td>
+<td colspan="4"><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>uniqueItems</p></td>
+<td colspan="4"><p>True</p></td>
 </tr>
 </tbody>
 </table>

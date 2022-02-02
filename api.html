@@ -315,15 +315,13 @@ using JSON. The web platform is still under development.</p>
 <h2>Minimal example<a class="headerlink" href="#minimal-example" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="specifying-target-genomes-with-json">
 <h3>Specifying target genomes with JSON<a class="headerlink" href="#specifying-target-genomes-with-json" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;target_genomes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
-<span class="w">        </span><span class="p">{</span><span class="w"></span>
-<span class="w">            </span><span class="nt">&quot;sample&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;example&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">            </span><span class="nt">&quot;vcf_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/path/to/genome.vcf.gz&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">            </span><span class="nt">&quot;chrom&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">22</span><span class="w"></span>
-<span class="w">        </span><span class="p">}</span><span class="w"></span>
-<span class="w">    </span><span class="p">]</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;sample&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;example&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;vcf_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/path/to/genome.vcf.gz&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;chrom&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">22</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">]</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Target genomes are specified as a JSON array. Each element of the array must:</p>
@@ -344,15 +342,14 @@ with <code class="docutils literal notranslate"><span class="pre">.json</span></
 <div class="section" id="specifying-workflow-parameters-with-json">
 <h3>Specifying workflow parameters with JSON<a class="headerlink" href="#specifying-workflow-parameters-with-json" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;nxf_params_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="nt">&quot;scorefile&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/path/to/scorefile.txt&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">        </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;json&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;scorefile&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/path/to/scorefile.txt&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;json&quot;</span><span class="w"></span>
 <span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Some other parameters need to be set for the workflow to run, which are
-specified in a simple JSON object. This object can be complex, because many
+specified in a simple JSON object. Nextflow supports setting parameters via JSON
+with the <code class="docutils literal notranslate"><span class="pre">-params-file</span></code> flag. This object can be complex, because many
 optional parameters can be set here. A minimal workflow parameter object must
 contain:</p>
 <ul class="simple">
