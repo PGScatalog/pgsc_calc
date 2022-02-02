@@ -207,32 +207,32 @@
   <div class="section" id="glossary">
 <h1>Glossary<a class="headerlink" href="#glossary" title="Permalink to this headline">¶</a></h1>
 <dl class="glossary simple">
-<dt id="term-accession">accession<a class="headerlink" href="#term-accession" title="Permalink to this term">¶</a></dt><dd><p>A unique and stable identifier</p>
+<dt id="term-CSV">CSV<a class="headerlink" href="#term-CSV" title="Permalink to this term">¶</a></dt><dd><p>Comma-separated values, a popular plain text file format. <a class="reference external" href="https://www.gov.uk/guidance/using-csv-file-format">CSVs are
+good</a>. Please don’t use <code class="docutils literal notranslate"><span class="pre">.xlsx</span></code> (Excel), it makes bioinformaticians
+sad.</p>
 </dd>
-<dt id="term-target-genomic-data">target genomic data<a class="headerlink" href="#term-target-genomic-data" title="Permalink to this term">¶</a></dt><dd><p>Some genomes</p>
-</dd>
-<dt id="term-VCF">VCF<a class="headerlink" href="#term-VCF" title="Permalink to this term">¶</a></dt><dd><p>Variant Call Format</p>
-</dd>
-<dt id="term-JSON">JSON<a class="headerlink" href="#term-JSON" title="Permalink to this term">¶</a></dt><dd><p>Javascript object notation</p>
-</dd>
-<dt id="term-CSV">CSV<a class="headerlink" href="#term-CSV" title="Permalink to this term">¶</a></dt><dd><p>Comma separated values</p>
-</dd>
-<dt id="term-polygenic-score">polygenic score<a class="headerlink" href="#term-polygenic-score" title="Permalink to this term">¶</a></dt><dd><p>A <a class="reference external" href="https://www.pgscatalog.org/about/">polygenic score</a> (PGS) aggregates the effects of many genetic variants
-into a single number which predicts genetic predisposition for a
-phenotype. PGS are typically composed of hundreds-to-millions of genetic
-variants (usually SNPs) which are combined using a weighted sum of allele
-dosages multiplied by their corresponding effect sizes, as estimated from
-a relevant genome-wide association study (GWAS).</p>
+<dt id="term-JSON">JSON<a class="headerlink" href="#term-JSON" title="Permalink to this term">¶</a></dt><dd><p>Javascript Object Notation. A popular file format and data interchange
+format.</p>
 </dd>
 <dt id="term-PGS-Catalog">PGS Catalog<a class="headerlink" href="#term-PGS-Catalog" title="Permalink to this term">¶</a></dt><dd><p>The <a class="reference external" href="https://www.pgscatalog.org">PGS Catalog</a> is an open database of published polygenic scores
 (PGS). If you develop and publish polygenic scores, please consider
 <a class="reference external" href="https://www.pgscatalog.org/submit/">submitting them</a> to the Catalog!</p>
 </dd>
-<dt id="term-PGS-Catalog-Calculator">PGS Catalog Calculator<a class="headerlink" href="#term-PGS-Catalog-Calculator" title="Permalink to this term">¶</a></dt><dd><p>This cool workflow</p>
+<dt id="term-PGS-Catalog-Calculator">PGS Catalog Calculator<a class="headerlink" href="#term-PGS-Catalog-Calculator" title="Permalink to this term">¶</a></dt><dd><p><code class="docutils literal notranslate"><span class="pre">pgsc_calc</span></code> -  this cool workflow!</p>
 </dd>
-<dt id="term-Scoring-file">Scoring file<a class="headerlink" href="#term-Scoring-file" title="Permalink to this term">¶</a></dt><dd><p>A file for scoring</p>
+<dt id="term-SNP">SNP<a class="headerlink" href="#term-SNP" title="Permalink to this term">¶</a></dt><dd><p>A <a class="reference external" href="https://en.wikipedia.org/wiki/Single-nucleotide_polymorphism">single nucleotide polymorphism</a></p>
 </dd>
-<dt id="term-SNP">SNP<a class="headerlink" href="#term-SNP" title="Permalink to this term">¶</a></dt><dd><p>A single nucleotide polymorphism</p>
+<dt id="term-Scoring-file">Scoring file<a class="headerlink" href="#term-Scoring-file" title="Permalink to this term">¶</a></dt><dd><p>A file containing risk alleles and derived weights for a specific
+phenotype. Weights are typically calculated with 1) GWAS summary
+statistics and 2) A large population of people with known phenotypes
+(e.g. the <a class="reference external" href="https://www.ukbiobank.ac.uk/">UK BioBank</a>). These files are hopefully published in the
+PGS Catalog.</p>
+</dd>
+<dt id="term-VCF">VCF<a class="headerlink" href="#term-VCF" title="Permalink to this term">¶</a></dt><dd><p>Variant Call Format. A popular <a class="reference external" href="https://samtools.github.io/hts-specs/VCFv4.2.pdf">standard file format</a> used to store
+genetic variants.</p>
+</dd>
+<dt id="term-accession">accession<a class="headerlink" href="#term-accession" title="Permalink to this term">¶</a></dt><dd><p>A unique and stable identifier. PGS Catalog accessions start with the
+prefix PGS, e.g. <a class="reference external" href="https://www.pgscatalog.org/score/PGS000001/">PGS000001</a></p>
 </dd>
 <dt id="term-driver-pod">driver pod<a class="headerlink" href="#term-driver-pod" title="Permalink to this term">¶</a></dt><dt id="term-pod">pod<a class="headerlink" href="#term-pod" title="Permalink to this term">¶</a></dt><dd><p><a class="reference external" href="https://kubernetes.io/docs/concepts/workloads/pods/">A pod</a> is a description of one or more containers and its associated
 computing resources (e.g. number of processes and RAM, but it’s more
@@ -241,7 +241,22 @@ make it exist on the cluster. The driver pod is responsible for managing
 a workflow instance. The driver pod will monitor and submit each job in
 the workflow as a separate worker pod.</p>
 </dd>
-<dt id="term-worker-pods">worker pods<a class="headerlink" href="#term-worker-pods" title="Permalink to this term">¶</a></dt><dd><p>Pods unite! You have nothing to lose but your chains.</p>
+<dt id="term-polygenic-score">polygenic score<a class="headerlink" href="#term-polygenic-score" title="Permalink to this term">¶</a></dt><dd><p>A <a class="reference external" href="https://www.pgscatalog.org/about/">polygenic score</a> (PGS) aggregates the effects of many genetic variants
+into a single number which predicts genetic predisposition for a
+phenotype. PGS are typically composed of hundreds-to-millions of genetic
+variants (usually SNPs) which are combined using a weighted sum of allele
+dosages multiplied by their corresponding effect sizes, as estimated from
+a relevant genome-wide association study (GWAS).</p>
+</dd>
+<dt id="term-target-genomic-data">target genomic data<a class="headerlink" href="#term-target-genomic-data" title="Permalink to this term">¶</a></dt><dd><p>Genomes that you want to calculate polygenic scores for. Scores are
+calculated from an existing scoring file that contains risk alleles and
+associated weights. These genomes are distinct from those used to
+create the polygenic scoring file originally (i.e., those used to
+derive the risk alleles and weights).</p>
+</dd>
+<dt id="term-worker-pods">worker pods<a class="headerlink" href="#term-worker-pods" title="Permalink to this term">¶</a></dt><dd><p>A pod, managed by the nextflow driver pod, that is responsible for
+executing an atomic process in the workflow. They are created and
+destroyed automatically by the driver pod.</p>
 </dd>
 </dl>
 </div>
