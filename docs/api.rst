@@ -46,7 +46,8 @@ Specifying workflow parameters with JSON
   :language: JSON
 
 Some other parameters need to be set for the workflow to run, which are
-specified in a simple JSON object. This object can be complex, because many
+specified in a simple JSON object. Nextflow supports setting parameters via JSON
+with the ``-params-file`` flag. This object can be complex, because many
 optional parameters can be set here. A minimal workflow parameter object must
 contain:
 
@@ -55,7 +56,7 @@ contain:
   scorefile)
 - The format must be "json"
 
-The :ref:`JSON schema` specifies optional parameters in full.
+The JSON :ref:`schema` specifies optional parameters in full.
 
 API call
 ~~~~~~~~
@@ -77,7 +78,7 @@ This documentation is useful for a human, but not a computer, so we wrote a
 document (`a JSON schema`_) that describes the data format. The schema is used
 to automatically validate data submitted to the workflow via the API.
 
-.. _a JSON schema: https://raw.githubusercontent.com/PGScatalog/pgsc_calc/master/assets/schema_k8s.json
+.. _a JSON schema: https://json-schema.org/
 
 .. jsonschema:: ../assets/schema_k8s.json
 
@@ -89,7 +90,7 @@ Events`_. Briefly, a sensor constantly listens on a Kubernetes cluster for Kafka
 messages to launch the pipeline. Once the message is received, a nextflow driver
 pod is created and the workflow is executed using the `K8S executor`_. The
 status of the workflow instance is reported using Nextflow's `weblog`_ and
-a second sensor.
+a second sensor. We didn't have Nextflow Tower at the time.
 
 .. _Argo Events: https://argoproj.github.io/argo-events/
 .. _K8S executor: https://www.nextflow.io/docs/latest/kubernetes.html

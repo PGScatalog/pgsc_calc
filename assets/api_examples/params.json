@@ -1,6 +1,4 @@
 {
-    "nxf_params_file": {
-        "scorefile": "/path/to/scorefile.txt",
-        "format": "json"
-    }
+    "scorefile": "/path/to/scorefile.txt",
+    "format": "json"
 }

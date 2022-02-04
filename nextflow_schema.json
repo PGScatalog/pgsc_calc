@@ -21,6 +21,16 @@
                     "fa_icon": "fas fa-file-csv",
                     "pattern": ".csv$|.json$"
                 },
+                "format": {
+                    "type": "string",
+                    "default": "csv",
+                    "fa_icon": "fas fa-cog",
+                    "description": "Format of the input",
+                    "enum": [
+                        "csv",
+                        "json"
+                    ]
+                },
                 "scorefile": {
                     "type": "string",
                     "description": "Path to a scoring file in PGS Catalog format",
@@ -29,7 +39,8 @@
                 "accession": {
                     "type": "string",
                     "description": "A PGS Catalog accession",
-                    "pattern": "PGS[0-9]+"
+                    "pattern": "PGS[0-9]+",
+                    "fa_icon": "fas fa-star"
                 },
                 "outdir": {
                     "type": "string",
@@ -44,7 +55,11 @@
                     "help_text": "Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to specify this on the command line for every run.",
                     "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$"
                 }
-            }
+            },
+            "required": [
+                "format",
+                "input"
+            ]
         },
         "compatibility_options": {
             "title": "Compatibility options",
@@ -55,9 +70,11 @@
                 "min_overlap": {
                     "type": "number",
                     "default": 0.75,
-                    "description": "Minimum proportion of variants present in both the score file and input target genomic data"
+                    "description": "Minimum proportion of variants present in both the score file and input target genomic data",
+                    "fa_icon": "fas fa-cog"
                 }
-            }
+            },
+            "fa_icon": "fas fa-user-cog"
         },
         "institutional_config_options": {
             "title": "Institutional config options",
@@ -250,11 +267,5 @@
         {
             "$ref": "#/definitions/generic_options"
         }
-    ],
-    "properties": {
-        "format": {
-            "type": "string",
-            "default": "csv"
-        }
-    }
+    ]
 }

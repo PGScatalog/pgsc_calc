@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/PGScatalog/pgsc_calc/master/assets/schema_k8s.json",
-  "title": "PGS Catalog Calculator Parameters",
-  "description": "Parameters required to launch an instance of the PGS Catalog Calculator from IGS4EU backend on Embassy cloud",
+  "title": "PGS Catalog Calculator API Parameters",
+  "description": "Parameters required to launch an instance of the PGS Catalog Calculator from K8s cluster on Embassy cloud",
   "type": "object",
   "properties": {
     "target_genomes": {

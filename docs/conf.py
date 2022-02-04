@@ -31,8 +31,11 @@ extensions = [
     'sphinx.ext.githubpages',
     'sphinx.ext.autosectionlabel',
     'sphinx.ext.autodoc',
-    'sphinx-jsonschema'
+    'sphinx-jsonschema',
+    'sphinxemoji.sphinxemoji'
 ]
+
+sphinxemoji_style = 'twemoji'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
