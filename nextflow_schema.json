@@ -39,7 +39,7 @@
                 "accession": {
                     "type": "string",
                     "description": "A PGS Catalog accession",
-                    "pattern": "PGS[0-9]+",
+                    "pattern": "(PGS\\d+)(,\\s*PGS\\d+)*",
                     "fa_icon": "fas fa-star"
                 },
                 "outdir": {

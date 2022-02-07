@@ -1,5 +1,6 @@
 process SCOREFILE_CHECK {
     tag "$meta.accession"
+    label 'process_low'
 
     conda (params.enable_conda ? "bioconda::mawk=1.3.4" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
