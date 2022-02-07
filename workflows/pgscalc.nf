@@ -19,16 +19,23 @@ for (param in checkPathParamList) {
 // Check mandatory parameters
 ch_input = file(params.input, checkIfExists: true)
 
-// Set up score channels
-if (!params.accession && params.scorefile) {
-    scorefile = Channel.of([[accession: file(params.scorefile).getName()], file(params.scorefile, checkIfExists: true)])
-    accession = Channel.empty()
-} else if (params.accession && !params.scorefile) {
-    accession = params.accession
-    scorefile = Channel.empty()
-} else {
-    exit 1, 'Please specify only one of --accession or --scorefile'
-}
+// Set up scorefile channels ---------------------------------------------------
+// scorefile accessions MUST be unique because the accession is used as a key
+// for lots of grouping and joining operations throughout all workflows
+Channel.fromPath(params.scorefile)
+    .map { [[accession: it.getBaseName()], it ] }
+    .set { scorefiles }
+
+scorefiles
+    .map { it.take(1) }
+    .unique()
+    .join(scorefiles)
+    .set { unique_scorefiles }
+
+
+Channel.fromList(params.accession?.tokenize(','))
+    .unique()
+    .set { unique_accessions }
 
 /*
 ========================================================================================
@@ -56,16 +63,16 @@ workflow PGSCALC {
     // SUBWORKFLOW: Get scoring file from PGS Catalog accession
     //
     PGSCATALOG (
-        accession
+        unique_accessions
     )
 
-    scorefile
+    unique_scorefiles
         .mix( PGSCATALOG.out.scorefile )
         .set{ ch_scorefile }
 
     //
     // SUBWORKFLOW: Validate and stage input files
-    //
+
     INPUT_CHECK (
         ch_input,
         params.format,

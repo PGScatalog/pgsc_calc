@@ -17,7 +17,7 @@ process PGSCATALOG_PARSE {
 
     script:
     """
-    jq '[.ftp_scoring_file] | @tsv' ${json} > ${accession}.txt
+    jq '[.ftp_scoring_file] | @tsv' ${json} > ${accession}_url.txt
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
