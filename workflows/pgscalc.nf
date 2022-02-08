@@ -20,8 +20,8 @@ for (param in checkPathParamList) {
 ch_input = file(params.input, checkIfExists: true)
 
 // Set up scorefile channels ---------------------------------------------------
-// scorefile accessions MUST be unique because the accession is used as a key
-// for lots of grouping and joining operations throughout all workflows
+// scorefile accessions MUST be unique: they're used as keys for combining
+// multiple scorefiles
 Channel.fromPath(params.scorefile)
     .map { [[accession: it.getBaseName()], it ] }
     .set { scorefiles }
@@ -66,12 +66,11 @@ workflow PGSCALC {
         unique_accessions
     )
 
-    unique_scorefiles
-        .mix( PGSCATALOG.out.scorefile )
-        .set{ ch_scorefile }
+    unique_scorefiles.mix( PGSCATALOG.out.scorefile ).map { it[1] }.collect().set{ ch_scorefile }
 
     //
     // SUBWORKFLOW: Validate and stage input files
+    //
 
     INPUT_CHECK (
         ch_input,
