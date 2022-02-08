@@ -32,9 +32,10 @@ scorefiles
     .join(scorefiles)
     .set { unique_scorefiles }
 
-
 Channel.fromList(params.accession?.tokenize(','))
-    .unique()
+    .unique() // tokenize to ensure unique
+    .collect()
+    .map { it.join(',') } // join again for calling API
     .set { unique_accessions }
 
 /*
@@ -43,7 +44,8 @@ Channel.fromList(params.accession?.tokenize(','))
 ========================================================================================
 */
 
-include { PGSCATALOG           } from '../subworkflows/local/pgscatalog'
+include { PGSCATALOG_GET       } from '../modules/local/pgscatalog_get'
+
 include { INPUT_CHECK          } from '../subworkflows/local/input_check'
 include { MAKE_COMPATIBLE      } from '../subworkflows/local/make_compatible'
 include { SPLIT_GENOMIC        } from '../subworkflows/local/split_genomic'
@@ -62,11 +64,14 @@ workflow PGSCALC {
     //
     // SUBWORKFLOW: Get scoring file from PGS Catalog accession
     //
-    PGSCATALOG (
-        unique_accessions
-    )
+    if (params.accession) {
+        PGSCATALOG_GET ( unique_accessions )
+        scorefiles = unique_scorefiles.mix(PGSCATALOG_GET.out.scorefiles)
+    } else {
+        scorefiles = unique_scorefiles
+    }
 
-    unique_scorefiles.mix( PGSCATALOG.out.scorefile ).map { it[1] }.collect().set{ ch_scorefile }
+    scorefiles.map { it[1] }.collect().set{ ch_scorefile }
 
     //
     // SUBWORKFLOW: Validate and stage input files

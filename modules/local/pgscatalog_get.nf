@@ -1,35 +1,41 @@
 process PGSCATALOG_GET {
     tag "$accession"
     label 'process_low'
-    maxRetries 5
-    errorStrategy { sleep(Math.pow(2, task.attempt) * 200 as long); return 'retry' }
+    label 'error_retry'
 
-    conda (params.enable_conda ? "conda-forge::curl=7.79.1" : null)
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://containers.biocontainers.pro/s3/SingImgsRepo/biocontainers/v1.2.0_cv1/biocontainers_v1.2.0_cv1.img' :
-        'biocontainers/biocontainers:v1.2.0_cv1' }"
+    conda (params.enable_conda ? "bioconda::jq=1.6" : null)
+        container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/jq:1.6' :
+        'quay.io/biocontainers/jq:1.6' }"
 
     input:
-    tuple val(accession), path(url)
+    val(accession)
 
     output:
-    tuple val(accession), path("PGS*.txt"), emit: scorefile
+    tuple val(accession), path("PGS*.txt"), emit: scorefiles
     path "versions.yml"                   , emit: versions
 
     script:
     """
-    sed -i '1s/^/url = /' ${url}
-    curl --connect-timeout 5 \\
-        --speed-time 10 \\
-        --speed-limit 1000 \\
-         -O -K ${url}
+    pgs_api=\$(printf 'http://www.pgscatalog.org/rest/score/search?pgs_ids=%s' ${accession})
+    wget \$pgs_api -O response.json
+
+    # check for a valid response. empty response: {} = 2 chars
+    if [ \$(wc -m < response.json) -eq 2 ]
+    then
+        echo "PGS Catalog API error. Is --accession valid?"
+        exit 1
+    fi
+
+    jq '[.results][][].ftp_scoring_file' response.json | sed 's/https:\\/\\///' > urls.txt
+
+    cat urls.txt | xargs -n 1 wget -T 5
+
     gunzip *.txt.gz
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
-        sed: \$(sed --version 2>&1 | head -n 1 | cut -f 4 -d ' ')
-        gzip: \$(gzip --version 2>&1 | head -n 1 | cut -f 2 -d ' ')
-        curl: \$(curl --version 2>&1 | head -n 1 | sed 's/curl //; s/ (x86.*\$//')
+        jq: \$(jq --version 2>&1 | sed 's/jq-//')
     END_VERSIONS
     """
 }
