@@ -1,99 +1,9 @@
 #!/usr/bin/env python3
 
-import argparse
-import sqlite3
-from pathlib import Path
-import subprocess
 import pandas as pd
-import sys
-
-parser = argparse.ArgumentParser(description='Match variants from a scoring file to target genomic data')
-parser.add_argument('--min_overlap', dest='min_overlap', required=True, type = float)
-parser.add_argument('--scorefile', dest='scorefile', required=True)
-parser.add_argument('--target', dest='target', required=True)
-parser.add_argument('--db', dest='db', required=True)
-parser.add_argument('--out', dest='outfile', required=True)
-args = parser.parse_args()
-
-def connect_db(db_path):
-    db = Path(db_path).resolve()
-    con = sqlite3.connect(db)
-    return con
-
-def make_tables(con):
-    cur = con.cursor()
-
-    # Create table
-    cur.execute('''
-        CREATE TABLE scorefile(
-            "chrom" TEXT,
-            "pos" INTEGER,
-            "effect" TEXT,
-            "other" TEXT,
-            "weight" REAL)
-    ''')
-
-    cur.execute('''
-        CREATE TABLE target(
-          "#CHROM" TEXT,
-          "POS" INTEGER,
-          "ID" TEXT,
-          "REF" TEXT,
-          "ALT" TEXT
-        );
-    ''')
-
-    cur.execute('''
-        CREATE TABLE flip (
-            nucleotide TEXT NOT NULL,
-            complement TEXT NOT NULL
-        )
-    ''')
-
-    con.commit()
-    cur.close()
-
-def import_tables(con, db_path, scorefile_path, target_path):
-    scorefile = Path(scorefile_path).resolve()
-    target = Path(target_path).resolve()
-    db = Path(db_path).resolve()
-    cur = con.cursor()
-
-    # import with sqlite's native .import (much faster than python loop)
-    subprocess.run(['sqlite3',
-                         str(db),
-                         '-cmd',
-                         '.mode tabs',
-                         '.import ' + str(scorefile).replace('\\','\\\\')
-                                 +' scorefile'])
-
-    subprocess.run(['sqlite3',
-                         str(db),
-                         '-cmd',
-                         '.mode tabs',
-                         '.import ' + str(target).replace('\\','\\\\')
-                                 +' target'])
-
-    cur.execute('''
-        INSERT INTO flip (nucleotide, complement)
-        VALUES
-            ('A', 'T'),
-            ('T', 'A'),
-            ('C', 'G'),
-            ('G', 'C')
-    ''')
-
-    cur.execute('''
-        CREATE INDEX idx_scorefile on scorefile (pos, chrom)
-    ''')
-
-    cur.execute('''
-        CREATE INDEX idx_target ON target (pos, '#CHROM')
-    ''')
-
-    con.commit()
-    cur.close()
-
+import pickle
+import sqlite3
+from functools import reduce
 
 def get_matched(con):
     cur = con.cursor()
@@ -107,7 +17,8 @@ def get_matched(con):
             scorefile.pos,
             scorefile.effect,
             scorefile.other,
-            scorefile.weight
+            scorefile.weight,
+            scorefile.type
         FROM
             scorefile
         INNER JOIN target ON scorefile.chrom = target.'#CHROM' AND
@@ -125,7 +36,8 @@ def get_matched(con):
             scorefile.pos,
             scorefile.effect,
             scorefile.other,
-            scorefile.weight
+            scorefile.weight,
+            scorefile.type
         FROM
             scorefile
         INNER JOIN target ON scorefile.chrom = target.'#CHROM' AND
@@ -147,7 +59,8 @@ def get_unmatched(con):
         scorefile.pos,
         scorefile.effect,
         scorefile.other,
-        scorefile.weight
+        scorefile.weight,
+        scorefile.type
     FROM
         scorefile
     INNER JOIN
@@ -171,14 +84,16 @@ def get_flipped(con):
             pos,
             effect,
             other,
-            weight
+            weight,
+            type
         FROM
             -- subquery: get a table with flipped effect alleles
             (SELECT
             chrom,
             pos,
             complement AS effect,
-            weight
+            weight,
+            type
             FROM unmatched
             INNER JOIN flip
             ON unmatched.effect = flip.nucleotide)
@@ -203,7 +118,8 @@ def get_flipped(con):
             flipped.pos,
             flipped.effect,
             flipped.other,
-            flipped.weight
+            flipped.weight,
+            flipped.type
         FROM
             flipped
         INNER JOIN
@@ -221,7 +137,8 @@ def get_flipped(con):
             flipped.pos,
             flipped.effect,
             flipped.other,
-            flipped.weight
+            flipped.weight,
+            flipped.type
         FROM
             flipped
         INNER JOIN
@@ -231,72 +148,168 @@ def get_flipped(con):
             flipped.pos = target.pos AND
             flipped.effect = target.ALT AND
             flipped.other = target.'REF';
-
     ''')
 
     con.commit()
     cur.close()
 
-def export_tables(con):
-    query = """
-    SELECT
-        id,
-        effect,
-        weight
-    FROM
-        (SELECT
-            id,
-            chrom,
-            pos,
-            effect,
-            weight
-        FROM matched
-        ORDER BY chrom, pos);
-    """
+def import_scorefile(conn, df, col_names):
+    # easier to query short names, I am lazy
+    df.rename(columns = col_names, inplace = True)
 
-    return pd.read_sql_query(query,con)
+    # index manually
+    df.to_sql('scorefile', conn, index = False)
 
-def report(con, df, args):
-    # these files can be big, wc is quick
-    lines_target = subprocess.run(["wc", "-l", args.target], stdout=subprocess.PIPE)
-    n_target = int(lines_target.stdout.decode("utf-8").split()[0])
+    cur = conn.cursor()
 
-    lines_scorefile =subprocess.run(["wc", "-l", args.scorefile], stdout=subprocess.PIPE)
-    n_scorefile = int(lines_scorefile.stdout.decode("utf-8").split()[0])
+    cur.execute('''
+        CREATE INDEX idx_scorefile on scorefile (pos, chrom);
+    ''')
 
-    n_matched = len(df.index)
-    perc_matched = (n_matched / n_scorefile) * 100
+    conn.commit()
+    cur.close()
 
-    # check overlap and exit with error if required
-    if (perc_matched < args.min_overlap * 100):
-        print("""
-        ERROR: Your target data seem to overlap poorly with the scoring file
-        ERROR: Minimum overlap set to {}%
-        ERROR: Only {}% variants matched
-        """.format(args.min_overlap * 100, round(perc_matched, 2)))
-        sys.exit(1)
+def import_target(conn, path):
+    df = pd.read_csv(path, sep = "\t")
 
-    # otherwise write a log
-    f = open("match.log", "w")
-    f.write("match_variants.py log\n")
-    f.write("Percent matched variants: {}%\n".format(round(perc_matched, 2)))
-    f.write("Total matched variants: {}\n".format(n_matched))
-    f.write("Total variants in scorefile: {}\n".format(n_scorefile))
-    f.write("Total variants in target data: {}\n".format(n_target))
-    f.write("Minimum overlap: {}%".format(args.min_overlap * 100))
-    f.close()
+    # index manually
+    df.to_sql('target', conn, index = False)
 
-def match_variants(args):
-    con = connect_db(args.db)
-    make_tables(con)
-    import_tables(con, args.db, args.scorefile, args.target)
-    get_matched(con)
-    get_unmatched(con)
-    get_flipped(con)
-    df = export_tables(con)
-    report(con, df, args)
-    df.to_csv(args.outfile, sep = "\t", index = False, header = False)
-    con.close()
+    cur = conn.cursor()
 
-if __name__ == "__main__":
-    match_variants(args)
+    cur.execute('''
+        CREATE INDEX idx_target ON target (pos, '#CHROM')
+    ''')
+
+    cur.execute('''
+        CREATE TABLE flip (
+            nucleotide TEXT NOT NULL,
+            complement TEXT NOT NULL
+        )
+    ''')
+
+    cur.execute('''
+        INSERT INTO flip (nucleotide, complement)
+        VALUES
+            ('A', 'T'),
+            ('T', 'A'),
+            ('C', 'G'),
+            ('G', 'C')
+    ''')
+
+    conn.commit()
+    cur.close()
+
+def teardown_tables(conn):
+    # drop analysis tables, get ready for a new scorefile
+    cur = conn.cursor()
+
+    cur.execute('''
+        DROP TABLE scorefile
+    ''')
+    cur.execute('''
+        DROP TABLE matched
+    ''')
+    cur.execute('''
+        DROP TABLE unmatched
+    ''')
+    cur.execute('''
+        DROP VIEW flipped
+    ''')
+
+    conn.commit()
+    cur.close()
+
+def read_scorefiles(pkl):
+    jar = open(pkl, "rb")
+    scorefiles = pickle.load(jar)
+    return scorefiles
+
+def merge_scorefiles(x, y):
+    return x.merge(y, on = ['id', 'effect_allele', 'effect_type'], how = 'outer')
+
+def split_effect_type(df):
+    # split df by effect type (additive, dominant, or recessive) into a dict of
+    # dfs
+    grouped = df.groupby('effect_type')
+    return { k: grouped.get_group(k).drop('effect_type', axis = 1 ) for k, v in
+        grouped.groups.items() }
+
+def match_variants(conn, scorefile, accession):
+    # shorten column names for lazy SQL lookups
+    col_names = {'chr_name': 'chrom', 'chr_position': 'pos', 'effect_allele':
+    'effect', 'other_allele': 'other', 'effect_weight': 'weight', 'effect_type':
+    'type'}
+
+    # matching stuff quickly with tuned sql queries ----------------------------
+    import_scorefile(conn, scorefile, col_names)
+    get_matched(conn) # simple matching, EA = REF or EA = ALT
+    get_unmatched(conn)
+    get_flipped(conn) # flip only unmatched, try matching EA = REF or EA = ALT
+
+    # extract results ----------------------------------------------------------
+    # read matches back into pandas df, return column names back to original
+    # set effect weight to accession to prepare for merging
+    matched = (
+        pd.read_sql('SELECT * from matched', conn)
+        .rename(columns = {v: k for k, v in col_names.items()})
+        .loc[:, ['id', 'effect_allele', 'effect_type', 'effect_weight']]
+        .rename(columns = {'effect_weight': accession})
+        .sort_values(by=['id'])
+        )
+
+    # reporting and cleanup ----------------------------------------------------
+    make_report(conn, accession)
+    teardown_tables(conn)
+
+    return matched
+
+def make_report(conn, accession):
+    cur = conn.cursor()
+    queries = ["SELECT COUNT(pos) AS flip_matched FROM flipped EXCEPT SELECT pos FROM matched", \
+               "SELECT COUNT(pos) AS matched FROM matched EXCEPT SELECT pos FROM flipped", \
+               "SELECT COUNT(pos) AS scorefile_variants FROM scorefile", \
+               "SELECT COUNT(POS) AS target_variants FROM target"]
+    result = reduce(lambda x, y: x.combine_first(y), [pd.read_sql(x, conn) for x in queries])
+    result["accession"] = accession
+    result.to_sql("report", conn, if_exists = "append", index = False)
+
+def unduplicate_variants(df):
+    # when merging a lot of scoring files, sometimes a variant might be duplicated
+    # this can happen when the effect allele differs at the same position, e.g.:
+    #     - chr1: chr2:20003:A:C A 0.3 NA
+    #     - chr1: chr2:20003:A:C C NA 0.7
+    # where the last two columns represent different scores.  plink demands
+    # unique identifiers! so need to split, score, and sum later
+
+    # .duplicated() marks first duplicate element as True
+    # cats, cats, dogs -> False, True, False
+    ea_ref = ~df.duplicated(subset=['id'], keep='first')
+    ea_alt = ~ea_ref
+    # ~ negates for getting a subset of rows with a boolean series
+    return { 'ea_ref': df[ea_ref], 'ea_alt': df[ea_alt] }
+
+def write_scorefiles(effect_type, scorefile):
+    fout = "{}_{}.scorefile"
+
+    if not scorefile.get('ea_ref').empty:
+        df = scorefile.get('ea_ref')
+        df.to_csv(fout.format(effect_type, "first"), sep = "\t", index = False)
+    if not scorefile.get('ea_alt').empty:
+        df = scorefile.get('ea_alt')
+        df.to_csv(fout.format(effect_type, "second"), sep = "\t", index = False)
+
+conn = sqlite3.connect('test.db')
+import_target(conn, "cineca_synthetic_subset.combined")
+
+unpickled_scorefiles = read_scorefiles("scorefiles.pkl") # { accession: df }
+matched_scorefiles = [match_variants(conn, v, k) for k, v in unpickled_scorefiles.items()]
+merged_scorefile = reduce(lambda x, y: x.merge(y, on = ['id', 'effect_allele',
+    'effect_type'], how = 'outer'), matched_scorefiles)
+split_effects = split_effect_type(merged_scorefile)
+unduplicated = { k: unduplicate_variants(v) for k, v in split_effects.items() }
+[write_scorefiles(k, v) for k, v in unduplicated.items() ]
+pd.read_sql("select * from report", conn).to_csv("report.csv", index = False)
+
+# to do: argparse
+# to do: double check ambiguous alleles??
