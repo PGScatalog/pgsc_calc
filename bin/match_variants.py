@@ -3,7 +3,19 @@
 import pandas as pd
 import pickle
 import sqlite3
+import argparse
+import sys
 from functools import reduce
+
+def parse_args(args=None):
+    parser = argparse.ArgumentParser(description='Read and format scoring files')
+    parser.add_argument('-s','--scorefiles', dest = 'scorefiles',
+                        help='<Required> Pickled scorefile path (output of read_scorefiles.py)', required=True)
+    parser.add_argument('-t','--target', dest = 'target',
+                        help='<Required> A table of target genomic variants (.bim format)', required=True)
+    parser.add_argument('-m', '--min_overlap', dest='min_overlap', required=True,
+                        help='<Required> Minimum proportion of variants to match before error', type = float)
+    return parser.parse_args()
 
 def get_matched(con):
     cur = con.cursor()
@@ -266,10 +278,11 @@ def match_variants(conn, scorefile, accession):
 
 def make_report(conn, accession):
     cur = conn.cursor()
-    queries = ["SELECT COUNT(pos) AS flip_matched FROM flipped EXCEPT SELECT pos FROM matched", \
-               "SELECT COUNT(pos) AS matched FROM matched EXCEPT SELECT pos FROM flipped", \
+    queries = ["SELECT COUNT(POS) AS target_variants FROM target", \
                "SELECT COUNT(pos) AS scorefile_variants FROM scorefile", \
-               "SELECT COUNT(POS) AS target_variants FROM target"]
+               "SELECT COUNT(pos) AS matched FROM matched EXCEPT SELECT pos FROM flipped", \
+               "SELECT COUNT(pos) AS flip_matched FROM flipped EXCEPT SELECT pos FROM matched"]
+
     result = reduce(lambda x, y: x.combine_first(y), [pd.read_sql(x, conn) for x in queries])
     result["accession"] = accession
     result.to_sql("report", conn, if_exists = "append", index = False)
@@ -299,17 +312,44 @@ def write_scorefiles(effect_type, scorefile):
         df = scorefile.get('ea_alt')
         df.to_csv(fout.format(effect_type, "second"), sep = "\t", index = False)
 
-conn = sqlite3.connect('test.db')
-import_target(conn, "cineca_synthetic_subset.combined")
+def write_report(conn, min_overlap):
+    report = pd.read_sql("select * from report", conn)
+    report['prop_matched'] = report['target_variants'] / report['scorefile_variants']
+    report['min_overlap'] = min_overlap
+    report['pass_filter'] = report['prop_matched'] >= report['min_overlap']
+    report.to_csv("report.csv", index = False)
 
-unpickled_scorefiles = read_scorefiles("scorefiles.pkl") # { accession: df }
-matched_scorefiles = [match_variants(conn, v, k) for k, v in unpickled_scorefiles.items()]
-merged_scorefile = reduce(lambda x, y: x.merge(y, on = ['id', 'effect_allele',
-    'effect_type'], how = 'outer'), matched_scorefiles)
-split_effects = split_effect_type(merged_scorefile)
-unduplicated = { k: unduplicate_variants(v) for k, v in split_effects.items() }
-[write_scorefiles(k, v) for k, v in unduplicated.items() ]
-pd.read_sql("select * from report", conn).to_csv("report.csv", index = False)
+    # check minimum overlap
+    for index, row in report.iterrows():
+        match_error = """
+            MATCH ERROR: Scorefile {} doesn't match target genomes well
+            Minimum overlap: {:.2%}
+            Scorefile match: {:.2%}
+        """.format(row['accession'], row['min_overlap'], row['prop_matched'])
+        assert row['pass_filter'], match_error
 
-# to do: argparse
-# to do: double check ambiguous alleles??
+def main(args = None):
+    args = parse_args(args)
+    # read inputs and set up database tables -----------------------------------
+    conn = sqlite3.connect('match_variants.db')
+    import_target(conn, args.target)
+    unpickled_scorefiles = read_scorefiles(args.scorefiles) # { accession: df }
+
+    # start matching :) --------------------------------------------------------
+    matched_scorefiles = [match_variants(conn, v, k) for k, v in unpickled_scorefiles.items()]
+
+    # process matched variants: merge, split by effect type, and unduplicate ---
+    merged_scorefile = reduce(lambda x, y: x.merge(y, on = ['id', 'effect_allele',
+        'effect_type'], how = 'outer'), matched_scorefiles)
+    split_effects = split_effect_type(merged_scorefile)
+    unduplicated = { k: unduplicate_variants(v) for k, v in split_effects.items() }
+
+    # write matched and processed variants out, with a report -------------------
+    [write_scorefiles(k, v) for k, v in unduplicated.items() ]
+    write_report(conn, args.min_overlap)
+
+if __name__ == "__main__":
+    sys.exit(main())
+
+# TO DO ========================================================================
+# TO DO: double check ambiguous alleles??
