@@ -36,8 +36,15 @@ workflow MAKE_COMPATIBLE {
     psam = PLINK2_RELABEL.out.psam.mix(PLINK2_VCF.out.psam)
     pvar = PLINK2_RELABEL.out.pvar.mix(PLINK2_VCF.out.pvar)
 
-    // Recombine split variant information files to match target variants
-    pvar.map { extract_chrom(it) }
+    // Recombine split variant information files to match target variants ------
+
+    // custom groupKey() to set a different group size for each sample ID
+    // different samples may have different numbers of chromosomes
+    // see https://nextflow.io/docs/latest/operator.html#grouptuple
+    // if a size is not provided then nextflow must wait for the entire process
+    // to finish before releasing the grouped tuples, which can be very slow(!)
+    pvar.map { tuple(groupKey(it[0].subMap(['id', 'is_vcf']), it[0].n_chrom),
+                     it[0].chrom, it[1]) }
         .groupTuple()
         .set { flat_bims }
 
@@ -51,16 +58,4 @@ workflow MAKE_COMPATIBLE {
     pvar
     scorefile = MATCH_VARIANTS.out.scorefile
     versions = ch_versions
-}
-
-def extract_chrom(ArrayList it) {
-    // [[meta], path]
-    // first element is a meta map:
-    // [ id: hello, is_vcf: true, chrom:22 ]
-    // where chrom can be false
-    // need to extract chrom for groupTuple() to work
-    meta = it[0]
-    chrom = it[0].chrom
-    meta.remove('chrom')
-    return [meta, chrom, it[1]]
 }
