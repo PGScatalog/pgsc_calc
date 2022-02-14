@@ -29,7 +29,7 @@ process MATCH_VARIANTS {
         'quay.io/biocontainers/pandas:1.1.5' }"
 
     input:
-    tuple val(meta), val(chrom), path(target), path(scorefile)
+    tuple val(meta), val(chrom), path('??.pvar'), path(scorefile)
 
     output:
     tuple val(meta), val(chrom), path("*.scorefile"), emit: scorefile
@@ -42,8 +42,8 @@ process MATCH_VARIANTS {
 
     if (split)
         """
-        sed -i '/##/d' $target # delete annoying plink comment lines before combining
-        awk 'FNR == 1 && NR != 1 { next } { print }' $target > combined.txt
+        sed -i '/##/d' *.pvar # delete annoying plink comment lines before combining
+        awk 'FNR == 1 && NR != 1 { next } { print }' *.pvar > combined.txt
 
         match_variants.py \
             $args \
@@ -59,8 +59,8 @@ process MATCH_VARIANTS {
         """
     else
         """
-        sed -i '/##/d' $target # delete annoying plink comment lines before combining
-        awk 'FNR == 1 && NR != 1 { next } { print }' $target > combined.txt
+        sed -i '/##/d' *.pvar # delete annoying plink comment lines before combining
+        awk 'FNR == 1 && NR != 1 { next } { print }' *.pvar > combined.txt
 
         match_variants.py \
             $args \
