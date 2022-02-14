@@ -3,9 +3,6 @@
     "homePage": "https://github.com/nf-core/pgscalc",
     "repos": {
         "nf-core/modules": {
-            "plink/extract": {
-                "git_sha": "cde237e7cec07798e5754b72aeca44efe89fc6db"
-            },
             "plink2/vcf": {
                 "git_sha": "e20e57f90b6787ac9a010a980cf6ea98bd990046"
             }
