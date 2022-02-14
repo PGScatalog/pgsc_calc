@@ -18,7 +18,8 @@ workflow INPUT_CHECK {
         SAMPLESHEET_JSON(input)
         ch_versions = ch_versions.mix(SAMPLESHEET_JSON.out.versions)
         SAMPLESHEET_JSON.out.json
-            .flatMap { json_slurp(it) }
+            .map { json_slurp(it) }
+            .flatMap { count_chrom(it) }
             .buffer ( size: 2 )
             .branch {
                 vcf: it[0].is_vcf
@@ -27,7 +28,8 @@ workflow INPUT_CHECK {
             .set { ch_input }
     } else if (format.equals("json")) {
         Channel.from(input)
-            .flatMap { json_slurp(it) }
+            .map { json_slurp(it) }
+            .flatMap { count_chrom(it) }
             .buffer( size: 2 )
             .branch {
                 vcf: it[0].is_vcf
@@ -66,6 +68,7 @@ def json_slurp(Path input) {
 }
 
 def json_to_genome(HashMap slurped) {
+    // parse slurped JSON into [[meta], [path_to_target_genome]]
     def meta    = [:]
     meta.id     = slurped.sample
     meta.is_vcf = slurped.vcf_path ? true : false
@@ -83,4 +86,17 @@ def json_to_genome(HashMap slurped) {
         genome_lst = [ meta, [ bed, bim, fam ] ]
     }
     return genome_lst
+}
+
+def count_chrom(ArrayList genomes) {
+    // count the number of chromosomes associated with each sample ID
+    // add this value to the meta map
+    maps = genomes.findAll { it instanceof HashMap }
+    n_chrom = maps.groupBy { it.id }
+        .collectEntries { key, map -> [key, map*.chrom.size()] }
+    return genomes.each {
+        if ( it instanceof HashMap ) {
+            it.n_chrom = n_chrom[it.id]
+        }
+    }
 }
