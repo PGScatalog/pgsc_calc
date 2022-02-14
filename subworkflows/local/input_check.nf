@@ -72,7 +72,7 @@ def json_to_genome(HashMap slurped) {
     def meta    = [:]
     meta.id     = slurped.sample
     meta.is_vcf = slurped.vcf_path ? true : false
-    meta.chrom  = slurped.chrom?: false
+    meta.chrom  = slurped.chrom? slurped.chrom.toInteger() : false
 
     def genome_lst = []
 
