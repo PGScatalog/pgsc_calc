@@ -184,27 +184,27 @@ def write_scorefiles(effect_type, scorefile, split):
     None, a set of scorefiles are written to disk.
     """
 
-    fout = '{et}_{dup}.scorefile'
+    fout = 'false_{et}_{dup}.scorefile'
 
     if not scorefile.get('ea_ref').empty:
         df = scorefile.get('ea_ref')
         if split:
             write_split(split_scorefile(df), effect_type, '0')
         else:
-            df.to_csv(fout.format(et = effect_type, dup = '0'), sep = '\t', index = False)
+            df.fillna(0).to_csv(fout.format(et = effect_type, dup = '0'), sep = '\t', index = False)
 
     if not scorefile.get('ea_alt').empty:
         df = scorefile.get('ea_alt')
         if split:
             write_split(split_scorefile(df), effect_type, '1')
         else:
-            df.to_csv(fout.format(et = effect_type, dup = '1'), sep = '\t', index = False)
+            df.fillna(0).to_csv(fout.format(et = effect_type, dup = '1'), sep = '\t', index = False)
 
 def write_split(split_dfs, effect_type, dup):
     ''' Write a dict of dataframes to files with appropriate names '''
     split_fout = '{chr}_{et}_{dup}.scorefile'
 
-    [df.to_csv(split_fout.format(chr = k, et = effect_type, dup = dup), \
+    [df.fillna(0).to_csv(split_fout.format(chr = k, et = effect_type, dup = dup), \
                sep = '\t', index = False) for k, df in split_dfs.items()]
 
 def split_scorefile(df):

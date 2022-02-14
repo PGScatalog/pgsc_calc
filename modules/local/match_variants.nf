@@ -32,9 +32,9 @@ process MATCH_VARIANTS {
     tuple val(meta), val(chrom), path('??.pvar'), path(scorefile)
 
     output:
-    tuple val(meta), val(chrom), path("*.scorefile"), emit: scorefile
-    path "report.csv"                               , emit: log
-    path "versions.yml"                             , emit: versions
+    tuple val(meta), path("*.scorefile"), emit: scorefile
+    path "report.csv"                   , emit: log
+    path "versions.yml"                 , emit: versions
 
     script:
     def args = task.ext.args ?: ''

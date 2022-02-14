@@ -15,10 +15,14 @@ process PLINK2_SCORE {
     path "versions.yml"              , emit: versions
 
     script:
+    def args = task.ext.args ?: ''
+
     if (n_samples < 50)
         """
+        colmax=\$(head -n 1 $scorefile | awk -F '\t' '{ print NF }')
         plink2 \\
-            --score ${scorefile} no-mean-imputation \\
+            --score ${scorefile} header-read cols=scoresums no-mean-imputation $args \\
+            --score-col-nums 3-\$colmax \\
             --pfile ${pgen.baseName} \\
             --out ${meta.id}_${meta.chrom}
 
@@ -29,8 +33,10 @@ process PLINK2_SCORE {
         """
     else if (n_samples > 50)
         """
+        colmax=\$(head -n 1 $scorefile | awk -F '\t' '{ print NF }')
         plink2 \\
-            --score ${scorefile} \\
+            --score ${scorefile} header-read cols=scoresums $args \\
+            --score-col-nums 3-\$colmax \\
             --pfile ${pgen.baseName} \\
             --out ${meta.id}_${meta.chrom}
 

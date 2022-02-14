@@ -50,7 +50,7 @@ include { INPUT_CHECK          } from '../subworkflows/local/input_check'
 include { MAKE_COMPATIBLE      } from '../subworkflows/local/make_compatible'
 
 // include { SPLIT_GENOMIC        } from '../subworkflows/local/split_genomic'
-// include { APPLY_SCORE          } from '../subworkflows/local/apply_score'
+include { APPLY_SCORE          } from '../subworkflows/local/apply_score'
 // include { DUMPSOFTWAREVERSIONS } from '../modules/local/dumpsoftwareversions'
 
 /*
@@ -104,12 +104,12 @@ workflow PGSCALC {
 //     // SUBWORKFLOW: Apply a scoring file to target genomic data
 //     //
 
-//     APPLY_SCORE (
-//         MAKE_COMPATIBLE.out.pgen,
-//         MAKE_COMPATIBLE.out.psam,
-//         MAKE_COMPATIBLE.out.pvar,
-//         MAKE_COMPATIBLE.out.scorefile
-//     )
+    APPLY_SCORE (
+        MAKE_COMPATIBLE.out.pgen,
+        MAKE_COMPATIBLE.out.psam,
+        MAKE_COMPATIBLE.out.pvar,
+        MAKE_COMPATIBLE.out.scorefile
+    )
 
 //     ch_versions = ch_versions.mix(APPLY_SCORE.out.versions)
 
