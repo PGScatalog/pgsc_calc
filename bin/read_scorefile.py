@@ -54,6 +54,8 @@ def read_scorefile(path):
     x = pd.read_table(path, converters = { "chr_name": to_int, "chr_pos": to_int
                                            }, comment = "#")
 
+    assert len(x.columns) > 1, "ERROR: scorefile not formatted correctly"
+
     assert { 'chr_name', 'chr_position' }.issubset(x.columns), "ERROR: Need chr_position and chr_name (rsids not supported yet!)"
 
     # nullable int is always important

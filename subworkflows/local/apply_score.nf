@@ -49,7 +49,7 @@ workflow APPLY_SCORE {
     ch_versions = ch_versions.mix(MAKE_REPORT.out.versions)
 
     emit:
-    score = scorefiles // MAKE_REPORT.out.scores
+    score = MAKE_REPORT.out.scores
     versions = ch_versions
 }
 
@@ -91,7 +91,7 @@ def annotate_scorefiles(ArrayList scorefiles) {
             scoremeta.effect_type = it.last().getName().tokenize('_')[1]
 
             // get score number from file name of scorefile ---------------------
-            scoremeta.n = it.last().getName().tokenize('_')[2]
+            scoremeta.n = it.last().getName().tokenize('_')[2].tokenize('.')[0]
 
             return [scoremeta, it.last()]
     }

@@ -20,7 +20,9 @@ process PLINK2_SCORE {
 
     def maxcol = (scoremeta.n_scores + 2) // id + effect allele = 2 cols
     def no_imputation = (meta.n_samples >= 50) ? '' : ' no-mean-imputation '
-    args2 = args2 + no_imputation
+    def recessive = (scoremeta.effect_type == 'recessive') ? ' recessive ' : ''
+    def dominant = (scoremeta.effect_type == 'dominant') ? ' dominant ' : ''
+    args2 = args2 + no_imputation + recessive + dominant
 
     if (scoremeta.n_scores == 1)
         """
@@ -28,22 +30,21 @@ process PLINK2_SCORE {
             $args \\
             --score $scorefile $args2 \\
             --pfile ${pgen.baseName} \\
-            --out ${meta.id}_${meta.chrom}_${scorefile.baseName.tokenize('_')[2]}
-        # prevent collisions for duplicate variants that were split
+            --out ${meta.id}_${meta.chrom}_${scoremeta.effect_type}_${scoremeta.n}
 
         cat <<-END_VERSIONS > versions.yml
         ${task.process.tokenize(':').last()}:
             plink2: \$(plink2 --version 2>&1 | sed 's/^PLINK v//; s/ 64.*\$//' )
         END_VERSIONS
         """
-    else
+    else if (scoremeta.n_scores > 1)
         """
         plink2 \\
             $args \\
             --score $scorefile $args2 \\
             --score-col-nums 3-$maxcol \\
             --pfile ${pgen.baseName} \\
-            --out ${meta.id}_${meta.chrom}_${scorefile.baseName.tokenize('_')[2]}
+            --out ${meta.id}_${meta.chrom}_${scoremeta.effect_type}_${scoremeta.n}
 
         cat <<-END_VERSIONS > versions.yml
         ${task.process.tokenize(':').last()}:
