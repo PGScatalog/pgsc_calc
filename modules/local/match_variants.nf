@@ -32,13 +32,15 @@ process MATCH_VARIANTS {
     tuple val(meta), val(chrom), path('??.pvar'), path(scorefile)
 
     output:
-    tuple val(meta), path("*.scorefile"), emit: scorefile
+    tuple val(scoremeta), path("*.scorefile"), emit: scorefile
     path "report.csv"                   , emit: log
     path "versions.yml"                 , emit: versions
 
     script:
     def args = task.ext.args ?: ''
     def split = !chrom.contains(false)
+    scoremeta = [:]
+    scoremeta.id = "$meta.id"
 
     if (split)
         """
