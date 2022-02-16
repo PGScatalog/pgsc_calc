@@ -23,7 +23,7 @@ def to_int(i):
     except ValueError:
         return np.nan
 
-def set_effect_type(x):
+def set_effect_type(x, path):
     mandatory_columns = ["chr_name", "chr_position", "effect_allele", "other_allele", "effect_weight"]
     col_error = "ERROR: Missing mandatory columns"
 
@@ -36,6 +36,14 @@ def set_effect_type(x):
     else:
         mandatory_columns.extend(["is_recessive", "is_dominant"])
         assert set(mandatory_columns).issubset(x.columns), col_error
+
+        truth_error = ''' ERROR: Bad scorefile {}
+        is_recessive and is_dominant columns are both TRUE for a variant
+        These columns are mutually exclusive (both can't be true)
+        Both can be FALSE for additive variant scores
+        '''
+        assert not x[['is_dominant', 'is_recessive']].all(axis = 1).any(), truth_error.format(path)
+
         scorefile = (
             x[mandatory_columns]
             .assign(additive = lambda x: (x["is_recessive"] == False) & (x["is_dominant"] == False))
@@ -44,11 +52,21 @@ def set_effect_type(x):
         )
     return scorefile
 
-def quality_control(df):
-    return (
+def quality_control(df, path):
+    qc = (
         df.query('effect_allele != "P" | effect_allele != "N"')
-        .dropna(subset = ['chr_name', 'chr_position'])
+        .dropna(subset = ['chr_name', 'chr_position', 'effect_weight'])
     )
+
+    unique_err = ''' ERROR: Bad scorefile "{}"
+    Duplicate variant identifiers in scorefile (chr:pos:effect:other)
+    Please use only unique variants and try again!
+    '''
+
+    unique_df = qc.groupby(['chr_name', 'chr_position', 'effect_allele', 'other_allele']).size() == 1
+    assert unique_df.all(), unique_err.format(os.path.basename(path))
+
+    return qc
 
 def read_scorefile(path):
     x = pd.read_table(path, converters = { "chr_name": to_int, "chr_pos": to_int
@@ -61,8 +79,8 @@ def read_scorefile(path):
     # nullable int is always important
     x[["chr_name", "chr_position"]] = x[["chr_name", "chr_position"]].astype(pd.Int64Dtype())
 
-    scorefile = set_effect_type(x) # e.g. additive, recessive
-    qc_scorefile = quality_control(scorefile)
+    scorefile = set_effect_type(x, path) # e.g. additive, recessive
+    qc_scorefile = quality_control(scorefile, path)
 
     return qc_scorefile
 
