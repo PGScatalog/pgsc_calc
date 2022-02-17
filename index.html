@@ -339,13 +339,14 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="input.html">Input</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="input.html#samplesheet">Samplesheet</a></li>
-<li class="toctree-l2"><a class="reference internal" href="input.html#scoring-file">Scoring file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="input.html#scoring-files">Scoring files</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="usage.html#calculating-scores-with-a-vcf-file">Calculating scores with a VCF file</a></li>
 <li class="toctree-l2"><a class="reference internal" href="usage.html#calculating-scores-with-plink-binary-filesets">Calculating scores with plink binary filesets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="usage.html#calculating-scores-with-multiple-files">Calculating scores with multiple files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#calculating-scores-with-split-genomic-data">Calculating scores with split genomic data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#using-custom-scoring-files">Using custom scoring files</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="parameters.html">Parameters</a><ul>
@@ -360,7 +361,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="troubleshooting.html#i-get-an-error-about-variant-matching">I get an error about variant matching</a></li>
-<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html#the-workflow-isn-t-using-much-resources-e-g-ram-cpu">The workflow isn’t using much resources (e.g. RAM / CPU)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html#the-workflow-isn-t-using-many-resources-e-g-ram-cpu">The workflow isn’t using many resources (e.g. RAM / CPU)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="troubleshooting.html#when-i-run-the-workflow-i-get-an-error-about-software-not-being-installed">When I run the workflow I get an error about software not being installed</a></li>
 </ul>
 </li>
@@ -377,12 +378,11 @@
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">pgsc_calc</span></code> is a bioinformatics best-practice analysis pipeline for applying
-scoring files from the <a class="reference external" href="https://www.pgscatalog.org/">Polygenic Score (PGS)
-Catalog</a> to target genotyped samples 🧬 🥳</p>
+scoring files from the <a class="reference external" href="https://www.pgscatalog.org/">Polygenic Score (PGS) Catalog</a> to target genotyped samples 🧬
+🥳</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This project is under active development and may break at any time but should
-be ready soon ™️</p>
+<p>This project is under very active development and updates are frequent</p>
 </div>
 </div>
 <div class="section" id="quick-start">
@@ -399,19 +399,23 @@ fallback</p></li>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">docker</span></code> profile option can be replaced with <code class="docutils literal notranslate"><span class="pre">singularity</span></code> or
-<code class="docutils literal notranslate"><span class="pre">conda</span></code>.</p>
+<code class="docutils literal notranslate"><span class="pre">conda</span></code> depending on your local environment</p>
 </div>
 </div>
 <div class="section" id="workflow-summary">
 <h2>Workflow summary<a class="headerlink" href="#workflow-summary" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>Optionally, fetch a scorefile from the PGS Catalog API</p></li>
-<li><p>Convert target genomic data from VCF to plink format automatically</p></li>
-<li><p>Split target genomic data automatically</p></li>
-<li><p>Relabel variants to a common identifier</p></li>
-<li><p>Match variants in the scoring file against variants in the target genome</p></li>
-<li><p>Calculate scores for each sample</p></li>
+<li><p>Optionally, fetch scoring files from the PGS Catalog API</p></li>
+<li><p>Convert target genomic data to plink 2 binary fileset format automatically</p></li>
+<li><p>Match variants in the scoring files against variants in the target genome</p></li>
+<li><p>Create a set of new scoring files from the matched variant data</p></li>
+<li><p>Calculate scores for each sample from each scoring file</p></li>
 <li><p>Produce a summary report</p></li>
+</ul>
+<p>In the future, the calculator will include:</p>
+<ul class="simple">
+<li><p>Build conversion of scoring files</p></li>
+<li><p>Ancestry estimation</p></li>
 </ul>
 </div>
 <div class="section" id="credits">

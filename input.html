@@ -205,9 +205,21 @@
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#scoring-file">
-   Scoring file
+  <a class="reference internal nav-link" href="#scoring-files">
+   Scoring files
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#pgs-catalog">
+     PGS Catalog
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#custom-scoring-files">
+     Custom scoring files
+    </a>
+   </li>
+  </ul>
  </li>
 </ul>
 
@@ -242,9 +254,21 @@
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#scoring-file">
-   Scoring file
+  <a class="reference internal nav-link" href="#scoring-files">
+   Scoring files
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#pgs-catalog">
+     PGS Catalog
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#custom-scoring-files">
+     Custom scoring files
+    </a>
+   </li>
+  </ul>
  </li>
 </ul>
 
@@ -261,10 +285,11 @@
 inputs:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="glossary.html#term-target-genomic-data"><span class="xref std std-term">target genomic data</span></a></p></li>
-<li><p>a <a class="reference internal" href="glossary.html#term-Scoring-file"><span class="xref std std-term">scoring file</span></a></p></li>
+<li><p>a <a class="reference internal" href="glossary.html#term-Scoring-file"><span class="xref std std-term">scoring file</span></a>, or a list of scoring files</p></li>
 </ul>
-<p>At its simplest, target genomic data might be a single <a class="reference internal" href="glossary.html#term-VCF"><span class="xref std std-term">VCF</span></a> file. Larger
-and more complex datasets might be split across multiple files. There are two
+<p>At its simplest, target genomic data might be a single <a class="reference internal" href="glossary.html#term-VCF"><span class="xref std std-term">VCF</span></a> file or a
+plink 1 binary fileset (i.e., bed / bim / fam). Larger and more complex datasets
+might be split across multiple files, separated by chromosome. There are two
 ways to specify the structure of target genomic data:</p>
 <ul class="simple">
 <li><p>A <a class="reference internal" href="glossary.html#term-CSV"><span class="xref std std-term">CSV</span></a> file (a “samplesheet”)</p></li>
@@ -273,11 +298,6 @@ ways to specify the structure of target genomic data:</p>
 <p>Most people should use a CSV file, because they are easy to work with using
 Excel or similar spreadsheet software. The use of samplesheets is quite popular
 across <a class="reference external" href="https://nf-co.re/">nf-core</a> pipelines.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Genomic data must currently be in build 37, but we’re working to
-support other builds ASAP</p>
-</div>
 <div class="section" id="samplesheet">
 <h2>Samplesheet<a class="headerlink" href="#samplesheet" title="Permalink to this headline">¶</a></h2>
 <p>The samplesheet method is specified using the <code class="docutils literal notranslate"><span class="pre">--input</span></code> parameter. The
@@ -311,13 +331,13 @@ are using JSON.</p>
 </tr>
 </tbody>
 </table>
-<p>A template is <a class="reference external" href="https://github.com/PGScatalog/pgsc_calc/tree/master/assets/examples/example_data">available here</a>.</p>
+<p>A template is <a class="reference external" href="https://github.com/PGScatalog/pgsc_calc/tree/master/assets/examples/samplesheet.csv">available here</a>.</p>
 <p>There are four mandatory columns. Two columns, <strong>vcf_path</strong> and <strong>bfile_path</strong>,
 are mutually exclusive and specify the genomic files:</p>
 <ul class="simple">
-<li><p><strong>sample</strong>: A text string containing the name of a sample/experiment, which
-can be split across multiple files. Scores generated from files with the same
-sample name are cominbed in later stages of the analysis.</p></li>
+<li><p><strong>sample</strong>: A text string containing the name of a dataset, which can be split
+across multiple files. Scores generated from files with the same sample name
+are combined in later stages of the analysis.</p></li>
 <li><p><strong>vcf_path</strong>: A text string of a file path pointing to a multi-sample
 <a class="reference internal" href="glossary.html#term-VCF"><span class="xref std std-term">VCF</span></a> file. File names must be unique.</p></li>
 <li><p><strong>bfile_path</strong>: A text string of a file path pointing to the prefix of a plink
@@ -431,24 +451,94 @@ contains additional technical detail.</p>
 </table>
 </div>
 </div>
-<div class="section" id="scoring-file">
-<h2>Scoring file<a class="headerlink" href="#scoring-file" title="Permalink to this headline">¶</a></h2>
-<p>Scoring files can be specified with <code class="docutils literal notranslate"><span class="pre">--scorefile</span></code>, which must be a string of a
-file path. Scorefiles must be:</p>
-<ul class="simple">
-<li><p>PGS Catalog <a class="reference external" href="https://www.pgscatalog.org/downloads/#scoring_header">scoring file format v2.0</a></p></li>
-<li><p>Genome build 37</p></li>
-</ul>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>We’re adding support for custom scoring files, multiple scoring files,
-and build conversion very soon!</p>
+<div class="section" id="scoring-files">
+<h2>Scoring files<a class="headerlink" href="#scoring-files" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="pgs-catalog">
+<h3>PGS Catalog<a class="headerlink" href="#pgs-catalog" title="Permalink to this headline">¶</a></h3>
+<p>The calculator natively supports scoring files submitted to the PGS Catalog
+using the parameter <code class="docutils literal notranslate"><span class="pre">--accession</span></code>. Setting this parameter means that the
+calculator will query the PGS Catalog API and automatically fetch scoring
+files. Multiple accessions can be specified using a comma separated list, e.g.:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>--accession PGS001229,PGS000014
+</pre></div>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p><code class="docutils literal notranslate"><span class="pre">--accession</span></code> can be used to automatically fetch a scorefile via the
-PGS Catalog API. The <code class="docutils literal notranslate"><span class="pre">--accession</span></code> and <code class="docutils literal notranslate"><span class="pre">-scorefile</span></code> parameters are
-mututally exclusive.</p>
+<p>Multiple accessions will be merged and processed in parallel. If you want to
+calculate a lot of scores for your dataset, it’s always more efficient to
+specify multiple accessions and to run the calculator once (instead of running
+the calculator multiple times, once per accession). Accessions should always
+start with the prefix “PGS”.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>You MUST check that the PGS Catalog accession and target genomic
+data are in the same build (e.g. GrCh37) for your calculated scores
+to be biologically meaningful. We’re working to support automatic
+build conversion.</p>
+</div>
+</div>
+<div class="section" id="custom-scoring-files">
+<span id="custom-scoring"></span><h3>Custom scoring files<a class="headerlink" href="#custom-scoring-files" title="Permalink to this headline">¶</a></h3>
+<p>The calculator also supports using custom scoring files that haven’t been
+submitted to the PGS Catalog. The custom scorefile should have the following format:</p>
+<table class="colwidths-given table" id="id2">
+<caption><span class="caption-text">Scorefile template</span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>chr_name</p></th>
+<th class="head"><p>chr_position</p></th>
+<th class="head"><p>effect_allele</p></th>
+<th class="head"><p>other_allele</p></th>
+<th class="head"><p>effect_weight</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>22</p></td>
+<td><p>17080378</p></td>
+<td><p>G</p></td>
+<td><p>A</p></td>
+<td><p>0.01045457</p></td>
+</tr>
+</tbody>
+</table>
+<p>Where column names are defined in the PGS Catalog <a class="reference external" href="https://www.pgscatalog.org/downloads/#scoring_header">scoring file format v2.0</a>.
+The file should be in tab separated values (TSV) format. Example <a class="reference external" href="https://github.com/PGScatalog/pgsc_calc/blob/master/assets/examples/scorefiles">scorefile
+templates</a> are available in the calculator repository. Two additional optional
+columns can be set to specify the effect type of each variant:</p>
+<table class="colwidths-given table" id="id3">
+<caption><span class="caption-text">Optional effect type columns</span><a class="headerlink" href="#id3" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>is_dominant</p></th>
+<th class="head"><p>is_recessive</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>TRUE</p></td>
+<td><p>FALSE</p></td>
+</tr>
+</tbody>
+</table>
+<p>These optional columns follow the structure described in the PGS Catalog
+<a class="reference external" href="https://www.pgscatalog.org/downloads/#scoring_header">scoring file format v2.0</a> and should be included after the effect_weight
+column. Briefly, a variant with an additive effect type (the default if optional
+columns are not set) is specified by setting both columns to FALSE. If the
+variant effect type is recessive, set is_recessive to TRUE. If the variant
+effect type is dominant, set is_dominant to TRUE. The columns are mutually
+exclusive (a variant cannot be dominant and recessive).</p>
+<p>The calculator can run using a custom scorefile with the <code class="docutils literal notranslate"><span class="pre">--scorefile</span></code>
+parameter (e.g. <code class="docutils literal notranslate"><span class="pre">--scorefile</span> <span class="pre">path/to/scorefile.txt</span></code>. A custom scorefile can
+only contain a single score. If you would like to calculate multiple scores in
+parallel, include a wildcard (<code class="docutils literal notranslate"><span class="pre">*</span></code>) with the scorefile parameter
+(e.g. <code class="docutils literal notranslate"><span class="pre">--scorefile</span> <span class="pre">path/to/scorefiles/*.txt</span></code>). More detailed examples are
+available in the <a class="reference internal" href="usage.html"><span class="doc">Usage</span></a> section of the documentation.</p>
 </div>
 </div>
 </div>

@@ -203,8 +203,13 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#calculating-scores-with-multiple-files">
-   Calculating scores with multiple files
+  <a class="reference internal nav-link" href="#calculating-scores-with-split-genomic-data">
+   Calculating scores with split genomic data
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#using-custom-scoring-files">
+   Using custom scoring files
   </a>
  </li>
 </ul>
@@ -238,8 +243,13 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#calculating-scores-with-multiple-files">
-   Calculating scores with multiple files
+  <a class="reference internal nav-link" href="#calculating-scores-with-split-genomic-data">
+   Calculating scores with split genomic data
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#using-custom-scoring-files">
+   Using custom scoring files
   </a>
  </li>
 </ul>
@@ -256,7 +266,10 @@
 <p>This page describes some typical use cases of the workflow.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Target genomic data must be in build 37 currently</p>
+<p>You MUST check that the scorefile and target genomic data are in
+the same build (e.g. GrCh37) for your calculated scores to be
+biologically meaningful. We’re working to support automatic build
+conversion.</p>
 </div>
 <div class="section" id="calculating-scores-with-a-vcf-file">
 <h2>Calculating scores with a VCF file<a class="headerlink" href="#calculating-scores-with-a-vcf-file" title="Permalink to this headline">¶</a></h2>
@@ -280,16 +293,17 @@
 <tr class="row-even"><td><p>cineca_synthetic_subset_vcf</p></td>
 <td><p>path/to/vcf.gz</p></td>
 <td></td>
-<td><p>22</p></td>
+<td></td>
 </tr>
 </tbody>
 </table>
-<p>An example samplesheet is available to download <a class="reference external" href="https://github.com/PGScatalog/pgsc_calc/blob/master/assets/examples/example_data/bfile_samplesheet.csv">here</a>.
-Secondly, download a polygenic score from the <a class="reference external" href="https://www.pgscatalog.org/">PGS Catalog</a> and decompress it.</p>
+<p>An example samplesheet is available to download <a class="reference external" href="https://github.com/PGScatalog/pgsc_calc/blob/master/assets/examples/example_data/samplesheet.csv">here</a>.
+Secondly, specify one or more PGS Catalog accessions. To specify multiple
+accessions, use a comma separated list (with no spaces between accessions).</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nextflow run pgscatalog/pgsc_calc <span class="se">\</span>
     -profile docker <span class="se">\</span>
     --input example_vcf.csv <span class="se">\</span>
-    --scorefile example_scorefile.txt
+    --accession PGS001229,PGS000014
 </pre></div>
 </div>
 </div>
@@ -323,21 +337,97 @@ binary fileset prefix, which is the name of the fileset before the file extensio
 <tr class="row-even"><td><p>cineca_synthetic_subset</p></td>
 <td></td>
 <td><p>path/to/bfile_prefix</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>An example samplesheet is available to download <a class="reference external" href="https://github.com/PGScatalog/pgsc_calc/blob/master/assets/examples/example_data/samplesheet.csv">here</a>.
+Secondly, specify one or more PGS Catalog accessions. To specify multiple
+accessions, use a comma separated list (with no spaces between accessions).</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nextflow run pgscatalog/pgsc_calc <span class="se">\</span>
+    -profile docker <span class="se">\</span>
+    --input example_bfile.csv <span class="se">\</span>
+    --accession PGS001229,PGS000014
+</pre></div>
+</div>
+</div>
+<div class="section" id="calculating-scores-with-split-genomic-data">
+<h2>Calculating scores with split genomic data<a class="headerlink" href="#calculating-scores-with-split-genomic-data" title="Permalink to this headline">¶</a></h2>
+<p>Sometimes your target genomic data might be split across multiple files. The
+calculator supports this type of input data for data split by chromosome. To
+work with split genomic data, add rows to the samplesheet (one per file) and
+set the <strong>chrom</strong> column. For example:</p>
+<table class="colwidths-given table" id="id4">
+<caption><span class="caption-text">Example samplesheet: <code class="docutils literal notranslate"><span class="pre">example_split_vcf.csv</span></code></span><a class="headerlink" href="#id4" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>sample</p></th>
+<th class="head"><p>vcf_path</p></th>
+<th class="head"><p>bfile_path</p></th>
+<th class="head"><p>chrom</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>cineca_synthetic_subset_vcf</p></td>
+<td><p>path/to/1.vcf.gz</p></td>
+<td></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>…</p></td>
+<td><p>…</p></td>
+<td></td>
+<td><p>…</p></td>
+</tr>
+<tr class="row-even"><td><p>cineca_synthetic_subset_vcf</p></td>
+<td><p>path/to/22.vcf.gz</p></td>
+<td></td>
 <td><p>22</p></td>
 </tr>
 </tbody>
 </table>
-<p>An example samplesheet is available to download <a class="reference external" href="https://github.com/PGScatalog/pgsc_calc/blob/master/assets/examples/example_data/bfile_samplesheet.csv">here</a>.</p>
-<p>Secondly, download a polygenic score from the <a class="reference external" href="https://www.pgscatalog.org/">PGS Catalog</a> and decompress it.</p>
+<p>You can include as many or as few chromosomes as you want. For example, if your
+scoring file only includes variants across 3 chromosomes you can choose to
+include only these three chromosomes. Omitting unused chromosomes will make the
+calculator slightly faster.</p>
+</div>
+<div class="section" id="using-custom-scoring-files">
+<h2>Using custom scoring files<a class="headerlink" href="#using-custom-scoring-files" title="Permalink to this headline">¶</a></h2>
+<p>If you would like to use a scoring file not in the PGS Catalog, you will need to
+format it correctly for the calculator. See the <a class="reference internal" href="input.html#custom-scoring"><span class="std std-ref">Custom scoring files</span></a> section
+for an explanation of the scoring file format. Once your scoring file is
+prepared, simply replace the <code class="docutils literal notranslate"><span class="pre">--accession</span></code> parameter:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nextflow run pgscatalog/pgsc_calc <span class="se">\</span>
     -profile docker <span class="se">\</span>
-    --input example_bfile.csv <span class="se">\</span>
-    --scorefile example_scorefile.txt
+    --input example_vcf.csv <span class="se">\</span>
+    --scorefile /path/to/scorefile.txt
 </pre></div>
 </div>
+<p>The calculator can calculate multiple scores in parallel efficiently. Just
+prepare multiple scoring files, and use a wildcard character (<code class="docutils literal notranslate"><span class="pre">*</span></code>) to set
+multiple files:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nextflow run pgscatalog/pgsc_calc <span class="se">\</span>
+    -profile docker <span class="se">\</span>
+    --input example_vcf.csv <span class="se">\</span>
+    --scorefile /path/to/scorefile/directory/*.txt
+</pre></div>
 </div>
-<div class="section" id="calculating-scores-with-multiple-files">
-<h2>Calculating scores with multiple files<a class="headerlink" href="#calculating-scores-with-multiple-files" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It’s a good idea to keep scorefiles in a separate and clean
+directory. If there are other text files (that aren’t scores) in the
+same directory, then the calculator will try to use them and break!</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The base name of the scoring file (e.g. <code class="docutils literal notranslate"><span class="pre">depression.txt</span></code> -&gt;
+“depression”) is important and used to label scores in the output
+report. Please use filenames you’ll understand.</p>
+</div>
 </div>
 </div>
 
