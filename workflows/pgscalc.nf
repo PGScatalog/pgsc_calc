@@ -110,7 +110,8 @@ workflow PGSCALC {
         MAKE_COMPATIBLE.out.psam,
         MAKE_COMPATIBLE.out.pvar,
         MAKE_COMPATIBLE.out.scorefile,
-        allelic_freq
+        allelic_freq,
+        MAKE_COMPATIBLE.out.db
     )
 
     ch_versions = ch_versions.mix(APPLY_SCORE.out.versions)

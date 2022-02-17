@@ -7,9 +7,12 @@ params:
 ---
 
 ```{r setup, include=FALSE}
+options(tidyverse.quiet = TRUE)
 knitr::opts_chunk$set(echo = TRUE)
-```
 
+library(dplyr)
+library(RSQLite)
+```
 
 ```{r, echo=FALSE}
 # logo
@@ -19,9 +22,45 @@ htmltools::img(src = knitr::image_uri(params$img),
                height = "200px")
 ```
 
+## Compatibility summary
+
+```{r, echo = FALSE, message = FALSE}
+dbs <- list.files(pattern = "*.db", full.names = TRUE)
+
+get_meta <- function(path) {
+  con <- DBI::dbConnect(RSQLite::SQLite(), path)
+  id <- pull(tbl(con, "id"), "id")
+  tbl(con, "meta") %>%
+    collect() %>%
+    mutate(dataset = id)
+}
+
+get_matches <- function(path) {
+  con <- DBI::dbConnect(RSQLite::SQLite(), path)
+  id <- pull(tbl(con, "id"), "id")
+  tbl(con, "matches") %>%
+    collect() %>%
+    mutate(dataset = id)
+}
+
+matches <- purrr::map_dfr(dbs, get_matches)
+meta <- purrr::map_dfr(dbs, get_meta)
+
+matches %>%
+  group_by(dataset, accession) %>%
+  summarise(matches = n()) %>%
+  left_join(meta, by = c("accession", "dataset")) %>%
+  mutate(match_success = scales::percent((matches / n_scorefile), accuracy = 0.1)) %>%
+  arrange(desc(match_success)) %>%
+  rename(target_variants = n_target, scorefile_variants = n_scorefile) %>%
+  select(dataset, accession, target_variants, scorefile_variants, everything()) %>%
+  knitr::kable(align = c('l', 'l', rep('r', 4)))
+```
+
 ## Score summary
 
 ```{r, echo = FALSE, message = FALSE}
+# TODO: update these functions now the container has tidyverse...
 # some weird function choices here but container has a sparse set of libraries 
 # e.g. no dplyr :( no group_by, mutate, map_dfr...
 
@@ -41,10 +80,13 @@ agg <- aggregate(. ~ IID + dataset, data = combined, sum)
 write.table(agg, "aggregated_scores.txt", col.names = TRUE, quote = FALSE, row.names = FALSE)
 ```
 
+Score peek:
+
 ```{r, echo = FALSE}
-xfun::embed_file("aggregated_scores.txt", text = "Download calculated scores")
 scores <- read.table("aggregated_scores.txt", header = TRUE, comment.char = "")
-head(scores)
+head(scores) %>%
+  knitr::kable()
+xfun::embed_file("aggregated_scores.txt", text = "Download all calculated scores")
 ```
 
 ## Session information

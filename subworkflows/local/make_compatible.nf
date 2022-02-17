@@ -62,5 +62,6 @@ workflow MAKE_COMPATIBLE {
     psam
     pvar
     scorefile = MATCH_VARIANTS.out.scorefile
+    db = MATCH_VARIANTS.out.db
     versions = ch_versions
 }

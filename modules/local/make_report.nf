@@ -3,13 +3,14 @@ process MAKE_REPORT {
 
     conda (params.enable_conda ? "conda-forge::r-tidyverse=1.3.1" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/bioconductor-biocworkflowtools:1.20.0--r41hdfd78af_0' :
-        'quay.io/biocontainers/bioconductor-biocworkflowtools:1.20.0--r41hdfd78af_0' }"
+        'docker://rocker/tidyverse:4.1.2' :
+        'rocker/tidyverse:4.1.2' }"
 
     input:
     path scorefiles
     path report
     path logo
+    path db
 
     output:
     path "*.html"      , emit: report
