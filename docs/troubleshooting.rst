@@ -8,7 +8,7 @@ I get an error about variant matching
 - ``--min_overlap`` defaults to 0.75 (75% of variants in scoring file must be
   present in target genomes). Try changing this parameter!
 
-The workflow isn't using much resources (e.g. RAM / CPU)
+The workflow isn't using many resources (e.g. RAM / CPU)
 --------------------------------------------------------
 
 Did you forget to set ``--max_cpu`` or ``--max_memory?``
