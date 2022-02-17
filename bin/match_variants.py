@@ -9,6 +9,8 @@ from functools import reduce
 
 def parse_args(args=None):
     parser = argparse.ArgumentParser(description='Read and format scoring files')
+    parser.add_argument('-d','--dataset', dest = 'dataset', required = True,
+                        help='<Required> Label for target genomic dataset (e.g. "-d thousand_genomes")')
     parser.add_argument('-s','--scorefiles', dest = 'scorefiles', required = True,
                         help='<Required> Pickled scorefile path (output of read_scorefiles.py)')
     parser.add_argument('-t','--target', dest = 'target', required = True,
@@ -256,6 +258,8 @@ def main(args = None):
     target = pd.read_csv(args.target, sep = '\t')
     unpickled_scorefiles = read_scorefiles(args.scorefiles) # { accession: df }
     conn = sqlite3.connect('match_variants.db')
+
+    pd.DataFrame.from_dict( { 'id': [args.dataset] }).to_sql('id', conn, index = False)
 
     # start matching :) --------------------------------------------------------
     matched_scorefiles = [match_variants(v, target, k, conn) for k, v in unpickled_scorefiles.items()]
