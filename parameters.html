@@ -252,94 +252,94 @@ contains additional technical detail.</p>
 <tr class="row-odd"><td><p>type</p></td>
 <td colspan="3"><p><em>object</em></p></td>
 </tr>
-<tr class="row-even"><td colspan="4"><p>properties</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="2"><ul class="simple">
-<li><p>split</p></li>
-</ul>
-</td>
-<td><p>type</p></td>
-<td colspan="2"><p><em>string</em></p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td colspan="2"><p>false</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="5"><p>allOf</p></td>
+<tr class="row-even"><td rowspan="5"><p>allOf</p></td>
 <td colspan="3"><p><span class="xref std std-ref">#/definitions/input_output_options</span></p></td>
 </tr>
-<tr class="row-even"><td colspan="3"><p><span class="xref std std-ref">#/definitions/compatibility_options</span></p></td>
+<tr class="row-odd"><td colspan="3"><p><span class="xref std std-ref">#/definitions/compatibility_options</span></p></td>
 </tr>
-<tr class="row-odd"><td colspan="3"><p><span class="xref std std-ref">#/definitions/institutional_config_options</span></p></td>
+<tr class="row-even"><td colspan="3"><p><span class="xref std std-ref">#/definitions/institutional_config_options</span></p></td>
 </tr>
-<tr class="row-even"><td colspan="3"><p><span class="xref std std-ref">#/definitions/max_job_request_options</span></p></td>
+<tr class="row-odd"><td colspan="3"><p><span class="xref std std-ref">#/definitions/max_job_request_options</span></p></td>
 </tr>
-<tr class="row-odd"><td colspan="3"><p><span class="xref std std-ref">#/definitions/generic_options</span></p></td>
+<tr class="row-even"><td colspan="3"><p><span class="xref std std-ref">#/definitions/generic_options</span></p></td>
 </tr>
-<tr class="row-even"><td colspan="4"><p>definitions</p></td>
+<tr class="row-odd"><td colspan="4"><p>definitions</p></td>
 </tr>
-<tr class="row-odd"><td rowspan="23"><ul class="simple">
+<tr class="row-even"><td rowspan="26"><ul class="simple">
 <li><p>input_output_options</p></li>
 </ul>
 </td>
 <td colspan="3"><p><em>Input/output options</em></p></td>
 </tr>
-<tr class="row-even"><td colspan="3"><p>Define where the pipeline should find input data and save output data.</p></td>
+<tr class="row-odd"><td colspan="3"><p>Define where the pipeline should find input data and save output data.</p></td>
 </tr>
-<tr class="row-odd"><td><p>type</p></td>
+<tr class="row-even"><td><p>type</p></td>
 <td colspan="2"><p><em>object</em></p></td>
 </tr>
-<tr class="row-even"><td colspan="3"><p>properties</p></td>
+<tr class="row-odd"><td colspan="3"><p>properties</p></td>
 </tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
+<tr class="row-even"><td rowspan="4"><ul class="simple">
 <li><p><strong>input</strong></p></li>
 </ul>
 </td>
 <td colspan="2"><p>Path to comma-separated file containing information about the samples (a sample sheet)</p></td>
 </tr>
-<tr class="row-even"><td><p>type</p></td>
+<tr class="row-odd"><td><p>type</p></td>
 <td><p><em>string</em></p></td>
 </tr>
-<tr class="row-odd"><td><p>pattern</p></td>
+<tr class="row-even"><td><p>pattern</p></td>
 <td><p>.csv$|.json$</p></td>
 </tr>
-<tr class="row-even"><td><p>format</p></td>
+<tr class="row-odd"><td><p>format</p></td>
 <td><p>file-path</p></td>
 </tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
+<tr class="row-even"><td rowspan="4"><ul class="simple">
 <li><p><strong>format</strong></p></li>
 </ul>
 </td>
 <td colspan="2"><p>Format of the input</p></td>
 </tr>
-<tr class="row-even"><td><p>type</p></td>
+<tr class="row-odd"><td><p>type</p></td>
 <td><p><em>string</em></p></td>
 </tr>
-<tr class="row-odd"><td><p>enum</p></td>
+<tr class="row-even"><td><p>enum</p></td>
 <td><p>csv, json</p></td>
 </tr>
-<tr class="row-even"><td><p>default</p></td>
+<tr class="row-odd"><td><p>default</p></td>
 <td><p>csv</p></td>
 </tr>
-<tr class="row-odd"><td rowspan="2"><ul class="simple">
+<tr class="row-even"><td rowspan="2"><ul class="simple">
 <li><p>scorefile</p></li>
 </ul>
 </td>
 <td colspan="2"><p>Path to a scoring file in PGS Catalog format</p></td>
 </tr>
-<tr class="row-even"><td><p>type</p></td>
+<tr class="row-odd"><td><p>type</p></td>
 <td><p><em>string</em></p></td>
 </tr>
-<tr class="row-odd"><td rowspan="3"><ul class="simple">
+<tr class="row-even"><td rowspan="3"><ul class="simple">
 <li><p>accession</p></li>
 </ul>
 </td>
 <td colspan="2"><p>A PGS Catalog accession</p></td>
 </tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>pattern</p></td>
+<td><p>(PGS\d+)(,\s*PGS\d+)*</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="3"><ul class="simple">
+<li><p>allelic_freq</p></li>
+</ul>
+</td>
+<td colspan="2"><p>(Optional) Path to a plink 2 allelic frequency file (see –read-freq)</p></td>
+</tr>
 <tr class="row-even"><td><p>type</p></td>
 <td><p><em>string</em></p></td>
 </tr>
-<tr class="row-odd"><td><p>pattern</p></td>
-<td><p>(PGS\d+)(,\s*PGS\d+)*</p></td>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>NO_FILE</p></td>
 </tr>
 <tr class="row-even"><td rowspan="3"><ul class="simple">
 <li><p>outdir</p></li>
