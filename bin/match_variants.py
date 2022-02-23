@@ -264,6 +264,14 @@ def main(args = None):
     # start matching :) --------------------------------------------------------
     matched_scorefiles = [match_variants(v, target, k, conn) for k, v in unpickled_scorefiles.items()]
 
+    empty_match = [x.empty for x in matched_scorefiles]
+    empty_err = ''' ERROR: No target variants match any variants in all scoring files
+    This is quite odd!
+    Try checking the genome build (see --liftover and --target_build parameters)
+    Try imputing your microarray data if it doesn't cover the scoring variants well
+    '''
+    assert not all(empty_match), empty_err
+
     # process matched variants: merge, split by effect type, and unduplicate ---
     merged_scorefile = reduce(lambda x, y: x.merge(y, on = ['ID', 'effect_allele', \
         'effect_type'], how = 'outer'), matched_scorefiles)
