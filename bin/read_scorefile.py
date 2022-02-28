@@ -20,10 +20,10 @@ def parse_args(args=None):
                         required='--liftover' in sys.argv)
     parser.add_argument('-m', '--min_lift', dest = 'min_lift', help='<Optional> If liftover, minimum proportion of variants lifted over',
                         default = 0.95, type = float)
-    parser.add_argument('-o', '--outfile', dest = 'outfile', required = False,
+    parser.add_argument('-o', '--outfile', dest = 'outfile', required = True,
                         default = 'scorefiles.pkl',
                         help = '<Required> Output path to pickled list of scorefiles, e.g. scorefiles.pkl')
-    return parser.parse_args()
+    return parser.parse_args(args)
 
 def to_int(i):
     ''' Convert non-numeric chromosomes or positions to NaN '''
@@ -185,7 +185,7 @@ def liftover_stats(df_dict, accession, min_lift):
 
 def read_build(path):
     ''' Extract genome build of scorefile from PGS Catalog header format '''
-    build_dict = {'GRCh37':'hg19', 'GRCh38':'hg38'}
+    build_dict = {'GRCh37':'hg19', 'GRCh38':'hg38', 'hg19':'hg19', 'hg38':'hg38'}
 
     with open(path, 'r') as f:
         for line in f:
