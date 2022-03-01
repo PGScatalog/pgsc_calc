@@ -19,7 +19,7 @@ def parse_args(args=None):
                         help='<Required> Split scorefile per chromosome?')
     parser.add_argument('-m', '--min_overlap', dest='min_overlap', required=True,
                         type = float, help='<Required> Minimum proportion of variants to match before error')
-    return parser.parse_args()
+    return parser.parse_args(args)
 
 def read_scorefiles(pkl):
     ''' Read a pickled dict of dataframes (key: accession, value: scores df) '''
