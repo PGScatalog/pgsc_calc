@@ -1,0 +1,31 @@
+- name: pgscatalog testaccession
+  command: nextflow run ./tests/modules/pgscatalog -entry testaccession -c ./tests/config/nextflow.config
+  tags:
+    - pgscatalog
+  files:
+    - path: output/pgscatalog/PGS000001.txt
+      md5sum: d83f37c3fc5d4e8aedfb17f2307943ed
+
+- name: pgscatalog testmultipleaccessions
+  command: nextflow run ./tests/modules/pgscatalog -entry testmultipleaccessions -c ./tests/config/nextflow.config
+  tags:
+    - pgscatalog
+  files:
+    - path: output/pgscatalog/PGS000001.txt
+      md5sum: d83f37c3fc5d4e8aedfb17f2307943ed
+    - path: output/pgscatalog/PGS000002.txt
+      md5sum: c81a1a2b846167aea2899bb7f52083a1
+
+- name: pgscatalog testbadaccession
+  command: nextflow run ./tests/modules/pgscatalog -entry testbadaccession -c ./tests/config/nextflow.config
+  tags:
+    - pgscatalog
+  exit_code: 1
+
+- name: pgscatalog testmixedaccessions
+  command: nextflow run ./tests/modules/pgscatalog -entry testmixedaccessions -c ./tests/config/nextflow.config
+  tags:
+    - pgscatalog
+  files:
+    - path: output/pgscatalog/PGS000001.txt
+      md5sum: d83f37c3fc5d4e8aedfb17f2307943ed

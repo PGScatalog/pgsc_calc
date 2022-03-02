@@ -21,7 +21,7 @@ process PGSCATALOG_GET {
     wget \$pgs_api -O response.json
 
     # check for a valid response. empty response: {} = 2 chars
-    if [ \$(wc -m < response.json) -eq 2 ]
+    if [ \$(jq .size < response.json) -eq 0 ]
     then
         echo "PGS Catalog API error. Is --accession valid?"
         exit 1
