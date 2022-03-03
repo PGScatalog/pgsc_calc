@@ -1,0 +1,58 @@
+- name: plink2 testscore
+  command: nextflow run ./tests/modules/plink2/score -entry testscore -c ./tests/config/nextflow.config
+  tags:
+    - plink2
+  files:
+    - path: output/plink2/test_null_null_null.sscore
+      md5sum: 6bd7d904ad982ac6d436ddc876adef7a
+      contains:
+        - "SUM"      
+    - path: output/plink2/test_null_null_null.log
+      must_not_contain:
+        - "no-mean-imputation"
+
+- name: plink2 testsmallscore
+  command: nextflow run ./tests/modules/plink2/score -entry testsmallscore -c ./tests/config/nextflow.config
+  tags:
+    - plink2
+  files:
+    - path: output/plink2/test_null_null_null.sscore
+      md5sum: dcad7dc4ae1dc0ad4eb25d56b12eca97
+      contains:
+        - "SUM"      
+    - path: output/plink2/test_null_null_null.log
+      contains:
+        - "no-mean-imputation"
+
+- name: plink2 testmultiscore
+  command: nextflow run ./tests/modules/plink2/score -entry testmultiscore -c ./tests/config/nextflow.config
+  tags:
+    - plink2
+  files:
+    - path: output/plink2/test_null_null_null.sscore
+      md5sum: 4d13c4ab472fe1afccf86d443c86bda9
+      contains:
+        - "SUM"
+    - path: output/plink2/test_null_null_null.log
+      contains:
+        - "--score-col-nums"
+
+- name: plink2 testsmallmultiscore
+  command: nextflow run ./tests/modules/plink2/score -entry testsmallmultiscore -c ./tests/config/nextflow.config
+  tags:
+    - plink2
+  files:
+    - path: output/plink2/test_null_null_null.sscore
+      md5sum: 58965293214dfc3c91a4b4675bd04250
+      contains:
+        - "SUM"
+    - path: output/plink2/test_null_null_null.log
+      contains:
+        - "no-mean-imputation"
+        - "--score-col-nums"        
+        
+- name: plink2 testmultiscorefail
+  command: nextflow run ./tests/modules/plink2/score -entry testmultiscorefail -c ./tests/config/nextflow.config
+  tags:
+    - plink2
+  exit_code: 1
