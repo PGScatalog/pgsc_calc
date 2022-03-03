@@ -6,6 +6,9 @@ import os
 import sqlite3
 import pickle
 from functools import reduce
+
+import sys
+sys.path.append("..")
 from bin.match_variants import *
 
 @pytest.fixture
