@@ -9,17 +9,17 @@ on:
   release:
     types: [published]
 
-env:
-  NXF_ANSI_LOG: false
-  CAPSULE_LOG: none
-
 jobs:
   test:
-    name: Run workflow tests
-    # Only run on push if this is the nf-core dev branch (merged PRs)
-    if: ${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'pgscatalog/pgsc_calc') }}
+    name: Run standard workflow test
+    if: ${{ github.event_name == 'push'}}
     runs-on: ubuntu-latest
+    env:
+      NXF_VER: ${{ matrix.nxf_ver }}
+      NXF_ANSI_LOG: false
+      CAPSULE_LOG: none    
     strategy:
+      fail-fast: false        
       matrix:
         test_profile: ["test", "test_json"]
         profile: ["docker", "singularity", "conda"]
@@ -27,37 +27,75 @@ jobs:
         include:
           # Test pipeline minimum Nextflow version
           - NXF_VER: '21.04.0'
-            NXF_EDGE: ''
           # Test latest edge release of Nextflow
           - NXF_VER: ''
-            NXF_EDGE: '1'
-    env:
-      NXF_ANSI_LOG: false
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2
-
-      - name: Install Nextflow
-        env:
-          NXF_VER: ${{ matrix.NXF_VER }}
-          # Uncomment only if the edge release is more recent than the latest stable release
-          # See https://github.com/nextflow-io/nextflow/issues/2467
-          # NXF_EDGE: ${{ matrix.NXF_EDGE }}
-        run: |
-          wget -qO- get.nextflow.io | bash
-          sudo mv nextflow /usr/local/bin/
-
+ 
       - name: Set up Singularity
         if: matrix.profile == 'singularity'
         uses: eWaterCycle/setup-singularity@v5
         with:
           singularity-version: 3.7.1
+          
+      - name: Setup miniconda
+        if: matrix.profile == 'conda'
+        uses: conda-incubator/setup-miniconda@v2.1.1
+        with:
+          auto-update-conda: true
+          channels: conda-forge,bioconda,defaults
+          python-version: ${{ matrix.python-version }}          
+
+      - name: Conda clean
+        if: matrix.profile == 'conda'
+        run: conda clean -a
+
+      - name: Install Nextflow
+        run: |
+          wget -qO- get.nextflow.io | bash
+          sudo mv nextflow /usr/local/bin/
+        
+      - name: Run pipeline with test data
+        run: |
+          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
+
+  unit_test:
+    name: Run unit tests
+    if: ${{ github.event_name == 'push'}}
+    runs-on: ubuntu-latest
+    env:
+      NXF_VER: ${{ matrix.nxf_ver }}
+      NXF_ANSI_LOG: false
+      CAPSULE_LOG: none    
+    strategy:
+      fail-fast: false        
+      matrix:
+        profile: ["docker", "singularity", "conda"]
+        # Nextflow versions
+        include:
+          # Test pipeline minimum Nextflow version
+          - NXF_VER: '21.04.0'
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v2
 
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: "3.x"
+          python-version: '3.x'
 
+      - name: Install Python dependencies          
+        run: |
+          python -m ensurepip --upgrade
+          pip install pandas pyliftover pytest-workflow requests
+        
+      - name: Set up Singularity
+        if: matrix.profile == 'singularity'
+        uses: eWaterCycle/setup-singularity@v5
+        with:
+          singularity-version: 3.7.1
+          
       - name: Setup miniconda
         if: matrix.profile == 'conda'
         uses: conda-incubator/setup-miniconda@v2.1.1
@@ -70,6 +108,12 @@ jobs:
         if: matrix.profile == 'conda'
         run: conda clean -a
 
-      - name: Run pipeline with test data
+      - name: Install Nextflow
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
+          wget -qO- get.nextflow.io | bash
+          sudo mv nextflow /usr/local/bin/
+        
+      - name: Run unit tests
+        run: |
+          PROFILE=${{matrix.profile}} pytest ${GITHUB_WORKSPACE}
+          
