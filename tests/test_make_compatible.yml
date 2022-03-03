@@ -1,0 +1,14 @@
+- name: test make compatible subworkflow
+  command: nextflow run main.nf -profile test,docker --only_compatible
+  tags:
+    - makecompatible
+    - subworkflow
+  files:
+    - path: results/samplesheet/out.json
+    - path: results/scorefile/scorefiles.pkl
+    - path: results/plink2/cineca_synthetic_subset_22.pgen      
+    - path: results/plink2/cineca_synthetic_subset_22.psam
+    - path: results/plink2/cineca_synthetic_subset_22.pvar            
+    - path: results/match/22_additive_0.scorefile
+    - path: results/match/match_variants.db
+    - path: results/match/report.csv      

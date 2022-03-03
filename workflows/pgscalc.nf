@@ -41,6 +41,28 @@ Channel.fromList(params.accession?.tokenize(','))
 // Don't check existence of optional parameters
 allelic_freq = file(params.allelic_freq)
 
+def run_input_check     = true
+def run_make_compatible = true
+def run_apply_score     = true
+
+if (params.only_input) {
+    run_input_check = true
+    run_make_compatible = false
+    run_apply_score = false
+}
+
+if (params.only_compatible) {
+    run_input_check = true
+    run_make_compatible = true
+    run_apply_score = false
+}
+
+if (params.only_score) {
+    run_input_check = true
+    run_make_compatible = true
+    run_apply_score = true
+}
+
 /*
 ========================================================================================
     IMPORT LOCAL MODULES/SUBWORKFLOWS
@@ -79,42 +101,45 @@ workflow PGSCALC {
     // SUBWORKFLOW: Validate and stage input files
     //
 
-    INPUT_CHECK (
-        ch_input,
-        params.format,
-        ch_scorefile
-    )
-
-    ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
+    if (run_input_check) {
+        INPUT_CHECK (
+            ch_input,
+            params.format,
+            ch_scorefile
+        )
+        ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
+    }
 
     //
     // SUBWORKFLOW: Make scoring file and target genomic data compatible
     //
 
-    MAKE_COMPATIBLE (
-        INPUT_CHECK.out.bed,
-        INPUT_CHECK.out.bim,
-        INPUT_CHECK.out.fam,
-        INPUT_CHECK.out.vcf,
-        INPUT_CHECK.out.scorefiles
-    )
-
-    ch_versions = ch_versions.mix(MAKE_COMPATIBLE.out.versions)
+    if (run_make_compatible) {
+        MAKE_COMPATIBLE (
+            INPUT_CHECK.out.bed,
+            INPUT_CHECK.out.bim,
+            INPUT_CHECK.out.fam,
+            INPUT_CHECK.out.vcf,
+            INPUT_CHECK.out.scorefiles
+        )
+        ch_versions = ch_versions.mix(MAKE_COMPATIBLE.out.versions)
+    }
 
     //
     // SUBWORKFLOW: Apply a scoring file to target genomic data
     //
 
-    APPLY_SCORE (
-        MAKE_COMPATIBLE.out.pgen,
-        MAKE_COMPATIBLE.out.psam,
-        MAKE_COMPATIBLE.out.pvar,
-        MAKE_COMPATIBLE.out.scorefile,
-        allelic_freq,
-        MAKE_COMPATIBLE.out.db
-    )
-
-    ch_versions = ch_versions.mix(APPLY_SCORE.out.versions)
+    if (run_apply_score) {
+        APPLY_SCORE (
+            MAKE_COMPATIBLE.out.pgen,
+            MAKE_COMPATIBLE.out.psam,
+            MAKE_COMPATIBLE.out.pvar,
+            MAKE_COMPATIBLE.out.scorefile,
+            allelic_freq,
+            MAKE_COMPATIBLE.out.db
+        )
+        ch_versions = ch_versions.mix(APPLY_SCORE.out.versions)
+    }
 
     //
     // MODULE: Dump software versions for all tools used in the workflow

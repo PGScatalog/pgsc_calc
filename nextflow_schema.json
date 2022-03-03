@@ -273,5 +273,22 @@
         {
             "$ref": "#/definitions/generic_options"
         }
-    ]
+    ],
+    "properties": {
+        "liftover": {
+            "type": "boolean"
+        },
+        "target_build": {
+            "type": "string"
+        },
+        "only_input": {
+            "type": "boolean"
+        },
+        "only_compatible": {
+            "type": "boolean"
+        },
+        "only_score": {
+            "type": "boolean"
+        }
+    }
 }
