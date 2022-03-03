@@ -14,6 +14,7 @@ process PLINK2_SCORE {
     output:
     path "*.sscore"    , emit: scores
     path "versions.yml", emit: versions
+    path "*.log"       , emit: log
 
     script:
     def args = task.ext.args ?: ''
