@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>pgsc_calc’s documentation &#8212; Polygenic Score (PGS) Catalog Calculator  documentation</title>
+    <title>pgsc_calc: Simple polygenic score calculation &#8212; Polygenic Score (PGS) Catalog Calculator  documentation</title>
     
   <link href="_static/css/theme.css" rel="stylesheet">
   <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -24,7 +24,6 @@
     
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-book-theme.css?digest=84ace793992934648b4de8eed757e5a2" />
-    <link rel="stylesheet" type="text/css" href="_static/twemoji.css" />
     
   <link rel="preload" as="script" href="_static/js/index.be7d3bbb2ef33a8344ce.js">
 
@@ -32,12 +31,9 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js"></script>
-    <script src="_static/twemoji.js"></script>
     <script src="_static/sphinx-book-theme.9d8b4a8b9bb19db25eeaddc40d639ba2.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Installation" href="install.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -61,73 +57,37 @@
 </label>
 <div class="col-12 col-md-3 bd-sidebar site-navigation " id="site-navigation">
     
-        <div class="navbar-brand-box">
-    <a class="navbar-brand text-wrap" href="#">
-      
-      
-      
-      <h1 class="site-logo" id="site-title">Polygenic Score (PGS) Catalog Calculator  documentation</h1>
-      
-    </a>
-</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+        <form class="bd-search d-flex align-items-center" action="search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
-</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
-    <div class="bd-toc-item active">
-        <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="install.html">
-   Installation
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="input.html">
-   Input
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="usage.html">
-   Usage
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="parameters.html">
-   Parameters
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="output.html">
-   Output
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="troubleshooting.html">
-   Troubleshooting
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="api.html">
-   API
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="offline.html">
-   Offline usage
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="glossary.html">
-   Glossary
-  </a>
- </li>
+</form><h3>Contents</h3>
+
+<ul>
+  <li><a href="#">Home</a></li>
+  <li><a href="getting-started.html">Get started</a></li>
+  <li><a href="how-to/index.html">How-to guides</a></li>
+  <li><a href="reference/index.html">Reference guide</a></li>
+  <li><a href="explanation/index.html">Explanation</a></li>
+  <li><a href="glossary.html">Glossary</a></li>
 </ul>
 
-    </div>
-</nav> <!-- To handle the deprecated key -->
+<h3>About the project</h3>
 
-<div class="navbar_extra_footer">
-  Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
-</div>
+<ul>
+  <li><a href="changelog.html">Changelog</a></li>
+  <li><a href="license.html">License</a></li>
+</ul>
+
+<h3>Useful links</h3>
+
+<ul>
+  <li><a href="https://github.com/pgscatalog/pgsc_calc">Github repository</a></li>
+  <li><a href="https://github.com/pgscatalog/pgsc_calc/issues">Issue tracker</a></li>
+</ul>
+
+<hr>
+<a href="genindex.html">Index</a>
+<hr> <!-- To handle the deprecated key -->
 
 </div>
 
@@ -191,59 +151,47 @@
             </div>
             <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
- <li class="toc-h1 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#">
-   <code class="docutils literal notranslate">
-    <span class="pre">
-     pgsc_calc
-    </span>
-   </code>
-   ’s documentation
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#quick-example">
+   Quick example
   </a>
-  <ul class="visible nav section-nav flex-column">
-   <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#introduction">
-     Introduction
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#workflow-summary">
+   Workflow summary
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#documentation">
+   Documentation
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#changelog">
+   Changelog
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#citations">
+   Citations
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#credits">
+   Credits
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#others">
+     Others
     </a>
    </li>
-   <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#quick-start">
-     Quick start
-    </a>
-   </li>
-   <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#workflow-summary">
-     Workflow summary
-    </a>
-   </li>
-   <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#credits">
-     Credits
-    </a>
-    <ul class="nav section-nav flex-column">
-     <li class="toc-h3 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#others">
-       Others
-      </a>
-     </li>
-    </ul>
-   </li>
-   <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#citations">
-     Citations
-    </a>
-   </li>
-   <li class="toc-h2 nav-item toc-entry">
+   <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#data-references">
      Data references
     </a>
    </li>
   </ul>
- </li>
- <li class="toc-h1 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#indices-and-tables">
-   Indices and tables
-  </a>
  </li>
 </ul>
 
@@ -255,7 +203,7 @@
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>pgsc_calc’s documentation</h1>
+                <h1>pgsc_calc: Simple polygenic score calculation</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
@@ -265,59 +213,47 @@
                         </div>
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
- <li class="toc-h1 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#">
-   <code class="docutils literal notranslate">
-    <span class="pre">
-     pgsc_calc
-    </span>
-   </code>
-   ’s documentation
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#quick-example">
+   Quick example
   </a>
-  <ul class="visible nav section-nav flex-column">
-   <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#introduction">
-     Introduction
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#workflow-summary">
+   Workflow summary
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#documentation">
+   Documentation
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#changelog">
+   Changelog
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#citations">
+   Citations
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#credits">
+   Credits
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#others">
+     Others
     </a>
    </li>
-   <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#quick-start">
-     Quick start
-    </a>
-   </li>
-   <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#workflow-summary">
-     Workflow summary
-    </a>
-   </li>
-   <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#credits">
-     Credits
-    </a>
-    <ul class="nav section-nav flex-column">
-     <li class="toc-h3 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#others">
-       Others
-      </a>
-     </li>
-    </ul>
-   </li>
-   <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#citations">
-     Citations
-    </a>
-   </li>
-   <li class="toc-h2 nav-item toc-entry">
+   <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#data-references">
      Data references
     </a>
    </li>
   </ul>
- </li>
- <li class="toc-h1 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#indices-and-tables">
-   Indices and tables
-  </a>
  </li>
 </ul>
 
@@ -328,72 +264,48 @@
             
               <div>
                 
-  <div class="section" id="pgsc-calc-s-documentation">
-<h1><code class="docutils literal notranslate"><span class="pre">pgsc_calc</span></code>’s documentation<a class="headerlink" href="#pgsc-calc-s-documentation" title="Permalink to this headline">¶</a></h1>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install.html#workflow-software">Workflow software</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#workflow-code">Workflow code</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="input.html">Input</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="input.html#samplesheet">Samplesheet</a></li>
-<li class="toctree-l2"><a class="reference internal" href="input.html#scoring-files">Scoring files</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="usage.html#calculating-scores-with-a-vcf-file">Calculating scores with a VCF file</a></li>
-<li class="toctree-l2"><a class="reference internal" href="usage.html#calculating-scores-with-plink-binary-filesets">Calculating scores with plink binary filesets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="usage.html#calculating-scores-with-split-genomic-data">Calculating scores with split genomic data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="usage.html#using-custom-scoring-files">Using custom scoring files</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="parameters.html">Parameters</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="parameters.html#pgscatalog-pgsc-calc-pipeline-parameters">pgscatalog/pgsc_calc pipeline parameters</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="output.html">Output</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="output.html#report">Report</a></li>
-<li class="toctree-l2"><a class="reference internal" href="output.html#logs">Logs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="output.html#pipeline-information">Pipeline information</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html#i-get-an-error-about-variant-matching">I get an error about variant matching</a></li>
-<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html#the-workflow-isn-t-using-many-resources-e-g-ram-cpu">The workflow isn’t using many resources (e.g. RAM / CPU)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html#when-i-run-the-workflow-i-get-an-error-about-software-not-being-installed">When I run the workflow I get an error about software not being installed</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api.html#minimal-example">Minimal example</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#schema">Schema</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#implementation-details">Implementation details</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="offline.html">Offline usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
-</ul>
-</div>
-<div class="section" id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">pgsc_calc</span></code> is a bioinformatics best-practice analysis pipeline for applying
-scoring files from the <a class="reference external" href="https://www.pgscatalog.org/">Polygenic Score (PGS) Catalog</a> to target genotyped samples 🧬
-🥳</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This project is under very active development and updates are frequent</p>
-</div>
-</div>
-<div class="section" id="quick-start">
-<h2>Quick start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+  <div class="section" id="pgsc-calc-simple-polygenic-score-calculation">
+<h1><code class="docutils literal notranslate"><span class="pre">pgsc_calc</span></code>: Simple polygenic score calculation<a class="headerlink" href="#pgsc-calc-simple-polygenic-score-calculation" title="Permalink to this headline">¶</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">pgsc_calc</span></code> workflow makes it easy to calculate polygenic scores using
+scoring files published in the <a class="reference external" href="https://www.pgscatalog.org/">Polygenic Score (PGS) Catalog</a> 🧬
+🥳 If you have custom scoring files not in the catalog, that’s OK
+too!</p>
+<div class="section" id="quick-example">
+<h2>Quick example<a class="headerlink" href="#quick-example" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
-<li><p>Install <a class="reference internal" href="install.html"><span class="doc">Nextflow</span></a></p></li>
+<li><p>Install <a class="reference internal" href="getting-started.html"><span class="doc">Nextflow</span></a></p></li>
 <li><p>Install <a class="reference external" href="https://docs.docker.com/get-docker/">Docker</a> or <a class="reference external" href="https://sylabs.io/">Singularity</a> for full reproducibility or <a class="reference external" href="https://conda.io">Conda</a> as a
 fallback</p></li>
-<li><p>Run the workflow on a minimal test dataset using:</p></li>
+<li><p>Calculate some polygenic scores using synthetic test data:</p></li>
 </ol>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nextflow run pgscatalog/pgsc_calc -profile test,docker
+</pre></div>
+</div>
+<p>The workflow should output:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>... &lt;configuration messages intentionally not shown&gt; ...
+------------------------------------------------------
+If you use pgscatalog/pgsc_calc <span class="k">for</span> your analysis please cite:
+
+* The Polygenic Score Catalog
+  https://doi.org/10.1038/s41588-021-00783-5
+
+* The nf-core framework
+  https://doi.org/10.1038/s41587-020-0439-x
+
+* Software dependencies
+  https://github.com/pgscatalog/pgsc_calc/blob/master/CITATIONS.md
+------------------------------------------------------
+executor &gt;  <span class="nb">local</span> <span class="o">(</span><span class="m">7</span><span class="o">)</span>
+
+<span class="o">[</span><span class="m">49</span>/d28766<span class="o">]</span> process &gt; PGSC_CALC:PGSCALC:INPUT_CHECK:SAMPLESHEET_JSON <span class="o">(</span>samplesheet.csv<span class="o">)</span>           <span class="o">[</span><span class="m">100</span>%<span class="o">]</span> <span class="m">1</span> of <span class="m">1</span> ✔
+<span class="o">[</span>c3/a8e0d9<span class="o">]</span> process &gt; PGSC_CALC:PGSCALC:INPUT_CHECK:SCOREFILE_CHECK                              <span class="o">[</span><span class="m">100</span>%<span class="o">]</span> <span class="m">1</span> of <span class="m">1</span> ✔
+<span class="o">[</span>-        <span class="o">]</span> process &gt; PGSC_CALC:PGSCALC:MAKE_COMPATIBLE:PLINK2_VCF                               -
+<span class="o">[</span>7c/5cca6c<span class="o">]</span> process &gt; PGSC_CALC:PGSCALC:MAKE_COMPATIBLE:PLINK2_BFILE <span class="o">(</span>cineca_synthetic_subset<span class="o">)</span>   <span class="o">[</span><span class="m">100</span>%<span class="o">]</span> <span class="m">1</span> of <span class="m">1</span> ✔
+<span class="o">[</span>3b/ce0e39<span class="o">]</span> process &gt; PGSC_CALC:PGSCALC:MAKE_COMPATIBLE:MATCH_VARIANTS <span class="o">(</span>cineca_synthetic_subset<span class="o">)</span> <span class="o">[</span><span class="m">100</span>%<span class="o">]</span> <span class="m">1</span> of <span class="m">1</span> ✔
+<span class="o">[</span>2e/fb3233<span class="o">]</span> process &gt; PGSC_CALC:PGSCALC:APPLY_SCORE:PLINK2_SCORE <span class="o">(</span>cineca_synthetic_subset<span class="o">)</span>       <span class="o">[</span><span class="m">100</span>%<span class="o">]</span> <span class="m">1</span> of <span class="m">1</span> ✔
+<span class="o">[</span>b5/fc5b1e<span class="o">]</span> process &gt; PGSC_CALC:PGSCALC:APPLY_SCORE:MAKE_REPORT <span class="o">(</span><span class="m">1</span><span class="o">)</span>                              <span class="o">[</span><span class="m">100</span>%<span class="o">]</span> <span class="m">1</span> of <span class="m">1</span> ✔
+<span class="o">[</span><span class="m">03</span>/009cb6<span class="o">]</span> process &gt; PGSC_CALC:PGSCALC:DUMPSOFTWAREVERSIONS <span class="o">(</span><span class="m">1</span><span class="o">)</span>                                 <span class="o">[</span><span class="m">100</span>%<span class="o">]</span> <span class="m">1</span> of <span class="m">1</span> ✔
+-<span class="o">[</span>pgscatalog/pgsc_calc<span class="o">]</span> Pipeline completed successfully-
 </pre></div>
 </div>
 <div class="admonition note">
@@ -401,22 +313,51 @@ fallback</p></li>
 <p>The <code class="docutils literal notranslate"><span class="pre">docker</span></code> profile option can be replaced with <code class="docutils literal notranslate"><span class="pre">singularity</span></code> or
 <code class="docutils literal notranslate"><span class="pre">conda</span></code> depending on your local environment</p>
 </div>
+<p>If you want to try the workflow with your own data, have a look at the
+<a class="reference internal" href="getting-started.html#get-started"><span class="std std-ref">Get started</span></a> section.</p>
 </div>
 <div class="section" id="workflow-summary">
 <h2>Workflow summary<a class="headerlink" href="#workflow-summary" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>Optionally, fetch scoring files from the PGS Catalog API</p></li>
-<li><p>Convert target genomic data to plink 2 binary fileset format automatically</p></li>
+<li><p>Fetch scoring files using the PGS Catalog API</p></li>
+<li><p>Read custom scoring files</p></li>
+<li><p>Lift over scoring files to match input genetic data build</p></li>
 <li><p>Match variants in the scoring files against variants in the target genome</p></li>
-<li><p>Create a set of new scoring files from the matched variant data</p></li>
-<li><p>Calculate scores for each sample from each scoring file</p></li>
-<li><p>Produce a summary report</p></li>
+<li><p>Automatically combine and split different scoring files for efficient parallel
+computation of scores</p></li>
+<li><p>Calculate and aggregate split scores</p></li>
+<li><p>Publish a summary report</p></li>
 </ul>
 <p>In the future, the calculator will include:</p>
 <ul class="simple">
-<li><p>Build conversion of scoring files</p></li>
 <li><p>Ancestry estimation</p></li>
 </ul>
+</div>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="getting-started.html"><span class="doc">Get started</span></a>: install pgsc_calc and calculate some polygenic scores quickly!</p></li>
+<li><p><a class="reference internal" href="how-to/index.html"><span class="doc">How-to guides</span></a>: step-by-step guides, covering different use cases</p></li>
+<li><p><a class="reference internal" href="reference/index.html"><span class="doc">Reference guides</span></a>: technical information about workflow configuration</p></li>
+<li><p><a class="reference internal" href="explanation/index.html"><span class="doc">Explanation</span></a>: background, discussion of important topics, answers to high level
+questions</p></li>
+</ul>
+</div>
+<div class="section" id="changelog">
+<h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="changelog.html"><span class="doc">Changelog page</span></a> describes fixes and enhancements for each version.</p>
+</div>
+<div class="section" id="citations">
+<h2>Citations<a class="headerlink" href="#citations" title="Permalink to this headline">¶</a></h2>
+<p>If you use <code class="docutils literal notranslate"><span class="pre">pgscatalog/pgsc_calc</span></code> in your analysis, please cite:</p>
+<blockquote>
+<div><p>PGS Catalog Calculator <cite>(in development)</cite>. PGS Catalog
+Team. <a class="reference external" href="https://github.com/PGScatalog/pgsc_calc">https://github.com/PGScatalog/pgsc_calc</a></p>
+<p>Lambert <cite>et al.</cite> (2021) The Polygenic Score Catalog as an open database for
+reproducibility and systematic evaluation.  Nature Genetics. 53:420–425
+doi:<a class="reference external" href="https://doi.org/10.1038/s41588-021-00783-5">10.1038/s41588-021-00783-5</a>.</p>
+</div></blockquote>
+<p>In addition, please remember to cite the other papers described in the <a class="reference external" href="https://github.com/PGScatalog/pgsc_calc/blob/master/CITATIONS.md">citations file</a>.</p>
 </div>
 <div class="section" id="credits">
 <h2>Credits<a class="headerlink" href="#credits" title="Permalink to this headline">¶</a></h2>
@@ -449,21 +390,8 @@ the University of Cambridge, Health Data Research UK (HDRUK), and the European
 Union’s Horizon 2020 research and innovation programme under grant agreement No
 101016775 INTERVENE.</p>
 </div>
-</div>
-<div class="section" id="citations">
-<h2>Citations<a class="headerlink" href="#citations" title="Permalink to this headline">¶</a></h2>
-<p>If you use <code class="docutils literal notranslate"><span class="pre">pgscatalog/pgsc_calc</span></code> in your analysis, please cite:</p>
-<blockquote>
-<div><p>PGS Catalog Calculator <cite>(in development)</cite>. PGS Catalog
-Team. <a class="reference external" href="https://github.com/PGScatalog/pgsc_calc">https://github.com/PGScatalog/pgsc_calc</a></p>
-<p>Lambert <cite>et al.</cite> (2021) The Polygenic Score Catalog as an open database for
-reproducibility and systematic evaluation.  Nature Genetics. 53:420–425
-doi:<a class="reference external" href="https://doi.org/10.1038/s41588-021-00783-5">10.1038/s41588-021-00783-5</a>.</p>
-</div></blockquote>
-<p>In addition, please remember to cite the other papers described in the <a class="reference external" href="https://github.com/PGScatalog/pgsc_calc/blob/master/CITATIONS.md">citations file</a>.</p>
-</div>
 <div class="section" id="data-references">
-<h2>Data references<a class="headerlink" href="#data-references" title="Permalink to this headline">¶</a></h2>
+<h3>Data references<a class="headerlink" href="#data-references" title="Permalink to this headline">¶</a></h3>
 <p>The pipeline is distributed with and uses a licensed dataset for testing:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC-BY-NC-SA</a>: <a class="reference external" href="https://doi.org/10.5281/zenodo.5082689">CINECA synthetic cohort Europe CH SIB</a></p></li>
@@ -473,12 +401,6 @@ cohort to create the test dataset. It’s up to end-users to ensure that their u
 of test data conforms to the license restrictions.</p>
 </div>
 </div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
-</ul>
 </div>
 
 
@@ -487,13 +409,6 @@ of test data conforms to the license restrictions.</p>
             
                 <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='right-next' id="next-link" href="install.html" title="next page">
-    <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Installation</p>
-    </div>
-    <i class="fas fa-angle-right"></i>
-    </a>
 </div>
             
         </div>

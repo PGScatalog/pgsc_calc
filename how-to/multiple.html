@@ -1,0 +1,427 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>How to apply multiple scores in parallel &#8212; Polygenic Score (PGS) Catalog Calculator  documentation</title>
+    
+  <link href="../_static/css/theme.css" rel="stylesheet">
+  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-book-theme.css?digest=84ace793992934648b4de8eed757e5a2" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx-book-theme.9d8b4a8b9bb19db25eeaddc40d639ba2.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<div class="col-12 col-md-3 bd-sidebar site-navigation " id="site-navigation">
+    
+        <form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><h3>Contents</h3>
+
+<ul>
+  <li><a href="../index.html">Home</a></li>
+  <li><a href="../getting-started.html">Get started</a></li>
+  <li><a href="index.html">How-to guides</a></li>
+  <li><a href="../reference/index.html">Reference guide</a></li>
+  <li><a href="../explanation/index.html">Explanation</a></li>
+  <li><a href="../glossary.html">Glossary</a></li>
+</ul>
+
+<h3>About the project</h3>
+
+<ul>
+  <li><a href="../changelog.html">Changelog</a></li>
+  <li><a href="../license.html">License</a></li>
+</ul>
+
+<h3>Useful links</h3>
+
+<ul>
+  <li><a href="https://github.com/pgscatalog/pgsc_calc">Github repository</a></li>
+  <li><a href="https://github.com/pgscatalog/pgsc_calc/issues">Issue tracker</a></li>
+</ul>
+
+<hr>
+<a href="../genindex.html">Index</a>
+<hr> <!-- To handle the deprecated key -->
+
+</div>
+
+
+          
+
+
+          
+<!-- This is an invisible pixel that we watch to see if we've scrolled. -->
+<div class="sbt-scroll-pixel-helper"></div>
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            <div class="topbar-left">
+                
+                <label class="nav-toggle-button" for="__navigation">
+                    <div class="visually-hidden">Toggle navigation</div>
+                    <i class="fas fa-bars"></i>
+                </label>
+                
+            </div>
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../_sources/how-to/multiple.rst.txt"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.rst</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+                onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show noprint">
+            
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#samplesheet-setup">
+   1. Samplesheet setup
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#multiple-pgs-catalog-scores">
+   2. Multiple PGS Catalog scores
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#multiple-custom-scorefiles">
+   3. Multiple custom scorefiles
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#setting-multiple-scores-in-one-custom-scoring-file">
+     Setting multiple scores in one custom scoring file
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#calculate">
+   4. Calculate!
+  </a>
+ </li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>How to apply multiple scores in parallel</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#samplesheet-setup">
+   1. Samplesheet setup
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#multiple-pgs-catalog-scores">
+   2. Multiple PGS Catalog scores
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#multiple-custom-scorefiles">
+   3. Multiple custom scorefiles
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#setting-multiple-scores-in-one-custom-scoring-file">
+     Setting multiple scores in one custom scoring file
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#calculate">
+   4. Calculate!
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            
+              <div>
+                
+  <div class="section" id="how-to-apply-multiple-scores-in-parallel">
+<span id="multiple"></span><h1>How to apply multiple scores in parallel<a class="headerlink" href="#how-to-apply-multiple-scores-in-parallel" title="Permalink to this headline">¶</a></h1>
+<p>pgsc_calc makes it simple to scale up polygenic score calculation by using PLINK
+2’s built-in matrix multiplication. If you want to calculate multiple scores for
+your genetic data it will always be faster to run the pipeline once with the
+parallel method described in this section. Running the workflow many times, once
+for each score, will be much slower 🏃‍♂️</p>
+<div class="section" id="samplesheet-setup">
+<h2>1. Samplesheet setup<a class="headerlink" href="#samplesheet-setup" title="Permalink to this headline">¶</a></h2>
+<p>First, you need to describe the structure of your genomic data in a standardised
+way. To do this, set up a spreadsheet that looks like:</p>
+<table class="colwidths-given table" id="id1">
+<caption><span class="caption-text">Example samplesheet</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>sample</p></th>
+<th class="head"><p>vcf_path</p></th>
+<th class="head"><p>bfile_path</p></th>
+<th class="head"><p>chrom</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>cineca_synthetic_subset</p></td>
+<td></td>
+<td><p>path/to/bfile_prefix</p></td>
+<td><p>22</p></td>
+</tr>
+<tr class="row-odd"><td><p>cineca_synthetic_subset_vcf</p></td>
+<td><p>path/to/vcf.gz</p></td>
+<td></td>
+<td><p>22</p></td>
+</tr>
+</tbody>
+</table>
+<p>Save the file as <code class="docutils literal notranslate"><span class="pre">samplesheet.csv</span></code>. See <a class="reference internal" href="samplesheet.html#setup-samplesheet"><span class="std std-ref">How to set up a samplesheet</span></a> for more details.</p>
+</div>
+<div class="section" id="multiple-pgs-catalog-scores">
+<h2>2. Multiple PGS Catalog scores<a class="headerlink" href="#multiple-pgs-catalog-scores" title="Permalink to this headline">¶</a></h2>
+<p>It’s simple to run multiple scoring files published in the PGS Catalog. Each
+entry in the PGS Catalog has an accession that starts with the prefix PGS. The
+<code class="docutils literal notranslate"><span class="pre">--accession</span></code> parameter supports multiple entries. List each PGS accession,
+separating each accession with commas (no whitespace):</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">--accession PGS001229,PGS001405</span>
+</pre></div>
+</div>
+<p>That’s all you need to do! 🥳</p>
+<p>In this simple example all PGS Catalog accessions are scoring files in build
+GRCh37. You might find that some scores don’t match the genome build of your
+genomic data as you use more scores. To make sure all scores match the build of
+your genomic data, you’ll need to set some additional parameters (see
+<a class="reference internal" href="liftover.html#liftover"><span class="std std-ref">How to liftover scoring files to match your input genome build</span></a>).</p>
+</div>
+<div class="section" id="multiple-custom-scorefiles">
+<h2>3. Multiple custom scorefiles<a class="headerlink" href="#multiple-custom-scorefiles" title="Permalink to this headline">¶</a></h2>
+<p>You might have set up multiple custom scorefiles (see <a class="reference internal" href="calculate_custom.html#calculate-custom"><span class="std std-ref">How to use a custom scoring file</span></a>). The <code class="docutils literal notranslate"><span class="pre">--scorefile</span></code> parameter supports multiple scorefile paths by
+using star characters (<code class="docutils literal notranslate"><span class="pre">*</span></code>). If your custom scorefiles are in the
+directory <code class="docutils literal notranslate"><span class="pre">my_custom_scores/</span></code>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">--scorefile &quot;my_custom_scores/*.tsv&quot;</span>
+</pre></div>
+</div>
+<p>Assuming your scorefiles all have a <code class="docutils literal notranslate"><span class="pre">.tsv</span></code> extension. This will match <strong>all</strong>
+files ending with <code class="docutils literal notranslate"><span class="pre">.tsv</span></code>, so be careful not to include other text files that
+may match the pattern.</p>
+<p>Two stars (<code class="docutils literal notranslate"><span class="pre">**</span></code>) will match across multiple directories. This can be useful if
+your scoring files have a structure like:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>tree diabetes/
+<span class="go">diabetes/</span>
+<span class="go">├── type1</span>
+<span class="go">│   └── type1.tsv</span>
+<span class="go">└── type2</span>
+<span class="go">    └── type2.tsv</span>
+
+<span class="go">2 directories, 2 files</span>
+</pre></div>
+</div>
+<p>In this case, using two stars with the scorefile parameter can be helpful:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">--scorefile &quot;diabetes/**.tsv&quot;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>Custom scorefiles <strong>must</strong> have unique filenames</p></li>
+<li><p>The basename of each file (e.g. <code class="docutils literal notranslate"><span class="pre">type1.tsv</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">type1</span></code>) is used
+to label the score in the workflow output</p></li>
+<li><p>Quotes around stars (<code class="docutils literal notranslate"><span class="pre">&quot;*.tsv&quot;</span></code>) are important for matching to work as expected</p></li>
+</ul>
+</div>
+<div class="section" id="setting-multiple-scores-in-one-custom-scoring-file">
+<h3>Setting multiple scores in one custom scoring file<a class="headerlink" href="#setting-multiple-scores-in-one-custom-scoring-file" title="Permalink to this headline">¶</a></h3>
+<p>The examples above assume each scoring file contains a single score. A single
+custom scoring file can contain multiple scores by using a different scoring
+file template. The final column effect_weight can be repeated if every column
+has a suffix:</p>
+<table class="colwidths-given table" id="id2">
+<caption><span class="caption-text">Scorefile with multiple effect weights</span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>chr_name</p></th>
+<th class="head"><p>…</p></th>
+<th class="head"><p>effect_weight_type1</p></th>
+<th class="head"><p>effect_weight_type2</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>22</p></td>
+<td><p>…</p></td>
+<td><p>0.01045457</p></td>
+<td><p>0.02000000</p></td>
+</tr>
+</tbody>
+</table>
+<p>The columns chr_position, effect_allele, and other_allele are left out (…) in
+the example table to save space, but are mandatory (see <a class="reference internal" href="calculate_custom.html#custom-scorefile-setup"><span class="std std-ref">2. Scorefile setup</span></a>). Multiple score columns <strong>must</strong> follow the pattern
+effect_weight_suffix, where suffix is a label for each score. Suffixes <strong>must</strong>
+be unique.</p>
+<p>Setting effect types for variants is not supported with this format (see
+<a class="reference internal" href="effecttype.html#effect-type"><span class="std std-ref">How to set effect type of variants in a scoring file</span></a>). An example template is available here.</p>
+</div>
+</div>
+<div class="section" id="calculate">
+<h2>4. Calculate!<a class="headerlink" href="#calculate" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>If you’re using multiple scores from the PGS Catalog:</p></li>
+</ul>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>nextflow run pgscatalog/pgscalc <span class="se">\</span>
+    --input samplesheet.csv <span class="se">\</span>
+    --accession PGS001229,PGS001405
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Or you might be using multiple scoring files in the same directory:</p></li>
+</ul>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>nextflow run pgscatalog/pgscalc <span class="se">\</span>
+    --input samplesheet.csv <span class="se">\</span>
+    --scorefile <span class="s2">&quot;my_custom_scores/*.tsv&quot;</span>
+</pre></div>
+</div>
+<p>Congratulations, you’ve now calculated multiple scores in parallel!
+🥳</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can set both <code class="docutils literal notranslate"><span class="pre">--accession</span></code> and <code class="docutils literal notranslate"><span class="pre">--scorefile</span></code> parameters to
+combine scores in the PGS Catalog with your own custom scores</p>
+</div>
+<p>After the workflow executes successfully, the calculated scores and a summary
+report should be available in the <code class="docutils literal notranslate"><span class="pre">results/make/</span></code> directory by default. If
+you’re interested in more information, see <a class="reference internal" href="interpret.html#interpret"><span class="std std-ref">How to interpret workflow output</span></a>.</p>
+<p>If the workflow didn’t execute successfully, have a look at the
+<a class="reference internal" href="../explanation/troubleshooting.html#troubleshoot"><span class="std std-ref">Troubleshooting</span></a> section.</p>
+</div>
+</div>
+
+
+              </div>
+              
+            
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+            
+        </div>
+    </div>
+    <footer class="footer">
+  <p>
+    
+      By Polygenic Score (PGS) Catalog team<br/>
+    
+        &copy; Copyright 2022, PGS Catalog team.<br/>
+  </p>
+</footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+
+  </body>
+</html>

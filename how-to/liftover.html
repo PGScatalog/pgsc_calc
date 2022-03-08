@@ -1,0 +1,277 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>How to liftover scoring files to match your input genome build &#8212; Polygenic Score (PGS) Catalog Calculator  documentation</title>
+    
+  <link href="../_static/css/theme.css" rel="stylesheet">
+  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-book-theme.css?digest=84ace793992934648b4de8eed757e5a2" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx-book-theme.9d8b4a8b9bb19db25eeaddc40d639ba2.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<div class="col-12 col-md-3 bd-sidebar site-navigation " id="site-navigation">
+    
+        <form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><h3>Contents</h3>
+
+<ul>
+  <li><a href="../index.html">Home</a></li>
+  <li><a href="../getting-started.html">Get started</a></li>
+  <li><a href="index.html">How-to guides</a></li>
+  <li><a href="../reference/index.html">Reference guide</a></li>
+  <li><a href="../explanation/index.html">Explanation</a></li>
+  <li><a href="../glossary.html">Glossary</a></li>
+</ul>
+
+<h3>About the project</h3>
+
+<ul>
+  <li><a href="../changelog.html">Changelog</a></li>
+  <li><a href="../license.html">License</a></li>
+</ul>
+
+<h3>Useful links</h3>
+
+<ul>
+  <li><a href="https://github.com/pgscatalog/pgsc_calc">Github repository</a></li>
+  <li><a href="https://github.com/pgscatalog/pgsc_calc/issues">Issue tracker</a></li>
+</ul>
+
+<hr>
+<a href="../genindex.html">Index</a>
+<hr> <!-- To handle the deprecated key -->
+
+</div>
+
+
+          
+
+
+          
+<!-- This is an invisible pixel that we watch to see if we've scrolled. -->
+<div class="sbt-scroll-pixel-helper"></div>
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            <div class="topbar-left">
+                
+                <label class="nav-toggle-button" for="__navigation">
+                    <div class="visually-hidden">Toggle navigation</div>
+                    <i class="fas fa-bars"></i>
+                </label>
+                
+            </div>
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../_sources/how-to/liftover.rst.txt"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.rst</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+                onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show noprint">
+            
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#lifting-over-pgs-catalog-scoring-files">
+   Lifting over PGS Catalog scoring files
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#lifting-over-custom-scoring-files">
+   Lifting over custom scoring files
+  </a>
+ </li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>How to liftover scoring files to match your input genome build</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#lifting-over-pgs-catalog-scoring-files">
+   Lifting over PGS Catalog scoring files
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#lifting-over-custom-scoring-files">
+   Lifting over custom scoring files
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            
+              <div>
+                
+  <div class="section" id="how-to-liftover-scoring-files-to-match-your-input-genome-build">
+<span id="liftover"></span><h1>How to liftover scoring files to match your input genome build<a class="headerlink" href="#how-to-liftover-scoring-files-to-match-your-input-genome-build" title="Permalink to this headline">¶</a></h1>
+<p>pgsc_calc uses genomic coordinates to help match variants in the scoring file to
+variants in your input genomic data. These coordinates may not match if scoring
+files are developed in a different genome build. Luckily, it’s fairly simple to
+automatically remap coordinates (liftover) to different genome builds.</p>
+<div class="section" id="lifting-over-pgs-catalog-scoring-files">
+<span id="liftover-pgscatalog"></span><h2>Lifting over PGS Catalog scoring files<a class="headerlink" href="#lifting-over-pgs-catalog-scoring-files" title="Permalink to this headline">¶</a></h2>
+<p>PGS Catalog scoring files have additional metadata set in a <a class="reference external" href="https://www.pgscatalog.org/downloads/#scoring_header">header</a>. pgsc_calc
+reads this metadata and can automatically liftover scoring files to match your
+input data if you set the following additional parameters at runtime:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">--liftover --target_build GRCh38</span>
+</pre></div>
+</div>
+<p>Where <code class="docutils literal notranslate"><span class="pre">--target_build</span></code> can be GRCh37 or GRCh38. Some scoring files in the PGS
+Catalog do not contain genome build data and cannot be remapped, see
+<a class="reference internal" href="calculate_pgscatalog.html#limitations"><span class="std std-ref">Limitations</span></a>.</p>
+<p>Putting everything together for an example run, assuming the input genomic data
+are in build GRCh38:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>nextflow run pgscatalog/pgsc_calc <span class="se">\</span>
+    --input samplesheet.csv <span class="se">\</span>
+    --accession PGS001229 <span class="se">\</span>
+    --liftover <span class="se">\</span>
+    --target_build GRCh38
+</pre></div>
+</div>
+</div>
+<div class="section" id="lifting-over-custom-scoring-files">
+<h2>Lifting over custom scoring files<a class="headerlink" href="#lifting-over-custom-scoring-files" title="Permalink to this headline">¶</a></h2>
+<p>Custom scoring files need to include metadata in a <a class="reference external" href="https://www.pgscatalog.org/downloads/#scoring_header">header</a>, following the PGS
+Catalog v2 file format standard. A single line can be included at the top of
+your custom scoring file to set the genome build:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">#</span><span class="nv">genome_build</span><span class="o">=</span>GRCh38
+</pre></div>
+</div>
+<p>Valid genome builds are GRCh37 and GRCh38.</p>
+<p>Then use the same procedure described in <a class="reference internal" href="#liftover-pgscatalog"><span class="std std-ref">Lifting over PGS Catalog scoring files</span></a> to
+automatically remap a scoring file against your genomic data build.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you’re calculating multiple scores (see <a class="reference internal" href="multiple.html#multiple"><span class="std std-ref">How to apply multiple scores in parallel</span></a>) and you
+want to liftover some of the scorefiles, then <strong>all</strong> scorefiles need
+genome builds set in the header</p>
+</div>
+</div>
+</div>
+
+
+              </div>
+              
+            
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+            
+        </div>
+    </div>
+    <footer class="footer">
+  <p>
+    
+      By Polygenic Score (PGS) Catalog team<br/>
+    
+        &copy; Copyright 2022, PGS Catalog team.<br/>
+  </p>
+</footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+
+  </body>
+</html>
