@@ -15,6 +15,7 @@ Core functionality
    effecttype
    liftover
    multiple
+   bigjob
 
 Workflow output
 ---------------

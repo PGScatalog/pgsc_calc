@@ -20,7 +20,7 @@ Quick example
 
 .. code-block:: bash
 
-    nextflow run pgscatalog/pgsc_calc -profile test,docker
+    $ nextflow run pgscatalog/pgsc_calc -profile test,docker
 
 The workflow should output:
 

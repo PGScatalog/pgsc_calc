@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>How-to guides &#8212; Polygenic Score (PGS) Catalog Calculator  documentation</title>
+    <title>How do I run big jobs on a powerful computer? &#8212; Polygenic Score (PGS) Catalog Calculator  documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -65,7 +65,7 @@
 <ul>
   <li><a href="../index.html">Home</a></li>
   <li><a href="../getting-started.html">Get started</a></li>
-  <li><a href="#">How-to guides</a></li>
+  <li><a href="index.html">How-to guides</a></li>
   <li><a href="../reference/index.html">Reference guide</a></li>
   <li><a href="../explanation/index.html">Explanation</a></li>
   <li><a href="../glossary.html">Glossary</a></li>
@@ -121,7 +121,7 @@
         <!-- ipynb file if we had a myst markdown file -->
         
         <!-- Download raw file -->
-        <a class="dropdown-buttons" href="../_sources/how-to/index.rst.txt"><button type="button"
+        <a class="dropdown-buttons" href="../_sources/how-to/bigjob.rst.txt"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
                 data-placement="left">.rst</button></a>
         <!-- Download PDF via print -->
@@ -152,18 +152,18 @@
             <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#core-functionality">
-   Core functionality
+  <a class="reference internal nav-link" href="#configuring-pgsc-calc-to-use-more-resources-locally">
+   Configuring pgsc_calc to use more resources locally
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#workflow-output">
-   Workflow output
+  <a class="reference internal nav-link" href="#high-performance-computing-cluster">
+   High performance computing cluster
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#web-platform">
-   Web platform
+  <a class="reference internal nav-link" href="#other-environments">
+   Other environments
   </a>
  </li>
 </ul>
@@ -176,7 +176,7 @@
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>How-to guides</h1>
+                <h1>How do I run big jobs on a powerful computer?</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
@@ -187,18 +187,18 @@
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#core-functionality">
-   Core functionality
+  <a class="reference internal nav-link" href="#configuring-pgsc-calc-to-use-more-resources-locally">
+   Configuring pgsc_calc to use more resources locally
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#workflow-output">
-   Workflow output
+  <a class="reference internal nav-link" href="#high-performance-computing-cluster">
+   High performance computing cluster
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#web-platform">
-   Web platform
+  <a class="reference internal nav-link" href="#other-environments">
+   Other environments
   </a>
  </li>
 </ul>
@@ -210,37 +210,101 @@
             
               <div>
                 
-  <div class="section" id="how-to-guides">
-<h1>How-to guides<a class="headerlink" href="#how-to-guides" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="core-functionality">
-<h2>Core functionality<a class="headerlink" href="#core-functionality" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="samplesheet.html">How to set up a samplesheet</a></li>
-<li class="toctree-l1"><a class="reference internal" href="calculate_pgscatalog.html">How to use scoring files in the PGS Catalog</a></li>
-<li class="toctree-l1"><a class="reference internal" href="calculate_custom.html">How to use a custom scoring file</a></li>
-<li class="toctree-l1"><a class="reference internal" href="effecttype.html">How to set effect type of variants in a scoring file</a></li>
-<li class="toctree-l1"><a class="reference internal" href="liftover.html">How to liftover scoring files to match your input genome build</a></li>
-<li class="toctree-l1"><a class="reference internal" href="multiple.html">How to apply multiple scores in parallel</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bigjob.html">How do I run big jobs on a powerful computer?</a></li>
+  <div class="section" id="how-do-i-run-big-jobs-on-a-powerful-computer">
+<h1>How do I run big jobs on a powerful computer?<a class="headerlink" href="#how-do-i-run-big-jobs-on-a-powerful-computer" title="Permalink to this headline">¶</a></h1>
+<p>If you want to calculate many polygenic scores for a very large dataset, like
+the UK BioBank, you might need some extra computing power! You might have access
+to a powerful workstation, a University cluster, or some cloud compute
+resources. This section will show how to set up pgsc_calc to submit work to
+these types of systems.</p>
+<div class="section" id="configuring-pgsc-calc-to-use-more-resources-locally">
+<h2>Configuring pgsc_calc to use more resources locally<a class="headerlink" href="#configuring-pgsc-calc-to-use-more-resources-locally" title="Permalink to this headline">¶</a></h2>
+<p>If you have a powerful computer available locally, you can configure the amount
+of resources that the workflow uses.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>params {
+    max_memory = 36.GB
+    max_cpus = 8
+    max_time = 12.h
+}
+
+process {
+    withLabel:process_low {
+        cpus   = { check_max( 2     * task.attempt, &#39;cpus&#39;    ) }
+        memory = { check_max( 12.GB * task.attempt, &#39;memory&#39;  ) }
+        time   = { check_max( 4.h   * task.attempt, &#39;time&#39;    ) }
+    }
+    withLabel:process_medium {
+        cpus   = { check_max( 6     * task.attempt, &#39;cpus&#39;    ) }
+        memory = { check_max( 36.GB * task.attempt, &#39;memory&#39;  ) }
+        time   = { check_max( 8.h   * task.attempt, &#39;time&#39;    ) }
+    }
+}
+</pre></div>
+</div>
+<p>You should change <code class="docutils literal notranslate"><span class="pre">cpus</span></code>, <code class="docutils literal notranslate"><span class="pre">memory</span></code>, and <code class="docutils literal notranslate"><span class="pre">time</span></code> to match the amount of
+resources used (don’t forget to change <code class="docutils literal notranslate"><span class="pre">max</span></code> in the params block too).</p>
+<p>Assuming the configuration file you set up is saved as <code class="docutils literal notranslate"><span class="pre">my_custom.config</span></code> in
+your current working directory, you’re ready to run pgsc_calc:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>nextflow run pgscatalog/pgsc_calc <span class="se">\</span>
+    --input samplesheet.csv <span class="se">\</span>
+    --accession PGS001229 <span class="se">\</span>
+    -c my_custom.config
+</pre></div>
+</div>
+</div>
+<div class="section" id="high-performance-computing-cluster">
+<h2>High performance computing cluster<a class="headerlink" href="#high-performance-computing-cluster" title="Permalink to this headline">¶</a></h2>
+<p>If you have access to a HPC cluster, you’ll need to configure your cluster’s
+unique parameters to set correct queues, user accounts, and resource limits:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>params {
+    max_memory = 36.GB
+    max_cpus = 8
+    max_time = 12.h
+}
+
+process {
+    executor = &#39;slurm&#39;
+    queue = &#39;standard&#39;
+    clusterOptions = &#39;&#39;
+
+    withLabel:process_low {
+        cpus   = { check_max( 2     * task.attempt, &#39;cpus&#39;    ) }
+        memory = { check_max( 12.GB * task.attempt, &#39;memory&#39;  ) }
+        time   = { check_max( 4.h   * task.attempt, &#39;time&#39;    ) }
+    }
+    withLabel:process_medium {
+        cpus   = { check_max( 6     * task.attempt, &#39;cpus&#39;    ) }
+        memory = { check_max( 36.GB * task.attempt, &#39;memory&#39;  ) }
+        time   = { check_max( 8.h   * task.attempt, &#39;time&#39;    ) }
+    }
+}
+</pre></div>
+</div>
+<p>In SLURM, queue is equivalent to a partition. Nextflow can support other
+executors like <a class="reference external" href="https://nextflow.io/docs/latest/executor.html#slurm">LSF and PBS</a>. Other cluster parameters can be provided by
+modifying <code class="docutils literal notranslate"><span class="pre">clusterOptions</span></code>. You should change <code class="docutils literal notranslate"><span class="pre">cpus</span></code>, <code class="docutils literal notranslate"><span class="pre">memory</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">time</span></code> to match the amount of resources used (don’t forget to change <code class="docutils literal notranslate"><span class="pre">max</span></code>
+in the params block too).</p>
+<p>Assuming the configuration file you set up is saved as <code class="docutils literal notranslate"><span class="pre">my_custom.config</span></code> in
+your current working directory, you’re ready to run pgsc_calc:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>nextflow run pgscatalog/pgsc_calc <span class="se">\</span>
+    --input samplesheet.csv <span class="se">\</span>
+    --accession PGS001229 <span class="se">\</span>
+    -c my_custom.config
+</pre></div>
+</div>
+</div>
+<div class="section" id="other-environments">
+<h2>Other environments<a class="headerlink" href="#other-environments" title="Permalink to this headline">¶</a></h2>
+<p>Nextflow also supports submitting jobs platforms like:</p>
+<ul class="simple">
+<li><p>Google cloud</p></li>
+<li><p>Azure cloud</p></li>
+<li><p>Amazon cloud</p></li>
 </ul>
-</div>
-</div>
-<div class="section" id="workflow-output">
-<h2>Workflow output<a class="headerlink" href="#workflow-output" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="interpret.html">How to interpret workflow output</a></li>
-</ul>
-</div>
-</div>
-<div class="section" id="web-platform">
-<h2>Web platform<a class="headerlink" href="#web-platform" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="api.html">How to start the workflow with an API call</a></li>
-</ul>
-</div>
+<p>Check the <a class="reference external" href="https://nextflow.io/docs/latest/google.html">nextflow documentation</a> for configuration specifics. pgsc_calc is
+deployed and tested on a <a class="reference external" href="https://github.com/PGScatalog/pgsc_calc/blob/master/conf/k8s.config">local Kubernetes cluster</a>, but it’s not a recommended
+way of running the pipeline for normal users.</p>
 </div>
 </div>
 
