@@ -15,22 +15,18 @@ of resources that the workflow uses.
 
 .. code-block:: text
 
-    params {
-        max_memory = 36.GB
-        max_cpus = 8
-        max_time = 12.h
-    }
-
     process {
+        executor = 'local'
+
         withLabel:process_low {
-            cpus   = { check_max( 2     * task.attempt, 'cpus'    ) }
-            memory = { check_max( 12.GB * task.attempt, 'memory'  ) }
-            time   = { check_max( 4.h   * task.attempt, 'time'    ) }
+            cpus   = 2
+            memory = 12.GB
+            time   = 4.h
         }
         withLabel:process_medium {
-            cpus   = { check_max( 6     * task.attempt, 'cpus'    ) }
-            memory = { check_max( 36.GB * task.attempt, 'memory'  ) }
-            time   = { check_max( 8.h   * task.attempt, 'time'    ) }
+            cpus   = 6
+            memory = 32.GB
+            time   = 8.h
         }
     }
 
@@ -41,7 +37,7 @@ Assuming the configuration file you set up is saved as ``my_custom.config`` in
 your current working directory, you're ready to run pgsc_calc:
 
 .. code-block:: console
-                
+
     $ nextflow run pgscatalog/pgsc_calc \
         --input samplesheet.csv \
         --accession PGS001229 \
@@ -51,32 +47,33 @@ High performance computing cluster
 ----------------------------------
 
 If you have access to a HPC cluster, you'll need to configure your cluster's
-unique parameters to set correct queues, user accounts, and resource limits:
+unique parameters to set correct queues, user accounts, and resource
+limits. It's also recommended to run the workflow using singularity on a HPC
+(Docker is usually not an option):
 
 .. code-block:: text
 
-    params {
-        max_memory = 36.GB
-        max_cpus = 8
-        max_time = 12.h
+    singularity {
+        enabled = true
+        autoMounts = true
     }
 
     process {
-        executor = 'slurm'
-        queue = 'standard'
+        executor = 'lsf'
+        queue = 'short'
         clusterOptions = ''
 
         withLabel:process_low {
-            cpus   = { check_max( 2     * task.attempt, 'cpus'    ) }
-            memory = { check_max( 12.GB * task.attempt, 'memory'  ) }
-            time   = { check_max( 4.h   * task.attempt, 'time'    ) }
+            cpus   = 2
+            memory = 12.GB
+            time   = 4.h
         }
         withLabel:process_medium {
-            cpus   = { check_max( 6     * task.attempt, 'cpus'    ) }
-            memory = { check_max( 36.GB * task.attempt, 'memory'  ) }
-            time   = { check_max( 8.h   * task.attempt, 'time'    ) }
+            cpus   = 6
+            memory = 32.GB
+            time   = 8.h
         }
-    } 
+    }
 
 In SLURM, queue is equivalent to a partition. Nextflow can support other
 executors like `LSF and PBS`_. Other cluster parameters can be provided by
@@ -88,7 +85,7 @@ Assuming the configuration file you set up is saved as ``my_custom.config`` in
 your current working directory, you're ready to run pgsc_calc:
 
 .. code-block:: console
-                
+
     $ nextflow run pgscatalog/pgsc_calc \
         --input samplesheet.csv \
         --accession PGS001229 \

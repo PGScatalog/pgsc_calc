@@ -221,22 +221,18 @@ these types of systems.</p>
 <h2>Configuring pgsc_calc to use more resources locally<a class="headerlink" href="#configuring-pgsc-calc-to-use-more-resources-locally" title="Permalink to this headline">¶</a></h2>
 <p>If you have a powerful computer available locally, you can configure the amount
 of resources that the workflow uses.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>params {
-    max_memory = 36.GB
-    max_cpus = 8
-    max_time = 12.h
-}
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>process {
+    executor = &#39;local&#39;
 
-process {
     withLabel:process_low {
-        cpus   = { check_max( 2     * task.attempt, &#39;cpus&#39;    ) }
-        memory = { check_max( 12.GB * task.attempt, &#39;memory&#39;  ) }
-        time   = { check_max( 4.h   * task.attempt, &#39;time&#39;    ) }
+        cpus   = 2
+        memory = 12.GB
+        time   = 4.h
     }
     withLabel:process_medium {
-        cpus   = { check_max( 6     * task.attempt, &#39;cpus&#39;    ) }
-        memory = { check_max( 36.GB * task.attempt, &#39;memory&#39;  ) }
-        time   = { check_max( 8.h   * task.attempt, &#39;time&#39;    ) }
+        cpus   = 6
+        memory = 32.GB
+        time   = 8.h
     }
 }
 </pre></div>
@@ -255,27 +251,28 @@ your current working directory, you’re ready to run pgsc_calc:</p>
 <div class="section" id="high-performance-computing-cluster">
 <h2>High performance computing cluster<a class="headerlink" href="#high-performance-computing-cluster" title="Permalink to this headline">¶</a></h2>
 <p>If you have access to a HPC cluster, you’ll need to configure your cluster’s
-unique parameters to set correct queues, user accounts, and resource limits:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>params {
-    max_memory = 36.GB
-    max_cpus = 8
-    max_time = 12.h
+unique parameters to set correct queues, user accounts, and resource
+limits. It’s also recommended to run the workflow using singularity on a HPC
+(Docker is usually not an option):</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>singularity {
+    enabled = true
+    autoMounts = true
 }
 
 process {
-    executor = &#39;slurm&#39;
-    queue = &#39;standard&#39;
+    executor = &#39;lsf&#39;
+    queue = &#39;short&#39;
     clusterOptions = &#39;&#39;
 
     withLabel:process_low {
-        cpus   = { check_max( 2     * task.attempt, &#39;cpus&#39;    ) }
-        memory = { check_max( 12.GB * task.attempt, &#39;memory&#39;  ) }
-        time   = { check_max( 4.h   * task.attempt, &#39;time&#39;    ) }
+        cpus   = 2
+        memory = 12.GB
+        time   = 4.h
     }
     withLabel:process_medium {
-        cpus   = { check_max( 6     * task.attempt, &#39;cpus&#39;    ) }
-        memory = { check_max( 36.GB * task.attempt, &#39;memory&#39;  ) }
-        time   = { check_max( 8.h   * task.attempt, &#39;time&#39;    ) }
+        cpus   = 6
+        memory = 32.GB
+        time   = 8.h
     }
 }
 </pre></div>
