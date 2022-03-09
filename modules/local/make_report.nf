@@ -3,8 +3,8 @@ process MAKE_REPORT {
 
     conda (params.enable_conda ? "conda-forge::r-tidyverse=1.3.1 conda-forge::r-rsqlite=2.1.1" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'docker://rocker/tidyverse:4.1.2' :
-        'rocker/tidyverse:4.1.2' }"
+        'https://depot.galaxyproject.org/singularity/r-tidyverse:1.2.1' :
+        'quay.io/biocontainers/mulled-v2-e5054a4b868f4ffd21311d4e05426694e2c7fb5e:17fe01267c936fedcbd51470941b075c42b08c23-0' }"
 
     input:
     path scorefiles
