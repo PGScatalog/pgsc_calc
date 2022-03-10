@@ -220,6 +220,7 @@ Catalog do not contain genome build data and cannot be remapped, see
 <p>Putting everything together for an example run, assuming the input genomic data
 are in build GRCh38:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>nextflow run pgscatalog/pgsc_calc <span class="se">\</span>
+    -profile &lt;docker/singularity/conda&gt; <span class="se">\</span>
     --input samplesheet.csv <span class="se">\</span>
     --accession PGS001229 <span class="se">\</span>
     --liftover <span class="se">\</span>

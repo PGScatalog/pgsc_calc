@@ -284,6 +284,7 @@ module load nextflow-21.10.6-gcc-9.3.0-tkuemwd
 module load singularity-3.7.0-gcc-9.3.0-dp5ffrp
 
 nextflow run pgscatalog/pgsc_calc <span class="se">\</span>
+    -profile singularity <span class="se">\</span>
     --input samplesheet.csv <span class="se">\</span>
     --accession PGS001229 <span class="se">\</span>
     -c my_custom.config

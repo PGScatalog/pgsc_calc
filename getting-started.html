@@ -366,16 +366,20 @@ the scoring files with the <code class="docutils literal notranslate"><span clas
 <p>For this example, we’ll assume that the input genomes are in build GRCh37 and that
 they match the scoring file genome build.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>nextflow run pgscatalog/pgsc_calc <span class="se">\</span>
+    -profile &lt;docker/singularity/conda&gt; <span class="se">\</span>
     --input samplesheet.csv <span class="se">\</span>
     --accession PGS001229
 </pre></div>
 </div>
-<p>Congratulations, you’ve now (<cite>hopefully</cite>) calculated some scores! 🥳</p>
+<p>Congratulations, you’ve now (<cite>hopefully</cite>) calculated some scores!
+🥳</p>
 <p>After the workflow executes successfully, the calculated scores and a summary
 report should be available in the <code class="docutils literal notranslate"><span class="pre">results/make/</span></code> directory by default. If
 you’re interested in more information, see <a class="reference internal" href="how-to/interpret.html#interpret"><span class="std std-ref">How to interpret workflow output</span></a>.</p>
 <p>If the workflow didn’t execute successfully, have a look at the
-<a class="reference internal" href="explanation/troubleshooting.html#troubleshoot"><span class="std std-ref">Troubleshooting</span></a> section.</p>
+<a class="reference internal" href="explanation/troubleshooting.html#troubleshoot"><span class="std std-ref">Troubleshooting</span></a> section. Remember to replace <code class="docutils literal notranslate"><span class="pre">&lt;docker/singularity/conda&gt;</span></code>
+with the software you have installed on your computer, see <a class="reference internal" href="explanation/packaging.html#containers"><span class="std std-ref">Packaging bioinformatics software with containers</span></a> for
+a more detailed explanation.</p>
 </div>
 </div>
 </div>

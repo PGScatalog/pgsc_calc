@@ -299,6 +299,7 @@ the genome build of the new input genomes, see <a class="reference internal" hre
 <h2>3. Calculate!<a class="headerlink" href="#calculate" title="Permalink to this headline">¶</a></h2>
 <p>Set the path of the custom scoring file with the <code class="docutils literal notranslate"><span class="pre">--scorefile</span></code> parameter:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>nextflow run pgscatalog/pgscalc <span class="se">\</span>
+    -profile &lt;docker/singularity/conda&gt; <span class="se">\</span>
     --input samplesheet.csv <span class="se">\</span>
     --scorefile scorefile.txt
 </pre></div>

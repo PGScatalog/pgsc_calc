@@ -370,6 +370,7 @@ be unique.</p>
 <li><p>If you’re using multiple scores from the PGS Catalog:</p></li>
 </ul>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>nextflow run pgscatalog/pgscalc <span class="se">\</span>
+    -profile &lt;docker/singularity/conda&gt; <span class="se">\</span>
     --input samplesheet.csv <span class="se">\</span>
     --accession PGS001229,PGS001405
 </pre></div>
@@ -378,6 +379,7 @@ be unique.</p>
 <li><p>Or you might be using multiple scoring files in the same directory:</p></li>
 </ul>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>nextflow run pgscatalog/pgscalc <span class="se">\</span>
+    -profile &lt;docker/singularity/conda&gt; <span class="se">\</span>
     --input samplesheet.csv <span class="se">\</span>
     --scorefile <span class="s2">&quot;my_custom_scores/*.tsv&quot;</span>
 </pre></div>

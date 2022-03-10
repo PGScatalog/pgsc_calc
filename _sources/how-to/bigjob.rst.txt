@@ -11,7 +11,7 @@ Configuring pgsc_calc to use more resources locally
 ---------------------------------------------------
 
 If you have a powerful computer available locally, you can configure the amount
-of resources that the workflow uses.
+of resources that the workflow uses. 
 
 .. code-block:: text
 
@@ -84,6 +84,7 @@ instead:
     module load singularity-3.7.0-gcc-9.3.0-dp5ffrp
 
     nextflow run pgscatalog/pgsc_calc \
+        -profile singularity \
         --input samplesheet.csv \
         --accession PGS001229 \
         -c my_custom.config
