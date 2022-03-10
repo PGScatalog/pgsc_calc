@@ -278,34 +278,34 @@ too!</p>
 fallback</p></li>
 <li><p>Calculate some polygenic scores using synthetic test data:</p></li>
 </ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ nextflow run pgscatalog/pgsc_calc -profile test,docker
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>nextflow run pgscatalog/pgsc_calc -profile test,docker
 </pre></div>
 </div>
 <p>The workflow should output:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>... &lt;configuration messages intentionally not shown&gt; ...
-------------------------------------------------------
-If you use pgscatalog/pgsc_calc <span class="k">for</span> your analysis please cite:
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">... &lt;configuration messages intentionally not shown&gt; ...</span>
+<span class="go">------------------------------------------------------</span>
+<span class="go">If you use pgscatalog/pgsc_calc for your analysis please cite:</span>
 
-* The Polygenic Score Catalog
-  https://doi.org/10.1038/s41588-021-00783-5
+<span class="go">* The Polygenic Score Catalog</span>
+<span class="go">  https://doi.org/10.1038/s41588-021-00783-5</span>
 
-* The nf-core framework
-  https://doi.org/10.1038/s41587-020-0439-x
+<span class="go">* The nf-core framework</span>
+<span class="go">  https://doi.org/10.1038/s41587-020-0439-x</span>
 
-* Software dependencies
-  https://github.com/pgscatalog/pgsc_calc/blob/master/CITATIONS.md
-------------------------------------------------------
-executor &gt;  <span class="nb">local</span> <span class="o">(</span><span class="m">7</span><span class="o">)</span>
+<span class="go">* Software dependencies</span>
+<span class="go">  https://github.com/pgscatalog/pgsc_calc/blob/master/CITATIONS.md</span>
+<span class="go">------------------------------------------------------</span>
+<span class="go">executor &gt;  local (7)</span>
 
-<span class="o">[</span><span class="m">49</span>/d28766<span class="o">]</span> process &gt; PGSC_CALC:PGSCALC:INPUT_CHECK:SAMPLESHEET_JSON <span class="o">(</span>samplesheet.csv<span class="o">)</span>           <span class="o">[</span><span class="m">100</span>%<span class="o">]</span> <span class="m">1</span> of <span class="m">1</span> ✔
-<span class="o">[</span>c3/a8e0d9<span class="o">]</span> process &gt; PGSC_CALC:PGSCALC:INPUT_CHECK:SCOREFILE_CHECK                              <span class="o">[</span><span class="m">100</span>%<span class="o">]</span> <span class="m">1</span> of <span class="m">1</span> ✔
-<span class="o">[</span>-        <span class="o">]</span> process &gt; PGSC_CALC:PGSCALC:MAKE_COMPATIBLE:PLINK2_VCF                               -
-<span class="o">[</span>7c/5cca6c<span class="o">]</span> process &gt; PGSC_CALC:PGSCALC:MAKE_COMPATIBLE:PLINK2_BFILE <span class="o">(</span>cineca_synthetic_subset<span class="o">)</span>   <span class="o">[</span><span class="m">100</span>%<span class="o">]</span> <span class="m">1</span> of <span class="m">1</span> ✔
-<span class="o">[</span>3b/ce0e39<span class="o">]</span> process &gt; PGSC_CALC:PGSCALC:MAKE_COMPATIBLE:MATCH_VARIANTS <span class="o">(</span>cineca_synthetic_subset<span class="o">)</span> <span class="o">[</span><span class="m">100</span>%<span class="o">]</span> <span class="m">1</span> of <span class="m">1</span> ✔
-<span class="o">[</span>2e/fb3233<span class="o">]</span> process &gt; PGSC_CALC:PGSCALC:APPLY_SCORE:PLINK2_SCORE <span class="o">(</span>cineca_synthetic_subset<span class="o">)</span>       <span class="o">[</span><span class="m">100</span>%<span class="o">]</span> <span class="m">1</span> of <span class="m">1</span> ✔
-<span class="o">[</span>b5/fc5b1e<span class="o">]</span> process &gt; PGSC_CALC:PGSCALC:APPLY_SCORE:MAKE_REPORT <span class="o">(</span><span class="m">1</span><span class="o">)</span>                              <span class="o">[</span><span class="m">100</span>%<span class="o">]</span> <span class="m">1</span> of <span class="m">1</span> ✔
-<span class="o">[</span><span class="m">03</span>/009cb6<span class="o">]</span> process &gt; PGSC_CALC:PGSCALC:DUMPSOFTWAREVERSIONS <span class="o">(</span><span class="m">1</span><span class="o">)</span>                                 <span class="o">[</span><span class="m">100</span>%<span class="o">]</span> <span class="m">1</span> of <span class="m">1</span> ✔
--<span class="o">[</span>pgscatalog/pgsc_calc<span class="o">]</span> Pipeline completed successfully-
+<span class="go">[49/d28766] process &gt; PGSC_CALC:PGSCALC:INPUT_CHECK:SAMPLESHEET_JSON (samplesheet.csv)           [100%] 1 of 1 ✔</span>
+<span class="go">[c3/a8e0d9] process &gt; PGSC_CALC:PGSCALC:INPUT_CHECK:SCOREFILE_CHECK                              [100%] 1 of 1 ✔</span>
+<span class="go">[-        ] process &gt; PGSC_CALC:PGSCALC:MAKE_COMPATIBLE:PLINK2_VCF                               -</span>
+<span class="go">[7c/5cca6c] process &gt; PGSC_CALC:PGSCALC:MAKE_COMPATIBLE:PLINK2_BFILE (cineca_synthetic_subset)   [100%] 1 of 1 ✔</span>
+<span class="go">[3b/ce0e39] process &gt; PGSC_CALC:PGSCALC:MAKE_COMPATIBLE:MATCH_VARIANTS (cineca_synthetic_subset) [100%] 1 of 1 ✔</span>
+<span class="go">[2e/fb3233] process &gt; PGSC_CALC:PGSCALC:APPLY_SCORE:PLINK2_SCORE (cineca_synthetic_subset)       [100%] 1 of 1 ✔</span>
+<span class="go">[b5/fc5b1e] process &gt; PGSC_CALC:PGSCALC:APPLY_SCORE:MAKE_REPORT (1)                              [100%] 1 of 1 ✔</span>
+<span class="go">[03/009cb6] process &gt; PGSC_CALC:PGSCALC:DUMPSOFTWAREVERSIONS (1)                                 [100%] 1 of 1 ✔</span>
+<span class="go">-[pgscatalog/pgsc_calc] Pipeline completed successfully-</span>
 </pre></div>
 </div>
 <div class="admonition note">

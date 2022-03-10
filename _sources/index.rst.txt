@@ -18,13 +18,13 @@ Quick example
    fallback
 3. Calculate some polygenic scores using synthetic test data:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ nextflow run pgscatalog/pgsc_calc -profile test,docker
 
 The workflow should output:
 
-.. code-block:: bash
+.. code-block:: console
 
     ... <configuration messages intentionally not shown> ...
     ------------------------------------------------------

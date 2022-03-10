@@ -151,22 +151,27 @@
             </div>
             <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#">
+   Get started
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
   <a class="reference internal nav-link" href="#calculate-your-first-polygenic-scores">
    Calculate your first polygenic scores
   </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h2 nav-item toc-entry">
     <a class="reference internal nav-link" href="#samplesheet-setup">
      1. Samplesheet setup
     </a>
    </li>
-   <li class="toc-h3 nav-item toc-entry">
+   <li class="toc-h2 nav-item toc-entry">
     <a class="reference internal nav-link" href="#select-scoring-files">
      2. Select scoring files
     </a>
    </li>
-   <li class="toc-h3 nav-item toc-entry">
+   <li class="toc-h2 nav-item toc-entry">
     <a class="reference internal nav-link" href="#putting-it-all-together">
      3. Putting it all together
     </a>
@@ -193,22 +198,27 @@
                         </div>
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#">
+   Get started
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
   <a class="reference internal nav-link" href="#calculate-your-first-polygenic-scores">
    Calculate your first polygenic scores
   </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h2 nav-item toc-entry">
     <a class="reference internal nav-link" href="#samplesheet-setup">
      1. Samplesheet setup
     </a>
    </li>
-   <li class="toc-h3 nav-item toc-entry">
+   <li class="toc-h2 nav-item toc-entry">
     <a class="reference internal nav-link" href="#select-scoring-files">
      2. Select scoring files
     </a>
    </li>
-   <li class="toc-h3 nav-item toc-entry">
+   <li class="toc-h2 nav-item toc-entry">
     <a class="reference internal nav-link" href="#putting-it-all-together">
      3. Putting it all together
     </a>
@@ -283,14 +293,15 @@ workflow with bundled test data:</p>
 your computer (e.g., <code class="docutils literal notranslate"><span class="pre">docker</span></code>, <code class="docutils literal notranslate"><span class="pre">singularity</span></code>, or <code class="docutils literal notranslate"><span class="pre">conda</span></code>). These
 options are mutually exclusive!</p>
 </div>
+</div>
 <div class="section" id="calculate-your-first-polygenic-scores">
-<h2>Calculate your first polygenic scores<a class="headerlink" href="#calculate-your-first-polygenic-scores" title="Permalink to this headline">¶</a></h2>
+<h1>Calculate your first polygenic scores<a class="headerlink" href="#calculate-your-first-polygenic-scores" title="Permalink to this headline">¶</a></h1>
 <p>If you’ve completed the installation process that means you’ve already
 calculated some polygenic scores 😍 However, these scores were
 calculated from boring synthetic data. Let’s try calculating scores with your
 genomic data, which are probably sequenced from real people!</p>
 <div class="section" id="samplesheet-setup">
-<h3>1. Samplesheet setup<a class="headerlink" href="#samplesheet-setup" title="Permalink to this headline">¶</a></h3>
+<h2>1. Samplesheet setup<a class="headerlink" href="#samplesheet-setup" title="Permalink to this headline">¶</a></h2>
 <p>First, you need to describe the structure of your genomic data in a standardised
 way. To do this, set up a spreadsheet that looks like:</p>
 <table class="colwidths-given table" id="id2">
@@ -342,7 +353,7 @@ chromosomes in the same sample.</p></li>
 example template is <a class="reference external" href="https://github.com/PGScatalog/pgsc_calc/blob/master/assets/examples/example_data/bfile_samplesheet.csv">available here</a>.</p>
 </div>
 <div class="section" id="select-scoring-files">
-<h3>2. Select scoring files<a class="headerlink" href="#select-scoring-files" title="Permalink to this headline">¶</a></h3>
+<h2>2. Select scoring files<a class="headerlink" href="#select-scoring-files" title="Permalink to this headline">¶</a></h2>
 <p>pgsc_calc makes it simple to work with polygenic scores that have been published
 in the PGS Catalog. You can specify one or more scores using the <code class="docutils literal notranslate"><span class="pre">--accession</span></code>
 parameter:</p>
@@ -362,7 +373,7 @@ the scoring files with the <code class="docutils literal notranslate"><span clas
 <code class="docutils literal notranslate"><span class="pre">GRCh37</span></code>. See <a class="reference internal" href="how-to/liftover.html#liftover"><span class="std std-ref">How to liftover scoring files to match your input genome build</span></a> for more information.</p>
 </div>
 <div class="section" id="putting-it-all-together">
-<h3>3. Putting it all together<a class="headerlink" href="#putting-it-all-together" title="Permalink to this headline">¶</a></h3>
+<h2>3. Putting it all together<a class="headerlink" href="#putting-it-all-together" title="Permalink to this headline">¶</a></h2>
 <p>For this example, we’ll assume that the input genomes are in build GRCh37 and that
 they match the scoring file genome build.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>nextflow run pgscatalog/pgsc_calc <span class="se">\</span>
@@ -380,7 +391,6 @@ you’re interested in more information, see <a class="reference internal" href=
 <a class="reference internal" href="explanation/troubleshooting.html#troubleshoot"><span class="std std-ref">Troubleshooting</span></a> section. Remember to replace <code class="docutils literal notranslate"><span class="pre">&lt;docker/singularity/conda&gt;</span></code>
 with the software you have installed on your computer, see <a class="reference internal" href="explanation/packaging.html#containers"><span class="std std-ref">Packaging bioinformatics software with containers</span></a> for
 a more detailed explanation.</p>
-</div>
 </div>
 </div>
 
