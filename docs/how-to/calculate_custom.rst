@@ -83,6 +83,7 @@ Set the path of the custom scoring file with the ``--scorefile`` parameter:
 .. code-block:: console
 
     $ nextflow run pgscatalog/pgscalc \
+        -profile <docker/singularity/conda> \    
         --input samplesheet.csv \
         --scorefile scorefile.txt
 
