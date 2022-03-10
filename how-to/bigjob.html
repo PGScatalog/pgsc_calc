@@ -221,31 +221,28 @@ these types of systems.</p>
 <h2>Configuring pgsc_calc to use more resources locally<a class="headerlink" href="#configuring-pgsc-calc-to-use-more-resources-locally" title="Permalink to this headline">¶</a></h2>
 <p>If you have a powerful computer available locally, you can configure the amount
 of resources that the workflow uses.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>params {
-    max_memory = 36.GB
-    max_cpus = 8
-    max_time = 12.h
-}
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>process {
+    executor = &#39;local&#39;
 
-process {
     withLabel:process_low {
-        cpus   = { check_max( 2     * task.attempt, &#39;cpus&#39;    ) }
-        memory = { check_max( 12.GB * task.attempt, &#39;memory&#39;  ) }
-        time   = { check_max( 4.h   * task.attempt, &#39;time&#39;    ) }
+        cpus   = 2
+        memory = 8.GB
+        time   = 1.h
     }
     withLabel:process_medium {
-        cpus   = { check_max( 6     * task.attempt, &#39;cpus&#39;    ) }
-        memory = { check_max( 36.GB * task.attempt, &#39;memory&#39;  ) }
-        time   = { check_max( 8.h   * task.attempt, &#39;time&#39;    ) }
+        cpus   = 8
+        memory = 64.GB
+        time   = 4.h
     }
 }
 </pre></div>
 </div>
 <p>You should change <code class="docutils literal notranslate"><span class="pre">cpus</span></code>, <code class="docutils literal notranslate"><span class="pre">memory</span></code>, and <code class="docutils literal notranslate"><span class="pre">time</span></code> to match the amount of
-resources used (don’t forget to change <code class="docutils literal notranslate"><span class="pre">max</span></code> in the params block too).</p>
-<p>Assuming the configuration file you set up is saved as <code class="docutils literal notranslate"><span class="pre">my_custom.config</span></code> in
-your current working directory, you’re ready to run pgsc_calc:</p>
+resources used. Assuming the configuration file you set up is saved as
+<code class="docutils literal notranslate"><span class="pre">my_custom.config</span></code> in your current working directory, you’re ready to run
+pgsc_calc:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>nextflow run pgscatalog/pgsc_calc <span class="se">\</span>
+    -profile &lt;docker/singularity/conda&gt; <span class="se">\</span>
     --input samplesheet.csv <span class="se">\</span>
     --accession PGS001229 <span class="se">\</span>
     -c my_custom.config
@@ -255,44 +252,54 @@ your current working directory, you’re ready to run pgsc_calc:</p>
 <div class="section" id="high-performance-computing-cluster">
 <h2>High performance computing cluster<a class="headerlink" href="#high-performance-computing-cluster" title="Permalink to this headline">¶</a></h2>
 <p>If you have access to a HPC cluster, you’ll need to configure your cluster’s
-unique parameters to set correct queues, user accounts, and resource limits:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>params {
-    max_memory = 36.GB
-    max_cpus = 8
-    max_time = 12.h
-}
-
-process {
-    executor = &#39;slurm&#39;
-    queue = &#39;standard&#39;
+unique parameters to set correct queues, user accounts, and resource
+limits. Here’s an example for an LSF cluster:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>process {
+    executor = &#39;lsf&#39;
+    queue = &#39;short&#39;
     clusterOptions = &#39;&#39;
 
     withLabel:process_low {
-        cpus   = { check_max( 2     * task.attempt, &#39;cpus&#39;    ) }
-        memory = { check_max( 12.GB * task.attempt, &#39;memory&#39;  ) }
-        time   = { check_max( 4.h   * task.attempt, &#39;time&#39;    ) }
+        cpus   = 2
+        memory = 8.GB
+        time   = 1.h
     }
     withLabel:process_medium {
-        cpus   = { check_max( 6     * task.attempt, &#39;cpus&#39;    ) }
-        memory = { check_max( 36.GB * task.attempt, &#39;memory&#39;  ) }
-        time   = { check_max( 8.h   * task.attempt, &#39;time&#39;    ) }
+        cpus   = 8
+        memory = 64.GB
+        time   = 4.h
     }
 }
 </pre></div>
 </div>
-<p>In SLURM, queue is equivalent to a partition. Nextflow can support other
-executors like <a class="reference external" href="https://nextflow.io/docs/latest/executor.html#slurm">LSF and PBS</a>. Other cluster parameters can be provided by
-modifying <code class="docutils literal notranslate"><span class="pre">clusterOptions</span></code>. You should change <code class="docutils literal notranslate"><span class="pre">cpus</span></code>, <code class="docutils literal notranslate"><span class="pre">memory</span></code>, and
-<code class="docutils literal notranslate"><span class="pre">time</span></code> to match the amount of resources used (don’t forget to change <code class="docutils literal notranslate"><span class="pre">max</span></code>
-in the params block too).</p>
-<p>Assuming the configuration file you set up is saved as <code class="docutils literal notranslate"><span class="pre">my_custom.config</span></code> in
-your current working directory, you’re ready to run pgsc_calc:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>nextflow run pgscatalog/pgsc_calc <span class="se">\</span>
+<p>In SLURM, queue is equivalent to a partition. Specific cluster parameters can be
+provided by modifying <code class="docutils literal notranslate"><span class="pre">clusterOptions</span></code>. You should change <code class="docutils literal notranslate"><span class="pre">cpus</span></code>,
+<code class="docutils literal notranslate"><span class="pre">memory</span></code>, and <code class="docutils literal notranslate"><span class="pre">time</span></code> to match the amount of resources used. Assuming the
+configuration file you set up is saved as <code class="docutils literal notranslate"><span class="pre">my_custom.config</span></code> in your current
+working directory, you’re ready to run pgsc_calc. Instead of running nextflow
+directly on the shell, save a bash script (<code class="docutils literal notranslate"><span class="pre">run_pgscalc.sh</span></code>) to a file
+instead:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">NXF_ANSI_LOG</span><span class="o">=</span><span class="nb">false</span>
+module load nextflow-21.10.6-gcc-9.3.0-tkuemwd
+module load singularity-3.7.0-gcc-9.3.0-dp5ffrp
+
+nextflow run pgscatalog/pgsc_calc <span class="se">\</span>
     --input samplesheet.csv <span class="se">\</span>
     --accession PGS001229 <span class="se">\</span>
     -c my_custom.config
 </pre></div>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The name of the nextflow and singularity modules will be different in
+your local environment</p>
+</div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>bsub -M 2GB -q short -o output.txt &lt; run_pgscalc.sh
+</pre></div>
+</div>
+<p>This will submit a nextflow driver job, which will submit additional jobs for
+each process in the workflow. The nextflow driver requires up to 4GB of RAM
+(bsub’s <code class="docutils literal notranslate"><span class="pre">-M</span></code> parameter) and 2 CPUs to use (see a guide for <a class="reference external" href="https://www.nextflow.io/blog/2021/5_tips_for_hpc_users.html">HPC users</a> here).</p>
 </div>
 <div class="section" id="other-environments">
 <h2>Other environments<a class="headerlink" href="#other-environments" title="Permalink to this headline">¶</a></h2>
