@@ -17,7 +17,7 @@ for (param in checkPathParamList) {
 }
 
 // Check mandatory parameters
-ch_input = file(params.input, checkIfExists: true)
+ch_input = Channel.fromPath(params.input, checkIfExists: true)
 
 // Set up scorefile channels ---------------------------------------------------
 // scorefile accessions MUST be unique: they're used as keys for combining
@@ -32,7 +32,7 @@ scorefiles
     .join(scorefiles)
     .set { unique_scorefiles }
 
-Channel.fromList(params.accession?.tokenize(','))
+Channel.fromList(params.accession?.replaceAll('\\s','')?.tokenize(','))
     .unique() // tokenize to ensure unique
     .collect()
     .map { it.join(',') } // join again for calling API
