@@ -14,6 +14,7 @@ process PGSCATALOG_GET {
     output:
     tuple val(accession), path("PGS*.txt.gz"), emit: scorefiles
     path "versions.yml"                      , emit: versions
+    path "PGS*.txt.gz" // for publishDir
 
     script:
     """

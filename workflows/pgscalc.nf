@@ -25,7 +25,7 @@ unique_scorefiles = Channel.empty()
 unique_accessions = Channel.empty()
 
 if (params.scorefile) {
-    Channel.fromPath(params.scorefile)
+    Channel.fromPath(params.scorefile, checkIfExists: true)
         .map { [[accession: it.getBaseName()], it ] }
         .set { scorefiles }
 

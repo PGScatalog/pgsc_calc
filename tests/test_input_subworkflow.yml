@@ -14,6 +14,7 @@
     - subworkflow    
     - pgscatalog
   files:
+    - path: results/pgscatalog/PGS001229.txt.gz
     - path: results/samplesheet/out.json
     - path: results/scorefile/scorefiles.pkl
       
@@ -24,5 +25,7 @@
     - subworkflow    
     - pgscatalog
   files:
+    - path: results/pgscatalog/PGS000802.txt.gz
+    - path: results/pgscatalog/PGS001229.txt.gz    
     - path: results/samplesheet/out.json
     - path: results/scorefile/scorefiles.pkl
