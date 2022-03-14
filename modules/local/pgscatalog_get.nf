@@ -12,8 +12,8 @@ process PGSCATALOG_GET {
     val(accession)
 
     output:
-    tuple val(accession), path("PGS*.txt"), emit: scorefiles
-    path "versions.yml"                   , emit: versions
+    tuple val(accession), path("PGS*.txt.gz"), emit: scorefiles
+    path "versions.yml"                      , emit: versions
 
     script:
     """
@@ -30,8 +30,6 @@ process PGSCATALOG_GET {
     jq '[.results][][].ftp_scoring_file' response.json | sed 's/https:\\/\\///' > urls.txt
 
     cat urls.txt | xargs -n 1 wget -T 5
-
-    gunzip *.txt.gz
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

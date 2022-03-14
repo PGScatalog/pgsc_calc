@@ -20,23 +20,29 @@ for (param in checkPathParamList) {
 ch_input = Channel.fromPath(params.input, checkIfExists: true)
 
 // Set up scorefile channels ---------------------------------------------------
-// scorefile accessions MUST be unique: they're used as keys for combining
-// multiple scorefiles
-Channel.fromPath(params.scorefile)
-    .map { [[accession: it.getBaseName()], it ] }
-    .set { scorefiles }
 
-scorefiles
-    .map { it.take(1) }
-    .unique()
-    .join(scorefiles)
-    .set { unique_scorefiles }
+unique_scorefiles = Channel.empty()
+unique_accessions = Channel.empty()
 
-Channel.fromList(params.accession?.replaceAll('\\s','')?.tokenize(','))
-    .unique() // tokenize to ensure unique
-    .collect()
-    .map { it.join(',') } // join again for calling API
-    .set { unique_accessions }
+if (params.scorefile) {
+    Channel.fromPath(params.scorefile)
+        .map { [[accession: it.getBaseName()], it ] }
+        .set { scorefiles }
+
+    scorefiles
+        .map { it.take(1) }
+        .unique()
+        .join(scorefiles)
+        .set { unique_scorefiles }
+}
+
+if (params.accession) {
+    Channel.fromList(params.accession.replaceAll('\\s','').tokenize(','))
+        .unique() // tokenize to ensure unique
+        .collect()
+        .map { it.join(',') } // join again for calling API
+        .set { unique_accessions }
+}
 
 // Don't check existence of optional parameters
 allelic_freq = file(params.allelic_freq)
