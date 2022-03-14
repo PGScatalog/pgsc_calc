@@ -296,35 +296,35 @@ your genomic data, you’ll need to set some additional parameters (see
 <p>You might have set up multiple custom scorefiles (see <a class="reference internal" href="calculate_custom.html#calculate-custom"><span class="std std-ref">How to use a custom scoring file</span></a>). The <code class="docutils literal notranslate"><span class="pre">--scorefile</span></code> parameter supports multiple scorefile paths by
 using star characters (<code class="docutils literal notranslate"><span class="pre">*</span></code>). If your custom scorefiles are in the
 directory <code class="docutils literal notranslate"><span class="pre">my_custom_scores/</span></code>:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">--scorefile &quot;my_custom_scores/*.tsv&quot;</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">--scorefile &quot;my_custom_scores/*.txt&quot;</span>
 </pre></div>
 </div>
-<p>Assuming your scorefiles all have a <code class="docutils literal notranslate"><span class="pre">.tsv</span></code> extension. This will match <strong>all</strong>
-files ending with <code class="docutils literal notranslate"><span class="pre">.tsv</span></code>, so be careful not to include other text files that
+<p>Assuming your scorefiles all have a <code class="docutils literal notranslate"><span class="pre">.txt</span></code> extension. This will match <strong>all</strong>
+files ending with <code class="docutils literal notranslate"><span class="pre">.txt</span></code>, so be careful not to include other text files that
 may match the pattern.</p>
 <p>Two stars (<code class="docutils literal notranslate"><span class="pre">**</span></code>) will match across multiple directories. This can be useful if
 your scoring files have a structure like:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>tree diabetes/
 <span class="go">diabetes/</span>
 <span class="go">├── type1</span>
-<span class="go">│   └── type1.tsv</span>
+<span class="go">│   └── type1.txt</span>
 <span class="go">└── type2</span>
-<span class="go">    └── type2.tsv</span>
+<span class="go">    └── type2.txt</span>
 
 <span class="go">2 directories, 2 files</span>
 </pre></div>
 </div>
 <p>In this case, using two stars with the scorefile parameter can be helpful:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">--scorefile &quot;diabetes/**.tsv&quot;</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">--scorefile &quot;diabetes/**.txt&quot;</span>
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <ul class="simple">
 <li><p>Custom scorefiles <strong>must</strong> have unique filenames</p></li>
-<li><p>The basename of each file (e.g. <code class="docutils literal notranslate"><span class="pre">type1.tsv</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">type1</span></code>) is used
+<li><p>The basename of each file (e.g. <code class="docutils literal notranslate"><span class="pre">type1.txt</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">type1</span></code>) is used
 to label the score in the workflow output</p></li>
-<li><p>Quotes around stars (<code class="docutils literal notranslate"><span class="pre">&quot;*.tsv&quot;</span></code>) are important for matching to work as expected</p></li>
+<li><p>Quotes around stars (<code class="docutils literal notranslate"><span class="pre">&quot;*.txt&quot;</span></code>) are important for matching to work as expected</p></li>
 </ul>
 </div>
 <div class="section" id="setting-multiple-scores-in-one-custom-scoring-file">
@@ -381,7 +381,7 @@ be unique.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>nextflow run pgscatalog/pgscalc <span class="se">\</span>
     -profile &lt;docker/singularity/conda&gt; <span class="se">\</span>
     --input samplesheet.csv <span class="se">\</span>
-    --scorefile <span class="s2">&quot;my_custom_scores/*.tsv&quot;</span>
+    --scorefile <span class="s2">&quot;my_custom_scores/*.txt&quot;</span>
 </pre></div>
 </div>
 <p>Congratulations, you’ve now calculated multiple scores in parallel!

@@ -57,10 +57,11 @@ Setup your scorefile in a spreadsheet with the following format:
      - A
      - 0.01045457
 
-Save the file as ``scorefile.tsv``. Column names are defined in the PGS Catalog
-`scoring file format v2.0`_.  The file should be in tab separated values (TSV)
-format. Example `scorefile templates`_ are available in the calculator
-repository.
+Save the file as ``scorefile.txt``. The file should be in tab separated values
+(TSV) format. Scorefiles can be compressed with gzip if you would like to save
+storage space (e.g. ``scorefile.txt.gz``). Column names are defined in the PGS
+Catalog `scoring file format v2.0`_. Example `scorefile templates`_ are
+available in the calculator repository.
 
 This how to guide describes a simple scoring file. More complicated scoring
 files need extra work:

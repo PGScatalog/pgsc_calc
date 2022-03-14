@@ -295,6 +295,11 @@ nextflow run pgscatalog/pgsc_calc <span class="se">\</span>
 <p>The name of the nextflow and singularity modules will be different in
 your local environment</p>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Your institution may already have <a class="reference external" href="https://github.com/nf-core/configs">a nextflow profile</a>, which can be
+used instead of setting up a custom config using <code class="docutils literal notranslate"><span class="pre">-c</span></code></p>
+</div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>bsub -M 2GB -q short -o output.txt &lt; run_pgscalc.sh
 </pre></div>
 </div>
