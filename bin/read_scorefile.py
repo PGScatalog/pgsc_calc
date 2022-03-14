@@ -7,6 +7,8 @@ import os.path
 import sys
 import pickle
 import re
+import gzip
+import io
 from functools import reduce
 from pyliftover import LiftOver
 
@@ -184,22 +186,29 @@ def liftover_stats(df_dict, accession, min_lift):
     assert n_mapped / total > min_lift
 
 def read_build(path):
+    ''' Open scorefiles and automatically handle compressed input '''
+    try:
+        with io.TextIOWrapper(io.BufferedReader(gzip.open(path, 'r'))) as f:
+            return read_header(f)
+    except gzip.BadGzipFile:
+        with open(path, 'r') as f:
+            return read_header(f)
+
+def read_header(f):
     ''' Extract genome build of scorefile from PGS Catalog header format '''
     build_dict = {'GRCh37':'hg19', 'GRCh38':'hg38', 'hg19':'hg19', 'hg38':'hg38'}
-
-    with open(path, 'r') as f:
-        for line in f:
-            if re.search("^#genome_build", line):
-                # get #genome_build=GRCh37 from header
-                header = line.replace('\n', '').replace('#', '').split('=')
-                # and remap to liftover style
-                try:
-                    return build_dict[header[-1]]
-                except KeyError:
-                    return None # bad genome build
-            elif (line[0] != '#'):
-                # genome build isn't set in header :( stop the loop and cry
-                return None
+    for line in f:
+        if re.search("^#genome_build", line):
+            # get #genome_build=GRCh37 from header
+            header = line.replace('\n', '').replace('#', '').split('=')
+            # and remap to liftover style
+            try:
+                return build_dict[header[-1]]
+            except KeyError:
+                return None # bad genome build
+        elif (line[0] != '#'):
+            # genome build isn't set in header :( stop the loop and cry
+            return None
 
 def get_accession(path):
     ''' Return the basename of a scoring file without extension '''
