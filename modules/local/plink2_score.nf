@@ -19,6 +19,7 @@ process PLINK2_SCORE {
     script:
     def args = task.ext.args ?: ''
     def args2 = task.ext.args2 ?: ''
+    def mem_mb = task.memory.toMega() // plink is greedy
 
     // custom args
     def allelic_freq = optional_AF.name != 'NO_FILE' ? "--read-freq $optional_AF" : ''
@@ -35,6 +36,8 @@ process PLINK2_SCORE {
     if (scoremeta.n_scores == 1)
         """
         plink2 \\
+            --threads $task.cpus \\
+            --memory $mem_mb \\
             $args \\
             --score $scorefile $args2 \\
             --pfile ${pgen.baseName} \\
@@ -48,6 +51,8 @@ process PLINK2_SCORE {
     else if (scoremeta.n_scores > 1)
         """
         plink2 \\
+            --threads $task.cpus \\
+            --memory $mem_mb \\
             $args \\
             --score $scorefile $args2 \\
             --score-col-nums 3-$maxcol \\
