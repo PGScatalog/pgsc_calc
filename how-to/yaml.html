@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>How to start the workflow with an API call &#8212; Polygenic Score (PGS) Catalog Calculator  documentation</title>
+    <title>How to set parameters in a file &#8212; Polygenic Score (PGS) Catalog Calculator  documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -121,7 +121,7 @@
         <!-- ipynb file if we had a myst markdown file -->
         
         <!-- Download raw file -->
-        <a class="dropdown-buttons" href="../_sources/how-to/api.rst.txt"><button type="button"
+        <a class="dropdown-buttons" href="../_sources/how-to/yaml.rst.txt"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
                 data-placement="left">.rst</button></a>
         <!-- Download PDF via print -->
@@ -146,6 +146,24 @@
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#make-yaml-file">
+   Make YAML file
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#run-pgsc-calc-with-yaml-file">
+   Run pgsc_calc with YAML file
+  </a>
+ </li>
+</ul>
+
+            </nav>
         </div>
     </div>
 </div>
@@ -153,19 +171,67 @@
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>How to start the workflow with an API call</h1>
+                <h1>How to set parameters in a file</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
                         
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#make-yaml-file">
+   Make YAML file
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#run-pgsc-calc-with-yaml-file">
+   Run pgsc_calc with YAML file
+  </a>
+ </li>
+</ul>
+
+                        </nav>
                     </div>
                 </div>
             </div>
             
               <div>
                 
-  <div class="section" id="how-to-start-the-workflow-with-an-api-call">
-<h1>How to start the workflow with an API call<a class="headerlink" href="#how-to-start-the-workflow-with-an-api-call" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="how-to-set-parameters-in-a-file">
+<h1>How to set parameters in a file<a class="headerlink" href="#how-to-set-parameters-in-a-file" title="Permalink to this headline">¶</a></h1>
+<p>It can be useful to store workflow parameters in a file if you’re running
+complex jobs or you want to keep track of exactly what type of analysis you did.</p>
+<div class="section" id="make-yaml-file">
+<h2>Make YAML file<a class="headerlink" href="#make-yaml-file" title="Permalink to this headline">¶</a></h2>
+<p>Parameters can be stored in YAML format, for example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">path/to/samplesheet.csv</span><span class="w"></span>
+<span class="nt">accession</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;PGS001229,PGS000018&#39;</span><span class="w"></span>
+<span class="nt">liftover</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<span class="nt">target_build</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GRCh37</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Save this file as <code class="docutils literal notranslate"><span class="pre">my_example_params.yaml</span></code>. An <a class="reference external" href="https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/params.yaml">example template</a> used in
+pgsc_calc’s test suite is also available (see <span class="xref std std-ref">testing</span> for an explanation
+of the test suite).</p>
+</div>
+<div class="section" id="run-pgsc-calc-with-yaml-file">
+<h2>Run pgsc_calc with YAML file<a class="headerlink" href="#run-pgsc-calc-with-yaml-file" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>nextflow run pgscatalog/pgsc_calc <span class="se">\</span>
+    -profile &lt;conda/docker/singularity&gt; <span class="se">\</span>
+    -params-file my_example_params.yaml
+</pre></div>
+</div>
+<p>The workflow will now run with the parameters you set up in YAML. See
+<a class="reference internal" href="../reference/params.html#param-ref"><span class="std std-ref">Parameter reference</span></a> for a full description of parameters you can set.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you prefer JSON, you can <a class="reference external" href="https://jsonformatter.org/yaml-to-json">convert the YAML to JSON</a> and it should work
+fine</p>
+</div>
+</div>
 </div>
 
 
