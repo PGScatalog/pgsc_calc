@@ -7,4 +7,5 @@ Reference guides
    :maxdepth: 1
 
    input
-   api
+   params
+   api   
