@@ -1,29 +1,29 @@
 - name: test make compatible subworkflow
-  command: nextflow run main.nf -profile test,docker --only_compatible
+  command: nextflow run main.nf -profile test --only_compatible -c ./tests/config/nextflow.config
   tags:
     - makecompatible
     - subworkflow
   files:
-    - path: results/samplesheet/out.json
-    - path: results/scorefile/scorefiles.pkl
-    - path: results/plink2/cineca_synthetic_subset_22.pgen      
-    - path: results/plink2/cineca_synthetic_subset_22.psam
-    - path: results/plink2/cineca_synthetic_subset_22.pvar            
-    - path: results/match/22_additive_0.scorefile
-    - path: results/match/match_variants.db
-    - path: results/match/report.csv      
+    - path: output/samplesheet/out.json
+    - path: output/scorefile/scorefiles.pkl
+    - path: output/plink2/cineca_synthetic_subset_22.pgen      
+    - path: output/plink2/cineca_synthetic_subset_22.psam
+    - path: output/plink2/cineca_synthetic_subset_22.pvar            
+    - path: output/match/22_additive_0.scorefile
+    - path: output/match/match_variants.db
+    - path: output/match/report.csv      
 
 - name: test make compatible subworkflow with vcf
-  command: nextflow run main.nf -profile test,docker --input "https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/samplesheet_vcf.csv" --only_compatible
+  command: nextflow run main.nf -profile test --input "https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/samplesheet_vcf.csv" --only_compatible  -c ./tests/config/nextflow.config
   tags:
     - inputcheck
     - vcf  
   files:
-    - path: results/samplesheet/out.json
-    - path: results/scorefile/scorefiles.pkl
-    - path: results/plink2/cineca_synthetic_subset_22.pgen      
-    - path: results/plink2/cineca_synthetic_subset_22.psam
-    - path: results/plink2/cineca_synthetic_subset_22.pvar            
-    - path: results/match/22_additive_0.scorefile
-    - path: results/match/match_variants.db
-    - path: results/match/report.csv
+    - path: output/samplesheet/out.json
+    - path: output/scorefile/scorefiles.pkl
+    - path: output/plink2/cineca_synthetic_subset_22.pgen      
+    - path: output/plink2/cineca_synthetic_subset_22.psam
+    - path: output/plink2/cineca_synthetic_subset_22.pvar            
+    - path: output/match/22_additive_0.scorefile
+    - path: output/match/match_variants.db
+    - path: output/match/report.csv
