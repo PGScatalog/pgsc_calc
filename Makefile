@@ -17,7 +17,7 @@ pytest:
 	PROFILE=docker pytest --kwdof
 
 clean: ## Clean temporary files
-	rm -rf ./work ./results ./__pycache__ ./.nextflow.* ./.pytest_cache
+	rm -rf ./work ./results ./__pycache__ ./.nextflow.* ./.pytest_cache ./output
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

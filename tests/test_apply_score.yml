@@ -1,16 +1,16 @@
 - name: test apply score subworkflow
-  command: nextflow run main.nf -profile test,docker --only_score
+  command: nextflow run main.nf -profile test --only_score -c ./tests/config/nextflow.config
   tags:
     - applyscore
     - subworkflow
   files:
-    - path: results/samplesheet/out.json
-    - path: results/scorefile/scorefiles.pkl
-    - path: results/plink2/cineca_synthetic_subset_22.pgen
-    - path: results/plink2/cineca_synthetic_subset_22.psam
-    - path: results/plink2/cineca_synthetic_subset_22.pvar
-    - path: results/match/22_additive_0.scorefile
-    - path: results/match/match_variants.db
-    - path: results/match/report.csv
-    - path: results/make/aggregated_scores.txt
-    - path: results/make/report.html
+    - path: output/samplesheet/out.json
+    - path: output/scorefile/scorefiles.pkl
+    - path: output/plink2/cineca_synthetic_subset_22.pgen
+    - path: output/plink2/cineca_synthetic_subset_22.psam
+    - path: output/plink2/cineca_synthetic_subset_22.pvar
+    - path: output/match/22_additive_0.scorefile
+    - path: output/match/match_variants.db
+    - path: output/match/report.csv
+    - path: output/make/aggregated_scores.txt
+    - path: output/make/report.html
