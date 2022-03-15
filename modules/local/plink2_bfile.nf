@@ -1,6 +1,6 @@
 process PLINK2_BFILE {
     tag "$meta.id"
-    label 'process_low'
+    label 'process_low_long'
 
     conda (params.enable_conda ? "bioconda::plink2=2.00a2.3" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
