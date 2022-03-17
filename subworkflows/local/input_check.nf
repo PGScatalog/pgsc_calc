@@ -12,6 +12,17 @@ workflow INPUT_CHECK {
     scorefile // flat list of paths
 
     main:
+    /* all genomic data should be represented as a list of : [[meta], file]
+
+       meta hashmap structure:
+        id: experiment label, possibly shared across split genomic files
+        is_vcf: boolean, is in variant call format
+        is_bfile: boolean, is in PLINK1 fileset format
+        is_pfile: boolean, is in PLINK2 fileset format
+        chrom: The chromosome associated with the file. If multiple chroms, null.
+        n_chrom: Total separate chromosome files per experiment ID
+     */
+
     ch_versions = Channel.empty()
 
     if (format.equals("csv")) {
@@ -23,7 +34,8 @@ workflow INPUT_CHECK {
             .buffer ( size: 2 )
             .branch {
                 vcf: it[0].is_vcf
-                bfile: !it[0].is_vcf
+                bfile: it[0].is_bfile
+                pfile: it[0].is_pfile
             }
             .set { ch_input }
     } else if (format.equals("json")) {
@@ -33,7 +45,8 @@ workflow INPUT_CHECK {
             .buffer( size: 2 )
             .branch {
                 vcf: it[0].is_vcf
-                bfile: !it[0].is_vcf
+                bfile: it[0].is_bfile
+                pfile: it[0].is_pfile
             }
             .set { ch_input }
     }
@@ -47,17 +60,30 @@ workflow INPUT_CHECK {
     }
         .set { ch_bfiles }
 
+    ch_input.pfile.multiMap { it ->
+        pgen: [it[0], it[1][0]]
+        psam: [it[0], it[1][1]]
+        pvar: [it[0], it[1][2]]
+    }
+        .set { ch_pfiles }
+
     SCOREFILE_CHECK ( scorefile )
 
-    ch_versions = ch_versions.mix(SCOREFILE_CHECK.out.versions)
+    versions = ch_versions.mix(SCOREFILE_CHECK.out.versions)
+
+    ch_bfiles.bed.mix(ch_pfiles.pgen).dump(tag: 'input').set { geno }
+    ch_bfiles.bim.mix(ch_pfiles.pvar).dump(tag: 'input').set { var }
+    ch_bfiles.fam.mix(ch_pfiles.psam).dump(tag: 'input').set { pheno }
+    ch_input.vcf.dump(tag: 'input').set{vcf}
+    SCOREFILE_CHECK.out.scorefiles.dump(tag: 'input').set{ scorefiles }
 
     emit:
-    bed = ch_bfiles.bed
-    bim = ch_bfiles.bim
-    fam = ch_bfiles.fam
-    vcf = ch_input.vcf
-    scorefiles = SCOREFILE_CHECK.out.scorefiles
-    versions = ch_versions
+    bed = geno
+    bim = var
+    fam = pheno
+    vcf
+    scorefiles
+    versions
 }
 
 def json_slurp(Path input) {
@@ -69,21 +95,30 @@ def json_slurp(Path input) {
 
 def json_to_genome(HashMap slurped) {
     // parse slurped JSON into [[meta], [path_to_target_genome]]
-    def meta    = [:]
-    meta.id     = slurped.sample
-    meta.is_vcf = slurped.vcf_path ? true : false
-    meta.chrom  = slurped.chrom? slurped.chrom.toInteger() : false
+    def meta      = [:]
+
+    meta.id       = slurped.sample
+    meta.is_vcf   = slurped.vcf_path ? true : false
+    meta.is_bfile = slurped.bed ? true : false
+    meta.is_pfile = slurped.pgen ? true : false
+    meta.chrom    = slurped.chrom? slurped.chrom.toInteger() : false
 
     def genome_lst = []
 
     if (meta.is_vcf) {
         vcf_path   = file(slurped.vcf_path, checkIfExists: true)
         genome_lst = [ meta, [ vcf_path ] ]
-    } else {
+    } else if (meta.is_bfile) {
         bed        = file(slurped.bed, checkIfExists: true)
         bim        = file(slurped.bim, checkIfExists: true)
         fam        = file(slurped.fam, checkIfExists: true)
         genome_lst = [ meta, [ bed, bim, fam ] ]
+    } else if (meta.is_pfile) {
+        pgen       = file(slurped.pgen, checkIfExists: true)
+        psam       = file(slurped.psam, checkIfExists: true)
+        pvar       = file(slurped.pvar, checkIfExists: true)
+        genome_lst = [ meta, [ pgen, psam, pvar ] ]
+
     }
     return genome_lst
 }
