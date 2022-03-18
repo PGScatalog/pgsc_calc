@@ -16,9 +16,6 @@ process PLINK2_VCF {
     tuple val(meta), path("*.pvar"), emit: pvar
     path "versions.yml"            , emit: versions
 
-    when:
-    task.ext.when == null || task.ext.when
-
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
@@ -27,6 +24,7 @@ process PLINK2_VCF {
     plink2 \\
         --threads $task.cpus \\
         --memory $mem_mb \\
+        --set-all-var-ids '@:#:\$r:\$a' \\
         $args \\
         --vcf $vcf \\
         --make-pgen \\

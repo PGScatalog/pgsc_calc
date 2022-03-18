@@ -7,12 +7,11 @@ include { MAKE_REPORT    } from '../../modules/local/make_report'
 
 workflow APPLY_SCORE {
     take:
-    pgen // [[id: 1, is_vcf: true, chrom: 21], path(pgen)]
-    psam // [[id: 1, is_vcf: true, chrom: 21], path(pvar)]
-    pvar // [[id: 1, is_vcf: true, chrom: 21], path(pvar)]
-    scorefiles // [[id: 1], path(scorefiles)]
-    allelic_freq
-    db // match_variants db
+    geno
+    pheno
+    variants
+    scorefiles
+    db // TO DO: improve database..
 
     main:
     ch_versions = Channel.empty()
@@ -23,8 +22,8 @@ workflow APPLY_SCORE {
         .set { annotated_scorefiles }
 
     // intersect genomic data with split scoring files -------------------------
-    pgen
-        .mix(psam, pvar)
+    geno
+        .mix(pheno, variants)
         .groupTuple(size: 3, sort: true) // sorting is important for annotate_genomic
         .map { annotate_genomic(it) }
         .dump( tag: 'final_genomes')
@@ -33,8 +32,7 @@ workflow APPLY_SCORE {
         .dump(tag: 'ready_to_score')
         .set { ch_apply }
 
-
-    PLINK2_SCORE ( ch_apply, allelic_freq )
+    PLINK2_SCORE ( ch_apply )
 
     ch_versions = ch_versions.mix(PLINK2_SCORE.out.versions.first())
 
@@ -52,7 +50,6 @@ workflow APPLY_SCORE {
     ch_versions = ch_versions.mix(MAKE_REPORT.out.versions)
 
     emit:
-    score = MAKE_REPORT.out.scores
     versions = ch_versions
 }
 
@@ -106,12 +103,11 @@ def annotate_genomic(ArrayList target) {
     // OUTPUT:
     // [[meta], [pgen_path, psam_path, pvar_path]]
     // where meta map has been annotated with n_samples
-    // the default meta map contains keys 'id', 'is_vcf', and 'chrom'
+    // cloning is important or original instance will also be edited
 
-    meta = [:]
-    meta.id = target.first().id.toString() // copy fields into new map
-    meta.is_vcf = target.first().is_vcf
-    meta.chrom = target.first().chrom.toString()
+    meta = target.first().clone()
+    meta.id = meta.id.toString()
+    meta.chrom = meta.chrom.toString()
 
     paths = target.last()
     psam = paths[1] // sorted path input! or we'll count the wrong file
