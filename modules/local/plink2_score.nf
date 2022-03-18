@@ -8,8 +8,7 @@ process PLINK2_SCORE {
         'quay.io/biocontainers/plink2:2.00a2.3--h712d239_1' }"
 
     input:
-    tuple val(meta), path(pgen), path(psam), path(pvar), val(scoremeta), path(scorefile)
-    path(optional_AF) // allelic frequencies
+    tuple val(meta), path(geno), path(pheno), path(variants), val(scoremeta), path(scorefile)
 
     output:
     path "*.sscore"    , emit: scores
@@ -21,8 +20,8 @@ process PLINK2_SCORE {
     def args2 = task.ext.args2 ?: ''
     def mem_mb = task.memory.toMega() // plink is greedy
 
-    // custom args
-    def allelic_freq = optional_AF.name != 'NO_FILE' ? "--read-freq $optional_AF" : ''
+    // dynamic input option
+    def input = (meta.is_pfile) ? '--pfile' : '--bfile'
 
     // custom args2
     def maxcol = (scoremeta.n_scores + 2) // id + effect allele = 2 cols
@@ -30,7 +29,6 @@ process PLINK2_SCORE {
     def recessive = (scoremeta.effect_type == 'recessive') ? ' recessive ' : ''
     def dominant = (scoremeta.effect_type == 'dominant') ? ' dominant ' : ''
 
-    args = [args, allelic_freq].join(' ')
     args2 = [args2, no_imputation, recessive, dominant].join(' ')
 
     if (scoremeta.n_scores == 1)
@@ -40,7 +38,7 @@ process PLINK2_SCORE {
             --memory $mem_mb \\
             $args \\
             --score $scorefile $args2 \\
-            --pfile ${pgen.baseName} \\
+            $input ${geno.baseName} \\
             --out ${meta.id}_${meta.chrom}_${scoremeta.effect_type}_${scoremeta.n}
 
         cat <<-END_VERSIONS > versions.yml
@@ -56,7 +54,7 @@ process PLINK2_SCORE {
             $args \\
             --score $scorefile $args2 \\
             --score-col-nums 3-$maxcol \\
-            --pfile ${pgen.baseName} \\
+            $input ${geno.baseName} \\
             --out ${meta.id}_${meta.chrom}_${scoremeta.effect_type}_${scoremeta.n}
 
         cat <<-END_VERSIONS > versions.yml

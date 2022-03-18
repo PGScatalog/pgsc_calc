@@ -72,15 +72,15 @@ workflow INPUT_CHECK {
     versions = ch_versions.mix(SCOREFILE_CHECK.out.versions)
 
     ch_bfiles.bed.mix(ch_pfiles.pgen).dump(tag: 'input').set { geno }
-    ch_bfiles.bim.mix(ch_pfiles.pvar).dump(tag: 'input').set { var }
+    ch_bfiles.bim.mix(ch_pfiles.pvar).dump(tag: 'input').set { variants }
     ch_bfiles.fam.mix(ch_pfiles.psam).dump(tag: 'input').set { pheno }
     ch_input.vcf.dump(tag: 'input').set{vcf}
     SCOREFILE_CHECK.out.scorefiles.dump(tag: 'input').set{ scorefiles }
 
     emit:
-    bed = geno
-    bim = var
-    fam = pheno
+    geno
+    variants
+    pheno
     vcf
     scorefiles
     versions
