@@ -14,26 +14,29 @@ A samplesheet can be set up in a spreadsheet program, using the following
 structure:
 
 .. list-table:: Example samplesheet
-   :widths: 25 25 25 25
+   :widths: 20 20 20 20 20
    :header-rows: 1
 
    * - sample
      - vcf_path
      - bfile_path
+     - pfile_path
      - chrom
    * - cineca_synthetic_subset
      -
      - path/to/bfile_prefix
+     -
      - 22
    * - cineca_synthetic_subset_vcf
      - path/to/vcf.gz
-     - 
+     -
+     -
      - 22
 
 The file should be in :term:`CSV` format. A template is `available here`_.
 
-There are four mandatory columns. Two columns, **vcf_path** and **bfile_path**,
-are mutually exclusive and specify the genomic file paths:
+There are five mandatory columns. Columns that specify genomic data paths
+(**vcf_path**, **bfile_path**, and **pfile_path**) are mutually exclusive:
 
 - **sample**: A text string containing the name of a dataset, which can be split
   across multiple files. Scores generated from files with the same sample name
@@ -43,9 +46,10 @@ are mutually exclusive and specify the genomic file paths:
 - **bfile_path**: A text string of a file path pointing to the prefix of a plink
   binary fileset. For example, if a binary fileset consists of plink.bed,
   plink.bim, and plink.fam then the prefix would be "plink". Must be unique.
+- **pfile_path**: Like **bfile_path**, but for a PLINK2 format fileset (pgen /
+  psam / pvar)  
 - **chrom**: An integer, range 1-22. If the target genomic data contains
   multiple chromosomes, leave empty.
 
-.. _`available here`: https://github.com/PGScatalog/pgsc_calc/blob/master/assets/examples/example_data/bfile_samplesheet.csv
-
+.. _`available here`: https://github.com/PGScatalog/pgsc_calc/blob/dev/assets/examples/samplesheet.csv 
 
