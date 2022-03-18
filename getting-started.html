@@ -307,15 +307,17 @@ way. To do this, set up a spreadsheet that looks like:</p>
 <table class="colwidths-given table" id="id2">
 <caption><span class="caption-text">Example samplesheet</span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>sample</p></th>
 <th class="head"><p>vcf_path</p></th>
 <th class="head"><p>bfile_path</p></th>
+<th class="head"><p>pfile_path</p></th>
 <th class="head"><p>chrom</p></th>
 </tr>
 </thead>
@@ -323,17 +325,19 @@ way. To do this, set up a spreadsheet that looks like:</p>
 <tr class="row-even"><td><p>cineca_synthetic_subset</p></td>
 <td></td>
 <td><p>path/to/bfile_prefix</p></td>
+<td></td>
 <td><p>22</p></td>
 </tr>
 <tr class="row-odd"><td><p>cineca_synthetic_subset_vcf</p></td>
 <td><p>path/to/vcf.gz</p></td>
 <td></td>
+<td></td>
 <td><p>22</p></td>
 </tr>
 </tbody>
 </table>
-<p>There are four mandatory columns. Two columns, <strong>vcf_path</strong> and <strong>bfile_path</strong>,
-are mutually exclusive (and specify the genomic file paths):</p>
+<p>There are five mandatory columns. Columns that specify genomic data paths
+(<strong>vcf_path</strong>, <strong>bfile_path</strong>, and <strong>pfile_path</strong>) are mutually exclusive:</p>
 <ul class="simple">
 <li><p><strong>sample</strong>: A text string containing the name of a dataset, which can be split
 across multiple files. Scores generated from files with the same sample name
@@ -345,6 +349,8 @@ not relative file paths.</p></li>
 binary fileset. For example, if a binary fileset consists of plink.bed,
 plink.bim, and plink.fam then the prefix would be “plink”. Must be
 unique. It’s best to use full file paths, not relative file paths.</p></li>
+<li><p><strong>pfile_path</strong>: Like <strong>bfile_path</strong>, but for a PLINK2 format fileset (pgen /
+psam / pvar)</p></li>
 <li><p><strong>chrom</strong>: An integer, range 1-22. If the target genomic data file contains
 multiple chromosomes, leave empty. Don’t use a mix of empty and integer
 chromosomes in the same sample.</p></li>

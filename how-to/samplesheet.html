@@ -202,15 +202,17 @@ structure:</p>
 <table class="colwidths-given table" id="id1">
 <caption><span class="caption-text">Example samplesheet</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>sample</p></th>
 <th class="head"><p>vcf_path</p></th>
 <th class="head"><p>bfile_path</p></th>
+<th class="head"><p>pfile_path</p></th>
 <th class="head"><p>chrom</p></th>
 </tr>
 </thead>
@@ -218,18 +220,20 @@ structure:</p>
 <tr class="row-even"><td><p>cineca_synthetic_subset</p></td>
 <td></td>
 <td><p>path/to/bfile_prefix</p></td>
+<td></td>
 <td><p>22</p></td>
 </tr>
 <tr class="row-odd"><td><p>cineca_synthetic_subset_vcf</p></td>
 <td><p>path/to/vcf.gz</p></td>
 <td></td>
+<td></td>
 <td><p>22</p></td>
 </tr>
 </tbody>
 </table>
-<p>The file should be in <a class="reference internal" href="../glossary.html#term-CSV"><span class="xref std std-term">CSV</span></a> format. A template is <a class="reference external" href="https://github.com/PGScatalog/pgsc_calc/blob/master/assets/examples/example_data/bfile_samplesheet.csv">available here</a>.</p>
-<p>There are four mandatory columns. Two columns, <strong>vcf_path</strong> and <strong>bfile_path</strong>,
-are mutually exclusive and specify the genomic file paths:</p>
+<p>The file should be in <a class="reference internal" href="../glossary.html#term-CSV"><span class="xref std std-term">CSV</span></a> format. A template is <a class="reference external" href="https://github.com/PGScatalog/pgsc_calc/blob/dev/assets/examples/samplesheet.csv">available here</a>.</p>
+<p>There are five mandatory columns. Columns that specify genomic data paths
+(<strong>vcf_path</strong>, <strong>bfile_path</strong>, and <strong>pfile_path</strong>) are mutually exclusive:</p>
 <ul class="simple">
 <li><p><strong>sample</strong>: A text string containing the name of a dataset, which can be split
 across multiple files. Scores generated from files with the same sample name
@@ -239,6 +243,8 @@ are combined in later stages of the analysis.</p></li>
 <li><p><strong>bfile_path</strong>: A text string of a file path pointing to the prefix of a plink
 binary fileset. For example, if a binary fileset consists of plink.bed,
 plink.bim, and plink.fam then the prefix would be “plink”. Must be unique.</p></li>
+<li><p><strong>pfile_path</strong>: Like <strong>bfile_path</strong>, but for a PLINK2 format fileset (pgen /
+psam / pvar)</p></li>
 <li><p><strong>chrom</strong>: An integer, range 1-22. If the target genomic data contains
 multiple chromosomes, leave empty.</p></li>
 </ul>
