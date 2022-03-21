@@ -38,4 +38,5 @@ Working with big data
    :maxdepth: 1
 
    bigjob
+   copygenomes
    yaml
