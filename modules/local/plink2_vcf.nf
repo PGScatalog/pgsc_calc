@@ -11,26 +11,26 @@ process PLINK2_VCF {
     tuple val(meta), path(vcf)
 
     output:
-    tuple val(meta), path("*.pgen"), emit: pgen
-    tuple val(meta), path("*.psam"), emit: psam
-    tuple val(meta), path("*.pvar"), emit: pvar
+    tuple val(newmeta), path("*.pgen"), emit: pgen
+    tuple val(newmeta), path("*.psam"), emit: psam
+    tuple val(newmeta), path("*.pvar"), emit: pvar
     path "versions.yml"            , emit: versions
-
-    when:
-    task.ext.when == null || task.ext.when
 
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     def mem_mb = task.memory.toMega()
+    newmeta = meta.clone() // copy hashmap for updating...
+    newmeta.is_pfile = true // now it's converted to a pfile :)
     """
     plink2 \\
         --threads $task.cpus \\
         --memory $mem_mb \\
+        --set-all-var-ids '@:#:\$r:\$a' \\
         $args \\
         --vcf $vcf \\
         --make-pgen \\
-        --out ${prefix}_${meta.chrom}
+        --out vcf_${prefix}_${meta.chrom} # 'vcf_' prefix is important
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

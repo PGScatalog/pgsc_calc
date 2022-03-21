@@ -75,7 +75,7 @@ jobs:
     strategy:
       fail-fast: false        
       matrix:
-        profile: ["docker", "singularity", "conda"]      
+        profile: ["docker", "singularity"]      
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2
@@ -102,18 +102,6 @@ jobs:
         uses: eWaterCycle/setup-singularity@v5
         with:
           singularity-version: 3.7.1
-
-      - name: Setup miniconda
-        if: matrix.profile == 'conda'
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-          auto-update-conda: true
-          channels: conda-forge,bioconda,defaults
-          python-version: ${{ matrix.python-version }}
-
-      - name: Conda clean
-        if: matrix.profile == 'conda'
-        run: conda clean -a
         
       - name: Install Nextflow
         run: |

@@ -1,18 +1,18 @@
 - name: test input check subworkflow with liftover 38to37
-  command: nextflow run main.nf -profile test,docker --only_input --accession PGS000193 --liftover --target_build GRCh37
+  command: nextflow run main.nf -profile test --only_input --accession PGS000193 --liftover --target_build GRCh37 -c ./tests/config/nextflow.config
   tags:
     - liftover
     - subworkflow
   files:
-    - path: results/samplesheet/out.json
-    - path: results/scorefile/scorefiles.pkl
+    - path: output/samplesheet/out.json
+    - path: output/scorefile/scorefiles.pkl
 
 - name: test input check subworkflow with liftover 37to38
-  command: nextflow run main.nf -profile test,docker --only_input --accession PGS001229 --liftover --target_build GRCh38
+  command: nextflow run main.nf -profile test --only_input --accession PGS001229 --liftover --target_build GRCh38 -c ./tests/config/nextflow.config
   tags:
     - liftover
     - subworkflow
   files:
-    - path: results/samplesheet/out.json
-    - path: results/scorefile/scorefiles.pkl
+    - path: output/samplesheet/out.json
+    - path: output/scorefile/scorefiles.pkl
       
