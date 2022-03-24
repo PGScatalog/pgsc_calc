@@ -240,10 +240,11 @@ def check_build(accession, build):
 
     assert build is not None, build_err
 
-def write_pickle(x, outfile):
+def write_scorefile(x, outfile):
     ''' Serialise an object to file '''
-    with open(outfile, 'wb') as f:
-        pickle.dump(x, f)
+    dfs = []
+    [ dfs.append(v.assign(accession = k)) for k, v in x.items() ]
+    pd.concat(dfs).to_csv(outfile, index = False, sep = '\t')
 
 def liftover_summary(lifted_dict, unlifted_dict, scorefile_summaries):
     """ Flatten dataframes collections and add liftover status (_chr, _pos).
@@ -325,11 +326,11 @@ def main(args = None):
             unlifted_dict[accession] = unlifted
 
         log = liftover_summary(lifted_dict, unlifted_dict, scorefile_summaries)
-        write_pickle({k: format_lifted(v) for k,v in lifted_dict.items()}, args.outfile)
+        write_scorefile({k: format_lifted(v) for k,v in lifted_dict.items()}, args.outfile)
     else:
         log = (pd.concat(scorefile_summaries)
             .assign(liftover = None, lifted_chr = None, lifted_pos = None))
-        write_pickle(reduce(lambda x, y: { **x, **y }, scorefiles), args.outfile)
+        write_scorefile(reduce(lambda x, y: { **x, **y }, scorefiles), args.outfile)
 
     write_log(log, conn)
 
