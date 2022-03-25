@@ -83,6 +83,7 @@ workflow INPUT_CHECK {
     pheno
     vcf
     scorefiles
+    db         = SCOREFILE_CHECK.out.log
     versions
 }
 

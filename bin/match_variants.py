@@ -15,6 +15,7 @@ def parse_args(args=None):
     parser.add_argument('--split', dest = 'split', default=False, action='store_true',
                         help='<Required> Split scorefile per chromosome?')
     parser.add_argument('--format', dest = 'plink_format', help='<Required> bim or pvar?')
+    parser.add_argument('--db', dest = 'db', help='<Required> path to database')
     parser.add_argument('-m', '--min_overlap', dest='min_overlap', required=True,
                         type = float, help='<Required> Minimum proportion of variants to match before error')
     return parser.parse_args(args)
@@ -29,7 +30,9 @@ def read_target(path, plink_format):
         x = pl.read_csv(path, sep = '\t', has_header = False)
         x.columns = ['#CHROM', 'ID', 'CM', 'POS', 'REF', 'ALT']
     else:
-        x = pl.read_csv(path, sep = '\t', has_header = True, comment_char = '##')
+        # plink2 pvar may have VCF comments in header starting ##
+        x = pl.read_csv(path, sep = '\t', has_header = False, comment_char = '##')
+        x.columns = ['#CHROM', 'POS', 'ID', 'REF', 'ALT']
 
     x = x.with_columns([
         (pl.col("REF").str.replace_all("A", "V")
@@ -169,6 +172,36 @@ def write_scorefile(effect_type, scorefile, split):
             path = fout.format(chr = k, et = effect_type, dup = 'first')
             v.write_csv(path, sep = "\t")
 
+def connect_db(path):
+    return 'sqlite://{}'.format(path)
+
+def read_log(conn):
+    ''' Read scorefile input log from database '''
+    query = 'SELECT * from scorefile'
+    return pl.read_sql(query, conn).with_columns([
+        pl.col("accession").cast(pl.Categorical),
+        pl.col("effect_type").cast(pl.Categorical)
+         ])
+
+def update_log(logs, matches, conn, min_overlap):
+    match_clean = matches.drop(['REF', 'ALT', 'REF_FLIP', 'ALT_FLIP'])
+    match_log = (logs.join(match_clean, left_on = ['chr_name', 'chr_position', 'effect_allele', 'other_allele', 'accession', 'effect_type', 'effect_weight'], right_on = ['chr_name', 'chr_position', 'effect_allele', 'other_allele', 'accession', 'effect_type', 'effect_weight'], how = 'left')
+               .with_column(pl.col('ambiguous').fill_null(True)))
+
+    check_match(match_log, min_overlap)
+    match_log.write_csv('log.csv')
+
+def check_match(match_log, min_overlap):
+    fail_rates = (match_log
+     .groupby('accession')
+     .agg([ pl.count(), (pl.col('match_type') == None).sum().alias('no_match') ])
+     .with_column((pl.col('no_match') / pl.col('count')).alias('fail_rate'))
+     )
+    for a, r in zip(fail_rates['accession'].to_list(), fail_rates['fail_rate'].to_list()):
+        err = "ERROR: Score {} matches your variants badly. Check --min_overlap"
+        assert r < (1 - min_overlap), err.format(a)
+
+
 def main(args = None):
     ''' Match variants from scorefiles against target variant information '''
     pl.Config.set_global_string_cache()
@@ -181,14 +214,17 @@ def main(args = None):
     # start matching -----------------------------------------------------------
     matches = get_all_matches(target, scorefile, remove = True)
 
-
-
     empty_err = ''' ERROR: No target variants match any variants in all scoring files
     This is quite odd!
     Try checking the genome build (see --liftover and --target_build parameters)
     Try imputing your microarray data if it doesn't cover the scoring variants well
     '''
     assert matches.shape[0] > 0, empty_err
+
+    # update logs --------------------------------------------------------------
+    conn = connect_db(args.db)
+    logs = read_log(conn)
+    update_log(logs, matches, conn, args.min_overlap)
 
     # prepare for writing out --------------------------------------------------
     # write one combined scorefile for efficiency, but need extra file for each:

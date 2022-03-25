@@ -2,18 +2,17 @@ process MATCH_VARIANTS {
     tag "$meta.id"
     label 'process_low'
 
-    conda (params.enable_conda ? "conda-forge::pandas=1.1.5 sqlite" : null)
+    conda (params.enable_conda ? "$projectDir/environments/polars/environment.yml" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/pandas:1.1.5' :
-        'quay.io/biocontainers/pandas:1.1.5' }"
+        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/polars:0.13.5' :
+        'dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/polars:0.13.5' }"
 
     input:
-    tuple val(meta), val(chrom), path('??.vars'), path(scorefile)
+    tuple val(meta), val(chrom), path('??.vars'), path(scorefile), path(db)
 
     output:
     tuple val(scoremeta), path("*.scorefile"), emit: scorefile
-    path "match_variants.db"                 , emit: db
-    path "report.csv"                        , emit: log
+    path "log.csv"                           , emit: db
     path "versions.yml"                      , emit: versions
 
     script:
@@ -30,7 +29,8 @@ process MATCH_VARIANTS {
         --scorefile $scorefile \
         --target '*.vars' \
         $split \
-        $format
+        --format $format \
+        --db \$(readlink -f $db)
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

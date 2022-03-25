@@ -123,7 +123,8 @@ workflow PGSCALC {
             INPUT_CHECK.out.pheno,
             INPUT_CHECK.out.variants,
             INPUT_CHECK.out.vcf,
-            INPUT_CHECK.out.scorefiles
+            INPUT_CHECK.out.scorefiles,
+            INPUT_CHECK.out.db
         )
         ch_versions = ch_versions.mix(MAKE_COMPATIBLE.out.versions)
     }
