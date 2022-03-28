@@ -34,6 +34,12 @@ def read_target(path, plink_format):
         x = pl.read_csv(path, sep = '\t', has_header = False, comment_char = '##')
         x.columns = ['#CHROM', 'POS', 'ID', 'REF', 'ALT']
 
+        # Handle multi-allelic variants
+        is_ma = x['ALT'].str.contains(',')  # plink2 pvar multi-alleles are comma-separated
+        if is_ma.sum() > 0:
+            x.replace('ALT', x['ALT'].str.split(by=',')) # turn ALT to list of variants
+            x = x.explode('ALT') # expand the DF to have all the variants in different rows
+
     x = x.with_columns([
         (pl.col("REF").str.replace_all("A", "V")
             .str.replace_all("T", "X")
