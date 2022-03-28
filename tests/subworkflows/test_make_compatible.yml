@@ -5,13 +5,12 @@
     - bfile
   files:
     - path: output/samplesheet/out.json
-    - path: output/scorefile/scorefiles.pkl
+    - path: output/scorefile/scorefiles.txt
     - path: output/plink2/cineca_synthetic_subset_22.bim
     - path: output/plink2/cineca_synthetic_subset_22.bed
     - path: output/plink2/cineca_synthetic_subset_22.fam            
-    - path: output/match/22_additive_0.scorefile
-    - path: output/match/match_variants.db
-    - path: output/match/report.csv      
+    - path: output/match/22_additive_first.scorefile
+    - path: output/match/log.csv      
 
 - name: test make compatible subworkflow with vcf
   command: nextflow run main.nf -profile test --input "https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/samplesheet_vcf.csv" --only_compatible  -c ./tests/config/nextflow.config
@@ -20,13 +19,12 @@
     - vcf  
   files:
     - path: output/samplesheet/out.json
-    - path: output/scorefile/scorefiles.pkl
+    - path: output/scorefile/scorefiles.txt
     - path: output/plink2/vcf_cineca_synthetic_subset_22.pgen    
     - path: output/plink2/vcf_cineca_synthetic_subset_22.pvar
     - path: output/plink2/vcf_cineca_synthetic_subset_22.psam           
-    - path: output/match/22_additive_0.scorefile
-    - path: output/match/match_variants.db
-    - path: output/match/report.csv
+    - path: output/match/22_additive_first.scorefile
+    - path: output/match/log.csv
 
 - name: test make compatible subworkflow with pfile
   command: nextflow run main.nf -profile test --input ./assets/examples/samplesheet.csv --only_compatible -c ./tests/config/nextflow.config
@@ -35,10 +33,9 @@
     - pfile
   files:
     - path: output/samplesheet/out.json
-    - path: output/scorefile/scorefiles.pkl
+    - path: output/scorefile/scorefiles.txt
     - path: output/plink2/cineca_22.pgen    
     - path: output/plink2/cineca_22.pvar
     - path: output/plink2/cineca_22.psam           
-    - path: output/match/22_additive_0.scorefile
-    - path: output/match/match_variants.db
-    - path: output/match/report.csv  
+    - path: output/match/22_additive_first.scorefile
+    - path: output/match/log.csv
