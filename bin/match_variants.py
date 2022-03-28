@@ -183,10 +183,14 @@ def read_log(conn):
         pl.col("effect_type").cast(pl.Categorical)
          ])
 
-def update_log(logs, matches, conn, min_overlap):
+def update_log(logs, matches, conn, min_overlap, dataset):
     match_clean = matches.drop(['REF', 'ALT', 'REF_FLIP', 'ALT_FLIP'])
     match_log = (logs.join(match_clean, left_on = ['chr_name', 'chr_position', 'effect_allele', 'other_allele', 'accession', 'effect_type', 'effect_weight'], right_on = ['chr_name', 'chr_position', 'effect_allele', 'other_allele', 'accession', 'effect_type', 'effect_weight'], how = 'left')
-               .with_column(pl.col('ambiguous').fill_null(True)))
+               .with_columns([
+                   pl.col('ambiguous').fill_null(True),
+                   pl.lit(dataset).alias('dataset')
+               ]))
+
 
     check_match(match_log, min_overlap)
     match_log.write_csv('log.csv')
@@ -224,7 +228,7 @@ def main(args = None):
     # update logs --------------------------------------------------------------
     conn = connect_db(args.db)
     logs = read_log(conn)
-    update_log(logs, matches, conn, args.min_overlap)
+    update_log(logs, matches, conn, args.min_overlap, args.dataset)
 
     # prepare for writing out --------------------------------------------------
     # write one combined scorefile for efficiency, but need extra file for each:
