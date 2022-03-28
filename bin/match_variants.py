@@ -139,7 +139,7 @@ def unduplicate_variants(df):
     # drop row numbers that occur in both dup and first
     dup_unique = dup[~(first["row_nr"] == dup["row_nr"])]
 
-    return {'first': first, 'dup': dup_unique }
+    return {'first': first.drop("row_nr"), 'dup': dup_unique.drop("row_nr") }
 
 def format_scorefile(df, split):
     """ Format a dataframe to plink2 --score standard

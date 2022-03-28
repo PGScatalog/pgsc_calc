@@ -5,7 +5,7 @@
     - subworkflow
   files:
     - path: output/samplesheet/out.json
-    - path: output/scorefile/scorefiles.pkl
+    - path: output/scorefile/scorefiles.txt
 
 - name: test input check subworkflow with PGS catalog API
   command: nextflow run main.nf -profile test --accession PGS001229 --only_input -c ./tests/config/nextflow.config
@@ -16,7 +16,7 @@
   files:
     - path: output/pgscatalog/PGS001229.txt.gz
     - path: output/samplesheet/out.json
-    - path: output/scorefile/scorefiles.pkl
+    - path: output/scorefile/scorefiles.txt
       
 - name: test input check subworkflow with PGS catalog API and whitespace
   command: nextflow run main.nf -profile test --accession "PGS001229, PGS000802" --only_input  -c ./tests/config/nextflow.config
@@ -28,7 +28,7 @@
     - path: output/pgscatalog/PGS000802.txt.gz
     - path: output/pgscatalog/PGS001229.txt.gz    
     - path: output/samplesheet/out.json
-    - path: output/scorefile/scorefiles.pkl
+    - path: output/scorefile/scorefiles.txt
 
 - name: test input check subworkflow with YAML parameters
   command: nextflow run main.nf -params-file 'https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/params.yaml' -c ./tests/config/nextflow.config
@@ -37,5 +37,5 @@
   files:
     - path: output/pgscatalog/PGS001229.txt.gz    
     - path: output/samplesheet/out.json
-    - path: output/scorefile/scorefiles.pkl
+    - path: output/scorefile/scorefiles.txt
     

@@ -95,7 +95,7 @@ jobs:
       - name: Install Python dependencies          
         run: |
           python -m ensurepip --upgrade
-          pip install pandas pyliftover pytest-workflow requests
+          pip install pandas pyliftover pytest-workflow requests polars
 
       - name: Set up Singularity
         if: matrix.profile == 'singularity'

@@ -5,7 +5,7 @@
     - subworkflow
   files:
     - path: output/samplesheet/out.json
-    - path: output/scorefile/scorefiles.pkl
+    - path: output/scorefile/scorefiles.txt
 
 - name: test input check subworkflow with liftover 37to38
   command: nextflow run main.nf -profile test --only_input --accession PGS001229 --liftover --target_build GRCh38 -c ./tests/config/nextflow.config
@@ -14,5 +14,5 @@
     - subworkflow
   files:
     - path: output/samplesheet/out.json
-    - path: output/scorefile/scorefiles.pkl
+    - path: output/scorefile/scorefiles.txt
       
