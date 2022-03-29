@@ -25,6 +25,18 @@ def parse_args(args=None):
                              'construct the score.')
     return parser.parse_args(args)
 
+def read_pvarcolumns(path):
+    """Get the column names from the pvar file (not constrained like bim, especially when converted from VCF)"""
+    f_pvar = open(path, 'rt')
+    line = '#'
+    header = []
+    while line.startswith('#'):
+        line = f_pvar.readline()
+        if line.startswith('#CHROM'):
+            header = line.strip().split('\t')
+    f_pvar.close()
+    return header
+
 def read_target(path, plink_format):
     """Complementing alleles with a pile of regexes seems weird, but polars string
     functions are limited (i.e. no str.translate). Applying a python complement
@@ -34,16 +46,20 @@ def read_target(path, plink_format):
     if plink_format == 'bim':
         x = pl.read_csv(path, sep = '\t', has_header = False)
         x.columns = ['#CHROM', 'ID', 'CM', 'POS', 'REF', 'ALT']
+        x = x[['#CHROM', 'POS', 'ID', 'REF', 'ALT']]  # subset to matching columns
     else:
         # plink2 pvar may have VCF comments in header starting ##
-        x = pl.read_csv(path, sep = '\t', has_header = False, comment_char = '##')
-        x.columns = ['#CHROM', 'POS', 'ID', 'REF', 'ALT']
+        x = pl.read_csv(path, sep = '\t', has_header = False, comment_char='#')
+
+        # read pvar header
+        x.columns = read_pvarcolumns(path)
+        x = x[['#CHROM', 'POS', 'ID', 'REF', 'ALT']]  # subset to matching columns
 
         # Handle multi-allelic variants
         is_ma = x['ALT'].str.contains(',')  # plink2 pvar multi-alleles are comma-separated
         if is_ma.sum() > 0:
-            x.replace('ALT', x['ALT'].str.split(by=',')) # turn ALT to list of variants
-            x = x.explode('ALT') # expand the DF to have all the variants in different rows
+            x.replace('ALT', x['ALT'].str.split(by=','))  # turn ALT to list of variants
+            x = x.explode('ALT')  # expand the DF to have all the variants in different rows
 
     x = x.with_columns([
         (pl.col("REF").str.replace_all("A", "V")
