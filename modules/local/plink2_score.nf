@@ -1,5 +1,5 @@
 process PLINK2_SCORE {
-    tag "$meta.id"
+    tag "$meta.id chromosome $meta.chrom"
     label 'process_medium'
 
     conda (params.enable_conda ? "bioconda::plink2=2.00a2.3" : null)
