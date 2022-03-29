@@ -1,5 +1,5 @@
 process PLINK2_VCF {
-    tag "$meta.id"
+    tag "$meta.id chromosome $meta.chrom"
     label 'process_low'
     label "${ params.copy_genomes ? 'copy_genomes' : '' }"
 
