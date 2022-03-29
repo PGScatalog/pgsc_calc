@@ -1,6 +1,6 @@
 process MATCH_VARIANTS {
     tag "$meta.id"
-    label 'process_low'
+    label 'process_medium'
 
     conda (params.enable_conda ? "$projectDir/environments/polars/environment.yml" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
