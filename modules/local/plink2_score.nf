@@ -36,6 +36,7 @@ process PLINK2_SCORE {
         plink2 \\
             --threads $task.cpus \\
             --memory $mem_mb \\
+            --seed 31 \\
             $args \\
             --score $scorefile $args2 \\
             $input ${geno.baseName} \\
@@ -51,6 +52,7 @@ process PLINK2_SCORE {
         plink2 \\
             --threads $task.cpus \\
             --memory $mem_mb \\
+            --seed 31 \\
             $args \\
             --score $scorefile $args2 \\
             --score-col-nums 3-$maxcol \\
