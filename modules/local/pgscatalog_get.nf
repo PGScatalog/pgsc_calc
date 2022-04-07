@@ -1,6 +1,5 @@
 process PGSCATALOG_GET {
     tag "$accession"
-    label 'process_low'
     label 'error_retry'
 
     conda (params.enable_conda ? "bioconda::fastq-scan=1.0.0" : null)
