@@ -1,6 +1,6 @@
 process PLINK2_VCF {
     tag "$meta.id chromosome $meta.chrom"
-    label 'process_low'
+    label 'process_extra_core'
     label "${ params.copy_genomes ? 'copy_genomes' : '' }"
 
     conda (params.enable_conda ? "bioconda::plink2=2.00a2.3" : null)
