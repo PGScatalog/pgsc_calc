@@ -120,31 +120,38 @@ def get_all_matches(target, scorefile, remove):
     effect_allele == ALT and other_allele == REF
     effect_allele == flip(REF) and other_allele == flip(ALT)
     effect_allele == flip(REF) and oher_allele ==  flip(REF)
+
+    If not removing ambiguous variants, then it's assumed that the genotype data
+    is on the same strand as the GWAS whose summary statistics were used to
+    construct the score
     """
 
     refalt = match_variants(scorefile, target, EA = 'REF', OA = 'ALT', match_type = "refalt")
     altref = match_variants(scorefile, target, EA = 'ALT', OA = 'REF', match_type = "altref")
     refalt_flip = match_variants(scorefile, target, EA = 'REF_FLIP', OA = 'ALT_FLIP', match_type = "refalt_flip")
     altref_flip = match_variants(scorefile, target, EA = 'ALT_FLIP', OA = 'REF_FLIP', match_type = "altref_flip")
-    return label_biallelic_ambiguous(pl.concat([refalt, altref, refalt_flip, altref_flip]), remove)
+    ambig_labelled = label_biallelic_ambiguous(pl.concat([refalt, altref, refalt_flip, altref_flip]))
 
-def label_biallelic_ambiguous(matches, remove):
+    if remove:
+        return ambig_labelled.filter(pl.col("ambiguous") == False)
+    else:
+        ambig = ambig_labelled.filter((pl.col("ambiguous") == True) & \
+                                      (pl.col("match_type") == "refalt"))
+        unambig = ambig_labelled.filter(pl.col("ambiguous") == False)
+        return pl.concat([ambig, unambig])
+
+def label_biallelic_ambiguous(matches):
     # A / T or C / G may match multiple times
     matches = matches.with_columns([
         pl.col(["effect_allele", "other_allele", "REF", "ALT", "REF_FLIP", "ALT_FLIP"]).cast(str),
         pl.lit(True).alias("ambiguous")
     ])
 
-    ambiguous = (matches.with_column(
+    return (matches.with_column(
         pl.when((pl.col("effect_allele") == pl.col("ALT_FLIP")) | \
                 (pl.col("effect_allele") == pl.col("REF_FLIP")))
         .then(pl.col("ambiguous"))
         .otherwise(False)))
-
-    if remove:
-        return ambiguous.filter(pl.col("ambiguous") == False)
-    else:
-        return ambiguous
 
 def unduplicate_variants(df):
     """ Find variant matches that have duplicate identifiers
@@ -204,7 +211,7 @@ def write_scorefile(effect_type, scorefile, split):
     if scorefile.get('dup').shape[0] > 0:
         df_dict = format_scorefile(scorefile.get('dup'), split)
         for k, v in df_dict.items():
-            path = fout.format(chr = k, et = effect_type, dup = 'first')
+            path = fout.format(chr = k, et = effect_type, dup = 'dup')
             v.write_csv(path, sep = "\t")
 
 def connect_db(path):
