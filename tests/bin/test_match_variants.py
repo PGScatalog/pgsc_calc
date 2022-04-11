@@ -33,6 +33,13 @@ def bad_score(score_df):
     return bad_score
 
 @pytest.fixture
+def duplicate_id_diff_ea(score_df):
+    ''' Scorefile dataframe with duplicate ID and different effect allele  '''
+    df = pl.concat([score_df, score_df])
+    df.replace('effect_allele', pl.Series('effect_allele', ['A', 'G']))
+    return df
+
+@pytest.fixture
 def score_dict(accession, accession_two, score):
     return { accession: score, accession_two: score }
 
@@ -51,9 +58,14 @@ def target_df(target):
     return read_target(target, 'bim')
 
 @pytest.fixture
-def target_df_dup(target_df):
-    ''' Target genome dataframe with duplicate ID '''
-    return pl.concat([target_df, target_df])
+def matches(score_df, target_df):
+    return get_all_matches(target_df, score_df, remove = False)
+
+@pytest.fixture
+def match_dup(matches):
+    m2 = matches.clone()
+    m2.replace('effect_allele', pl.Series('effect_allele', ['G']))
+    return pl.concat([matches, m2])
 
 def test_split_effect(score_df):
     ''' Test that scorefiles are split by effect type '''
@@ -72,10 +84,31 @@ def test_bad_match(bad_score, target_df):
    m = get_all_matches(target = target_df, scorefile = bad_score, remove = True)
    assert m.shape == (0, 14)
 
-def test_unduplicate_variants(score_df, target_df):
-    ''' Test that duplicate IDs (diff effect allele) are split appropriately '''
-    m = get_all_matches(target_df, score_df, remove = False)
-    d = unduplicate_variants(m)
+def test_unduplicate(matches, match_dup):
+    ''' Test that duplicate IDs + diff effect allele are split appropriately '''
+
+    # test with positive case --------------------------------------------------
+    d2 = unduplicate_variants(match_dup)
+
+    assert isinstance(d2, dict)
+    # no variants should go missing
+    assert d2['first'].shape[0] + d2['dup'].shape[0] == match_dup.shape[0]
+
+    # make sure splitting happened
+    assert d2['first'].shape[0] == 1
+    assert d2['dup'].shape[0] == 1
+
+    # make sure alleles are consistent after splitting
+    assert d2['first']['effect_allele'] == pl.Series('effect_allele', ['G'])
+    assert d2['dup']['effect_allele'] == matches['effect_allele']
+
+    # test with negative case --------------------------------------------------
+    d = unduplicate_variants(matches)
+
     assert isinstance(d, dict)
-    assert d['first'].shape[0] == score_df.shape[0]
+    assert d['first'].shape[0] + d['dup'].shape[0] == matches.shape[0]
+
+    assert d['first'].shape[0] == matches.shape[0]
     assert d['dup'].shape[0] == 0
+
+    assert d['first']['effect_allele'] == matches['effect_allele']
