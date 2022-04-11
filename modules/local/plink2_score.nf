@@ -1,6 +1,6 @@
 process PLINK2_SCORE {
     tag "$meta.id chromosome $meta.chrom"
-    label 'process_medium'
+    label 'process_low'
 
     conda (params.enable_conda ? "bioconda::plink2=2.00a2.3" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -36,6 +36,7 @@ process PLINK2_SCORE {
         plink2 \\
             --threads $task.cpus \\
             --memory $mem_mb \\
+            --seed 31 \\
             $args \\
             --score $scorefile $args2 \\
             $input ${geno.baseName} \\
@@ -51,6 +52,7 @@ process PLINK2_SCORE {
         plink2 \\
             --threads $task.cpus \\
             --memory $mem_mb \\
+            --seed 31 \\
             $args \\
             --score $scorefile $args2 \\
             --score-col-nums 3-$maxcol \\
