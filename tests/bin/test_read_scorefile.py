@@ -10,6 +10,23 @@ sys.path.append("..")
 from bin.read_scorefile import *
 
 @pytest.fixture
+def db():
+    ''' Download reference database from gitlab '''
+    database = req.get('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/reference_data/pgsc_calc_ref.sqlar')
+    with open('db.sqlar', 'wb') as f:
+        f.write(database.content)
+    yield 'db.sqlar'
+    os.remove('db.sqlar')
+
+@pytest.fixture
+def chain_files(db):
+    ''' Stage chain files from reference database in working directory '''
+    os.system('sqlite3 db.sqlar -Ax hg19ToHg38.over.chain.gz hg38ToHg19.over.chain.gz')
+    yield ['hg19ToHg38.over.chain.gz', 'hg38ToHg19.over.chain.gz']
+    os.remove('hg38ToHg19.over.chain.gz')
+    os.remove('hg19ToHg38.over.chain.gz')
+
+@pytest.fixture
 def valid_chrom():
     ''' Autosomes (1 - 22) are valid, which will cause problems for non-human species '''
     return 1
@@ -171,8 +188,12 @@ def test_remap(hg38_coords, lo_tohg19, lo_tohg38, hg38_to_hg19_coords, hg19_uniq
         .all(axis=None)
             )
 
-def test_liftover(accession, hg38_coords, hg38_to_hg19_coords, hg19, hg38, min_lift, hg19_unique_coords):
-    ''' Test liftover function, which is applied to each scoring file '''
+def test_liftover(accession, hg38_coords, hg38_to_hg19_coords, hg19, hg38, min_lift, hg19_unique_coords, chain_files):
+    """ Test liftover function, which is applied to each scoring file
+
+    chain_files fixture used only for staging reference data in working directory
+    normally the nextflow module takes care of this
+    """
 
     lifted, _ = liftover(accession, hg38_coords, hg38, hg19, min_lift)
     assert lifted.equals(hg38_to_hg19_coords)

@@ -184,7 +184,11 @@ def liftover(accession, df, from_build, to_build, min_lift):
 
         return mapped, unmapped
     else:
-        lo = LiftOver(build_dict[from_build], build_dict[to_build])
+        # chain paths in working directory, staged by nextflow module:
+        # hg19ToHg38.over.chain.gz
+        # hg38ToHg19.over.chain.gz
+        chain_path = "{}To{}.over.chain.gz".format(build_dict[from_build], build_dict[to_build].capitalize())
+        lo = LiftOver(chain_path)
         df[['lifted_chr', 'lifted_pos']] = df.apply(lambda x: convert_coordinates(x, lo), axis = 1)
         mapped = df[~df.isnull().any(axis = 1)].assign(liftover = True)
         unmapped = df[df.isnull().any(axis = 1)].assign(liftover = False)
