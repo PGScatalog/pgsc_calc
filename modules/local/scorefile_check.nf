@@ -8,6 +8,7 @@ process SCOREFILE_CHECK {
 
     input:
     path raw_scores
+    path reference
 
     output:
     path "scorefiles.txt"   , emit: scorefiles
@@ -19,6 +20,9 @@ process SCOREFILE_CHECK {
 
     if (params.liftover)
         """
+        # extract chain files from database
+        sqlite3 pgsc_calc_ref.sqlar -Ax hg19ToHg38.over.chain.gz hg38ToHg19.over.chain.gz
+
         read_scorefile.py -s $raw_scores \
             --liftover \
             -t $params.target_build \
