@@ -2,7 +2,7 @@
 
 :rotating_light: This pipeline is stable, but represents a very minimal implementation :rotating_light:
 
-:rotating_light: Please see the documentation for [important limitations](https://pgscatalog.github.io/pgsc_calc/input.html) :rotating_light:
+:rotating_light: Please see the documentation for [important limitations](https://pgscatalog.github.io/pgsc_calc/) :rotating_light:
 
 [![Documentation](https://github.com/PGScatalog/pgsc_calc/actions/workflows/docs.yml/badge.svg)](https://pgscatalog.github.io/pgsc_calc/index.html)
 [![pgscatalog/pgsc_calc CI](https://github.com/PGScatalog/pgsc_calc/actions/workflows/ci.yml/badge.svg)](https://github.com/PGScatalog/pgsc_calc/actions/workflows/ci.yml)
@@ -78,7 +78,7 @@ a last resort; see
 ## Documentation
 
 [Full documentation is available on Github
-pages](https://pgscatalog.github.io/pgsc_calc/input.html).
+pages](https://pgscatalog.github.io/pgsc_calc/).
 
 ## Credits
 
