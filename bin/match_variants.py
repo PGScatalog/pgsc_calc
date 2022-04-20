@@ -165,38 +165,35 @@ def unduplicate_variants(df):
     df: A dataframe containing all matches, with columns ID, effect_allele, and
         effect_weight
     Returns:
-        A dict of data frames (keys 'first' and 'dup')
+        A list of dataframes, with unique ID - effect allele combinations
     """
-    # get number of effect alleles per ID (1 or 2) and the two occuring alleles
-    # │ ID              ┆ count ┆ first ┆ last │
-    # │ ---             ┆ ---   ┆ ---   ┆ ---  │
-    # │ str             ┆ u32   ┆ str   ┆ str  │
-    # ╞═════════════════╪═══════╪═══════╪══════╡
-    # │ 1:147825548:C:T ┆ 2     ┆ C     ┆ T    │
-    # ├╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌┤
-    # │ 1:85462772:C:G  ┆ 1     ┆ C     ┆ C    │
 
-    ea_count = (df.groupby(["ID", "effect_allele"])
-                .count()
-                .groupby("ID")
-                .agg(
-                    [
-                        pl.count(),
-                        pl.first("effect_allele").alias("first"),
-                        pl.last("effect_allele").alias("last")
-                    ]))
+    # 1. unique ID - EA is important because normal duplicates are already ----
+    #   handled by pivoting, and it's pointless to split them unnecessarily
+    # 2. use cumcount to number duplicate IDs
+    # 3. join cumcount data on original DF, use this data for splitting
+    ea_count = (df.select(["ID", "effect_allele"])
+                .unique()
+                .with_columns([
+                    pl.col("ID").cumcount().over(["ID"]).alias("cumcount"),
+                    pl.col("ID").count().over(["ID"]).alias("count")
+                ]))
 
-    one_ea = (df
-              .join(ea_count.filter(pl.col("count") == 1), on = "ID", how = "inner")
-              .drop(["count", "first", "last"]))
+    dup_label = df.join(ea_count, on = ["ID", "effect_allele"], how = "left")
 
-    first_df = df.join(ea_count.filter(pl.col("count") == 2), left_on = ["ID", "effect_allele"], right_on = ["ID", "first"], how = "inner")
+    # now split the matched variants, and make sure we don't lose any ----------
+    n_splits = ea_count.select("cumcount").max()[0, 0] + 1 # cumcount = ngroup-1
+    df_lst = []
+    n_var = 0
 
-    dup_df = df.join(ea_count.filter(pl.col("count") == 2), left_on = ["ID", "effect_allele"], right_on = ["ID", "last"], how = "inner")
+    for i in range(0, n_splits):
+        x = dup_label.filter(pl.col("cumcount") == i)
+        n_var += x.shape[0]
+        df_lst.append(x)
 
-    assert dup_df.shape[0] + first_df.shape[0] + one_ea.shape[0] == df.shape[0]
+    assert n_var == df.shape[0]
 
-    return {'first': pl.concat([one_ea, first_df[one_ea.columns]]), 'dup': dup_df }
+    return df_lst
 
 def format_scorefile(df, split):
     """ Format a dataframe to plink2 --score standard
@@ -221,22 +218,21 @@ def split_effect_type(df):
     effect_types = df["effect_type"].unique().to_list()
     return {x: df.filter(pl.col("effect_type") == x) for x in effect_types}
 
-def write_scorefile(effect_type, scorefile, split):
-    fout = '{chr}_{et}_{dup}.scorefile'
+def write_scorefile(effect_type, scorefiles, split):
+    ''' Write a list of scorefiles with the same effect type '''
+    fout = '{chr}_{et}_{split}.scorefile'
 
-    if scorefile.get('first').shape[0] > 0:
-        df_dict = format_scorefile(scorefile.get('first'), split)
-        for k, v in df_dict.items():
-            path = fout.format(chr = k, et = effect_type, dup = 'first')
-            v.write_csv(path, sep = "\t")
+    # each list element contains a dataframe of variants
+    # lists are split to ensure variants have unique ID - effect alleles
+    for i, scorefile in enumerate(scorefiles):
+        df_dict = format_scorefile(scorefile, split) # may be split by chrom
 
-    if scorefile.get('dup').shape[0] > 0:
-        df_dict = format_scorefile(scorefile.get('dup'), split)
         for k, v in df_dict.items():
-            path = fout.format(chr = k, et = effect_type, dup = 'dup')
-            v.write_csv(path, sep = "\t")
+            path = fout.format(chr = k, et = effect_type, split = i)
+            df.write_csv(path, sep = "\t")
 
 def connect_db(path):
+    ''' Set up sqlite3 connection '''
     return 'sqlite://{}'.format(path)
 
 def read_log(conn):
@@ -248,6 +244,7 @@ def read_log(conn):
          ])
 
 def update_log(logs, matches, conn, min_overlap, dataset):
+    ''' Read log and update with match data, write to csv '''
     match_clean = matches.drop(['REF', 'ALT', 'REF_FLIP', 'ALT_FLIP'])
     match_log = (logs.join(match_clean, left_on = ['chr_name', 'chr_position', 'effect_allele', 'other_allele', 'accession', 'effect_type', 'effect_weight'], right_on = ['chr_name', 'chr_position', 'effect_allele', 'other_allele', 'accession', 'effect_type', 'effect_weight'], how = 'left')
                .with_columns([
@@ -255,11 +252,12 @@ def update_log(logs, matches, conn, min_overlap, dataset):
                    pl.lit(dataset).alias('dataset')
                ]))
 
-
     check_match(match_log, min_overlap)
-    match_log.write_csv('log.csv')
+    match_log.write_csv('log.csv') # TODO: sqlite3 database
 
 def check_match(match_log, min_overlap):
+    ''' Explode if matching goes badly '''
+
     fail_rates = (match_log
      .groupby('accession')
      .agg([ pl.count(), (pl.col('match_type') == None).sum().alias('no_match') ])
@@ -268,7 +266,6 @@ def check_match(match_log, min_overlap):
     for a, r in zip(fail_rates['accession'].to_list(), fail_rates['fail_rate'].to_list()):
         err = "ERROR: Score {} matches your variants badly. Check --min_overlap"
         assert r < (1 - min_overlap), err.format(a)
-
 
 def main(args = None):
     ''' Match variants from scorefiles against target variant information '''
