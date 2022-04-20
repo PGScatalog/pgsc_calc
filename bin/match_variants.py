@@ -229,7 +229,7 @@ def write_scorefile(effect_type, scorefiles, split):
 
         for k, v in df_dict.items():
             path = fout.format(chr = k, et = effect_type, split = i)
-            df.write_csv(path, sep = "\t")
+            v.write_csv(path, sep = "\t")
 
 def connect_db(path):
     ''' Set up sqlite3 connection '''
