@@ -14,7 +14,7 @@ run: ## Run an example workflow
 test: clean pytest ## Run pytest in a clean environment
 
 pytest:
-	PROFILE=docker pytest --kwdof
+	PROFILE=docker pytest --kwdof --git-aware
 
 clean: ## Clean temporary files
 	rm -rf ./work ./results ./__pycache__ ./.nextflow.* ./.pytest_cache ./output
