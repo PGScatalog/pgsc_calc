@@ -19,6 +19,8 @@ process MATCH_VARIANTS {
     def args = task.ext.args ?: ''
     def split = !chrom.contains(false) ? '--split': ''
     def format = meta.is_bfile ? 'bim' : 'pvar'
+    def ambig = params.keep_ambiguous ? '--keep-ambiguous' : ''
+    def multi = params.keep_multiallelic ? '--keep-multiallelic' : ''
     scoremeta = [:]
     scoremeta.id = "$meta.id"
 
@@ -30,7 +32,9 @@ process MATCH_VARIANTS {
         --target '*.vars' \
         $split \
         --format $format \
-        --db \$(readlink -f $db)
+        --db \$(readlink -f $db) \
+        $ambig \
+        $multi
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
