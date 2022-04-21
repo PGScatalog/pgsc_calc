@@ -12,7 +12,7 @@ from bin.read_scorefile import *
 @pytest.fixture
 def db():
     ''' Download reference database from gitlab '''
-    database = req.get('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/reference_data/pgsc_calc_ref.sqlar')
+    database = req.get('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/reference_data/pgsc_calc_ref.sqlar', timeout = 5)
     with open('db.sqlar', 'wb') as f:
         f.write(database.content)
     yield 'db.sqlar'
@@ -93,7 +93,8 @@ def min_lift():
 @pytest.fixture
 def scoring_file_noheader():
     ''' Fetch a scorefile without genome build data in the metadata header '''
-    scorefile = req.get('https://ftp.ebi.ac.uk/pub/databases/spot/pgs/scores/PGS000802/ScoringFiles/PGS000802.txt.gz')
+    scorefile = req.get('http://ftp.ebi.ac.uk/pub/databases/spot/pgs/scores/PGS000802/ScoringFiles/PGS000802.txt.gz', timeout = 5)
+
     with open('PGS000802.txt', 'wb') as f:
         f.write(gzip.decompress(scorefile.content))
     yield 'PGS000802.txt'
@@ -102,7 +103,7 @@ def scoring_file_noheader():
 @pytest.fixture
 def scoring_file_header():
     ''' Fetch a scorefile with genome build data in the metadata header '''
-    scorefile = req.get('https://ftp.ebi.ac.uk/pub/databases/spot/pgs/scores/PGS000777/ScoringFiles/PGS000777.txt.gz')
+    scorefile = req.get('http://ftp.ebi.ac.uk/pub/databases/spot/pgs/scores/PGS000777/ScoringFiles/PGS000777.txt.gz', timeout = 5)
     with open('PGS000777.txt', 'wb') as f:
         f.write(gzip.decompress(scorefile.content))
     yield 'PGS000777.txt'
