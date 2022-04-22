@@ -21,13 +21,13 @@ def parse_args(args=None):
     parser.add_argument('--db', dest='db', help='<Required> path to database')
     parser.add_argument('-m', '--min_overlap', dest='min_overlap', required=True,
                         type=float, help='<Required> Minimum proportion of variants to match before error')
-    parser.add_argument('--keep_ambiguous', dest='remove_ambiguous', default=True, action='store_false',
+    parser.add_argument('--keep_ambiguous', dest='remove_ambiguous', action='store_false',
                         help='Flag to force the program to keep variants with ambiguous alleles, (e.g. A/T and G/C '
-                             'SNPs), which are normally excluded. In this case the program proceeds assuming that the '
+                             'SNPs), which are normally excluded (default: false). In this case the program proceeds assuming that the '
                              'genotype data is on the same strand as the GWAS whose summary statistics were used to '
                              'construct the score.'),
-    parser.add_argument('--keep_multiallelic', dest='remove_multiallelic', default=False, action='store_true',
-                        help='Flag to preserve multiallelic variants (default: false).')
+    parser.add_argument('--keep_multiallelic', dest='remove_multiallelic', action='store_false',
+                        help='Flag to allow matching to multiallelic variants (default: false).')
     return parser.parse_args(args)
 
 
@@ -64,11 +64,13 @@ def read_target(path: str, plink_format: str, remove_multiallelic: bool) -> pl.D
 
         # Handle multi-allelic variants
         is_ma: pl.Series = x['ALT'].str.contains(',')  # plink2 pvar multi-alleles are comma-separated
-        if is_ma.sum() > 0 and not remove_multiallelic:
-            x.replace('ALT', x['ALT'].str.split(by=','))  # turn ALT to list of variants
-            x = x.explode('ALT')  # expand the DF to have all the variants in different rows
-        elif remove_multiallelic:
-            x = x[~is_ma]
+        if is_ma.sum() > 0:
+            if remove_multiallelic:
+                print('Dropping Multiallelic variants')
+                x = x[~is_ma]
+            else:
+                x.replace('ALT', x['ALT'].str.split(by=','))  # turn ALT to list of variants
+                x = x.explode('ALT')  # expand the DF to have all the variants in different rows
 
     x = x.with_columns([
         (pl.col("REF").str.replace_all("A", "V")
@@ -153,6 +155,7 @@ def get_all_matches(target: pl.DataFrame, scorefile: pl.DataFrame, remove_ambig:
     ambig_labelled: pl.DataFrame = label_biallelic_ambiguous(pl.concat([refalt, altref, refalt_flip, altref_flip]))
 
     if remove_ambig:
+        print('Removing Ambiguous Matches')
         return ambig_labelled.filter(pl.col("ambiguous") == False)
     else:
         ambig: pl.DataFrame = ambig_labelled.filter((pl.col("ambiguous") == True) & \
