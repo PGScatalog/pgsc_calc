@@ -4,8 +4,8 @@ process PLINK2_SCORE {
 
     conda (params.enable_conda ? "bioconda::plink2=2.00a2.3" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/plink2:2.00a2.3--h712d239_1' :
-        'quay.io/biocontainers/plink2:2.00a2.3--h712d239_1' }"
+        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/plink2:2.00a2.3--h712d239_1' :
+        'dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/plink2:2.00a2.3--h712d239_1' }"
 
     input:
     tuple val(meta), path(geno), path(pheno), path(variants), val(scoremeta), path(scorefile)
