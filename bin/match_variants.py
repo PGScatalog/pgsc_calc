@@ -17,8 +17,8 @@ def parse_args(args=None):
                         help='<Required> A table of target genomic variants (.bim format)')
     parser.add_argument('--split', dest='split', default=False, action='store_true',
                         help='<Required> Split scorefile per chromosome?')
-    parser.add_argument('--format', dest='plink_format', help='<Required> bim or pvar?')
-    parser.add_argument('--db', dest='db', help='<Required> path to database')
+    parser.add_argument('--format', required = True, dest='plink_format', help='<Required> bim or pvar?')
+    parser.add_argument('--db', dest='db', required = True, help='<Required> path to database')
     parser.add_argument('-m', '--min_overlap', dest='min_overlap', required=True,
                         type=float, help='<Required> Minimum proportion of variants to match before error')
     parser.add_argument('--keep_ambiguous', dest='remove_ambiguous', action='store_false',
