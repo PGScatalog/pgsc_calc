@@ -148,15 +148,6 @@ def scoring_file_header():
         os.remove('PGS000777.txt')
 
 @pytest.fixture
-def scoring_file_noOA(scoring_file_noheader):
-    ''' A scoring file (path) with no other allele '''
-    f = pd.read_table(scoring_file_noheader, comment = '#')
-    f.drop(['other_allele'], inplace = True, axis = 1)
-    f.to_csv('no_oa.txt', sep = '\t', index = False)
-    yield 'no_oa.txt'
-    os.remove('no_oa.txt')
-
-@pytest.fixture
 def scoring_file_noEA(scoring_file_noheader):
     ''' A scoring file (path) with no other allele '''
     f = pd.read_table(scoring_file_noheader, comment = '#')
@@ -164,6 +155,15 @@ def scoring_file_noEA(scoring_file_noheader):
     f.to_csv('no_ea.txt', sep = '\t', index = False)
     yield 'no_ea.txt'
     os.remove('no_ea.txt')
+
+@pytest.fixture
+def scoring_file_noOA(scoring_file_noheader):
+    ''' A scoring file (path) with no other allele '''
+    f = pd.read_table(scoring_file_noheader, comment = '#')
+    f.drop(['other_allele'], inplace = True, axis = 1)
+    f.to_csv('no_oa.txt', sep = '\t', index = False)
+    yield 'no_oa.txt'
+    os.remove('no_oa.txt')
 
 @pytest.fixture
 def out_scorefile():
@@ -338,14 +338,13 @@ def test_read_multi_ew(multi_score_file, bad_multi_score_file, multi_score_df):
         read_scorefile(bad_multi_score_file)
 
 
-def test_missing_alleles(scoring_file_noOA, scoring_file_noEA):
-    """ Test that reading a scorefile without effect alleles or other alleles
+def test_missing_alleles(scoring_file_noEA, scoring_file_noOA):
+    """ Test that reading a scorefile without effect alleles
     specified raises an assertion error """
 
-    with pytest.raises(AssertionError) as excinfo:
-        read_scorefile(scoring_file_noOA)
-
-    assert "Missing" in str(excinfo.value)
+    # missing other allele should be OK
+    df_dict, _ = read_scorefile(scoring_file_noOA)
+    assert [all(v['other_allele'].isna()) for k, v in df_dict.items()]
 
     with pytest.raises(AssertionError) as excinfo_ea:
         read_scorefile(scoring_file_noEA)
