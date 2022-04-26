@@ -40,8 +40,11 @@ def to_int(i: str) -> Optional[int]:
 
 def set_effect_type(x: pd.DataFrame, path: str) -> pd.DataFrame:
     """ Do error checking and extract effect type from single effect weight scorefile """
-    mandatory_columns: List[str] = ["chr_name", "chr_position", "effect_allele", "other_allele", "effect_weight"]
+    mandatory_columns: List[str] = ["chr_name", "chr_position", "effect_allele", "effect_weight"]
     col_error: str = "ERROR: Missing mandatory columns"
+
+    if 'other_allele' in x.columns:
+            mandatory_columns.extend(['other_allele'])
 
     if not {'is_recessive', 'is_dominant'}.issubset(x.columns):
         assert set(mandatory_columns).issubset(x.columns), col_error
@@ -63,7 +66,11 @@ def set_effect_type(x: pd.DataFrame, path: str) -> pd.DataFrame:
             .assign(effect_type=lambda df: df[["is_recessive", "is_dominant", "additive"]].idxmax(1))
             .drop(["is_recessive", "is_dominant", "additive"], axis=1)
         )
-    return scorefile
+
+    if 'other_allele' not in scorefile:
+        return scorefile.assign(other_allele = None)
+    else:
+        return scorefile
 
 
 def quality_control(accession: str, df: pd.DataFrame) -> pd.DataFrame:
@@ -94,7 +101,7 @@ def score_summary(raw: Dict[str, pd.DataFrame], qc: Dict[str, pd.DataFrame]) -> 
     # outer join to find raw scores missing from QC and then label with fail
     return (qc_scores
             .assign(qc=True)
-            .join(raw_scores.set_index(idx), on=idx, how='outer')
+            .merge(raw_scores, how='outer')
             .fillna(value={'qc': False}))
 
 
@@ -106,7 +113,7 @@ def read_scorefile(path: str) -> Tuple[Dict[str, pd.DataFrame], pd.DataFrame]:
     assert len(df.columns) > 1, "ERROR: scorefile not formatted correctly"
     assert {'chr_name', 'chr_position'}.issubset(df.columns), \
         "ERROR: Need chr_position and chr_name (rsids not supported yet!)"
-    assert {'effect_allele', 'other_allele'}.issubset(df.columns), "ERROR: Missing effect / other allele columns"
+    assert 'effect_allele' in df, "ERROR: Missing effect / other allele columns"
 
     # nullable int is always important
     df[["chr_name", "chr_position"]] = df[["chr_name", "chr_position"]].astype(pd.Int64Dtype())
@@ -264,10 +271,13 @@ def check_build(accession: str, build: Optional[str]) -> None:
 
 
 def write_scorefile(x: Dict[str, pd.DataFrame], outfile: str) -> None:
-    """ Serialise an object to file """
+    """ Combine scorefiles into a big flat TSV """
     dfs: List[pd.DataFrame] = []
     [dfs.append(v.assign(accession=k)) for k, v in x.items()]
-    pd.concat(dfs).to_csv(outfile, index=False, sep='\t')
+
+    # reset column order
+    cols: List[str] = ['chr_name', 'chr_position', 'effect_allele', 'other_allele', 'effect_weight', 'effect_type', 'accession']
+    pd.concat(dfs)[cols].to_csv(outfile, index=False, sep='\t')
 
 
 def liftover_summary(lifted_dict: Dict[str, pd.DataFrame],
