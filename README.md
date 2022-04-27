@@ -15,31 +15,29 @@
 
 ## Introduction
 
-`pgsc_calc` is a bioinformatics best-practice analysis pipeline for applying
-scoring files from the [Polygenic Score (PGS)
-Catalog](https://www.pgscatalog.org/) to target genotyped samples.
+`pgsc_calc` is a bioinformatics best-practice analysis pipeline for calculating
+polygenic [risk] scores on samples with imputed genotypes using existing scoring 
+files from the [Polygenic Score (PGS) Catalog](https://www.pgscatalog.org/) and/or user-defined PGS/PRS.
 
 The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 to run tasks across multiple compute infrastructures in a very portable
-manner. It uses Docker/Singularity containers making installation trivial and
-results highly reproducible. The [Nextflow
-DSL2](https://www.nextflow.io/docs/latest/dsl2.html) implementation of this
+manner (e.g. at the source of your dataset). It uses Docker/Singularity containers that make 
+results highly reproducible by automating software installation. The 
+[Nextflow DSL2](https://www.nextflow.io/docs/latest/dsl2.html) implementation of this
 pipeline uses one container per process which makes it much easier to maintain
 and update software dependencies. Where possible, these processes have been
-submitted to and installed from
-[nf-core/modules](https://github.com/nf-core/modules) in order to make them
-available to all nf-core pipelines, and to everyone within the Nextflow
-community!
+submitted to and installed from [nf-core/modules](https://github.com/nf-core/modules) 
+in order to make them available to all nf-core pipelines, and to everyone within the Nextflow community!
 
 ## Pipeline summary
 
 1. Optionally, fetch a scorefile from the PGS Catalog API
-2. Convert target genomic data from VCF to plink format automatically
-3. Split target genomic data automatically
-4. Relabel variants to a common identifier
-5. Match variants in the scoring file against variants in the target genome
-6. Calculate scores for each sample
-7. Produce a summary report
+2. Validate PGS Catalog and/or user-defined scoring file formays
+3. Convert target genotype data (e.g. plink1/2 files, VCF) to plink format automatically
+5. Relabel variants to a common identifier
+6. Match variants in the scoring file against variants in the genotyping data
+7. Calculate scores for each sample (handling multiple scores in paralell)
+8. Produce a summary report
 
 ### Features in development
 
