@@ -102,6 +102,10 @@ def read_target(path: str, plink_format: str, remove_multiallelic: bool) -> pl.D
 
 def read_scorefile(path: str) -> pl.DataFrame:
     scorefile: pl.DataFrame = pl.read_csv(path, sep='\t')
+
+    assert all((scorefile.groupby(['accession', 'chr_name', 'chr_position', 'effect_allele'])
+               .count()['count']) == 1), "Multiple effect weights per variant per accession!"
+
     return scorefile.with_columns([
         pl.col("effect_allele").cast(pl.Categorical),
         pl.col("other_allele").cast(pl.Categorical),
@@ -168,6 +172,7 @@ def get_all_matches(target: pl.DataFrame, scorefile: pl.DataFrame, remove_ambig:
         matches['altref'] = match_variants(scorefile, target, EA='ALT', OA='REF', match_type="altref")
         matches['refalt_flip'] = match_variants(scorefile, target, EA='REF_FLIP', OA='ALT_FLIP', match_type="refalt_flip")
         matches['altref_flip'] = match_variants(scorefile, target, EA='ALT_FLIP', OA='REF_FLIP', match_type="altref_flip")
+
     if scorefile_no_oa:
         matches['no_oa_ref'] = match_variants(scorefile_no_oa, target, EA='REF', OA=None, match_type="no_oa_ref")
         matches['no_oa_alt'] = match_variants(scorefile_no_oa, target, EA='ALT', OA=None, match_type="no_oa_alt")
@@ -175,6 +180,11 @@ def get_all_matches(target: pl.DataFrame, scorefile: pl.DataFrame, remove_ambig:
         matches['no_oa_alt_flip'] = match_variants(scorefile_no_oa, target, EA='ALT_FLIP', OA=None, match_type="no_oa_alt_flip")
 
     ambig_labelled: pl.DataFrame = label_biallelic_ambiguous(pl.concat(list(matches.values())))
+
+    # no. of matches should never be more than the no. of variants in scorefile
+    input_count = scorefile.groupby(['accession']).count().sort('accession')
+    match_count = ambig_labelled.groupby(['accession']).count().sort('accession')
+    assert all(input_count['count'] >= match_count['count'])
 
     if remove_ambig:
         print('Removing Ambiguous Matches')
@@ -185,6 +195,23 @@ def get_all_matches(target: pl.DataFrame, scorefile: pl.DataFrame, remove_ambig:
         unambig: pl.DataFrame = ambig_labelled.filter(pl.col("ambiguous") == False)
         return pl.concat([ambig, unambig])
 
+def get_distinct_weights(df: pl.DataFrame) -> pl.DataFrame:
+    """ Get a single effect weight for each matched variant per accession """
+    count: pl.DataFrame = df.groupby(['accession', 'chr_name', 'chr_position', 'effect_allele']).count()
+    singletons: pl.DataFrame = (count.filter(pl.col('count') == 1)[:,"accession":"effect_allele"]
+            .join(df, on = ['accession', 'chr_name', 'chr_position', 'effect_allele'], how = 'left'))
+
+    # TODO: something more complex than .unique()?
+    # prioritise unambiguous -> ref -> alt -> ref_flip -> alt_flip
+    dups: pl.DataFrame = (count.filter(pl.col('count') > 1)[:,"accession":"effect_allele"]
+            .join(df, on = ['accession', 'chr_name', 'chr_position', 'effect_allele'], how = 'left')
+            .unique(subset = ['accession', 'chr_name', 'chr_position', 'effect_allele']))
+    distinct: pl.DataFrame = pl.concat([singletons, dups])
+
+    assert all((distinct.groupby(['accession', 'chr_name', 'chr_position', 'effect_allele'])
+                .count()['count']) == 1), "Duplicate effect weights for a variant"
+
+    return distinct
 
 def label_biallelic_ambiguous(matches: pl.DataFrame) -> pl.DataFrame:
     # A / T or C / G may match multiple times
@@ -193,7 +220,7 @@ def label_biallelic_ambiguous(matches: pl.DataFrame) -> pl.DataFrame:
         pl.lit(True).alias("ambiguous")
     ])
 
-    return (matches.with_column(
+    return get_distinct_weights(matches.with_column(
         pl.when((pl.col("effect_allele") == pl.col("ALT_FLIP")) |
                 (pl.col("effect_allele") == pl.col("REF_FLIP")))
             .then(pl.col("ambiguous"))
@@ -335,6 +362,8 @@ def main(args=None) -> None:
     """ Match variants from scorefiles against target variant information """
     pl.Config.set_global_string_cache()
     args: argparse.Namespace = parse_args(args)
+
+    assert args.plink_format in ['bim', 'pvar'], "--format bim or --format pvar"
 
     # read inputs --------------------------------------------------------------
     target: pl.DataFrame = read_target(args.target, args.plink_format, args.remove_multiallelic)

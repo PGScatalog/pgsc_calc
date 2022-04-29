@@ -76,6 +76,8 @@ files need extra work:
 .. _`scorefile templates`: https://github.com/PGScatalog/pgsc_calc/blob/master/assets/examples/example_data/scorefile.txt
 .. _`scoring file format v2.0`: https://www.pgscatalog.org/downloads/#scoring_header
 
+.. note:: The ``other_allele`` column is optional but recommended
+          
 3. Calculate!
 ~~~~~~~~~~~~
 
