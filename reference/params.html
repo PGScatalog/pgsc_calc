@@ -199,12 +199,36 @@ title="Print to PDF"
     </ul>
   </div>
 </div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
 
     </div>
 </div>
 
 <!-- Table of contents -->
 <div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#pgscatalog-pgsc-calc-pipeline-parameters">
+   pgscatalog/pgsc_calc pipeline parameters
+  </a>
+ </li>
+</ul>
+
+    </nav>
 </div>
     </div>
     <div class="article row">
@@ -216,6 +240,19 @@ title="Print to PDF"
                 <div id="print-main-content">
                     <div id="jb-print-toc">
                         
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#pgscatalog-pgsc-calc-pipeline-parameters">
+   pgscatalog/pgsc_calc pipeline parameters
+  </a>
+ </li>
+</ul>
+
+                        </nav>
                     </div>
                 </div>
             </div>
@@ -227,6 +264,459 @@ title="Print to PDF"
 <span id="param-ref"></span><h1>Parameter reference<a class="headerlink" href="#parameter-reference" title="Permalink to this headline">#</a></h1>
 <p>The documentation below is automatically generated from the input schema and
 contains additional technical detail.</p>
+<section id="pgscatalog-pgsc-calc-pipeline-parameters">
+<h2>pgscatalog/pgsc_calc pipeline parameters<a class="headerlink" href="#pgscatalog-pgsc-calc-pipeline-parameters" title="Permalink to this headline">#</a></h2>
+<table class="table">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td colspan="4"><p><a class="reference external" href="https://raw.githubusercontent.com/pgscatalog/pgsc_calc/master/nextflow_schema.json">https://raw.githubusercontent.com/pgscatalog/pgsc_calc/master/nextflow_schema.json</a></p></td>
+</tr>
+<tr class="row-even"><td colspan="4"><p>This pipeline applies scoring files from the PGS Catalog to target genotyped samples</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td colspan="3"><p><em>object</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="4"><p>properties</p></td>
+</tr>
+<tr class="row-odd"><td><ul class="simple">
+<li><p>liftover</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-even"><td><ul class="simple">
+<li><p>target_build</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><ul class="simple">
+<li><p>only_input</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-even"><td><ul class="simple">
+<li><p>only_compatible</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-odd"><td><ul class="simple">
+<li><p>only_score</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="5"><p>allOf</p></td>
+<td colspan="3"><p><span class="xref std std-ref">#/definitions/input_output_options</span></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p><span class="xref std std-ref">#/definitions/compatibility_options</span></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p><span class="xref std std-ref">#/definitions/institutional_config_options</span></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p><span class="xref std std-ref">#/definitions/max_job_request_options</span></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p><span class="xref std std-ref">#/definitions/generic_options</span></p></td>
+</tr>
+<tr class="row-odd"><td colspan="4"><p>definitions</p></td>
+</tr>
+<tr class="row-even"><td rowspan="26"><ul class="simple">
+<li><p>input_output_options</p></li>
+</ul>
+</td>
+<td colspan="3"><p><em>Input/output options</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p>Define where the pipeline should find input data and save output data.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td colspan="2"><p><em>object</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p>properties</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p><strong>input</strong></p></li>
+</ul>
+</td>
+<td colspan="2"><p>Path to comma-separated file containing information about the samples (a sample sheet)</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>pattern</p></td>
+<td><p>.csv$|.json$</p></td>
+</tr>
+<tr class="row-odd"><td><p>format</p></td>
+<td><p>file-path</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p><strong>format</strong></p></li>
+</ul>
+</td>
+<td colspan="2"><p>Format of the input</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>enum</p></td>
+<td><p>csv, json</p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>csv</p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><ul class="simple">
+<li><p>scorefile</p></li>
+</ul>
+</td>
+<td colspan="2"><p>Path to a scoring file in PGS Catalog format</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="3"><ul class="simple">
+<li><p>accession</p></li>
+</ul>
+</td>
+<td colspan="2"><p>A PGS Catalog accession</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>pattern</p></td>
+<td><p>(PGS\d+)(,\s*PGS\d+)*</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="3"><ul class="simple">
+<li><p>allelic_freq</p></li>
+</ul>
+</td>
+<td colspan="2"><p>(Optional) Path to a plink 2 allelic frequency file (see –read-freq)</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>NO_FILE</p></td>
+</tr>
+<tr class="row-even"><td rowspan="3"><ul class="simple">
+<li><p>outdir</p></li>
+</ul>
+</td>
+<td colspan="2"><p>Path to the output directory where the results will be saved.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>./results</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="3"><ul class="simple">
+<li><p>email</p></li>
+</ul>
+</td>
+<td colspan="2"><p>Email address for completion summary.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>pattern</p></td>
+<td><p>^([a-zA-Z0-9_\-\.]+)&#64;([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$</p></td>
+</tr>
+<tr class="row-even"><td rowspan="8"><ul class="simple">
+<li><p>compatibility_options</p></li>
+</ul>
+</td>
+<td colspan="3"><p><em>Compatibility options</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td colspan="2"><p><em>object</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td colspan="2"></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p>properties</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="3"><ul class="simple">
+<li><p>min_overlap</p></li>
+</ul>
+</td>
+<td colspan="2"><p>Minimum proportion of variants present in both the score file and input target genomic data</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>number</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>0.75</p></td>
+</tr>
+<tr class="row-even"><td rowspan="20"><ul class="simple">
+<li><p>institutional_config_options</p></li>
+</ul>
+</td>
+<td colspan="3"><p><em>Institutional config options</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p>Parameters used to describe centralised config profiles. These should not be edited.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td colspan="2"><p><em>object</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p>properties</p></td>
+</tr>
+<tr class="row-even"><td rowspan="3"><ul class="simple">
+<li><p>custom_config_version</p></li>
+</ul>
+</td>
+<td colspan="2"><p>Git commit id for Institutional configs.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>master</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="3"><ul class="simple">
+<li><p>custom_config_base</p></li>
+</ul>
+</td>
+<td colspan="2"><p>Base directory for Institutional configs.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p><a class="reference external" href="https://raw.githubusercontent.com/nf-core/configs/master">https://raw.githubusercontent.com/nf-core/configs/master</a></p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><ul class="simple">
+<li><p>hostnames</p></li>
+</ul>
+</td>
+<td colspan="2"><p>Institutional configs hostname.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><ul class="simple">
+<li><p>config_profile_name</p></li>
+</ul>
+</td>
+<td colspan="2"><p>Institutional config name.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><ul class="simple">
+<li><p>config_profile_description</p></li>
+</ul>
+</td>
+<td colspan="2"><p>Institutional config description.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><ul class="simple">
+<li><p>config_profile_contact</p></li>
+</ul>
+</td>
+<td colspan="2"><p>Institutional config contact information.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><ul class="simple">
+<li><p>config_profile_url</p></li>
+</ul>
+</td>
+<td colspan="2"><p>Institutional config URL link.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="15"><ul class="simple">
+<li><p>max_job_request_options</p></li>
+</ul>
+</td>
+<td colspan="3"><p><em>Max job request options</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p>Set the top limit for requested resources for any single job.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td colspan="2"><p><em>object</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p>properties</p></td>
+</tr>
+<tr class="row-even"><td rowspan="3"><ul class="simple">
+<li><p>max_cpus</p></li>
+</ul>
+</td>
+<td colspan="2"><p>Maximum number of CPUs that can be requested for any single job.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>integer</em></p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>16</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="4"><ul class="simple">
+<li><p>max_memory</p></li>
+</ul>
+</td>
+<td colspan="2"><p>Maximum amount of memory that can be requested for any single job.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>pattern</p></td>
+<td><p>^\d+(\.\d+)?\.?\s*(K|M|G|T)?B$</p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>128.GB</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="4"><ul class="simple">
+<li><p>max_time</p></li>
+</ul>
+</td>
+<td colspan="2"><p>Maximum amount of time that can be requested for any single job.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>pattern</p></td>
+<td><p>^(\d+\.?\s*(s|m|h|day)\s*)+$</p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>240.h</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="29"><ul class="simple">
+<li><p>generic_options</p></li>
+</ul>
+</td>
+<td colspan="3"><p><em>Generic options</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p>Less common options for the pipeline, typically set in a config file.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td colspan="2"><p><em>object</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p>properties</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><ul class="simple">
+<li><p>help</p></li>
+</ul>
+</td>
+<td colspan="2"><p>Display help text.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-odd"><td rowspan="4"><ul class="simple">
+<li><p>publish_dir_mode</p></li>
+</ul>
+</td>
+<td colspan="2"><p>Method used to save pipeline results to output directory.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>enum</p></td>
+<td><p>symlink, rellink, link, copy, copyNoFollow, move</p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>copy</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="3"><ul class="simple">
+<li><p>email_on_fail</p></li>
+</ul>
+</td>
+<td colspan="2"><p>Email address for completion summary, only when pipeline fails.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>pattern</p></td>
+<td><p>^([a-zA-Z0-9_\-\.]+)&#64;([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$</p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><ul class="simple">
+<li><p>plaintext_email</p></li>
+</ul>
+</td>
+<td colspan="2"><p>Send plain-text email instead of HTML.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><ul class="simple">
+<li><p>monochrome_logs</p></li>
+</ul>
+</td>
+<td colspan="2"><p>Do not use coloured log outputs.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="3"><ul class="simple">
+<li><p>tracedir</p></li>
+</ul>
+</td>
+<td colspan="2"><p>Directory to keep pipeline Nextflow logs and reports.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>${params.outdir}/pipeline_info</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="3"><ul class="simple">
+<li><p>validate_params</p></li>
+</ul>
+</td>
+<td colspan="2"><p>Boolean whether to validate parameters against the schema at runtime</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><ul class="simple">
+<li><p>show_hidden_params</p></li>
+</ul>
+</td>
+<td colspan="2"><p>Show all params when using <cite>–help</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><ul class="simple">
+<li><p>enable_conda</p></li>
+</ul>
+</td>
+<td colspan="2"><p>Run this workflow with Conda. You can also use ‘-profile conda’ instead of providing this parameter.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><ul class="simple">
+<li><p>singularity_pull_docker_container</p></li>
+</ul>
+</td>
+<td colspan="2"><p>Instead of directly downloading Singularity images for use with Singularity, force the workflow to pull and convert Docker containers instead.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>boolean</em></p></td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 
 

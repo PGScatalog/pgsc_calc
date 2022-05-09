@@ -199,12 +199,36 @@ title="Print to PDF"
     </ul>
   </div>
 </div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
 
     </div>
 </div>
 
 <!-- Table of contents -->
 <div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id1">
+   Input schema
+  </a>
+ </li>
+</ul>
+
+    </nav>
 </div>
     </div>
     <div class="article row">
@@ -216,6 +240,19 @@ title="Print to PDF"
                 <div id="print-main-content">
                     <div id="jb-print-toc">
                         
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id1">
+   Input schema
+  </a>
+ </li>
+</ul>
+
+                        </nav>
                     </div>
                 </div>
             </div>
@@ -227,6 +264,108 @@ title="Print to PDF"
 <h1>Input schema<a class="headerlink" href="#input-schema" title="Permalink to this headline">#</a></h1>
 <p>The documentation below is automatically generated from the input schema and
 contains additional technical detail.</p>
+<section id="id1">
+<h2>Input schema<a class="headerlink" href="#id1" title="Permalink to this headline">#</a></h2>
+<table class="table">
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td colspan="5"><p><a class="reference external" href="https://raw.githubusercontent.com/pgscatalog/pgsc_calc/master/assets/schema_input.json">https://raw.githubusercontent.com/pgscatalog/pgsc_calc/master/assets/schema_input.json</a></p></td>
+</tr>
+<tr class="row-even"><td colspan="5"><p>Schema for the file provided with params.input</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td colspan="4"><p><em>array</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="19"><p>items</p></td>
+<td><p>type</p></td>
+<td colspan="3"><p><em>object</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="4"><p>properties</p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><ul class="simple">
+<li><p><strong>sample</strong></p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>pattern</p></td>
+<td colspan="2"><p>^\S+$</p></td>
+</tr>
+<tr class="row-even"><td rowspan="6"><ul class="simple">
+<li><p>vcf_path</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>pattern</p></td>
+<td colspan="2"><p>^\S+\.vcf\.gz$</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><p>anyOf</p></td>
+<td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>pattern</p></td>
+<td><p>^\S+\.vcf\.gz$</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>maxLength</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>bfile_path</p></li>
+</ul>
+</td>
+<td rowspan="4"><p>anyOf</p></td>
+<td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>pattern</p></td>
+<td><p>^\S+$</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>maxLength</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p><strong>chrom</strong></p></li>
+</ul>
+</td>
+<td rowspan="4"><p>anyOf</p></td>
+<td><p>type</p></td>
+<td><p><em>null</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>integer</em></p></td>
+</tr>
+<tr class="row-even"><td><p>maximum</p></td>
+<td><p>22</p></td>
+</tr>
+<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td colspan="4"><p>not</p></td>
+</tr>
+<tr class="row-odd"><td><p>minItems</p></td>
+<td colspan="4"><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>uniqueItems</p></td>
+<td colspan="4"><p>True</p></td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 
 
