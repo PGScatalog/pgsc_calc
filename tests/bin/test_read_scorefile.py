@@ -9,13 +9,18 @@ import sys
 sys.path.append("..")
 from bin.read_scorefile import *
 
+def get_timeout(url):
+    """ Get a remote file with timeout """
+    try:
+        return req.get(url, timeout = 5)
+    except (req.exceptions.ConnectionError, req.Timeout):
+        return []
+
+
 @pytest.fixture
 def db():
     ''' Download reference database from gitlab '''
-    try:
-        database = req.get('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/reference_data/pgsc_calc_ref.sqlar', timeout = 5)
-    except (req.exceptions.ConnectionError, req.Timeout):
-        database = []
+    database = get_timeout('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/reference_data/pgsc_calc_ref.sqlar')
 
     if not database:
         pytest.skip("Couldn't get file from EBI FTP")
@@ -25,6 +30,7 @@ def db():
 
         yield 'db.sqlar'
         os.remove('db.sqlar')
+
 
 @pytest.fixture
 def chain_files(db):
@@ -101,10 +107,7 @@ def min_lift():
 @pytest.fixture
 def scoring_file_noheader():
     ''' Fetch a scorefile without genome build data in the metadata header '''
-    try:
-        scorefile = req.get('https://ftp.ebi.ac.uk/pub/databases/spot/pgs/scores/PGS000802/ScoringFiles/PGS000802.txt.gz', timeout = 5)
-    except (req.exceptions.ConnectionError, req.Timeout):
-        scorefile = []
+    scorefile = get_timeout('https://ftp.ebi.ac.uk/pub/databases/spot/pgs/scores/PGS000802/ScoringFiles/PGS000802.txt.gz')
 
     if not scorefile:
         pytest.skip("Couldn't get file from EBI FTP")
@@ -116,10 +119,7 @@ def scoring_file_noheader():
 
 @pytest.fixture
 def pgs001229():
-    try:
-        scorefile = req.get('https://ftp.ebi.ac.uk/pub/databases/spot/pgs/scores/PGS001229/ScoringFiles/PGS001229.txt.gz', timeout = 5)
-    except (req.exceptions.ConnectionError, req.Timeout):
-        scorefile = []
+    scorefile = get_timeout('https://ftp.ebi.ac.uk/pub/databases/spot/pgs/scores/PGS001229/ScoringFiles/PGS001229.txt.gz')
 
     if not scorefile:
         pytest.skip("Couldn't get file from EBI FTP")
@@ -133,10 +133,7 @@ def pgs001229():
 @pytest.fixture
 def scoring_file_header():
     ''' Fetch a scorefile with genome build data in the metadata header '''
-    try:
-        scorefile = req.get('https://ftp.ebi.ac.uk/pub/databases/spot/pgs/scores/PGS000777/ScoringFiles/PGS000777.txt.gz', timeout = 5)
-    except (req.exceptions.ConnectionError, req.Timeout):
-        scorefile = []
+    scorefile = get_timeout('https://ftp.ebi.ac.uk/pub/databases/spot/pgs/scores/PGS000777/ScoringFiles/PGS000777.txt.gz')
 
     if not scorefile:
         pytest.skip("Couldn't get file from EBI FTP")
@@ -216,6 +213,20 @@ def bad_multi_score_file(multi_score_df):
 def df_cols():
     ''' Expected column names of a parsed scorefile '''
     return { 'chr_name', 'chr_position', 'effect_allele', 'other_allele', 'effect_weight', 'effect_type' }
+
+@pytest.fixture
+def multiple_weights_per_position():
+    """ A scorefile with multiple weights per position """
+    scorefile = get_timeout('http://ftp.ebi.ac.uk/pub/databases/spot/pgs/scores/PGS000318/ScoringFiles/PGS000318.txt.gz')
+
+    if not scorefile:
+        pytest.skip("Couldn't get file from EBI FTP")
+    else:
+        with open('PGS000318.txt', 'wb') as f:
+            f.write(gzip.decompress(scorefile.content))
+
+        yield 'PGS000318.txt'
+        os.remove('PGS000318.txt')
 
 def test_valid_chrom(valid_chrom):
     assert to_int(valid_chrom) == 1
@@ -404,3 +415,9 @@ def test_args():
     assert not args.liftover
     assert not args.target_build
     assert args.min_lift == 0.95
+
+def test_multiple_weights_per_position(multiple_weights_per_position):
+
+    x, _ = read_scorefile(multiple_weights_per_position)
+
+    assert x['PGS000318'].empty, "Scorefile should be filtered out"
