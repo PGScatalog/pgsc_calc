@@ -31,7 +31,7 @@ def parse_args(args=None) -> argparse.Namespace:
 
 
 def to_int(i: str) -> Optional[int]:
-    """ Convert non-numeric chromosomes or positions to NaN """
+    """ Convert non-numeric positions to NaN """
     try:
         return int(i)
     except ValueError:
@@ -116,15 +116,15 @@ def score_summary(raw: Dict[str, pd.DataFrame], qc: Dict[str, pd.DataFrame]) -> 
 def read_scorefile(path: str) -> Tuple[Dict[str, pd.DataFrame], pd.DataFrame]:
     """ Read essential information from a scorefile """
 
-    df: pd.DataFrame = pd.read_table(path, converters={"chr_name": to_int, "chr_pos": to_int}, comment="#")
+    df: pd.DataFrame = pd.read_table(path, converters={"chr_pos": to_int}, comment="#")
 
     assert len(df.columns) > 1, "ERROR: scorefile not formatted correctly"
     assert {'chr_name', 'chr_position'}.issubset(df.columns), \
         "ERROR: Need chr_position and chr_name (rsids not supported yet!)"
-    assert 'effect_allele' in df, "ERROR: Missing effect / other allele columns"
+    assert 'effect_allele' in df, "ERROR: Missing effect allele column"
 
     # nullable int is always important
-    df[["chr_name", "chr_position"]] = df[["chr_name", "chr_position"]].astype(pd.Int64Dtype())
+    df["chr_position"] = df["chr_position"].astype(pd.Int64Dtype())
 
     # check for a single effect weight column called 'effect_weight'
     columns: List[Optional[re.match]] = [re.search("^effect_weight$", x) for x in df.columns.to_list()]
@@ -173,13 +173,7 @@ def parse_lifted_chrom(i: str) -> Optional[int]:
     liftover needs chr suffix for chromosome input (1 -> chr1), and it also
     returns weird chromosomes sometimes (chr22 -> 22_KI270879v1_alt)
     """
-    try:
-        return int(i)
-    except ValueError:
-        try:
-            return int(i.split('_')[0])
-        except ValueError:
-            return None
+    return i.split('_')[0]
 
 
 def convert_coordinates(df: pd.DataFrame, lo: pyliftover.LiftOver) -> pd.Series:
@@ -190,11 +184,11 @@ def convert_coordinates(df: pd.DataFrame, lo: pyliftover.LiftOver) -> pd.Series:
     converted: Optional[List[Tuple[str, int, str, int]]] = lo.convert_coordinate(chrom, pos)
 
     if converted:
-        lifted_chrom: Optional[int] = parse_lifted_chrom(converted[0][0][3:])  # return first matching liftover
+        lifted_chrom: str = parse_lifted_chrom(converted[0][0][3:])  # return first matching liftover
         lifted_pos: int = int(converted[0][1]) + 1  # reverse 0 indexing
-        return pd.Series([lifted_chrom, lifted_pos], dtype='Int64')
+        return pd.Series([lifted_chrom, lifted_pos])
     else:
-        return pd.Series([None, None], dtype='Int64')
+        return pd.Series([None, None])
 
 
 def liftover(accession: str,
@@ -203,7 +197,7 @@ def liftover(accession: str,
              to_build: str,
              min_lift: float) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """ Update scorefile pd.DataFrame with lifted coordinates """
-    build_dict: dict = {'GRCh37': 'hg19', 'GRCh38': 'hg38', 'hg19': 'hg19', 'hg18': 'hg18'}
+    build_dict: dict = {'GRCh37': 'hg19', 'GRCh38': 'hg38', 'hg19': 'hg19', 'hg38': 'hg38'}
 
     if build_dict[from_build] == build_dict[to_build]:
         df[['lifted_chr', 'lifted_pos']] = df[['chr_name', 'chr_position']]
@@ -218,8 +212,9 @@ def liftover(accession: str,
         chain_path: str = "{}To{}.over.chain.gz".format(build_dict[from_build], build_dict[to_build].capitalize())
         lo: pyliftover.LiftOver = pyliftover.LiftOver(chain_path)
         df[['lifted_chr', 'lifted_pos']] = df.apply(lambda x: convert_coordinates(x, lo), axis=1)
-        mapped: pd.DataFrame = df[~df.isnull().any(axis=1)].assign(liftover=True)
-        unmapped: pd.DataFrame = df[df.isnull().any(axis=1)].assign(liftover=False)
+        mapped: pd.DataFrame = df[~df[['lifted_chr', 'lifted_pos']].isnull().any(axis = 1)].assign(liftover=True)
+        unmapped: pd.DataFrame = df[df[['lifted_chr', 'lifted_pos']].isnull().any(axis = 1)].assign(liftover=False)
+
         check_liftover({'mapped': mapped, 'unmapped': unmapped}, accession, min_lift)
 
         return mapped, unmapped
@@ -231,7 +226,7 @@ def check_liftover(df_dict: Dict[str, pd.DataFrame], accession: str, min_lift: f
     n_unmapped: int = df_dict['unmapped'].shape[0]
     total: int = n_mapped + n_unmapped
 
-    err: str = "ERROR: Liftover failed for {}, see --min-lift parameter".format(accession)
+    err: str = "ERROR: Liftover failed for {}, see --min_lift parameter".format(accession)
     assert n_mapped / total > min_lift, err
 
 
@@ -333,7 +328,7 @@ def write_log(df: pd.DataFrame, conn: sqlite3.Connection) -> None:
     """ Write log to DB. All columns mandatory even if liftover not used:
 
     CREATE TABLE IF NOT EXISTS "scorefile" (
-      "chr_name" INTEGER,
+      "chr_name" TEXT,
       "chr_position" INTEGER,
       "effect_allele" TEXT,
       "other_allele" TEXT,
@@ -352,7 +347,7 @@ def write_log(df: pd.DataFrame, conn: sqlite3.Connection) -> None:
                                'other_allele', 'effect_weight', 'effect_type',
                                'accession', 'qc', 'lifted_chr', 'lifted_pos',
                                'liftover'}
-    nullable_ints: List[str] = ['liftover', 'qc', 'lifted_chr', 'lifted_pos']
+    nullable_ints: List[str] = ['liftover', 'qc', 'lifted_pos']
     df[nullable_ints] = df[nullable_ints].astype('Int64')
     df.to_sql('scorefile', conn, index=False)
 

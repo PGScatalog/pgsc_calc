@@ -27,6 +27,7 @@ process SCOREFILE_CHECK {
             --liftover \
             -t $params.target_build \
             -o scorefiles.txt \
+            -m $params.min_lift \
             $args
 
         cat <<-END_VERSIONS > versions.yml
