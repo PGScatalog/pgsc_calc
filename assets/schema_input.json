@@ -1,74 +1,151 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "https://raw.githubusercontent.com/pgscatalog/pgsc_calc/master/assets/schema_input.json",
-  "title": "Input schema",
-  "description": "Schema for the file provided with params.input",
-  "type": "array",
-  "uniqueItems": true,
-  "minItems": 1,
-  "items": {
-    "type": "object",
-    "properties": {
-      "sample": {
-        "type": "string",
-        "pattern": "^\\S+$",
-        "errorMessage": "Sample name must be provided and cannot contain spaces"
+  "$schema":"http://json-schema.org/draft-07/schema",
+  "$id":"https://raw.githubusercontent.com/pgscatalog/pgsc_calc/master/assets/schema_input.json",
+  "title":"Input schema",
+  "description":"Schema for the JSON file provided with params.input when params.format is set to json",
+  "type":"array",
+  "uniqueItems":true,
+  "minItems":1,
+  "items":{
+    "type":"object",
+    "properties":{
+      "sample":{
+        "type":"string",
+        "pattern":"^\\S+$",
+        "errorMessage":"Sample name must be provided and cannot contain spaces"
       },
-      "vcf_path": {
-        "type": "string",
-        "pattern": "^\\S+\\.vcf\\.gz$",
-        "errorMessage": "VCF path must end with .vcf.gz, mutually exclusive with bfile_path",
-        "anyOf": [
+      "vcf_path":{
+        "type":"string",
+        "pattern":"^\\S+\\.vcf\\.gz$",
+        "errorMessage":"VCF path must end with .vcf.gz, mutually exclusive with other formats",
+        "anyOf":[
           {
-            "type": "string",
-            "pattern": "^\\S+\\.vcf\\.gz$"
+            "type":"string",
+            "pattern":"^\\S+\\.vcf\\.gz$"
           },
           {
-            "type": "string",
-            "maxLength": 0
+            "type":"string",
+            "minLength":1,
+            "maxLength":0
           }
         ]
       },
-      "bfile_path": {
-        "errorMessage": "Plink 1 binary fileset prefix, must not end with bed / bim / fam, mutually exclusive with vcf_path",
-        "anyOf": [
+      "bfile_path":{
+        "errorMessage":"Plink 1 binary fileset prefix, must not end with bed / bim / fam, mutually exclusive with other formats",
+        "anyOf":[
           {
-            "type": "string",
-            "pattern": "^\\S+$"
+            "type":"string",
+            "pattern":"^(?!vcf$|vcf\\.gz$|bim$|bed$|fam$)[^.]+$"
           },
           {
-            "type": "string",
-            "maxLength": 0
+            "type":"string",
+            "minLength":1,
+            "maxLength":0
           }
         ]
       },
-      "chrom": {
-        "errorMessage": "Plink 1 binary fileset prefix, must not end with bed / bim / fam, mutually exclusive with vcf_path",
-        "anyOf": [
+      "pfile_path":{
+        "errorMessage":"Plink 2 binary fileset prefix, must not end with pvar / pgen / psam, mutually exclusive with other formats. Must not be zstd compressed.",
+        "anyOf":[
           {
-            "type": "null"
+            "type":"string",
+            "pattern":"^(?!vcf$|vcf\\.gz$|psam$|pvar$|pgen$)[^.]+$"
           },
           {
-            "type": "integer",
-            "exclusiveMinimum": 1,
-            "maximum": 22
+            "type":"string",
+            "minLength":1,
+            "maxLength":0
+          }
+        ]
+      },
+      "chrom":{
+        "errorMessage":"Chromosome of associated genomic data. If multiple chromosomes are in the data, set to an empty string",
+        "anyOf":[
+          {
+            "type":"null"
+          },
+          {
+            "type":"string"
           }
         ]
       }
     },
-    "required": [
+    "required":[
       "sample",
       "chrom"
     ],
-    "not": {
-      "anyOf": [
-        {
-          "required": [
-            "vcf_path",
-            "bfile_path"
-          ]
-        }
-      ]
+    "oneOf":[
+      {
+        "required":[
+          "vcf_path"
+        ]
+      },
+      {
+        "required":[
+          "bfile_path"
+        ]
+      },
+      {
+        "required":[
+          "pfile_path"
+        ]
+      }
+    ],
+    "dependencies":{
+      "pfile_path":{
+        "allOf":[
+          {
+            "not":{
+              "required":[
+                "vcf_path"
+              ]
+            }
+          },
+          {
+            "not":{
+              "required":[
+                "bfile_path"
+              ]
+            }
+          }
+        ]
+      },
+      "bfile_path":{
+        "allOf":[
+          {
+            "not":{
+              "required":[
+                "vcf_path"
+              ]
+            }
+          },
+          {
+            "not":{
+              "required":[
+                "pfile_path"
+              ]
+            }
+          }
+        ]
+      },
+      "vcf_path":{
+        "allOf":[
+          {
+            "not":{
+              "required":[
+                "pfile_path"
+              ]
+            }
+          },
+          {
+            "not":{
+              "required":[
+                "bfile_path"
+              ]
+            }
+          }
+        ]
+      }
     }
   }
 }
