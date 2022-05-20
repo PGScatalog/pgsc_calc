@@ -6,7 +6,6 @@ import sys
 import glob
 from typing import List, Dict, Union
 
-
 def parse_args(args=None):
     parser = argparse.ArgumentParser(description='Read and format scoring files')
     parser.add_argument('-d', '--dataset', dest='dataset', required=True,
@@ -196,8 +195,12 @@ def get_all_matches(target: pl.DataFrame, scorefile: pl.DataFrame, remove_ambig:
         print('Removing Ambiguous Matches')
         return ambig_labelled.filter(pl.col("ambiguous") == False)
     else:
+        # pick the best possible match from the ambiguous matches
+        # EA = REF and OA = ALT or EA = REF and OA = None
         ambig: pl.DataFrame = ambig_labelled.filter((pl.col("ambiguous") == True) & \
-                                                    (pl.col("match_type") == "refalt"))
+                                                    (pl.col("match_type") == "refalt") |
+                                                    (pl.col("ambiguous") == True) & \
+                                                    (pl.col("match_type") == "no_oa_ref"))
         unambig: pl.DataFrame = ambig_labelled.filter(pl.col("ambiguous") == False)
         return pl.concat([ambig, unambig])
 
@@ -330,26 +333,49 @@ def read_log(conn: str) -> pl.DataFrame:
     ])
 
 
+def join_log(logs: pl.DataFrame, match: pl.DataFrame, lifted: bool) -> pl.DataFrame:
+    """ Lifted scorefiles need to match the log using different chr_name chr_pos """
+
+    if lifted:
+        return (logs.join(match,
+                          left_on=['lifted_chr', 'lifted_pos', 'effect_allele', 'other_allele',
+                                   'accession', 'effect_type', 'effect_weight'],
+                          right_on=['chr_name', 'chr_position', 'effect_allele', 'other_allele',
+                                    'accession', 'effect_type', 'effect_weight'], how='left'))
+    else:
+        return (logs.join(match,
+                          left_on=['chr_name', 'chr_position', 'effect_allele', 'other_allele',
+                                   'accession', 'effect_type', 'effect_weight'],
+                          right_on=['chr_name', 'chr_position', 'effect_allele', 'other_allele',
+                                    'accession', 'effect_type', 'effect_weight'], how='left'))
+
+
 def update_log(logs: pl.DataFrame,
                matches: pl.DataFrame,
                min_overlap: float,
                dataset: str) -> None:
     """ Read log and update with match data, write to csv """
-    match_clean: pl.DataFrame = matches.drop(['REF', 'ALT', 'REF_FLIP', 'ALT_FLIP'])
-    match_log: pl.DataFrame = (logs.join(match_clean,
-                                         left_on=['chr_name', 'chr_position', 'effect_allele', 'other_allele',
-                                                  'accession',
-                                                  'effect_type', 'effect_weight'],
-                                         right_on=['chr_name', 'chr_position', 'effect_allele', 'other_allele',
-                                                   'accession',
-                                                   'effect_type', 'effect_weight'], how='left')
-        .with_columns([
-        pl.col('ambiguous').fill_null(True),
-        pl.lit(dataset).alias('dataset')
-    ]))
 
+    match_clean: pl.DataFrame = matches.drop(['REF', 'ALT', 'REF_FLIP', 'ALT_FLIP'])
+    unlifted_accessions: pl.DataFrame = logs[['accession', 'liftover']].unique().filter(pl.col('liftover') == None)
+    lifted_accessions: pl.DataFrame = logs[['accession', 'liftover']].unique().filter(pl.col('liftover') == 1)
+    matches = []
+
+    if lifted_accessions:
+        matches.append(join_log(logs, match_clean, lifted = True))
+
+    if unlifted_accessions:
+        matches.append(join_log(logs, match_clean, lifted = False))
+
+
+    match_log: pl.DataFrame = (pl.concat(matches)
+                               .with_columns([
+                                   pl.col('ambiguous').fill_null(True),
+                                   pl.lit(dataset).alias('dataset')
+                               ]))
+
+    match_log.write_csv('log.csv') # TODO: sqlite3 database?
     check_match(match_log, min_overlap)
-    match_log.write_csv('log.csv')  # TODO: sqlite3 database
 
 
 def check_match(match_log: pl.DataFrame, min_overlap: float) -> None:
@@ -361,8 +387,8 @@ def check_match(match_log: pl.DataFrame, min_overlap: float) -> None:
                                 .with_column((pl.col('no_match') / pl.col('count')).alias('fail_rate'))
                                 )
     for a, r in zip(fail_rates['accession'].to_list(), fail_rates['fail_rate'].to_list()):
-        err: str = "ERROR: Score {} matches your variants badly. Check --min_overlap"
-        assert r < (1 - min_overlap), err.format(a)
+        err: str = "ERROR: Score {} matches your variants badly. Check --min_overlap ({:.2%} min, {:.2%} match)"
+        assert r < (1 - min_overlap), err.format(a, min_overlap, 1 - r)
 
 
 def main(args=None) -> None:
