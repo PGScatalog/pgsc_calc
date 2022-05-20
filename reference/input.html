@@ -277,12 +277,12 @@ contains additional technical detail.</p>
 <tbody>
 <tr class="row-odd"><td colspan="5"><p><a class="reference external" href="https://raw.githubusercontent.com/pgscatalog/pgsc_calc/master/assets/schema_input.json">https://raw.githubusercontent.com/pgscatalog/pgsc_calc/master/assets/schema_input.json</a></p></td>
 </tr>
-<tr class="row-even"><td colspan="5"><p>Schema for the file provided with params.input</p></td>
+<tr class="row-even"><td colspan="5"><p>Schema for the JSON file provided with params.input when params.format is set to json</p></td>
 </tr>
 <tr class="row-odd"><td><p>type</p></td>
 <td colspan="4"><p><em>array</em></p></td>
 </tr>
-<tr class="row-even"><td rowspan="19"><p>items</p></td>
+<tr class="row-even"><td rowspan="30"><p>items</p></td>
 <td><p>type</p></td>
 <td colspan="3"><p><em>object</em></p></td>
 </tr>
@@ -298,7 +298,7 @@ contains additional technical detail.</p>
 <tr class="row-odd"><td><p>pattern</p></td>
 <td colspan="2"><p>^\S+$</p></td>
 </tr>
-<tr class="row-even"><td rowspan="6"><ul class="simple">
+<tr class="row-even"><td rowspan="7"><ul class="simple">
 <li><p>vcf_path</p></li>
 </ul>
 </td>
@@ -308,7 +308,7 @@ contains additional technical detail.</p>
 <tr class="row-odd"><td><p>pattern</p></td>
 <td colspan="2"><p>^\S+\.vcf\.gz$</p></td>
 </tr>
-<tr class="row-even"><td rowspan="4"><p>anyOf</p></td>
+<tr class="row-even"><td rowspan="5"><p>anyOf</p></td>
 <td><p>type</p></td>
 <td><p><em>string</em></p></td>
 </tr>
@@ -321,16 +321,39 @@ contains additional technical detail.</p>
 <tr class="row-odd"><td><p>maxLength</p></td>
 <td><p>0</p></td>
 </tr>
-<tr class="row-even"><td rowspan="4"><ul class="simple">
+<tr class="row-even"><td><p>minLength</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="5"><ul class="simple">
 <li><p>bfile_path</p></li>
 </ul>
 </td>
-<td rowspan="4"><p>anyOf</p></td>
+<td rowspan="5"><p>anyOf</p></td>
+<td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>pattern</p></td>
+<td><p>^(?!vcf$|vcf\.gz$|bim$|bed$|fam$)[^.]+$</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>maxLength</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>minLength</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td rowspan="5"><ul class="simple">
+<li><p>pfile_path</p></li>
+</ul>
+</td>
+<td rowspan="5"><p>anyOf</p></td>
 <td><p>type</p></td>
 <td><p><em>string</em></p></td>
 </tr>
 <tr class="row-odd"><td><p>pattern</p></td>
-<td><p>^\S+$</p></td>
+<td><p>^(?!vcf$|vcf\.gz$|psam$|pvar$|pgen$)[^.]+$</p></td>
 </tr>
 <tr class="row-even"><td><p>type</p></td>
 <td><p><em>string</em></p></td>
@@ -338,29 +361,53 @@ contains additional technical detail.</p>
 <tr class="row-odd"><td><p>maxLength</p></td>
 <td><p>0</p></td>
 </tr>
-<tr class="row-even"><td rowspan="4"><ul class="simple">
+<tr class="row-even"><td><p>minLength</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><ul class="simple">
 <li><p><strong>chrom</strong></p></li>
 </ul>
 </td>
-<td rowspan="4"><p>anyOf</p></td>
+<td rowspan="2"><p>anyOf</p></td>
 <td><p>type</p></td>
 <td><p><em>null</em></p></td>
 </tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>integer</em></p></td>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
 </tr>
-<tr class="row-even"><td><p>maximum</p></td>
-<td><p>22</p></td>
+<tr class="row-odd"><td colspan="4"><p>dependencies</p></td>
 </tr>
-<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
-<td><p>1</p></td>
+<tr class="row-even"><td rowspan="2"><ul class="simple">
+<li><p>pfile_path</p></li>
+</ul>
+</td>
+<td rowspan="2"><p>allOf</p></td>
+<td colspan="2"><p>not</p></td>
 </tr>
-<tr class="row-even"><td colspan="4"><p>not</p></td>
+<tr class="row-odd"><td colspan="2"><p>not</p></td>
 </tr>
-<tr class="row-odd"><td><p>minItems</p></td>
+<tr class="row-even"><td rowspan="2"><ul class="simple">
+<li><p>bfile_path</p></li>
+</ul>
+</td>
+<td rowspan="2"><p>allOf</p></td>
+<td colspan="2"><p>not</p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>not</p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><ul class="simple">
+<li><p>vcf_path</p></li>
+</ul>
+</td>
+<td rowspan="2"><p>allOf</p></td>
+<td colspan="2"><p>not</p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>not</p></td>
+</tr>
+<tr class="row-even"><td><p>minItems</p></td>
 <td colspan="4"><p>1</p></td>
 </tr>
-<tr class="row-even"><td><p>uniqueItems</p></td>
+<tr class="row-odd"><td><p>uniqueItems</p></td>
 <td colspan="4"><p>True</p></td>
 </tr>
 </tbody>
