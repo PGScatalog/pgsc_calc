@@ -33,6 +33,7 @@ process MATCH_VARIANTS {
         $split \
         --format $format \
         --db \$(readlink -f $db) \
+        -n $task.cpus \
         $ambig \
         $multi
 
