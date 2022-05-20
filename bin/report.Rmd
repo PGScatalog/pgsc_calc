@@ -25,11 +25,12 @@ htmltools::img(src = knitr::image_uri(params$img),
 
 ```{r, echo = FALSE, message = FALSE}
 log <- read.csv("log.csv")
+log$match_type <- as.character(log$match_type)
 
 log %>%
   group_by(dataset, accession) %>%
   count(match_type, input_variants = n()) %>%
-  mutate(match_type = ifelse(is.na(match_type), "no match", match_type)) %>%
+  mutate(match_type = ifelse(match_type == "", "no match", match_type)) %>%
   ungroup() %>%
   mutate(perc = scales::percent(n / input_variants, accuracy = 0.1)) %>%
   knitr::kable(align = c(rep('l', 3), rep('r', 3)))
