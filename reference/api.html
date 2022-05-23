@@ -240,13 +240,6 @@ title="Print to PDF"
   <a class="reference internal nav-link" href="#api-call-schema">
    API call schema
   </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#pgs-catalog-calculator-api-parameters">
-     PGS Catalog Calculator API Parameters
-    </a>
-   </li>
-  </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#implementation-details">
@@ -291,13 +284,6 @@ title="Print to PDF"
   <a class="reference internal nav-link" href="#api-call-schema">
    API call schema
   </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#pgs-catalog-calculator-api-parameters">
-     PGS Catalog Calculator API Parameters
-    </a>
-   </li>
-  </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#implementation-details">
@@ -363,149 +349,6 @@ using JSON. The web platform is still under development.</p>
 </section>
 <section id="api-call-schema">
 <h2>API call schema<a class="headerlink" href="#api-call-schema" title="Permalink to this headline">#</a></h2>
-<section id="pgs-catalog-calculator-api-parameters">
-<h3>PGS Catalog Calculator API Parameters<a class="headerlink" href="#pgs-catalog-calculator-api-parameters" title="Permalink to this headline">#</a></h3>
-<table class="table">
-<colgroup>
-<col style="width: 20%" />
-<col style="width: 20%" />
-<col style="width: 20%" />
-<col style="width: 20%" />
-<col style="width: 20%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td colspan="5"><p><a class="reference external" href="https://raw.githubusercontent.com/PGScatalog/pgsc_calc/master/assets/schema_k8s.json">https://raw.githubusercontent.com/PGScatalog/pgsc_calc/master/assets/schema_k8s.json</a></p></td>
-</tr>
-<tr class="row-even"><td colspan="5"><p>Parameters required to launch an instance of the PGS Catalog Calculator from K8s cluster on Embassy cloud</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td colspan="4"><p><em>object</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="5"><p>properties</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="11"><ul class="simple">
-<li><p><strong>target_genomes</strong></p></li>
-</ul>
-</td>
-<td colspan="4"><p>An array of file objects containing bgzipped human genetic variant data (variant call format) and metadata.</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td colspan="3"><p><em>array</em></p></td>
-</tr>
-<tr class="row-odd"><td rowspan="7"><p>items</p></td>
-<td><p>type</p></td>
-<td colspan="2"><p><em>object</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="3"><p>properties</p></td>
-</tr>
-<tr class="row-odd"><td><ul class="simple">
-<li><p><strong>sample</strong></p></li>
-</ul>
-</td>
-<td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-even"><td rowspan="2"><ul class="simple">
-<li><p><strong>vcf_path</strong></p></li>
-</ul>
-</td>
-<td colspan="2"><p>Path to VCF file</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-even"><td rowspan="2"><ul class="simple">
-<li><p><strong>chrom</strong></p></li>
-</ul>
-</td>
-<td colspan="2"><p>If target data are split by chromosome, this should specify chromosome number (1-22). If target data are not split, set chrom to null</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>integer</em> / <em>null</em></p></td>
-</tr>
-<tr class="row-even"><td><p>minItems</p></td>
-<td colspan="3"><p>1</p></td>
-</tr>
-<tr class="row-odd"><td><p>uniqueItems</p></td>
-<td colspan="3"><p>True</p></td>
-</tr>
-<tr class="row-even"><td rowspan="14"><ul class="simple">
-<li><p><strong>nxf_params_file</strong></p></li>
-</ul>
-</td>
-<td colspan="4"><p>An object that contains parameters</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td colspan="3"><p><em>object</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="4"><p>properties</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="2"><ul class="simple">
-<li><p><strong>scorefile</strong></p></li>
-</ul>
-</td>
-<td colspan="3"><p>Path to a PGS Catalog scoring file</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td colspan="2"><p><em>string</em></p></td>
-</tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
-<li><p>min_overlap</p></li>
-</ul>
-</td>
-<td colspan="3"><p>Minimum proportion of variants in target genomic data matched in the provided scorefile</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td colspan="2"><p><em>number</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>maximum</p></td>
-<td colspan="2"><p>1</p></td>
-</tr>
-<tr class="row-even"><td><p>exclusiveMinimum</p></td>
-<td colspan="2"><p>0</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="2"><ul class="simple">
-<li><p>max_memory</p></li>
-</ul>
-</td>
-<td colspan="3"><p>The maximum memory used by a workflow process (worker pod limit). String uses nextflow format e.g. ‘4.GB’</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td colspan="2"><p><em>string</em></p></td>
-</tr>
-<tr class="row-odd"><td rowspan="3"><ul class="simple">
-<li><p>max_cpus</p></li>
-</ul>
-</td>
-<td colspan="3"><p>The maximum number of CPUs used by workflow process (worker pod limit).</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td colspan="2"><p><em>integer</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>minimum</p></td>
-<td colspan="2"><p>1</p></td>
-</tr>
-<tr class="row-even"><td rowspan="2"><ul class="simple">
-<li><p><strong>nxf_work</strong></p></li>
-</ul>
-</td>
-<td colspan="4"><p>A path to the nextflow working directory in the ReadWriteMany Persistent Volume Claim shared by the driver and worker pods. Must be a unique path in the PVC not shared by other workflow instances, or weird things will happen.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td colspan="3"><p><em>string</em></p></td>
-</tr>
-<tr class="row-even"><td rowspan="2"><ul class="simple">
-<li><p><strong>id</strong></p></li>
-</ul>
-</td>
-<td colspan="4"><p>An identifier assigned to the launched workflow instance. It should be universally unique to monitor the status of the launched workflow.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td colspan="3"><p><em>string</em></p></td>
-</tr>
-</tbody>
-</table>
-</section>
 </section>
 <section id="implementation-details">
 <h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">#</a></h2>
