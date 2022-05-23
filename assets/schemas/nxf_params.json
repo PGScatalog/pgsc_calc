@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://raw.githubusercontent.com/pgscatalog/pgsc_calc/dev/assets/schemas/nxf_params.json",
+  "title": "Nextflow JSON parameters for pgsc_calc",
+  "type": "object",
+  "properties": {
+    "scorefile": {
+      "type": "string",
+      "description": "Path to a scoring file"
+    },
+    "accession": {
+      "type": "string",
+      "description": "PGS Catalog accession, if a list separate with commas",
+      "pattern": "(PGS[0-9]{6}[,]?)+"
+    },
+    "min_overlap": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 1,
+      "description": "Minimum proportion of variants in target genomic data matched in the provided scorefile"
+    },
+    "max_memory": {
+      "type": "string",
+      "description": "The maximum memory used by a workflow process (worker pod limit). String uses nextflow format e.g. '4.GB'"
+    },
+    "max_cpus": {
+      "type": "integer",
+      "description": "The maximum number of CPUs used by workflow process (worker pod limit).",
+      "minimum": 1
+    },
+    "outdir": {
+      "type": "string",
+      "description": "Path to an output directory"
+    },
+    "target_build": {
+      "type": "string",
+      "enum": ["GRCh37", "GRCh38"],
+      "description": "Genome build of target (i.e. input) genomes"
+    }
+  },
+  "required": ["target_build"],
+  "oneOf": [
+    { "required": [
+          "scorefile"
+         ]
+    },
+        { "required": [
+          "accession"
+         ]
+    }
+  ]
+}
