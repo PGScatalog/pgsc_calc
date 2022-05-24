@@ -7,7 +7,7 @@ import pandas as pd
 def test_aggregated_scores(workflow_dir):
     ''' Make sure aggregated scores are floats with no missing values '''
 
-    agg_scores = pathlib.Path(workflow_dir, "output/make/aggregated_scores.txt")
+    agg_scores = pathlib.Path(workflow_dir, "output/score/aggregated_scores.txt")
     df = pd.read_csv(agg_scores, sep = ' ')
 
     assert not df.isnull().any().any(), 'Missing values in aggregated scores'
