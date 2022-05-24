@@ -233,13 +233,8 @@ title="Print to PDF"
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#compatibility-options">
-     Compatibility options
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#institutional-config-options">
-     Institutional config options
+    <a class="reference internal nav-link" href="#variant-matching-qc-filtering">
+     Variant Matching QC &amp; Filtering
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
@@ -284,13 +279,8 @@ title="Print to PDF"
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#compatibility-options">
-     Compatibility options
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#institutional-config-options">
-     Institutional config options
+    <a class="reference internal nav-link" href="#variant-matching-qc-filtering">
+     Variant Matching QC &amp; Filtering
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
@@ -320,6 +310,28 @@ title="Print to PDF"
 <p>The documentation below is automatically generated from the input schema and
 contains additional technical detail.</p>
 <p><strong>Parameters in bold</strong> are required and must be set by the user.</p>
+<p>Parameters can be set in two ways:</p>
+<ol class="arabic simple">
+<li><p>Storing parameters in a configuration file using the <code class="docutils literal notranslate"><span class="pre">-params-file</span></code> option, e.g.:</p></li>
+</ol>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">liftover</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<span class="nt">target_build</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GRCh38</span><span class="w"></span>
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="../how-to/yaml.html#params-file"><span class="std std-ref">How to set parameters in a file</span></a> for more details.</p>
+<ol class="arabic simple" start="2">
+<li><p>In a terminal using two dashes, e.g.:</p></li>
+</ol>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>nextflow run pgscatalog/pgsc_calc <span class="se">\</span>
+    -profile test,docker <span class="se">\</span>
+    --liftover <span class="se">\</span>
+    --target_build GRCh38
+</pre></div>
+</div>
+<p>Parameters with a single dash (<code class="docutils literal notranslate"><span class="pre">-profile</span></code>) configure nextflow directly.</p>
+<p>Setting parameters with a configuration file is the recommended method of
+working with the pipeline, because it helps you to keep track of your analysis.</p>
+<p>For background about max job request options, see <a class="reference internal" href="../how-to/bigjob.html#big-job"><span class="std std-ref">How do I run big jobs on a powerful computer?</span></a>.</p>
 <section id="pgscatalog-pgsc-calc-pipeline-parameters">
 <span id="pgscatalog-pgsc-calc-pipeline-parameters"></span><h2>pgscatalog/pgsc_calc pipeline parameters<a class="headerlink" href="#pgscatalog-pgsc-calc-pipeline-parameters" title="Permalink to this headline">#</a></h2>
 <p>This pipeline applies scoring files from the PGS Catalog to target genotyped samples</p>
@@ -333,17 +345,6 @@ contains additional technical detail.</p>
 </tr>
 <tr class="row-even"><td><p>type</p></td>
 <td><p><em>object</em></p></td>
-</tr>
-<tr class="row-odd"><td rowspan="5"><p>allOf</p></td>
-<td><p><a class="reference internal" href="#input-output-options">Input/output options</a></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#compatibility-options">Compatibility options</a></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#institutional-config-options">Institutional config options</a></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#max-job-request-options">Max job request options</a></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#generic-options">Generic options</a></p></td>
 </tr>
 </tbody>
 </table>
@@ -470,8 +471,8 @@ contains additional technical detail.</p>
 </tbody>
 </table>
 </section>
-<section id="compatibility-options">
-<span id="compatibility-options"></span><h3>Compatibility options<a class="headerlink" href="#compatibility-options" title="Permalink to this headline">#</a></h3>
+<section id="variant-matching-qc-filtering">
+<span id="variant-matching-qc-filtering"></span><h3>Variant Matching QC &amp; Filtering<a class="headerlink" href="#variant-matching-qc-filtering" title="Permalink to this headline">#</a></h3>
 <table class="table">
 <colgroup>
 <col style="width: 33%" />
@@ -549,93 +550,6 @@ contains additional technical detail.</p>
 </tr>
 <tr class="row-odd"><td><p>default</p></td>
 <td><p>0.75</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="institutional-config-options">
-<span id="institutional-config-options"></span><h3>Institutional config options<a class="headerlink" href="#institutional-config-options" title="Permalink to this headline">#</a></h3>
-<p>Parameters used to describe centralised config profiles. These should not be edited.</p>
-<table class="table">
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p>type</p></td>
-<td colspan="2"><p><em>object</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="3"><p>properties</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="3"><ul class="simple">
-<li><p>custom_config_version</p></li>
-</ul>
-</td>
-<td colspan="2"><p>Git commit id for Institutional configs.</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td><p>master</p></td>
-</tr>
-<tr class="row-even"><td rowspan="3"><ul class="simple">
-<li><p>custom_config_base</p></li>
-</ul>
-</td>
-<td colspan="2"><p>Base directory for Institutional configs.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p><a class="reference external" href="https://raw.githubusercontent.com/nf-core/configs/master">https://raw.githubusercontent.com/nf-core/configs/master</a></p></td>
-</tr>
-<tr class="row-odd"><td rowspan="2"><ul class="simple">
-<li><p>hostnames</p></li>
-</ul>
-</td>
-<td colspan="2"><p>Institutional configs hostname.</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-odd"><td rowspan="2"><ul class="simple">
-<li><p>config_profile_name</p></li>
-</ul>
-</td>
-<td colspan="2"><p>Institutional config name.</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-odd"><td rowspan="2"><ul class="simple">
-<li><p>config_profile_description</p></li>
-</ul>
-</td>
-<td colspan="2"><p>Institutional config description.</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-odd"><td rowspan="2"><ul class="simple">
-<li><p>config_profile_contact</p></li>
-</ul>
-</td>
-<td colspan="2"><p>Institutional config contact information.</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-odd"><td rowspan="2"><ul class="simple">
-<li><p>config_profile_url</p></li>
-</ul>
-</td>
-<td colspan="2"><p>Institutional config URL link.</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
 </tr>
 </tbody>
 </table>
