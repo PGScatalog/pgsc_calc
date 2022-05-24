@@ -5,7 +5,7 @@
 import java.util.logging.Logger
 
 include { PLINK2_SCORE } from '../../modules/local/plink2_score'
-include { MAKE_REPORT    } from '../../modules/local/make_report'
+include { SCORE_REPORT    } from '../../modules/local/score_report'
 
 workflow APPLY_SCORE {
     take:
@@ -46,14 +46,14 @@ workflow APPLY_SCORE {
         .collect()
         .set { ch_scores }
 
-    MAKE_REPORT(
+    SCORE_REPORT(
         ch_scores,
         Channel.fromPath("$projectDir/bin/report.Rmd", checkIfExists: true),
         Channel.fromPath("$projectDir/assets/PGS_Logo.png", checkIfExists: true),
         db
     )
 
-    ch_versions = ch_versions.mix(MAKE_REPORT.out.versions)
+    ch_versions = ch_versions.mix(SCORE_REPORT.out.versions)
 
     emit:
     versions = ch_versions
