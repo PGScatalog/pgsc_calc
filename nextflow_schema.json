@@ -74,8 +74,8 @@
                 "target_build"
             ]
         },
-        "compatibility_options": {
-            "title": "Compatibility options",
+        "variant_matching_qc_filtering": {
+            "title": "Variant Matching QC & Filtering",
             "type": "object",
             "description": "",
             "default": "",
@@ -290,7 +290,7 @@
             "$ref": "#/definitions/input_output_options"
         },
         {
-            "$ref": "#/definitions/compatibility_options"
+            "$ref": "#/definitions/variant_matching_qc_filtering"
         },
         {
             "$ref": "#/definitions/institutional_config_options"

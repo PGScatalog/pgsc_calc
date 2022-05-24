@@ -1,12 +1,7 @@
-# `pgsc_calc`: PGS Catalog Calculator
-
-:rotating_light: This pipeline is stable, but represents a very minimal implementation :rotating_light:
-
-:rotating_light: Please see the documentation for [important limitations](https://pgscatalog.github.io/pgsc_calc/) :rotating_light:
+# The Polygenic Score Catalog Calculator (`pgsc_calc`)
 
 [![Documentation](https://github.com/PGScatalog/pgsc_calc/actions/workflows/docs.yml/badge.svg)](https://pgscatalog.github.io/pgsc_calc/index.html)
 [![pgscatalog/pgsc_calc CI](https://github.com/PGScatalog/pgsc_calc/actions/workflows/ci.yml/badge.svg)](https://github.com/PGScatalog/pgsc_calc/actions/workflows/ci.yml)
-[![nf-core linting](https://github.com/PGScatalog/pgsc_calc/actions/workflows/linting.yml/badge.svg)](https://github.com/PGScatalog/pgsc_calc/actions/workflows/linting.yml)
 
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A521.04.0-23aa62.svg?labelColor=000000)](https://www.nextflow.io/)
 [![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
@@ -16,67 +11,54 @@
 ## Introduction
 
 `pgsc_calc` is a bioinformatics best-practice analysis pipeline for calculating
-polygenic [risk] scores on samples with imputed genotypes using existing scoring 
-files from the [Polygenic Score (PGS) Catalog](https://www.pgscatalog.org/) and/or user-defined PGS/PRS.
-
-The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
-to run tasks across multiple compute infrastructures in a very portable
-manner (e.g. at the source of your dataset). It uses Docker/Singularity containers that make 
-results highly reproducible by automating software installation. The 
-[Nextflow DSL2](https://www.nextflow.io/docs/latest/dsl2.html) implementation of this
-pipeline uses one container per process which makes it much easier to maintain
-and update software dependencies. Where possible, these processes have been
-submitted to and installed from [nf-core/modules](https://github.com/nf-core/modules) 
-in order to make them available to all nf-core pipelines, and to everyone within the Nextflow community!
+polygenic [risk] scores on samples with imputed genotypes using existing scoring
+files from the [Polygenic Score (PGS) Catalog](https://www.pgscatalog.org/)
+and/or user-defined PGS/PRS.
 
 ## Pipeline summary
 
 1. Optionally, fetch a scorefile from the PGS Catalog API
-2. Validate PGS Catalog and/or user-defined scoring file formays
-3. Convert target genotype data (e.g. plink1/2 files, VCF) to plink format automatically
-5. Relabel variants to a common identifier
-6. Match variants in the scoring file against variants in the genotyping data
-7. Calculate scores for each sample (handling multiple scores in paralell)
-8. Produce a summary report
+2. Validate and optionally liftover PGS Catalog and/or user-defined scoring file
+   formats
+3. Standardise variant data to a common specification (PLINK2)
+4. Match variants in the scoring file against variants in the genotyping data
+5. Calculate scores for each sample (handling multiple scores in paralell)
+6. Produce a summary report
 
 ### Features in development
 
-- Ancestry estimation using reference datasets
-- Multiple scoring file support
-- Custom scoring file support
-- Multiple genome build support
+1. Ancestry estimation using reference datasets
 
-## Quick Start
+## Quick start
 
 1. Install
 [`Nextflow`](https://www.nextflow.io/docs/latest/getstarted.html#installation)
 (`>=21.04.0`)
 
-2. Install any of [`Docker`](https://docs.docker.com/engine/installation/),
-[`Singularity`](https://www.sylabs.io/guides/3.0/user-guide/),
-[`Podman`](https://podman.io/),
-[`Shifter`](https://nersc.gitlab.io/development/shifter/how-to-use/) or
-[`Charliecloud`](https://hpc.github.io/charliecloud/) for full pipeline
-reproducibility _(please only use [`Conda`](https://conda.io/miniconda.html) as
-a last resort; see
-[docs](https://nf-co.re/usage/configuration#basic-configuration-profiles))_
+2. Install [`Docker`](https://docs.docker.com/engine/installation/) or
+[`Singularity (v3.8.3 minimum)`](https://www.sylabs.io/guides/3.0/user-guide/)
+(please only use [`Conda`](https://conda.io/miniconda.html) as a last resort)
 
 3. Download the pipeline and test it on a minimal dataset with a single command:
 
     ```console
-    nextflow run pgscatalog/pgsc_calc -profile test,<docker/singularity/podman/shifter/charliecloud/conda/institute>
+    nextflow run pgscatalog/pgsc_calc -profile test,<docker/singularity/conda>
     ```
 
 4. Start running your own analysis!
 
     ```console
-    nextflow run pgscatalog/pgsc_calc -profile <docker/singularity/podman/shifter/charliecloud/conda/institute> --input samplesheet.csv --accession PGS001229
+    nextflow run pgscatalog/pgsc_calc -profile <docker/singularity/conda> --input samplesheet.csv --accession PGS001229
     ```
+
+See [getting
+started](https://pgscatalog.github.io/pgsc_calc/getting-started.html) for more
+details.
 
 ## Documentation
 
 [Full documentation is available on Github
-pages](https://pgscatalog.github.io/pgsc_calc/).
+pages.](https://pgscatalog.github.io/pgsc_calc/)
 
 ## Credits
 
@@ -98,9 +80,11 @@ manuscript describing the tool is in preparation. In the meantime if you use the
 tool we ask you to cite the repo and the paper describing the PGS Catalog
 resource:
 
-- >PGS Catalog Calculator _(in development)_. PGS Catalog Team. [https://github.com/PGScatalog/pgsc_calc](https://github.com/PGScatalog/pgsc_calc)
-- >Lambert _et al._ (2021) The Polygenic Score Catalog as an open database for reproducibility and systematic evaluation.
-Nature Genetics. 53:420–425 doi:[10.1038/s41588-021-00783-5](https://doi.org/10.1038/s41588-021-00783-5).
+- >PGS Catalog Calculator _(in development)_. PGS Catalog
+  Team. [https://github.com/PGScatalog/pgsc_calc](https://github.com/PGScatalog/pgsc_calc)
+- >Lambert _et al._ (2021) The Polygenic Score Catalog as an open database for
+reproducibility and systematic evaluation.  Nature Genetics. 53:420–425
+doi:[10.1038/s41588-021-00783-5](https://doi.org/10.1038/s41588-021-00783-5).
 
 This pipeline uses code and infrastructure developed and maintained by the
 [nf-core](https://nf-co.re) community, reused here under the [MIT

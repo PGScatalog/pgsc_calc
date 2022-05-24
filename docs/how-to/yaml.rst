@@ -1,3 +1,5 @@
+.. _params file:
+
 How to set parameters in a file
 ===============================
 
