@@ -12,12 +12,12 @@
       "sample": {
         "type": "string",
         "pattern": "^\\S+$",
-        "errorMessage": "Sample name must be provided and cannot contain spaces"
+        "description": "Sample name must be provided and cannot contain spaces"
       },
       "vcf_path": {
         "type": "string",
         "pattern": "^\\S+\\.vcf\\.gz$",
-        "errorMessage": "VCF path must end with .vcf.gz, mutually exclusive with other formats",
+        "description": "VCF path must end with .vcf.gz, mutually exclusive with other formats",
         "anyOf": [
           {
             "type": "string",
@@ -31,7 +31,7 @@
         ]
       },
       "bfile_path": {
-        "errorMessage": "Plink 1 binary fileset prefix, must not end with bed / bim / fam, mutually exclusive with other formats",
+        "description": "Plink 1 binary fileset prefix, must not end with bed / bim / fam, mutually exclusive with other formats",
         "anyOf": [
           {
             "type": "string",
@@ -45,7 +45,7 @@
         ]
       },
       "pfile_path": {
-        "errorMessage": "Plink 2 binary fileset prefix, must not end with pvar / pgen / psam, mutually exclusive with other formats. Must not be zstd compressed.",
+        "description": "Plink 2 binary fileset prefix, must not end with pvar / pgen / psam, mutually exclusive with other formats. Must not be zstd compressed.",
         "anyOf": [
           {
             "type": "string",
@@ -59,7 +59,7 @@
         ]
       },
       "chrom": {
-        "errorMessage": "Chromosome of associated genomic data. If multiple chromosomes are in the data, set to an empty string",
+        "description": "Chromosome of associated genomic data. If multiple chromosomes are in the data, set to an empty string",
         "anyOf": [
           {
             "type": "null"

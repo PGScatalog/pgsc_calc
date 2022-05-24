@@ -13,19 +13,14 @@
             "properties": {
                 "input": {
                     "type": "string",
-                    "format": "file-path",
-                    "mimetype": "text/csv",
-                    "schema": "assets/schema_input.json",
-                    "description": "Path to comma-separated file containing information about the samples (a sample sheet)",
-                    "help_text": "You will need to create a design file with information about the samples before running the pipeline. Use this parameter to specify its location. See usage docs for a more detailed explanation.",
-                    "fa_icon": "fas fa-file-csv",
-                    "pattern": ".csv$|.json$"
+                    "default": "None",
+                    "description": "Path to input samplesheet"
                 },
                 "format": {
                     "type": "string",
                     "default": "csv",
                     "fa_icon": "fas fa-cog",
-                    "description": "Format of the input",
+                    "description": "Format of input samplesheet",
                     "enum": [
                         "csv",
                         "json"
@@ -38,15 +33,26 @@
                 },
                 "accession": {
                     "type": "string",
-                    "description": "A PGS Catalog accession",
+                    "description": "A PGS Catalog accession, multiple accessions can be specified in a comma separated list",
                     "pattern": "(PGS\\d+)(,\\s*PGS\\d+)*",
                     "fa_icon": "fas fa-star"
                 },
-                "allelic_freq": {
+                "target_build": {
                     "type": "string",
-                    "default": "NO_FILE",
-                    "description": "(Optional) Path to a plink 2 allelic frequency file (see --read-freq)",
-                    "fa_icon": "fas fa-file-alt"
+                    "enum": [
+                        "GRCh37",
+                        "GRCh38"
+                    ],
+                    "description": "Genome build of input data"
+                },
+                "ref": {
+                    "type": "string",
+                    "default": "https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/reference_data/pgsc_calc_ref.sqlar",
+                    "description": "Path to reference database"
+                },
+                "copy_genomes": {
+                    "type": "boolean",
+                    "description": "Copy harmonised genomes to outdir"
                 },
                 "outdir": {
                     "type": "string",
@@ -64,7 +70,8 @@
             },
             "required": [
                 "input",
-                "format"
+                "format",
+                "target_build"
             ]
         },
         "compatibility_options": {
@@ -73,11 +80,32 @@
             "description": "",
             "default": "",
             "properties": {
+                "liftover": {
+                    "type": "boolean",
+                    "description": "Lift scoring files to match your target genomes. Requires build information in the header of the scoring files."
+                },
+                "min_lift": {
+                    "type": "number",
+                    "default": 0.95,
+                    "description": "Minimum proportion of variants required to successfully remap a scoring file to a different genome build",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "keep_multiallelic": {
+                    "type": "boolean",
+                    "description": "Keep multiallelic alleles?"
+                },
+                "keep_ambiguous": {
+                    "type": "boolean",
+                    "description": "Keep ambiguous matches"
+                },
                 "min_overlap": {
                     "type": "number",
                     "default": 0.75,
                     "description": "Minimum proportion of variants present in both the score file and input target genomic data",
-                    "fa_icon": "fas fa-cog"
+                    "fa_icon": "fas fa-cog",
+                    "minimum": 0,
+                    "maximum": 1
                 }
             },
             "fa_icon": "fas fa-user-cog"
@@ -273,22 +301,5 @@
         {
             "$ref": "#/definitions/generic_options"
         }
-    ],
-    "properties": {
-        "liftover": {
-            "type": "boolean"
-        },
-        "target_build": {
-            "type": "string"
-        },
-        "only_input": {
-            "type": "boolean"
-        },
-        "only_compatible": {
-            "type": "boolean"
-        },
-        "only_score": {
-            "type": "boolean"
-        }
-    }
+    ]
 }
