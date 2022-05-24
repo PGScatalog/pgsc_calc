@@ -77,6 +77,7 @@
   <li><a href="how-to/index.html">How-to guides</a></li>
   <li><a href="reference/index.html">Reference guide</a></li>
   <li><a href="explanation/index.html">Explanation</a></li>
+  <li><a href="troubleshooting.html">Troubleshooting</a></li>
   <li><a href="glossary.html">Glossary</a></li>
 </ul>
 
@@ -227,12 +228,24 @@ title="Print to PDF"
   </a>
  </li>
  <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#pgsc-calc-v1-0-0-2022-05-24">
+   pgsc_calc v1.0.0 (2022-05-24)
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#features">
+     Features
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
   <a class="reference internal nav-link" href="#pgsc-calc-v0-1-3dev-2022-02-04">
    pgsc_calc v0.1.3dev (2022-02-04)
   </a>
   <ul class="visible nav section-nav flex-column">
    <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#features">
+    <a class="reference internal nav-link" href="#id1">
      Features
     </a>
    </li>
@@ -244,7 +257,7 @@ title="Print to PDF"
   </a>
   <ul class="visible nav section-nav flex-column">
    <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#id1">
+    <a class="reference internal nav-link" href="#id2">
      Features
     </a>
    </li>
@@ -256,7 +269,7 @@ title="Print to PDF"
   </a>
   <ul class="visible nav section-nav flex-column">
    <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#id2">
+    <a class="reference internal nav-link" href="#id3">
      Features
     </a>
    </li>
@@ -287,12 +300,24 @@ title="Print to PDF"
   </a>
  </li>
  <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#pgsc-calc-v1-0-0-2022-05-24">
+   pgsc_calc v1.0.0 (2022-05-24)
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#features">
+     Features
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
   <a class="reference internal nav-link" href="#pgsc-calc-v0-1-3dev-2022-02-04">
    pgsc_calc v0.1.3dev (2022-02-04)
   </a>
   <ul class="visible nav section-nav flex-column">
    <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#features">
+    <a class="reference internal nav-link" href="#id1">
      Features
     </a>
    </li>
@@ -304,7 +329,7 @@ title="Print to PDF"
   </a>
   <ul class="visible nav section-nav flex-column">
    <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#id1">
+    <a class="reference internal nav-link" href="#id2">
      Features
     </a>
    </li>
@@ -316,7 +341,7 @@ title="Print to PDF"
   </a>
   <ul class="visible nav section-nav flex-column">
    <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#id2">
+    <a class="reference internal nav-link" href="#id3">
      Features
     </a>
    </li>
@@ -337,10 +362,30 @@ title="Print to PDF"
 <p>Versions follow <a class="reference external" href="https://semver.org/">semantic versioning</a> (<code class="docutils literal notranslate"><span class="pre">major.minor.patch</span></code>). Breaking changes
 will only occur in major versions with changes noted in this changelog.</p>
 </section>
-<section id="pgsc-calc-v0-1-3dev-2022-02-04">
-<h1>pgsc_calc v0.1.3dev (2022-02-04)<a class="headerlink" href="#pgsc-calc-v0-1-3dev-2022-02-04" title="Permalink to this headline">#</a></h1>
+<section id="pgsc-calc-v1-0-0-2022-05-24">
+<h1>pgsc_calc v1.0.0 (2022-05-24)<a class="headerlink" href="#pgsc-calc-v1-0-0-2022-05-24" title="Permalink to this headline">#</a></h1>
+<p>This release produces scores that should be biologically meaningful. Significant
+effort has been made to validate calculate scores on different datasets. In the
+next release we’ll add score validation to our test suite to make sure
+calculated scores stay valid in the future.</p>
 <section id="features">
 <h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">#</a></h2>
+<ul class="simple">
+<li><p>Add support for PLINK2 format (samplesheet structure changed)</p></li>
+<li><p>Add support for allosomes (e.g. X, Y)</p></li>
+<li><p>Improve PGS Catalog compatibility (e.g. missing other allele)</p></li>
+<li><p>Add automatic liftover of scoring files to match target genome build</p></li>
+<li><p>Performance improvements to support UK BioBank scale data (500,000 genomes)</p></li>
+<li><p>Support calculation of multiple scores in parallel</p></li>
+<li><p>Significantly improved test coverage (&gt; 80%)</p></li>
+<li><p>Lots of other small changes to improve correctness and handling edge cases</p></li>
+</ul>
+</section>
+</section>
+<section id="pgsc-calc-v0-1-3dev-2022-02-04">
+<h1>pgsc_calc v0.1.3dev (2022-02-04)<a class="headerlink" href="#pgsc-calc-v0-1-3dev-2022-02-04" title="Permalink to this headline">#</a></h1>
+<section id="id1">
+<h2>Features<a class="headerlink" href="#id1" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Simplified JSON input processes</p></li>
 <li><p>Add first draft of documentation</p></li>
@@ -350,8 +395,8 @@ will only occur in major versions with changes noted in this changelog.</p>
 </section>
 <section id="pgsc-calc-v0-1-2dev-2022-01-17">
 <h1>pgsc_calc v0.1.2dev (2022-01-17)<a class="headerlink" href="#pgsc-calc-v0-1-2dev-2022-01-17" title="Permalink to this headline">#</a></h1>
-<section id="id1">
-<h2>Features<a class="headerlink" href="#id1" title="Permalink to this headline">#</a></h2>
+<section id="id2">
+<h2>Features<a class="headerlink" href="#id2" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Add JSON input support for web platform functionality</p></li>
 <li><p>Set up simple CI tests with Github actions</p></li>
@@ -360,8 +405,8 @@ will only occur in major versions with changes noted in this changelog.</p>
 </section>
 <section id="pgsc-calc-v0-1-1dev-2021-12-16">
 <h1>pgsc_calc v0.1.1dev (2021-12-16)<a class="headerlink" href="#pgsc-calc-v0-1-1dev-2021-12-16" title="Permalink to this headline">#</a></h1>
-<section id="id2">
-<h2>Features<a class="headerlink" href="#id2" title="Permalink to this headline">#</a></h2>
+<section id="id3">
+<h2>Features<a class="headerlink" href="#id3" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>First public release</p></li>
 <li><p>Support applying a single scoring file to target genomic data in GrCh37 build</p></li>

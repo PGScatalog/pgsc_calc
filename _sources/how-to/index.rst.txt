@@ -23,13 +23,6 @@ Making genomic data and scorefiles compatible
    liftover
    effecttype
    
-Understanding workflow output
------------------------------
-
-.. toctree::
-   :maxdepth: 1
-
-   interpret
 
 Working with big data
 ---------------------

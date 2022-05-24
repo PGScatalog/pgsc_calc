@@ -77,6 +77,7 @@
   <li><a href="how-to/index.html">How-to guides</a></li>
   <li><a href="reference/index.html">Reference guide</a></li>
   <li><a href="explanation/index.html">Explanation</a></li>
+  <li><a href="troubleshooting.html">Troubleshooting</a></li>
   <li><a href="#">Glossary</a></li>
 </ul>
 
@@ -253,13 +254,6 @@ genetic variants.</p>
 <dt id="term-accession">accession<a class="headerlink" href="#term-accession" title="Permalink to this term">#</a></dt><dd><p>A unique and stable identifier. PGS Catalog accessions start with the
 prefix PGS, e.g. <a class="reference external" href="https://www.pgscatalog.org/score/PGS000001/">PGS000001</a></p>
 </dd>
-<dt id="term-driver-pod">driver pod<a class="headerlink" href="#term-driver-pod" title="Permalink to this term">#</a></dt><dt id="term-pod">pod<a class="headerlink" href="#term-pod" title="Permalink to this term">#</a></dt><dd><p><a class="reference external" href="https://kubernetes.io/docs/concepts/workloads/pods/">A pod</a> is a description of one or more containers and its associated
-computing resources (e.g. number of processes and RAM, but it’s more
-complicated than that). Kubernetes takes this description and tries to
-make it exist on the cluster. The driver pod is responsible for managing
-a workflow instance. The driver pod will monitor and submit each job in
-the workflow as a separate worker pod.</p>
-</dd>
 <dt id="term-polygenic-score">polygenic score<a class="headerlink" href="#term-polygenic-score" title="Permalink to this term">#</a></dt><dd><p>A <a class="reference external" href="https://www.pgscatalog.org/about/">polygenic score</a> (PGS) aggregates the effects of many genetic variants
 into a single number which predicts genetic predisposition for a
 phenotype. PGS are typically composed of hundreds-to-millions of genetic
@@ -272,10 +266,6 @@ calculated from an existing scoring file that contains risk alleles and
 associated weights. These genomes are distinct from those used to
 create the polygenic scoring file originally (i.e., those used to
 derive the risk alleles and weights).</p>
-</dd>
-<dt id="term-worker-pods">worker pods<a class="headerlink" href="#term-worker-pods" title="Permalink to this term">#</a></dt><dd><p>A pod, managed by the nextflow driver pod, that is responsible for
-executing an atomic process in the workflow. They are created and
-destroyed automatically by the driver pod.</p>
 </dd>
 </dl>
 </section>

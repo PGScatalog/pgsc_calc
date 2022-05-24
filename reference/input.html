@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Input schema &#8212; Polygenic Score (PGS) Catalog Calculator  documentation</title>
+    <title>Input (samplesheet) schema &#8212; Polygenic Score (PGS) Catalog Calculator  documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -77,6 +77,7 @@
   <li><a href="../how-to/index.html">How-to guides</a></li>
   <li><a href="index.html">Reference guide</a></li>
   <li><a href="../explanation/index.html">Explanation</a></li>
+  <li><a href="../troubleshooting.html">Troubleshooting</a></li>
   <li><a href="../glossary.html">Glossary</a></li>
 </ul>
 
@@ -199,23 +200,60 @@ title="Print to PDF"
     </ul>
   </div>
 </div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
 
     </div>
 </div>
 
 <!-- Table of contents -->
 <div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#target-genome-schema">
+   Target genome schema
+  </a>
+ </li>
+</ul>
+
+    </nav>
 </div>
     </div>
     <div class="article row">
         <div class="col pl-md-3 pl-lg-5 content-container">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Input schema</h1>
+                <h1>Input (samplesheet) schema</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
                         
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#target-genome-schema">
+   Target genome schema
+  </a>
+ </li>
+</ul>
+
+                        </nav>
                     </div>
                 </div>
             </div>
@@ -223,10 +261,171 @@ title="Print to PDF"
                 
               <div>
                 
-  <section id="input-schema">
-<h1>Input schema<a class="headerlink" href="#input-schema" title="Permalink to this headline">#</a></h1>
-<p>The documentation below is automatically generated from the input schema and
-contains additional technical detail.</p>
+  <section id="input-samplesheet-schema">
+<h1>Input (samplesheet) schema<a class="headerlink" href="#input-samplesheet-schema" title="Permalink to this headline">#</a></h1>
+<p>The documentation below is automatically generated from the schema. The JSON
+file contains additional technical detail not shown in the table below.</p>
+<p>Each row in a samplesheet can only have a single genomic data format (i.e. they
+are mutually exclusive).</p>
+<section id="target-genome-schema">
+<h2>Target genome schema<a class="headerlink" href="#target-genome-schema" title="Permalink to this headline">#</a></h2>
+<table class="table">
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td colspan="5"><p><a class="reference external" href="https://raw.githubusercontent.com/pgscatalog/pgsc_calc/dev/assets/schemas/target_genomes.json">https://raw.githubusercontent.com/pgscatalog/pgsc_calc/dev/assets/schemas/target_genomes.json</a></p></td>
+</tr>
+<tr class="row-even"><td colspan="5"><p>Validates the JSON representation of a samplesheet</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td colspan="4"><p><em>array</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="35"><p>items</p></td>
+<td><p>type</p></td>
+<td colspan="3"><p><em>object</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="4"><p>properties</p></td>
+</tr>
+<tr class="row-even"><td rowspan="3"><ul class="simple">
+<li><p><strong>sample</strong></p></li>
+</ul>
+</td>
+<td colspan="3"><p>Sample name must be provided and cannot contain spaces</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>pattern</p></td>
+<td colspan="2"><p>^\S+$</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="8"><ul class="simple">
+<li><p>vcf_path</p></li>
+</ul>
+</td>
+<td colspan="3"><p>VCF path must end with .vcf.gz, mutually exclusive with other formats</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>pattern</p></td>
+<td colspan="2"><p>^\S+\.vcf\.gz$</p></td>
+</tr>
+<tr class="row-even"><td rowspan="5"><p>anyOf</p></td>
+<td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>pattern</p></td>
+<td><p>^\S+\.vcf\.gz$</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>maxLength</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>minLength</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="6"><ul class="simple">
+<li><p>bfile_path</p></li>
+</ul>
+</td>
+<td colspan="3"><p>Plink 1 binary fileset prefix, must not end with bed / bim / fam, mutually exclusive with other formats</p></td>
+</tr>
+<tr class="row-even"><td rowspan="5"><p>anyOf</p></td>
+<td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>pattern</p></td>
+<td><p>^(?!vcf$|vcf\.gz$|bim$|bed$|fam$)[^.]+$</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>maxLength</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>minLength</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="6"><ul class="simple">
+<li><p>pfile_path</p></li>
+</ul>
+</td>
+<td colspan="3"><p>Plink 2 binary fileset prefix, must not end with pvar / pgen / psam, mutually exclusive with other formats. Must not be zstd compressed.</p></td>
+</tr>
+<tr class="row-even"><td rowspan="5"><p>anyOf</p></td>
+<td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>pattern</p></td>
+<td><p>^(?!vcf$|vcf\.gz$|psam$|pvar$|pgen$)[^.]+$</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>maxLength</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>minLength</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="3"><ul class="simple">
+<li><p><strong>chrom</strong></p></li>
+</ul>
+</td>
+<td colspan="3"><p>Chromosome of associated genomic data. If multiple chromosomes are in the data, set to an empty string</p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><p>anyOf</p></td>
+<td><p>type</p></td>
+<td><p><em>null</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="4"><p>dependencies</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><ul class="simple">
+<li><p>pfile_path</p></li>
+</ul>
+</td>
+<td rowspan="2"><p>allOf</p></td>
+<td colspan="2"><p>not</p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>not</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><ul class="simple">
+<li><p>bfile_path</p></li>
+</ul>
+</td>
+<td rowspan="2"><p>allOf</p></td>
+<td colspan="2"><p>not</p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>not</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><ul class="simple">
+<li><p>vcf_path</p></li>
+</ul>
+</td>
+<td rowspan="2"><p>allOf</p></td>
+<td colspan="2"><p>not</p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>not</p></td>
+</tr>
+<tr class="row-odd"><td><p>minItems</p></td>
+<td colspan="4"><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>uniqueItems</p></td>
+<td colspan="4"><p>True</p></td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 
 

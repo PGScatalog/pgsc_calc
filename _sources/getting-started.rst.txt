@@ -56,7 +56,7 @@ workflow with bundled test data:
     [7c/5cca6c] process > PGSC_CALC:PGSCALC:MAKE_COMPATIBLE:PLINK2_BFILE (cineca_synthetic_subset)   [100%] 1 of 1 ✔
     [3b/ce0e39] process > PGSC_CALC:PGSCALC:MAKE_COMPATIBLE:MATCH_VARIANTS (cineca_synthetic_subset) [100%] 1 of 1 ✔
     [2e/fb3233] process > PGSC_CALC:PGSCALC:APPLY_SCORE:PLINK2_SCORE (cineca_synthetic_subset)       [100%] 1 of 1 ✔
-    [b5/fc5b1e] process > PGSC_CALC:PGSCALC:APPLY_SCORE:MAKE_REPORT (1)                              [100%] 1 of 1 ✔
+    [b5/fc5b1e] process > PGSC_CALC:PGSCALC:APPLY_SCORE:SCORE_REPORT (1)                             [100%] 1 of 1 ✔
     [03/009cb6] process > PGSC_CALC:PGSCALC:DUMPSOFTWAREVERSIONS (1)                                 [100%] 1 of 1 ✔
     -[pgscatalog/pgsc_calc] Pipeline completed successfully-
     

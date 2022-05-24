@@ -77,6 +77,7 @@
   <li><a href="how-to/index.html">How-to guides</a></li>
   <li><a href="reference/index.html">Reference guide</a></li>
   <li><a href="explanation/index.html">Explanation</a></li>
+  <li><a href="troubleshooting.html">Troubleshooting</a></li>
   <li><a href="glossary.html">Glossary</a></li>
 </ul>
 
@@ -352,7 +353,7 @@ workflow with bundled test data:</p>
 <span class="go">[7c/5cca6c] process &gt; PGSC_CALC:PGSCALC:MAKE_COMPATIBLE:PLINK2_BFILE (cineca_synthetic_subset)   [100%] 1 of 1 ✔</span>
 <span class="go">[3b/ce0e39] process &gt; PGSC_CALC:PGSCALC:MAKE_COMPATIBLE:MATCH_VARIANTS (cineca_synthetic_subset) [100%] 1 of 1 ✔</span>
 <span class="go">[2e/fb3233] process &gt; PGSC_CALC:PGSCALC:APPLY_SCORE:PLINK2_SCORE (cineca_synthetic_subset)       [100%] 1 of 1 ✔</span>
-<span class="go">[b5/fc5b1e] process &gt; PGSC_CALC:PGSCALC:APPLY_SCORE:MAKE_REPORT (1)                              [100%] 1 of 1 ✔</span>
+<span class="go">[b5/fc5b1e] process &gt; PGSC_CALC:PGSCALC:APPLY_SCORE:SCORE_REPORT (1)                             [100%] 1 of 1 ✔</span>
 <span class="go">[03/009cb6] process &gt; PGSC_CALC:PGSCALC:DUMPSOFTWAREVERSIONS (1)                                 [100%] 1 of 1 ✔</span>
 <span class="go">-[pgscatalog/pgsc_calc] Pipeline completed successfully-</span>
 </pre></div>
@@ -462,10 +463,10 @@ they match the scoring file genome build.</p>
 🥳</p>
 <p>After the workflow executes successfully, the calculated scores and a summary
 report should be available in the <code class="docutils literal notranslate"><span class="pre">results/make/</span></code> directory by default. If
-you’re interested in more information, see <a class="reference internal" href="how-to/interpret.html#interpret"><span class="std std-ref">How to interpret workflow output</span></a>.</p>
+you’re interested in more information, see <span class="xref std std-ref">interpret</span>.</p>
 <p>If the workflow didn’t execute successfully, have a look at the
-<a class="reference internal" href="explanation/troubleshooting.html#troubleshoot"><span class="std std-ref">Troubleshooting</span></a> section. Remember to replace <code class="docutils literal notranslate"><span class="pre">&lt;docker/singularity/conda&gt;</span></code>
-with the software you have installed on your computer, see <a class="reference internal" href="explanation/packaging.html#containers"><span class="std std-ref">Packaging bioinformatics software with containers</span></a> for
+<a class="reference internal" href="troubleshooting.html#troubleshoot"><span class="std std-ref">Troubleshooting</span></a> section. Remember to replace <code class="docutils literal notranslate"><span class="pre">&lt;docker/singularity/conda&gt;</span></code>
+with the software you have installed on your computer, see <span class="xref std std-ref">containers</span> for
 a more detailed explanation.</p>
 </section>
 </section>
