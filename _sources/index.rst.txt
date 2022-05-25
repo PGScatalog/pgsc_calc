@@ -14,8 +14,8 @@ Quick example
 -------------
 
 1. Install :doc:`Nextflow<getting-started>`
-2. Install `Docker`_ or `Singularity`_ for full reproducibility or `Conda`_ as a
-   fallback
+2. Install `Docker`_ or `Singularity`_ (minimum ``v3.8.3``) for full
+   reproducibility or `Conda`_ as a fallback
 3. Calculate some polygenic scores using synthetic test data:
 
 .. code-block:: console
