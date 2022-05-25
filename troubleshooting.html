@@ -237,6 +237,11 @@ title="Print to PDF"
    When I run the workflow I get an error about software not being installed
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#i-m-having-problems-with-vcf-input">
+   I’m having problems with VCF input
+  </a>
+ </li>
 </ul>
 
     </nav>
@@ -269,6 +274,11 @@ title="Print to PDF"
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#when-i-run-the-workflow-i-get-an-error-about-software-not-being-installed">
    When I run the workflow I get an error about software not being installed
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#i-m-having-problems-with-vcf-input">
+   I’m having problems with VCF input
   </a>
  </li>
 </ul>
@@ -304,6 +314,14 @@ to specify <code class="docutils literal notranslate"><span class="pre">-profile
 <p>Multiple profiles can be combined with a comma. The test profile is used only
 for checking the pipeline is installed and working correctly.</p>
 </section>
+<section id="i-m-having-problems-with-vcf-input">
+<h2>I’m having problems with VCF input<a class="headerlink" href="#i-m-having-problems-with-vcf-input" title="Permalink to this headline">#</a></h2>
+<p>If you use a “chr” prefix in the chromosome column of your VCF, please remove
+it. Here’s a simple method to do this (<a class="reference external" href="http://zhanxw.github.io/rvtests/#input-files">thanks to Rvtests</a>):</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(zgrep ^&quot;#&quot; $your_old_vcf; zgrep -v ^&quot;#&quot; $your_old_vcf | sed &#39;s:^chr::ig&#39; | sort -k1,1n -k2,2n)</span> <span class="go">| bgzip -c &gt; $your_vcf_file.gz</span>
+</pre></div>
+</div>
+</section>
 </section>
 
 
@@ -321,9 +339,7 @@ for checking the pipeline is installed and working correctly.</p>
     <div class="footer-content row">
         <footer class="col footer"><p>
   
-    By Polygenic Score (PGS) Catalog team<br/>
-  
-      &copy; Copyright 2022, PGS Catalog team.<br/>
+      &copy; Copyright Polygenic Score (PGS) Catalog team (licensed under Apache License V2).<br/>
 </p>
         </footer>
     </div>

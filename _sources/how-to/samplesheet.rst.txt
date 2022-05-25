@@ -33,7 +33,8 @@ structure:
      -
      - 22
 
-The file should be in :term:`CSV` format. A template is `available here`_.
+The file should be in :term:`CSV` format. A template is `available here`_ (right
+click the link and "save as" to download).
 
 There are five mandatory columns. Columns that specify genomic data paths
 (**vcf_path**, **bfile_path**, and **pfile_path**) are mutually exclusive:
@@ -51,5 +52,6 @@ There are five mandatory columns. Columns that specify genomic data paths
 - **chrom**: An integer, range 1-22. If the target genomic data contains
   multiple chromosomes, leave empty.
 
-.. _`available here`: https://github.com/PGScatalog/pgsc_calc/blob/dev/assets/examples/samplesheet.csv 
+.. _`available here`: https://raw.githubusercontent.com/PGScatalog/pgsc_calc/dev/assets/examples/samplesheet.csv
+
 
