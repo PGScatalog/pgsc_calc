@@ -200,12 +200,58 @@ title="Print to PDF"
     </ul>
   </div>
 </div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
 
     </div>
 </div>
 
 <!-- Table of contents -->
 <div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#score">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     score/
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#match">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     match/
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#pipeline-info">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     pipeline_info/
+    </span>
+   </code>
+  </a>
+ </li>
+</ul>
+
+    </nav>
 </div>
     </div>
     <div class="article row">
@@ -217,6 +263,41 @@ title="Print to PDF"
                 <div id="print-main-content">
                     <div id="jb-print-toc">
                         
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#score">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     score/
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#match">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     match/
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#pipeline-info">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     pipeline_info/
+    </span>
+   </code>
+  </a>
+ </li>
+</ul>
+
+                        </nav>
                     </div>
                 </div>
             </div>
@@ -226,6 +307,62 @@ title="Print to PDF"
                 
   <section id="understanding-workflow-output">
 <h1>Understanding workflow output<a class="headerlink" href="#understanding-workflow-output" title="Permalink to this headline">#</a></h1>
+<p>The output of the pipeline is currently quite simple. The results directory
+(<code class="docutils literal notranslate"><span class="pre">--outdir</span></code> default is <code class="docutils literal notranslate"><span class="pre">./results/</span></code>) will contain three subdirectories:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">score/</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">match/</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pipeline_info/</span></code></p></li>
+</ul>
+<section id="score">
+<h2><code class="docutils literal notranslate"><span class="pre">score/</span></code><a class="headerlink" href="#score" title="Permalink to this headline">#</a></h2>
+<p>Calculated scores are stored in a text file called
+<code class="docutils literal notranslate"><span class="pre">aggregated_scores.txt</span></code>. The file is a space delimited file. Each row
+represents an individual, and there should be at least three columns with the
+following headers:</p>
+<ul class="simple">
+<li><p>dataset: the name of the input dataset</p></li>
+<li><p>IID: the name of each sample</p></li>
+<li><p>PGS001229_22_SUM: this is the name of the calculated score. It will be
+different depending on which scores you have chosen to use.</p></li>
+</ul>
+<p>At least one score must be present in this file (the third column). Extra
+columns might be present if you calculated more than one score.</p>
+<p>A summary report is also available (<code class="docutils literal notranslate"><span class="pre">report.html</span></code>). The report should open in
+a web browser and contain useful information about the processes that calculated
+scores. For example, the number of variants in the scoring file that were
+successfully matched against the input target genomes.</p>
+</section>
+<section id="match">
+<h2><code class="docutils literal notranslate"><span class="pre">match/</span></code><a class="headerlink" href="#match" title="Permalink to this headline">#</a></h2>
+<p>This directory contains the raw data that is summarised in the scoring
+report. The log file is a <a class="reference internal" href="../glossary.html#term-CSV"><span class="xref std std-term">CSV</span></a> that contains a row for each variant in
+the aggregated input scoring files. Columns contain information about how each
+variant was matched against the target genomes. For example, a variant in a
+scoring file may be:</p>
+<ul class="simple">
+<li><p>Simple to match, with the effect allele being REF and the other allele being
+ALT in the target genomes</p></li>
+<li><p>Lifted from its original genome build to match the target genome build</p></li>
+<li><p>The effect allele may have matched ALT and the other allele may have matched
+REF in the target genomes</p></li>
+</ul>
+<p>This information might be useful to debug a score that is causing problems.</p>
+<p>Processed scoring files are also present in this directory. Briefly, variants in
+the scoring files are matched against the target genomes. Common variants across
+different scores are combined (left joined, so each score is an additional
+column). The combined scores are then partially split to overcome PLINK2
+technical limitations (e.g. calculating different effect types such as dominant
+/ recessive). Once scores are calculated from these partially split scoring
+files, scores are aggregated to produce the final results in <code class="docutils literal notranslate"><span class="pre">score/</span></code>.</p>
+</section>
+<section id="pipeline-info">
+<h2><code class="docutils literal notranslate"><span class="pre">pipeline_info/</span></code><a class="headerlink" href="#pipeline-info" title="Permalink to this headline">#</a></h2>
+<p>Summary reports generated by nextflow describes the execution of the pipeline in
+a lot of technical detail. The execution report can be useful to see how long a
+job takes to execute. The DAG is a diagram that may be useful to understand how
+the pipeline processes data.</p>
+</section>
 </section>
 
 

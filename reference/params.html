@@ -223,29 +223,41 @@ title="Print to PDF"
     <nav id="bd-toc-nav" aria-label="Page">
         <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#pgscatalog-pgsc-calc-pipeline-parameters">
-   pgscatalog/pgsc_calc pipeline parameters
+  <a class="reference internal nav-link" href="#setting-parameters">
+   Setting parameters
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#advanced-parameters">
+   Advanced parameters
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#input-output-options">
-     Input/output options
+    <a class="reference internal nav-link" href="#pgscatalog-pgsc-calc-pipeline-parameters">
+     pgscatalog/pgsc_calc pipeline parameters
     </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#variant-matching-qc-filtering">
-     Variant Matching QC &amp; Filtering
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#max-job-request-options">
-     Max job request options
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#generic-options">
-     Generic options
-    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#input-output-options">
+       Input/output options
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#variant-matching-qc-filtering">
+       Variant Matching QC &amp; Filtering
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#max-job-request-options">
+       Max job request options
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#generic-options">
+       Generic options
+      </a>
+     </li>
+    </ul>
    </li>
   </ul>
  </li>
@@ -269,29 +281,41 @@ title="Print to PDF"
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#pgscatalog-pgsc-calc-pipeline-parameters">
-   pgscatalog/pgsc_calc pipeline parameters
+  <a class="reference internal nav-link" href="#setting-parameters">
+   Setting parameters
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#advanced-parameters">
+   Advanced parameters
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#input-output-options">
-     Input/output options
+    <a class="reference internal nav-link" href="#pgscatalog-pgsc-calc-pipeline-parameters">
+     pgscatalog/pgsc_calc pipeline parameters
     </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#variant-matching-qc-filtering">
-     Variant Matching QC &amp; Filtering
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#max-job-request-options">
-     Max job request options
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#generic-options">
-     Generic options
-    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#input-output-options">
+       Input/output options
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#variant-matching-qc-filtering">
+       Variant Matching QC &amp; Filtering
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#max-job-request-options">
+       Max job request options
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#generic-options">
+       Generic options
+      </a>
+     </li>
+    </ul>
    </li>
   </ul>
  </li>
@@ -308,18 +332,14 @@ title="Print to PDF"
   <section id="parameter-reference">
 <span id="param-ref"></span><h1>Parameter reference<a class="headerlink" href="#parameter-reference" title="Permalink to this headline">#</a></h1>
 <p>The documentation below is automatically generated from the input schema and
-contains additional technical detail.</p>
-<p><strong>Parameters in bold</strong> are required and must be set by the user.</p>
+contains additional technical detail. <strong>Parameters in bold</strong> are required and
+must be set by the user.</p>
+<section id="setting-parameters">
+<h2>Setting parameters<a class="headerlink" href="#setting-parameters" title="Permalink to this headline">#</a></h2>
 <p>Parameters can be set in two ways:</p>
 <ol class="arabic simple">
-<li><p>Storing parameters in a configuration file using the <code class="docutils literal notranslate"><span class="pre">-params-file</span></code> option, e.g.:</p></li>
-</ol>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">liftover</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
-<span class="nt">target_build</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GRCh38</span><span class="w"></span>
-</pre></div>
-</div>
-<p>See <a class="reference internal" href="../how-to/yaml.html#params-file"><span class="std std-ref">How to set parameters in a file</span></a> for more details.</p>
-<ol class="arabic simple" start="2">
+<li><p>Storing parameters in a configuration file using the <code class="docutils literal notranslate"><span class="pre">-params-file</span></code>
+option. See <a class="reference internal" href="../how-to/yaml.html#params-file"><span class="std std-ref">How to set parameters in a file</span></a> for more details.</p></li>
 <li><p>In a terminal using two dashes, e.g.:</p></li>
 </ol>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>nextflow run pgscatalog/pgsc_calc <span class="se">\</span>
@@ -328,12 +348,21 @@ contains additional technical detail.</p>
     --target_build GRCh38
 </pre></div>
 </div>
-<p>Parameters with a single dash (<code class="docutils literal notranslate"><span class="pre">-profile</span></code>) configure nextflow directly.</p>
+<p>Parameters with a single dash (e.g. <code class="docutils literal notranslate"><span class="pre">-profile</span></code>) configure nextflow directly.</p>
 <p>Setting parameters with a configuration file is the recommended method of
 working with the pipeline, because it helps you to keep track of your analysis.</p>
-<p>For background about max job request options, see <a class="reference internal" href="../how-to/bigjob.html#big-job"><span class="std std-ref">How do I run big jobs on a powerful computer?</span></a>.</p>
+<p>For examples about setting max job request options, see <a class="reference internal" href="../how-to/bigjob.html#big-job"><span class="std std-ref">How do I run big jobs on a powerful computer?</span></a>.</p>
+</section>
+<section id="advanced-parameters">
+<h2>Advanced parameters<a class="headerlink" href="#advanced-parameters" title="Permalink to this headline">#</a></h2>
+<p>Some parameters have been hidden below to improve the readability of this
+page. You can view the entire list by running:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>nextflow run pgscatalog/pgsc_calc --help
+</pre></div>
+</div>
+<p>Or by <a class="reference external" href="https://github.com/PGScatalog/pgsc_calc/blob/master/nextflow_schema.json">downloading the schema</a> and opening it in a text editor</p>
 <section id="pgscatalog-pgsc-calc-pipeline-parameters">
-<span id="pgscatalog-pgsc-calc-pipeline-parameters"></span><h2>pgscatalog/pgsc_calc pipeline parameters<a class="headerlink" href="#pgscatalog-pgsc-calc-pipeline-parameters" title="Permalink to this headline">#</a></h2>
+<span id="pgscatalog-pgsc-calc-pipeline-parameters"></span><h3>pgscatalog/pgsc_calc pipeline parameters<a class="headerlink" href="#pgscatalog-pgsc-calc-pipeline-parameters" title="Permalink to this headline">#</a></h3>
 <p>This pipeline applies scoring files from the PGS Catalog to target genotyped samples</p>
 <table class="table">
 <colgroup>
@@ -349,7 +378,7 @@ working with the pipeline, because it helps you to keep track of your analysis.<
 </tbody>
 </table>
 <section id="input-output-options">
-<span id="input-output-options"></span><h3>Input/output options<a class="headerlink" href="#input-output-options" title="Permalink to this headline">#</a></h3>
+<span id="input-output-options"></span><h4>Input/output options<a class="headerlink" href="#input-output-options" title="Permalink to this headline">#</a></h4>
 <p>Define where the pipeline should find input data and save output data.</p>
 <table class="table">
 <colgroup>
@@ -472,7 +501,7 @@ working with the pipeline, because it helps you to keep track of your analysis.<
 </table>
 </section>
 <section id="variant-matching-qc-filtering">
-<span id="variant-matching-qc-filtering"></span><h3>Variant Matching QC &amp; Filtering<a class="headerlink" href="#variant-matching-qc-filtering" title="Permalink to this headline">#</a></h3>
+<span id="variant-matching-qc-filtering"></span><h4>Variant Matching QC &amp; Filtering<a class="headerlink" href="#variant-matching-qc-filtering" title="Permalink to this headline">#</a></h4>
 <table class="table">
 <colgroup>
 <col style="width: 33%" />
@@ -555,7 +584,7 @@ working with the pipeline, because it helps you to keep track of your analysis.<
 </table>
 </section>
 <section id="max-job-request-options">
-<span id="max-job-request-options"></span><h3>Max job request options<a class="headerlink" href="#max-job-request-options" title="Permalink to this headline">#</a></h3>
+<span id="max-job-request-options"></span><h4>Max job request options<a class="headerlink" href="#max-job-request-options" title="Permalink to this headline">#</a></h4>
 <p>Set the top limit for requested resources for any single job.</p>
 <table class="table">
 <colgroup>
@@ -615,7 +644,7 @@ working with the pipeline, because it helps you to keep track of your analysis.<
 </table>
 </section>
 <section id="generic-options">
-<span id="generic-options"></span><h3>Generic options<a class="headerlink" href="#generic-options" title="Permalink to this headline">#</a></h3>
+<span id="generic-options"></span><h4>Generic options<a class="headerlink" href="#generic-options" title="Permalink to this headline">#</a></h4>
 <p>Less common options for the pipeline, typically set in a config file.</p>
 <table class="table">
 <colgroup>
@@ -736,6 +765,7 @@ working with the pipeline, because it helps you to keep track of your analysis.<
 </tr>
 </tbody>
 </table>
+</section>
 </section>
 </section>
 </section>
