@@ -129,13 +129,13 @@ way. To do this, set up a spreadsheet that looks like one of the examples below:
      - pfile_path
      - chrom
    * - cineca_synthetic_subset_vcf
+     - /full/path/to/vcf.gz     
      -
-     - /full/path/to/vcf.gz
      -
      - 22
    * - cineca_synthetic_subset_vcf
-     -
      - /full/path/to/vcf.gz
+     -       
      -
      - 21       
        
