@@ -82,9 +82,9 @@ genomic data, which are probably sequenced from real people!
 --------------------
 
 First, you need to describe the structure of your genomic data in a standardised
-way. To do this, set up a spreadsheet that looks like:
+way. To do this, set up a spreadsheet that looks like one of the examples below:
 
-.. list-table:: Example samplesheet
+.. list-table:: Example bfile samplesheet
    :widths: 20 20 20 20 20
    :header-rows: 1
 
@@ -95,15 +95,50 @@ way. To do this, set up a spreadsheet that looks like:
      - chrom
    * - cineca_synthetic_subset
      -
-     - path/to/bfile_prefix
+     - /full/path/to/bfile_prefix
+     -
+     - 22
+   * - cineca_synthetic_subset
+     -
+     - /full/path/to/bfile_prefix
+     -
+     - 21
+
+.. list-table:: Example multi-chromosome bfile samplesheet
+   :widths: 20 20 20 20 20
+   :header-rows: 1
+
+   * - sample
+     - vcf_path
+     - bfile_path
+     - pfile_path
+     - chrom
+   * - cineca_synthetic_subset
+     -
+     - /full/path/to/bfile_prefix
+     -
+     - 
+     
+.. list-table:: Example split VCF samplesheet
+   :widths: 20 20 20 20 20
+   :header-rows: 1
+
+   * - sample
+     - vcf_path
+     - bfile_path
+     - pfile_path
+     - chrom
+   * - cineca_synthetic_subset_vcf
+     - /full/path/to/vcf.gz     
+     -
      -
      - 22
    * - cineca_synthetic_subset_vcf
-     - path/to/vcf.gz
+     - /full/path/to/vcf.gz
+     -       
      -
-     - 
-     - 22
-
+     - 21       
+       
 There are five mandatory columns. Columns that specify genomic data paths
 (**vcf_path**, **bfile_path**, and **pfile_path**) are mutually exclusive:
 
@@ -171,8 +206,9 @@ Congratulations, you've now (`hopefully`) calculated some scores!
 |:partying_face:|
 
 After the workflow executes successfully, the calculated scores and a summary
-report should be available in the ``results/make/`` directory by default. If
-you're interested in more information, see :ref:`interpret`.
+report should be available in the ``results/score/`` directory in your current
+working directory (``$PWD``) by default. If you're interested in more
+information, see :ref:`interpret`.
 
 If the workflow didn't execute successfully, have a look at the
 :ref:`troubleshoot` section. Remember to replace ``<docker/singularity/conda>``
