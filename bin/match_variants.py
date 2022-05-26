@@ -267,10 +267,7 @@ def main(args = None):
     unduplicated = { k: unduplicate_variants(v) for k, v in split_effects.items() }
 
     # write matched and processed variants out, with a report -------------------
-    # "is_" breaks output naming scheme (chr_effecttype_dup)
-    ea_dict = { 'is_dominant': 'dominant', 'is_recessive': 'recessive', 'additive': 'additive'}
-
-    [write_scorefiles(ea_dict.get(k), v, args.split) for k, v in unduplicated.items() ]
+    [write_scorefiles(k, v, args.split) for k, v in unduplicated.items() ]
 
     make_report(conn, args.min_overlap)
 
