@@ -8,7 +8,7 @@ process PLINK2_SCORE {
         'quay.io/biocontainers/plink2:2.00a2.3--h712d239_1' }"
 
     input:
-    tuple val(meta), path(pgen), path(psam), path(pvar), val(scoremeta), path(scorefile)
+    tuple val(meta), path(pgen), path(psam), path(pvar), val(scoremeta), path(scorefile), val(n_samples)
 
     output:
     path "*.sscore"    , emit: scores
@@ -16,34 +16,29 @@ process PLINK2_SCORE {
 
     script:
     def args = task.ext.args ?: ''
-    def args2 = task.ext.args2 ?: ''
 
-    def maxcol = (scoremeta.n_scores + 2) // id + effect allele = 2 cols
-    def no_imputation = (meta.n_samples >= 50) ? '' : ' no-mean-imputation '
-    args2 = args2 + no_imputation
-
-    if (scoremeta.n_scores == 1)
+    if (n_samples < 50)
         """
+        colmax=\$(head -n 1 $scorefile | awk -F '\t' '{ print NF }')
         plink2 \\
-            $args \\
-            --score $scorefile $args2 \\
+            --score ${scorefile} header-read cols=scoresums no-mean-imputation $args \\
+            --score-col-nums 3-\$colmax \\
             --pfile ${pgen.baseName} \\
-            --out ${meta.id}_${meta.chrom}_${scorefile.baseName.tokenize('_')[2]}
-        # prevent collisions for duplicate variants that were split
+            --out ${meta.id}_${meta.chrom}
 
         cat <<-END_VERSIONS > versions.yml
         ${task.process.tokenize(':').last()}:
             plink2: \$(plink2 --version 2>&1 | sed 's/^PLINK v//; s/ 64.*\$//' )
         END_VERSIONS
         """
-    else
+    else if (n_samples > 50)
         """
+        colmax=\$(head -n 1 $scorefile | awk -F '\t' '{ print NF }')
         plink2 \\
-            $args \\
-            --score $scorefile $args2 \\
-            --score-col-nums 3-$maxcol \\
+            --score ${scorefile} header-read cols=scoresums $args \\
+            --score-col-nums 3-\$colmax \\
             --pfile ${pgen.baseName} \\
-            --out ${meta.id}_${meta.chrom}_${scorefile.baseName.tokenize('_')[2]}
+            --out ${meta.id}_${meta.chrom}
 
         cat <<-END_VERSIONS > versions.yml
         ${task.process.tokenize(':').last()}:
