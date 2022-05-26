@@ -1,0 +1,16 @@
+# You can use this file to create a conda environment for this pipeline:
+#   conda env create -f environment.yml
+name: pgscatalog-calculator-0.1.2dev
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - pandas=1.1.5
+  - sqlite=3.36.0
+  - curl=7.79.1
+  - mawk=1.3.4
+  - jq=1.6
+  - plink=1.90b6.21
+  - plink2=2.00a2.3
+  - multiqc=1.11 # dump software versions local module, not used otherwise

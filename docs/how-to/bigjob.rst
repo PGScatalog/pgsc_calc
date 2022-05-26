@@ -1,5 +1,3 @@
-.. _big job:
-
 How do I run big jobs on a powerful computer?
 =============================================
 
