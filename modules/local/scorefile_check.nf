@@ -10,9 +10,8 @@ process SCOREFILE_CHECK {
     path raw_scores
 
     output:
-    path "scorefiles.pkl"   , emit: scorefiles
-    path "read_scorefile.db", emit: log
-    path "versions.yml"     , emit: versions
+    path "scorefiles.pkl", emit: scorefiles
+    path "versions.yml"  , emit: versions
 
     script:
     def args = task.ext.args ?: ''

@@ -38,10 +38,8 @@ def hg38_coords():
 @pytest.fixture
 def hg38_to_hg19_coords(hg38_coords):
     ''' A dataframe containing known good coordinates in GRCh37, from dbSNP '''
-    d = {'lifted_chr': [2, 20], 'lifted_pos': [192587204, 60956917], 'liftover': [True, True] }
-    return (hg38_coords.join(pd.DataFrame(d, dtype = 'Int64'), how = 'outer')
-            .astype({'liftover': bool}))
-
+    d = {'lifted_chr': [2, 20], 'lifted_pos': [192587204, 60956917] }
+    return hg38_coords.join(pd.DataFrame(d, dtype = 'Int64'), how = 'outer')
 
 @pytest.fixture
 def hg19_unique_coords():
@@ -136,7 +134,7 @@ def test_valid_chrom(valid_chrom):
     assert parse_lifted_chrom(valid_chrom) == 1
 
 def test_invalid_chrom(invalid_chrom):
-    assert to_int(invalid_chrom) is None
+    assert np.isnan(to_int(invalid_chrom)) # why is this behaviour different?
     assert parse_lifted_chrom(invalid_chrom) is None
 
 def test_annotated_chrom(annotated_chrom):
@@ -146,7 +144,7 @@ def test_remap(hg38_coords, lo_tohg19, lo_tohg38, hg38_to_hg19_coords, hg19_uniq
     ''' Test known genomic coordinates are valid when remapped '''
     # test valid positions are mapped from (GRCh38 -> GRCh37)
     hg38_coords[['lifted_chr', 'lifted_pos']] = hg38_coords.apply(lambda x: convert_coordinates(x, lo_tohg19), axis = 1)
-    assert hg38_coords.equals(hg38_to_hg19_coords.drop('liftover', axis = 1))
+    assert hg38_coords.equals(hg38_to_hg19_coords)
 
     # test invalid positions that won't map (GRCh37 -> GRCh38)
     assert (hg19_unique_coords
@@ -158,12 +156,11 @@ def test_remap(hg38_coords, lo_tohg19, lo_tohg38, hg38_to_hg19_coords, hg19_uniq
 def test_liftover(accession, hg38_coords, hg38_to_hg19_coords, hg19, hg38, min_lift, hg19_unique_coords):
     ''' Test liftover function, which is applied to each scoring file '''
 
-    lifted, _ = liftover(accession, hg38_coords, hg38, hg19, min_lift)
+    lifted = liftover(accession, hg38_coords, hg38, hg19, min_lift)
     assert lifted.equals(hg38_to_hg19_coords)
 
-    lift_same_build, _ = liftover(accession, hg38_coords, hg38, hg38, min_lift)
-    # drop liftover status label, it's not important for this test
-    assert lift_same_build.drop('liftover', axis = 1).equals(hg38_coords)
+    lift_same_build = liftover(accession, hg38_coords, hg38, hg38, min_lift)
+    assert lift_same_build.equals(hg38_coords)
 
     # test min_overlap throws an error
     with pytest.raises(AssertionError):
@@ -189,7 +186,7 @@ def test_read_scorefile(scoring_file_header, scoring_file_noheader, df_cols):
     with pytest.raises(AssertionError):
         read_scorefile(scoring_file_header)
 
-    df_dict, _ = read_scorefile(scoring_file_noheader)
+    df_dict = read_scorefile(scoring_file_noheader)
     assert 'PGS000802' in df_dict
     # https://www.pgscatalog.org/score/PGS000802/
     # 19 variants, 6 columns
@@ -230,3 +227,15 @@ def test_multi_effect_weights(multi_score_df, df_cols):
     # ... and dict values are dfs with proper columns
     assert set(d['one'].columns) == df_cols
     assert set(d['two'].columns) == df_cols
+
+def test_main(scoring_file_noheader, scoring_file_header, out_pickle):
+    ''' Test reading a scorefile and writing to a pickled dict '''
+
+    main(args = ['-s', scoring_file_noheader, '-o', out_pickle])
+
+    with open(out_pickle, 'rb') as f:
+        result = pickle.load(f)
+    assert isinstance(result, dict)
+
+    with pytest.raises(SystemExit):
+        main(args = [''])
