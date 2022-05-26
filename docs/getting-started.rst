@@ -158,19 +158,14 @@ they match the scoring file genome build.
 .. code-block:: console
 
     $ nextflow run pgscatalog/pgsc_calc \
-        -profile <docker/singularity/conda> \
         --input samplesheet.csv \
         --accession PGS001229
 
-Congratulations, you've now (`hopefully`) calculated some scores!
-|:partying_face:|
+Congratulations, you've now (`hopefully`) calculated some scores! |:partying_face:|
 
 After the workflow executes successfully, the calculated scores and a summary
 report should be available in the ``results/make/`` directory by default. If
 you're interested in more information, see :ref:`interpret`.
 
 If the workflow didn't execute successfully, have a look at the
-:ref:`troubleshoot` section. Remember to replace ``<docker/singularity/conda>``
-with the software you have installed on your computer, see :ref:`containers` for
-a more detailed explanation.
-
+:ref:`troubleshoot` section. 

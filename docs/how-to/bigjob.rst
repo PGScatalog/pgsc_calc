@@ -11,34 +11,38 @@ Configuring pgsc_calc to use more resources locally
 ---------------------------------------------------
 
 If you have a powerful computer available locally, you can configure the amount
-of resources that the workflow uses. 
+of resources that the workflow uses.
 
 .. code-block:: text
 
+    params {
+        max_memory = 36.GB
+        max_cpus = 8
+        max_time = 12.h
+    }
+
     process {
-        executor = 'local'
-        
         withLabel:process_low {
-            cpus   = 2
-            memory = 8.GB
-            time   = 1.h
+            cpus   = { check_max( 2     * task.attempt, 'cpus'    ) }
+            memory = { check_max( 12.GB * task.attempt, 'memory'  ) }
+            time   = { check_max( 4.h   * task.attempt, 'time'    ) }
         }
         withLabel:process_medium {
-            cpus   = 8
-            memory = 64.GB
-            time   = 4.h
+            cpus   = { check_max( 6     * task.attempt, 'cpus'    ) }
+            memory = { check_max( 36.GB * task.attempt, 'memory'  ) }
+            time   = { check_max( 8.h   * task.attempt, 'time'    ) }
         }
-    } 
+    }
 
 You should change ``cpus``, ``memory``, and ``time`` to match the amount of
-resources used. Assuming the configuration file you set up is saved as
-``my_custom.config`` in your current working directory, you're ready to run
-pgsc_calc:
+resources used (don't forget to change ``max`` in the params block too).
+
+Assuming the configuration file you set up is saved as ``my_custom.config`` in
+your current working directory, you're ready to run pgsc_calc:
 
 .. code-block:: console
                 
     $ nextflow run pgscatalog/pgsc_calc \
-        -profile <docker/singularity/conda> \
         --input samplesheet.csv \
         --accession PGS001229 \
         -c my_custom.config
@@ -47,62 +51,50 @@ High performance computing cluster
 ----------------------------------
 
 If you have access to a HPC cluster, you'll need to configure your cluster's
-unique parameters to set correct queues, user accounts, and resource
-limits. Here's an example for an LSF cluster:
+unique parameters to set correct queues, user accounts, and resource limits:
 
 .. code-block:: text
 
+    params {
+        max_memory = 36.GB
+        max_cpus = 8
+        max_time = 12.h
+    }
+
     process {
-        executor = 'lsf'
-        queue = 'short'
+        executor = 'slurm'
+        queue = 'standard'
         clusterOptions = ''
 
         withLabel:process_low {
-            cpus   = 2
-            memory = 8.GB
-            time   = 1.h
+            cpus   = { check_max( 2     * task.attempt, 'cpus'    ) }
+            memory = { check_max( 12.GB * task.attempt, 'memory'  ) }
+            time   = { check_max( 4.h   * task.attempt, 'time'    ) }
         }
         withLabel:process_medium {
-            cpus   = 8
-            memory = 64.GB
-            time   = 4.h
+            cpus   = { check_max( 6     * task.attempt, 'cpus'    ) }
+            memory = { check_max( 36.GB * task.attempt, 'memory'  ) }
+            time   = { check_max( 8.h   * task.attempt, 'time'    ) }
         }
     } 
 
-In SLURM, queue is equivalent to a partition. Specific cluster parameters can be
-provided by modifying ``clusterOptions``. You should change ``cpus``,
-``memory``, and ``time`` to match the amount of resources used. Assuming the
-configuration file you set up is saved as ``my_custom.config`` in your current
-working directory, you're ready to run pgsc_calc. Instead of running nextflow
-directly on the shell, save a bash script (``run_pgscalc.sh``) to a file
-instead:
+In SLURM, queue is equivalent to a partition. Nextflow can support other
+executors like `LSF and PBS`_. Other cluster parameters can be provided by
+modifying ``clusterOptions``. You should change ``cpus``, ``memory``, and
+``time`` to match the amount of resources used (don't forget to change ``max``
+in the params block too).
 
-.. code-block:: bash
+Assuming the configuration file you set up is saved as ``my_custom.config`` in
+your current working directory, you're ready to run pgsc_calc:
+
+.. code-block:: console
                 
-    export NXF_ANSI_LOG=false
-    module load nextflow-21.10.6-gcc-9.3.0-tkuemwd
-    module load singularity-3.7.0-gcc-9.3.0-dp5ffrp
-
-    nextflow run pgscatalog/pgsc_calc \
-        -profile singularity \
+    $ nextflow run pgscatalog/pgsc_calc \
         --input samplesheet.csv \
         --accession PGS001229 \
         -c my_custom.config
 
-.. note:: The name of the nextflow and singularity modules will be different in
-          your local environment
-   
-.. code-block:: console
-            
-    $ bsub -M 2GB -q short -o output.txt < run_pgscalc.sh
-
-This will submit a nextflow driver job, which will submit additional jobs for
-each process in the workflow. The nextflow driver requires up to 4GB of RAM
-(bsub's ``-M`` parameter) and 2 CPUs to use (see a guide for `HPC users`_ here).
-
 .. _`LSF and PBS`: https://nextflow.io/docs/latest/executor.html#slurm
-.. _`HPC users`: https://www.nextflow.io/blog/2021/5_tips_for_hpc_users.html
-
 
 Other environments
 ------------------

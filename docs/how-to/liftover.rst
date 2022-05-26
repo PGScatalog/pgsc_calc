@@ -31,7 +31,6 @@ are in build GRCh38:
 .. code-block:: console
 
     $ nextflow run pgscatalog/pgsc_calc \
-        -profile <docker/singularity/conda> \    
         --input samplesheet.csv \
         --accession PGS001229 \
         --liftover \

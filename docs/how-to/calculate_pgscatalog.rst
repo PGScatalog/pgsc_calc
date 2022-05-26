@@ -56,7 +56,6 @@ that starts with with the prefix "PGS". For example, `PGS001229`_. The parameter
 .. code-block:: console
 
     $ nextflow run pgscatalog/pgscalc \
-        -profile <docker/singularity/conda> \    
         --input samplesheet.csv \
         --accession PGS001229
 

@@ -133,7 +133,6 @@ Setting effect types for variants is not supported with this format (see
 .. code-block:: console
 
     $ nextflow run pgscatalog/pgscalc \
-        -profile <docker/singularity/conda> \    
         --input samplesheet.csv \
         --accession PGS001229,PGS001405
 
@@ -142,7 +141,6 @@ Setting effect types for variants is not supported with this format (see
 .. code-block:: console
 
     $ nextflow run pgscatalog/pgscalc \
-        -profile <docker/singularity/conda> \
         --input samplesheet.csv \
         --scorefile "my_custom_scores/*.tsv"    
 
