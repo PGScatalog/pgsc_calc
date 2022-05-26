@@ -3,6 +3,7 @@ title: "PGS Catalog calculator summary report"
 output: html_document
 date: "`r Sys.time()`"
 params:
+  file: dummy.sscore
   img: PGS_Logo.png
 ---
 
@@ -10,9 +11,7 @@ params:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-
 ```{r, echo=FALSE}
-# logo
 htmltools::img(src = knitr::image_uri(params$img),
                alt = 'logo', 
                style = 'position:absolute; top:0; right:0; padding:10px;',
@@ -21,33 +20,16 @@ htmltools::img(src = knitr::image_uri(params$img),
 
 ## Score summary
 
-```{r, echo = FALSE, message = FALSE}
-# some weird function choices here but container has a sparse set of libraries 
-# e.g. no dplyr :( no group_by, mutate, map_dfr...
-
-read_scorefiles <- function(path) {
-  dataset <- stringr::str_split(path, pattern = "_")[[1]][[1]]
-  df <- read.table(path, header = TRUE, comment.char = "")
-  cols <- colnames(df) 
-  cols[[1]] <- "IID"
-  colnames(df) <- cols
-  df$dataset <- dataset
-  return(df)
-}
-
-scorefiles <- list.files(pattern = "*.sscore", all.files = TRUE)
-combined <- purrr::reduce(purrr::map(scorefiles, read_scorefiles), rbind)
-agg <- aggregate(. ~ IID + dataset, data = combined, sum)
-write.table(agg, "aggregated_scores.txt", col.names = TRUE, quote = FALSE, row.names = FALSE)
+```{r, echo = FALSE}
+xfun::embed_file(params$file, text = "Download calculated scores")
 ```
 
-```{r, echo = FALSE}
-xfun::embed_file("aggregated_scores.txt", text = "Download calculated scores")
-scores <- read.table("aggregated_scores.txt", header = TRUE, comment.char = "")
+```{r}
+scores <- read.table(params$file, header = TRUE, comment.char = "")
 head(scores)
 ```
 
-## Session information
+## Sesssion information
 
 ```{r}
 sessionInfo()

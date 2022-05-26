@@ -7,22 +7,23 @@ process MAKE_REPORT {
         'quay.io/biocontainers/bioconductor-biocworkflowtools:1.20.0--r41hdfd78af_0' }"
 
     input:
-    path scorefiles
-    path report
-    path logo
+    tuple val(meta), path('results.scorefile')
+    path(report)
+    path(logo)
 
     output:
     path "*.html"      , emit: report
-    path "*.txt"       , emit: scores
     path "versions.yml", emit: versions
 
     script:
     def args = task.ext.args ?: ''
+    def prefix = task.ext.suffix ? "${meta.id}${task.ext.suffix}" : "${meta.id}"
     """
     # dumb workaround symlink & out_dir (rmarkdown)
+    # don't want to stageInMode very big score files
     cp $report report.rmd
-
     R -e 'rmarkdown::render("report.rmd", \
+        params = list(file = "results.scorefile"), \
         output_options = list(self_contained=TRUE))'
 
     cat <<-END_VERSIONS > versions.yml

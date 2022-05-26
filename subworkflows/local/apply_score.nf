@@ -39,22 +39,9 @@ workflow APPLY_SCORE {
 
     PLINK2_SCORE ( ch_apply )
 
-    ch_versions = ch_versions.mix(PLINK2_SCORE.out.versions.first())
-
-    PLINK2_SCORE.out.scores
-        .collect()
-        .set { ch_scores }
-
-    MAKE_REPORT(
-        ch_scores,
-        Channel.fromPath("$projectDir/bin/report.Rmd", checkIfExists: true),
-        Channel.fromPath("$projectDir/assets/PGS_Logo.png", checkIfExists: true)
-    )
-
-    ch_versions = ch_versions.mix(MAKE_REPORT.out.versions)
 
     emit:
-    score = MAKE_REPORT.out.scores
+    score = scorefiles
     versions = ch_versions
 }
 
