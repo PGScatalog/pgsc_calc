@@ -1,6 +1,5 @@
-process SCOREFILE_CHECK {
+process SCOREFILE_QC {
     tag "$meta.accession"
-    label 'process_low'
 
     conda (params.enable_conda ? "bioconda::mawk=1.3.4" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -17,8 +16,8 @@ process SCOREFILE_CHECK {
     script:
     def prefix  = "${meta.accession}"
     """
-    mawk -v out=${prefix}_checked.txt \
-        -f ${projectDir}/bin/check_scorefile.awk \
+    mawk -v out=${prefix}.txt \
+        -f ${projectDir}/bin/qc_scorefile.awk \
         ${datafile}
 
     cat <<-END_VERSIONS > versions.yml

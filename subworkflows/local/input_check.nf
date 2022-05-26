@@ -10,7 +10,7 @@ workflow INPUT_CHECK {
     take:
     input // file: /path/to/samplesheet.csv
     format // csv or JSON
-    scorefile // flat list of paths
+    scorefile // tuple val(id), path(/path/to/score_file)
 
     main:
     ch_versions = Channel.empty()
@@ -51,13 +51,13 @@ workflow INPUT_CHECK {
 
     // check scorefiles
     SCOREFILE_CHECK ( scorefile )
-    ch_versions = ch_versions.mix(SCOREFILE_CHECK.out.versions)
+    ch_versions = ch_versions.mix(SCOREFILE_CHECK.out.versions.first())
 
     emit:
     bed = ch_bfiles.bed.mix(PLINK_VCF.out.bed) // channel: [val(meta), path(bed)]
     bim = ch_bfiles.bim.mix(PLINK_VCF.out.bim) // channel: [val(meta), path(bim)]
     fam = ch_bfiles.fam.mix(PLINK_VCF.out.fam) // channel: [val(meta), path(fam)]
-    scorefiles = SCOREFILE_CHECK.out.scorefiles
+    scorefile = SCOREFILE_CHECK.out.data
     versions = ch_versions
 }
 
