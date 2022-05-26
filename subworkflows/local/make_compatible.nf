@@ -36,31 +36,22 @@ workflow MAKE_COMPATIBLE {
     psam = PLINK2_RELABEL.out.psam.mix(PLINK2_VCF.out.psam)
     pvar = PLINK2_RELABEL.out.pvar.mix(PLINK2_VCF.out.pvar)
 
-    // Recombine split variant information files to match target variants
-    pvar.map { extract_chrom(it) }
+    // Recombine any split variant information files to match target variants
+    // and scorefile variants (plink2 pvar == plink1 bim)
+    pvar.map { [it.head().take(2), it.tail()] } // drop chrom from meta for groupTuple
         .groupTuple()
+        .map { [it.head(), it.tail().flatten()] } // [[meta], [pvar1, ..., pvarn]]
         .set { flat_bims }
 
     // variants should be matched once per sample identifier
+    // [[meta], combined_pvar, [scoremeta], scorefile]
     MATCH_VARIANTS ( flat_bims.combine(scorefile) )
     ch_versions = ch_versions.mix(MATCH_VARIANTS.out.versions)
 
     emit:
-    pgen
-    psam
-    pvar
+    pgen = PLINK2_RELABEL.out.pgen
+    psam = PLINK2_RELABEL.out.psam
+    pvar = PLINK2_RELABEL.out.pvar
     scorefile = MATCH_VARIANTS.out.scorefile
     versions = ch_versions
-}
-
-def extract_chrom(ArrayList it) {
-    // [[meta], path]
-    // first element is a meta map:
-    // [ id: hello, is_vcf: true, chrom:22 ]
-    // where chrom can be false
-    // need to extract chrom for groupTuple() to work
-    meta = it[0]
-    chrom = it[0].chrom
-    meta.remove('chrom')
-    return [meta, chrom, it[1]]
 }
