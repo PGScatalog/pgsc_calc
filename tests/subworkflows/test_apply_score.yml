@@ -1,6 +1,5 @@
-# get a scores with two columns in output (test profile + PGS001229) for custom test
 - name: test apply score subworkflow
-  command: nextflow run main.nf -profile test --only_score -c ./tests/config/nextflow.config --accession PGS001229 --min_overlap 0
+  command: nextflow run main.nf -profile test --only_score -c ./tests/config/nextflow.config
   tags:
     - applyscore
     - subworkflow
@@ -10,8 +9,7 @@
     - path: output/plink2/cineca_synthetic_subset_22.bed
     - path: output/plink2/cineca_synthetic_subset_22.bim
     - path: output/plink2/cineca_synthetic_subset_22.fam
-    - path: output/match/22_additive_0.scorefile
+    - path: output/match/22_additive_first.scorefile
     - path: output/match/log.csv
     - path: output/make/aggregated_scores.txt
     - path: output/make/report.html
-      
