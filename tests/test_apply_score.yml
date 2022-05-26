@@ -5,11 +5,12 @@
     - subworkflow
   files:
     - path: output/samplesheet/out.json
-    - path: output/scorefile/scorefiles.txt
+    - path: output/scorefile/scorefiles.pkl
     - path: output/plink2/cineca_synthetic_subset_22.bed
     - path: output/plink2/cineca_synthetic_subset_22.bim
     - path: output/plink2/cineca_synthetic_subset_22.fam
-    - path: output/match/22_additive_first.scorefile
-    - path: output/match/log.csv
+    - path: output/match/22_additive_0.scorefile
+    - path: output/match/match_variants.db
+    - path: output/match/report.csv
     - path: output/make/aggregated_scores.txt
     - path: output/make/report.html
