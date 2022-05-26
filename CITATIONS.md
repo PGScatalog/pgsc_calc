@@ -11,9 +11,9 @@
 ## Pipeline tools
 
 * [PGS Catalog API](https://pubmed.ncbi.nlm.nih.gov/33692568/)
-    > Lambert SA, Gil L, Jupp S, Ritchie SC, Xu Y, Buniello A, McMahon A, Abraham G, Chapman M, Parkinson H, Danesh J. The Polygenic Score Catalog as an open database for reproducibility and systematic evaluation. Nature Genetics. 2021 Apr;53(4):420-5. doi: 10.1038/s41588-021-00783-5. PubMed PMID: 33692568. 
- 
- * [PLINK 1](https://pubmed.ncbi.nlm.nih.gov/17701901/)
+    > Lambert SA, Gil L, Jupp S, Ritchie SC, Xu Y, Buniello A, McMahon A, Abraham G, Chapman M, Parkinson H, Danesh J. The Polygenic Score Catalog as an open database for reproducibility and systematic evaluation. Nature Genetics. 2021 Apr;53(4):420-5. doi: 10.1038/s41588-021-00783-5. PubMed PMID: 33692568.
+
+* [PLINK 1](https://pubmed.ncbi.nlm.nih.gov/17701901/)
     > Purcell S, Neale B, Todd-Brown K, Thomas L, Ferreira MA, Bender D, Maller J, Sklar P, De Bakker PI, Daly MJ, Sham PC. PLINK: a tool set for whole-genome association and population-based linkage analyses. The American journal of human genetics. 2007 Sep 1;81(3):559-75. doi: 10.1086/519795. PubMed PMID:  17701901. PubMed Central PMCID: PMC1950838.
 
 * [PLINK 2](https://pubmed.ncbi.nlm.nih.gov/25722852/)

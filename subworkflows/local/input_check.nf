@@ -2,33 +2,55 @@
 // Check input samplesheet and get read channels
 //
 
-include { SAMPLESHEET_CHECK } from '../../modules/local/samplesheet_check'
-include { SCOREFILE_CHECK   } from '../../modules/local/scorefile_check'
-include { PLINK_VCF         } from '../../modules/nf-core/modules/plink/vcf/main'
+include { SAMPLESHEET_JSON } from '../../modules/local/samplesheet_json'
+include { SCOREFILE_CHECK  } from '../../modules/local/scorefile_check'
 
 workflow INPUT_CHECK {
     take:
-    samplesheet // file: /path/to/samplesheet.csv
-    scorefile // tuple val(id), path(/path/to/score_file)
+    input // file: /path/to/samplesheet.csv
+    format // csv or JSON
+    scorefile // flat list of paths
+    reference
 
     main:
+    /* all genomic data should be represented as a list of : [[meta], file]
+
+       meta hashmap structure:
+        id: experiment label, possibly shared across split genomic files
+        is_vcf: boolean, is in variant call format
+        is_bfile: boolean, is in PLINK1 fileset format
+        is_pfile: boolean, is in PLINK2 fileset format
+        chrom: The chromosome associated with the file. If multiple chroms, null.
+        n_chrom: Total separate chromosome files per experiment ID
+     */
+
     ch_versions = Channel.empty()
 
-    SAMPLESHEET_CHECK ( samplesheet )
-        .csv
-        .splitCsv ( header:true, sep:',' )
-        .map { create_variant_channel(it) }
-        .branch {
-            vcf: it[0].is_vcf
-            bfile: !it[0].is_vcf
-        }
-        .set { ch_input }
-    ch_versions = ch_versions.mix(SAMPLESHEET_CHECK.out.versions)
-
-    PLINK_VCF (
-        ch_input.vcf
-    )
-    ch_versions = ch_versions.mix(PLINK_VCF.out.versions.first())
+    if (format.equals("csv")) {
+        SAMPLESHEET_JSON(input)
+        ch_versions = ch_versions.mix(SAMPLESHEET_JSON.out.versions)
+        SAMPLESHEET_JSON.out.json
+            .map { json_slurp(it) }
+            .flatMap { count_chrom(it) }
+            .buffer ( size: 2 )
+            .branch {
+                vcf: it[0].is_vcf
+                bfile: it[0].is_bfile
+                pfile: it[0].is_pfile
+            }
+            .set { ch_input }
+    } else if (format.equals("json")) {
+        input
+            .map { json_slurp(it) }
+            .flatMap { count_chrom(it) }
+            .buffer( size: 2 )
+            .branch {
+                vcf: it[0].is_vcf
+                bfile: it[0].is_bfile
+                pfile: it[0].is_pfile
+            }
+            .set { ch_input }
+    }
 
     // branch is like a switch statement, so only one bed / bim was being
     // returned
@@ -39,54 +61,79 @@ workflow INPUT_CHECK {
     }
         .set { ch_bfiles }
 
-    SCOREFILE_CHECK ( scorefile )
-    ch_versions = ch_versions.mix(SCOREFILE_CHECK.out.versions.first())
+    ch_input.pfile.multiMap { it ->
+        pgen: [it[0], it[1][0]]
+        psam: [it[0], it[1][1]]
+        pvar: [it[0], it[1][2]]
+    }
+        .set { ch_pfiles }
+
+    SCOREFILE_CHECK ( scorefile, reference )
+
+    versions = ch_versions.mix(SCOREFILE_CHECK.out.versions)
+
+    ch_bfiles.bed.mix(ch_pfiles.pgen).dump(tag: 'input').set { geno }
+    ch_bfiles.bim.mix(ch_pfiles.pvar).dump(tag: 'input').set { variants }
+    ch_bfiles.fam.mix(ch_pfiles.psam).dump(tag: 'input').set { pheno }
+    ch_input.vcf.dump(tag: 'input').set{vcf}
+    SCOREFILE_CHECK.out.scorefiles.dump(tag: 'input').set{ scorefiles }
 
     emit:
-    bed = ch_bfiles.bed.mix(PLINK_VCF.out.bed) // channel: [val(meta), path(bed)]
-    bim = ch_bfiles.bim.mix(PLINK_VCF.out.bim) // channel: [val(meta), path(bim)]
-    fam = ch_bfiles.fam.mix(PLINK_VCF.out.fam) // channel: [val(meta), path(fam)]
-    scorefile = SCOREFILE_CHECK.out.data
-    versions = ch_versions
+    geno
+    variants
+    pheno
+    vcf
+    scorefiles
+    db         = SCOREFILE_CHECK.out.log
+    versions
 }
 
-// function to get a list of:
-// - [ meta, [vcf_path] ] OR
-// - [ meta, [bed_path, bim_path, fam_path] ]
-def create_variant_channel(LinkedHashMap row) {
-    def meta    = [:]
-    meta.id     = row.sample
-    meta.is_vcf = row.is_vcf.toBoolean()
-    meta.chrom  = row.chrom?: false
+def json_slurp(Path input) {
+    // classic is important, lazymap was causing problems
+    def slurper = new groovy.json.JsonSlurperClassic()
+    ArrayList result = slurper.parseText(input.text)
+    return result.collectMany{ json_to_genome(it) }
+}
 
-    if (row.datadir) {
-        if (! file(row.datadir).exists()) {
-            exit 1, "ERROR: Please check input samplesheet -> data directory doesn't exist!"
-        }
-    }
+def json_to_genome(HashMap slurped) {
+    // parse slurped JSON into [[meta], [path_to_target_genome]]
+    def meta      = [:]
 
-    def array = []
+    meta.id       = slurped.sample
+    meta.is_vcf   = slurped.vcf_path ? true : false
+    meta.is_bfile = slurped.bed ? true : false
+    meta.is_pfile = slurped.pgen ? true : false
+    meta.chrom    = slurped.chrom? slurped.chrom.toString() : false
+
+    def genome_lst = []
+
     if (meta.is_vcf) {
-        vcf_path = array_to_file([row.datadir, row.vcf_path])
-        array = [ meta, [ vcf_path ] ]
-    } else {
-        bed_path = array_to_file([row.datadir, row.bfile_prefix + ".bed"])
-        bim_path = array_to_file([row.datadir, row.bfile_prefix + ".bim"])
-        fam_path = array_to_file([row.datadir, row.bfile_prefix + ".fam"])
-        array = [ meta, [ bed_path, bim_path, fam_path ] ]
+        vcf_path   = file(slurped.vcf_path, checkIfExists: true)
+        genome_lst = [ meta, [ vcf_path ] ]
+    } else if (meta.is_bfile) {
+        bed        = file(slurped.bed, checkIfExists: true)
+        bim        = file(slurped.bim, checkIfExists: true)
+        fam        = file(slurped.fam, checkIfExists: true)
+        genome_lst = [ meta, [ bed, bim, fam ] ]
+    } else if (meta.is_pfile) {
+        pgen       = file(slurped.pgen, checkIfExists: true)
+        psam       = file(slurped.psam, checkIfExists: true)
+        pvar       = file(slurped.pvar, checkIfExists: true)
+        genome_lst = [ meta, [ pgen, psam, pvar ] ]
+
     }
-    return array
+    return genome_lst
 }
 
-// given an array of strings, return a file object
-def array_to_file(ArrayList x) {
-    x.removeAll(["", null]) // datadir may be null, don't convert to an absolute with join
-    try {
-        return file(x.join("/"), checkIfExists: true)
-    } catch(IOException e) {
-        // point the user to the samplesheet
-        throw new IOException("ERROR: Please check input samplesheet " +
-                              "-> file ${x.join('/')} does not exist\n" +
-                              "(did you correctly specify datadir column?)")
+def count_chrom(ArrayList genomes) {
+    // count the number of chromosomes associated with each sample ID
+    // add this value to the meta map
+    maps = genomes.findAll { it instanceof HashMap }
+    n_chrom = maps.groupBy { it.id }
+        .collectEntries { key, map -> [key, map*.chrom.size()] }
+    return genomes.each {
+        if ( it instanceof HashMap ) {
+            it.n_chrom = n_chrom[it.id]
+        }
     }
 }

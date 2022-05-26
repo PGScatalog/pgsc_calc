@@ -1,5 +1,4 @@
-name: PGS Catalog Calculator CI
-# This workflow runs the pipeline with the minimal test dataset to check that it completes without any syntax errors
+name: CI
 on:
   push:
     branches:
@@ -8,39 +7,138 @@ on:
   release:
     types: [published]
 
-env:
-  NXF_ANSI_LOG: false
-  CAPSULE_LOG: none
-
 jobs:
   test:
-    name: Run workflow tests
-    # Only run on push if this is the nf-core dev branch (merged PRs)
-    if: ${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'pgscatalog/pgsc_calc') }}
+    name: Run standard workflow test
+    if: ${{ github.event_name == 'push'}}
     runs-on: ubuntu-latest
+    env:
+      NXF_VER: ${{ matrix.nxf_ver }}
+      NXF_ANSI_LOG: false
+      CAPSULE_LOG: none    
     strategy:
+      fail-fast: false        
       matrix:
-        # Nextflow versions
+        test_profile: ["test", "test_json"]
+        profile: ["docker", "singularity", "conda"]
         include:
           # Test pipeline minimum Nextflow version
           - NXF_VER: '21.04.0'
-            NXF_EDGE: ''
-          # Test latest edge release of Nextflow
-          - NXF_VER: ''
-            NXF_EDGE: '1'
+    concurrency: ${{ matrix.profile }}  
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v2
+ 
+      - name: Set up Singularity
+        if: matrix.profile == 'singularity'
+        uses: eWaterCycle/setup-singularity@v5
+        with:
+          singularity-version: 3.7.1
+          
+      - name: Setup miniconda
+        if: matrix.profile == 'conda'
+        uses: conda-incubator/setup-miniconda@v2.1.1
+        with:
+          auto-update-conda: true
+          channels: conda-forge,bioconda,defaults
+          python-version: ${{ matrix.python-version }}          
+
+      - name: Conda clean
+        if: matrix.profile == 'conda'
+        run: conda clean -a
+
+      - name: Install Nextflow
+        run: |
+          wget -qO- get.nextflow.io | bash
+          sudo mv nextflow /usr/local/bin/
+        
+      - name: Run pipeline with test data (conda)
+        if: matrix.profile == 'conda'
+        continue-on-error: true
+        run: |
+          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
+          
+      - name: Run pipeline with test data (docker, singularity)
+        if: matrix.profile != 'conda'
+        continue-on-error: false
+        run: |
+          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile}},${{ matrix.profile }}          
+
+  unit_test:
+    name: Run unit tests
+    if: ${{ github.event_name == 'push'}}
+    runs-on: ubuntu-latest
+    env:
+      NXF_VER: ${{ matrix.nxf_ver }}
+      NXF_ANSI_LOG: false
+      CAPSULE_LOG: none
+    strategy:
+      fail-fast: false        
+      matrix:
+        profile: ["docker", "singularity"]      
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2
 
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+          
+      - name: Install Python dependencies          
+        run: |
+          python -m ensurepip --upgrade
+          pip install pandas pyliftover pytest-workflow requests polars
+          sudo apt install plink2
+
+      - name: Set up Singularity
+        if: matrix.profile == 'singularity'
+        uses: eWaterCycle/setup-singularity@v5
+        with:
+          singularity-version: 3.7.1
+        
       - name: Install Nextflow
-        env:
-          NXF_VER: ${{ matrix.NXF_VER }}
-          # Uncomment only if the edge release is more recent than the latest stable release
-          # See https://github.com/nextflow-io/nextflow/issues/2467
-          # NXF_EDGE: ${{ matrix.NXF_EDGE }}
         run: |
           wget -qO- get.nextflow.io | bash
           sudo mv nextflow /usr/local/bin/
-      - name: Run pipeline with test data
+
+      - uses: actions/cache@v2
+        with:
+          path: /usr/local/bin/nextflow
+          key: ${{ runner.os }}
+          restore-keys: |
+            ${{ runner.os }}-nextflow-
+            
+      - name: Run unit tests
+        run: TMPDIR=~ PROFILE=${{ matrix.profile }} pytest --kwdof --symlink --git-aware
+
+      - name: Output log on failure
+        if: failure()
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker
+          echo "======> log.out <======="
+          cat /home/runner/pytest_workflow_*/*/log.out
+          echo
+          echo
+          echo "======> log.err <======="
+          cat /home/runner/pytest_workflow_*/*/log.err
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: logs-${{ matrix.profile }}
+          path: |
+            /home/runner/pytest_workflow_*/*/.nextflow.log
+            /home/runner/pytest_workflow_*/*/log.out
+            /home/runner/pytest_workflow_*/*/log.err
+            /home/runner/pytest_workflow_*/*/work
+            !/home/runner/pytest_workflow_*/*/work/conda
+            !/home/runner/pytest_workflow_*/*/work/singularity        
+        
+        

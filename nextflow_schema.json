@@ -1,8 +1,8 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "https://raw.githubusercontent.com/nf-core/pgscalc/master/nextflow_schema.json",
-    "title": "nf-core/pgscalc pipeline parameters",
-    "description": "This pipeline applies scoring files from the PGS Catalog to genotyped samples",
+    "$id": "https://raw.githubusercontent.com/pgscatalog/pgsc_calc/master/nextflow_schema.json",
+    "title": "pgscatalog/pgsc_calc pipeline parameters",
+    "description": "This pipeline applies scoring files from the PGS Catalog to target genotyped samples",
     "type": "object",
     "definitions": {
         "input_output_options": {
@@ -13,23 +13,46 @@
             "properties": {
                 "input": {
                     "type": "string",
-                    "format": "file-path",
-                    "mimetype": "text/csv",
-                    "schema": "assets/schema_input.json",
-                    "description": "Path to comma-separated file containing information about the samples (a sample sheet)",
-                    "help_text": "You will need to create a design file with information about the samples before running the pipeline. Use this parameter to specify its location. See usage docs for a more detailed explanation.",
-                    "fa_icon": "fas fa-file-csv",
-                    "pattern": ".csv$"
+                    "default": "None",
+                    "description": "Path to input samplesheet"
+                },
+                "format": {
+                    "type": "string",
+                    "default": "csv",
+                    "fa_icon": "fas fa-cog",
+                    "description": "Format of input samplesheet",
+                    "enum": [
+                        "csv",
+                        "json"
+                    ]
                 },
                 "scorefile": {
                     "type": "string",
-                    "description": "Path to a scoring file in PGS Catalog format",
+                    "description": "Path to a scoring file in PGS Catalog format. Multiple scorefiles can be specified using wildcards (e.g., ``--scorefile path/to/scores/*.txt``)",
                     "fa_icon": "fas fa-file-alt"
                 },
                 "accession": {
                     "type": "string",
-                    "description": "A PGS Catalog accession",
-                    "pattern": "PGS[0-9]+"
+                    "description": "A PGS Catalog accession, multiple accessions can be specified in a comma separated list",
+                    "pattern": "(PGS\\d+)(,\\s*PGS\\d+)*",
+                    "fa_icon": "fas fa-star"
+                },
+                "target_build": {
+                    "type": "string",
+                    "enum": [
+                        "GRCh37",
+                        "GRCh38"
+                    ],
+                    "description": "Genome build of input data"
+                },
+                "ref": {
+                    "type": "string",
+                    "default": "https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/reference_data/pgsc_calc_ref.sqlar",
+                    "description": "Path to reference database"
+                },
+                "copy_genomes": {
+                    "type": "boolean",
+                    "description": "Copy harmonised genomes to outdir"
                 },
                 "outdir": {
                     "type": "string",
@@ -44,20 +67,50 @@
                     "help_text": "Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to specify this on the command line for every run.",
                     "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$"
                 }
-            }
+            },
+            "required": [
+                "input",
+                "format",
+                "target_build"
+            ]
         },
-        "compatibility_options": {
-            "title": "Compatibility options",
+        "variant_matching_qc_filtering": {
+            "title": "Variant Matching QC & Filtering",
             "type": "object",
             "description": "",
             "default": "",
             "properties": {
+                "liftover": {
+                    "type": "boolean",
+                    "description": "Lift scoring files to match your target genomes. Requires build information in the header of the scoring files."
+                },
+                "min_lift": {
+                    "type": "number",
+                    "default": 0.95,
+                    "description": "Minimum proportion of variants required to successfully remap a scoring file to a different genome build",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "keep_multiallelic": {
+                    "type": "boolean",
+                    "description": "Keep multiallelic alleles?",
+                    "default": false
+                },
+                "keep_ambiguous": {
+                    "type": "boolean",
+                    "description": "Keep ambiguous matches",
+                    "default": false
+                },
                 "min_overlap": {
                     "type": "number",
                     "default": 0.75,
-                    "description": "Minimum proportion of variants present in both the score file and input target genomic data"
+                    "description": "Minimum proportion of variants present in both the score file and input target genomic data",
+                    "fa_icon": "fas fa-cog",
+                    "minimum": 0,
+                    "maximum": 1
                 }
-            }
+            },
+            "fa_icon": "fas fa-user-cog"
         },
         "institutional_config_options": {
             "title": "Institutional config options",
@@ -239,7 +292,7 @@
             "$ref": "#/definitions/input_output_options"
         },
         {
-            "$ref": "#/definitions/compatibility_options"
+            "$ref": "#/definitions/variant_matching_qc_filtering"
         },
         {
             "$ref": "#/definitions/institutional_config_options"

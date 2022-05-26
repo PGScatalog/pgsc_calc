@@ -1,35 +1,72 @@
 ---
-title: "PGS Catalog calculator summary report"
+title: "Calculator summary report"
 output: html_document
 date: "`r Sys.time()`"
 params:
-  file: dummy.sscore
   img: PGS_Logo.png
 ---
 
 ```{r setup, include=FALSE}
+options(tidyverse.quiet = TRUE)
 knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
 ```
 
-```{r, echo=FALSE}
+```{r, eval = FALSE, echo=FALSE}
+# logo
 htmltools::img(src = knitr::image_uri(params$img),
                alt = 'logo', 
                style = 'position:absolute; top:0; right:0; padding:10px;',
                height = "200px")
 ```
 
+## Compatibility summary
+
+```{r, echo = FALSE, message = FALSE}
+log <- read.csv("log.csv")
+log$match_type <- as.character(log$match_type)
+
+log %>%
+  group_by(dataset, accession) %>%
+  count(match_type, input_variants = n()) %>%
+  mutate(match_type = ifelse(match_type == "", "no match", match_type)) %>%
+  ungroup() %>%
+  mutate(perc = scales::percent(n / input_variants, accuracy = 0.1)) %>%
+  knitr::kable(align = c(rep('l', 3), rep('r', 3)))
+```
+
 ## Score summary
 
+```{r, echo = FALSE, message = FALSE}
+
+read_scorefiles <- function(path) {
+  dataset <- stringr::str_split(path, pattern = "_")[[1]][[1]]
+  df <- read.table(path, header = TRUE, comment.char = "")
+  cols <- colnames(df) 
+  cols[[1]] <- "IID"
+  colnames(df) <- cols
+  df$dataset <- dataset
+  return(df)
+}
+
+scorefiles <- list.files(pattern = "*.sscore", all.files = TRUE)
+combined <- purrr::map_dfr(scorefiles, read_scorefiles) %>%
+  group_by(dataset, IID) %>%
+  summarise_all(sum, na.rm = TRUE)
+write.table(combined, "aggregated_scores.txt", col.names = TRUE, quote = FALSE, row.names = FALSE)
+```
+
+Score peek:
+
 ```{r, echo = FALSE}
-xfun::embed_file(params$file, text = "Download calculated scores")
+scores <- read.table("aggregated_scores.txt", header = TRUE, comment.char = "")
+head(scores) %>%
+  knitr::kable()
+xfun::embed_file("aggregated_scores.txt", text = "Download all calculated scores")
 ```
 
-```{r}
-scores <- read.table(params$file, header = TRUE, comment.char = "")
-head(scores)
-```
-
-## Sesssion information
+## Session information
 
 ```{r}
 sessionInfo()

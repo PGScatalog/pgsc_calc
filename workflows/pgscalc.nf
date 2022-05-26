@@ -10,36 +10,79 @@ def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 WorkflowPgscalc.initialise(params, log)
 
 // Check input path parameters to see if they exist
-def checkPathParamList = [params.input, params.scorefile]
-
-if (params.input && params.json) {
-    exit 1, 'Samplesheet input and JSON input are mutually exclusive'
-}
+def checkPathParamList = [params.input]
 
 for (param in checkPathParamList) {
-    if (param && !params.json) {
-        file(param, checkIfExists: true)
-    }
+    file(param, checkIfExists: true)
 }
 
 // Check mandatory parameters
-if (!params.json && params.input) {
-    ch_input = file(params.input, checkIfExists: true)
-    ch_json = Channel.empty()
-} else {
-    ch_input = Channel.empty()
-    ch_json = Channel.from(params.json)
+ch_input = Channel.fromPath(params.input, checkIfExists: true)
+
+// Set up scorefile channels ---------------------------------------------------
+
+if (!params.scorefile & !params.accession) {
+    println " ERROR: You didn't set any scores to use! \
+    Please set --scorefile or --accession parameters and try again (: "
+    System.exit(1)
 }
 
-// Set up score channels
-if (!params.accession && params.scorefile) {
-    scorefile = Channel.of([[accession: file(params.scorefile).getName()], file(params.scorefile, checkIfExists: true)])
-    accession = Channel.empty()
-} else if (params.accession && !params.scorefile) {
-    accession = params.accession
-    scorefile = Channel.empty()
-} else {
-    exit 1, 'Please specify only one of --accession or --scorefile'
+if (!params.target_build) {
+    println "ERROR: You didn't set the target build of your target genomes"
+    println "Please set --target_build GRCh37 or --target_build GRCh38"
+    System.exit(1)
+}
+
+unique_scorefiles = Channel.empty()
+unique_accessions = Channel.empty()
+
+if (params.scorefile) {
+    Channel.fromPath(params.scorefile, checkIfExists: true)
+        .map { [[accession: it.getBaseName()], it ] }
+        .set { scorefiles }
+
+    scorefiles
+        .map { it.take(1) }
+        .unique()
+        .join(scorefiles)
+        .set { unique_scorefiles }
+}
+
+if (params.accession) {
+    Channel.fromList(params.accession.replaceAll('\\s','').tokenize(','))
+        .unique() // tokenize to ensure unique
+        .collect()
+        .map { it.join(',') } // join again for calling API
+        .set { unique_accessions }
+}
+
+ch_reference = Channel.empty()
+
+if (params.ref) {
+    Channel.fromPath(params.ref, checkIfExists: true)
+        .set { ch_reference } 
+}
+
+def run_input_check     = true
+def run_make_compatible = true
+def run_apply_score     = true
+
+if (params.only_input) {
+    run_input_check = true
+    run_make_compatible = false
+    run_apply_score = false
+}
+
+if (params.only_compatible) {
+    run_input_check = true
+    run_make_compatible = true
+    run_apply_score = false
+}
+
+if (params.only_score) {
+    run_input_check = true
+    run_make_compatible = true
+    run_apply_score = true
 }
 
 /*
@@ -48,14 +91,13 @@ if (!params.accession && params.scorefile) {
 ========================================================================================
 */
 
-include { PGSCATALOG           } from '../subworkflows/local/pgscatalog'
+include { PGSCATALOG_GET       } from '../modules/local/pgscatalog_get'
+
 include { INPUT_CHECK          } from '../subworkflows/local/input_check'
 include { MAKE_COMPATIBLE      } from '../subworkflows/local/make_compatible'
-include { SPLIT_GENOMIC        } from '../subworkflows/local/split_genomic'
 include { APPLY_SCORE          } from '../subworkflows/local/apply_score'
 include { DUMPSOFTWAREVERSIONS } from '../modules/local/dumpsoftwareversions'
 
-include { PLINK_VCF as JSON_VCF } from '../modules/nf-core/modules/plink/vcf/main'
 /*
 ========================================================================================
     RUN MAIN WORKFLOW
@@ -68,84 +110,59 @@ workflow PGSCALC {
     //
     // SUBWORKFLOW: Get scoring file from PGS Catalog accession
     //
-    PGSCATALOG (
-        accession
-    )
+    if (params.accession) {
+        PGSCATALOG_GET ( unique_accessions )
+        scorefiles = unique_scorefiles.mix(PGSCATALOG_GET.out.scorefiles)
+    } else {
+        scorefiles = unique_scorefiles
+    }
 
-    scorefile
-        .mix( PGSCATALOG.out.scorefile )
-        .set{ ch_scorefile }
+    scorefiles.map { it[1] }.collect().set{ ch_scorefile }
 
     //
     // SUBWORKFLOW: Validate and stage input files
     //
-    INPUT_CHECK (
-        ch_input,
-        ch_scorefile
-    )
 
-    ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
-
-    // format JSON input but don't do proper validation
-    ch_json
-        .map {
-            [it.meta, file(it.vcf_path, checkIfExists: true)]
-        }
-        .set{json_genomic}
-
-    JSON_VCF(json_genomic)
-
-    ch_versions = ch_versions.mix(JSON_VCF.out.versions.first())
-
-    // now mix json input with samplesheet input
-    INPUT_CHECK.out.bed
-        .mix(JSON_VCF.out.bed)
-        .set{ ch_bed }
-
-    INPUT_CHECK.out.bim
-        .mix(JSON_VCF.out.bim)
-        .set{ ch_bim }
-
-    INPUT_CHECK.out.fam
-        .mix(JSON_VCF.out.fam)
-        .set{ ch_fam }
-
-    //
-    // SUBWORKFLOW: Split genetic data to improve parallelisation --------------
-    //
-
-    SPLIT_GENOMIC (
-        ch_bed,
-        ch_bim,
-        ch_fam,
-        INPUT_CHECK.out.scorefile
-    )
-
-    ch_versions = ch_versions.mix(SPLIT_GENOMIC.out.versions)
+    if (run_input_check) {
+        INPUT_CHECK (
+            ch_input,
+            params.format,
+            ch_scorefile,
+            ch_reference
+        )
+        ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
+    }
 
     //
     // SUBWORKFLOW: Make scoring file and target genomic data compatible
     //
-    MAKE_COMPATIBLE (
-        SPLIT_GENOMIC.out.bed,
-        SPLIT_GENOMIC.out.bim,
-        SPLIT_GENOMIC.out.fam,
-        SPLIT_GENOMIC.out.scorefile
-    )
 
-    ch_versions = ch_versions.mix(MAKE_COMPATIBLE.out.versions)
+    if (run_make_compatible) {
+        MAKE_COMPATIBLE (
+            INPUT_CHECK.out.geno,
+            INPUT_CHECK.out.pheno,
+            INPUT_CHECK.out.variants,
+            INPUT_CHECK.out.vcf,
+            INPUT_CHECK.out.scorefiles,
+            INPUT_CHECK.out.db
+        )
+        ch_versions = ch_versions.mix(MAKE_COMPATIBLE.out.versions)
+    }
 
     //
     // SUBWORKFLOW: Apply a scoring file to target genomic data
     //
-    APPLY_SCORE (
-        MAKE_COMPATIBLE.out.pgen,
-        MAKE_COMPATIBLE.out.psam,
-        MAKE_COMPATIBLE.out.pvar,
-        MAKE_COMPATIBLE.out.scorefile
-    )
 
-    ch_versions = ch_versions.mix(APPLY_SCORE.out.versions)
+    if (run_apply_score) {
+        APPLY_SCORE (
+            MAKE_COMPATIBLE.out.geno,
+            MAKE_COMPATIBLE.out.pheno,
+            MAKE_COMPATIBLE.out.variants,
+            MAKE_COMPATIBLE.out.scorefiles,
+            MAKE_COMPATIBLE.out.db
+        )
+        ch_versions = ch_versions.mix(APPLY_SCORE.out.versions)
+    }
 
     //
     // MODULE: Dump software versions for all tools used in the workflow

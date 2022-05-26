@@ -1,104 +1,80 @@
-//
-// Make the scoring file compatible with the target genomic data by:
-//     - Using a consistent variant labelling format (chr:pos) (PLINK2_RELABEL)
-//     - Match variants across scorefile and target data, flipping if necessary
-//
-
-include { PLINK2_RELABEL  } from '../../modules/local/plink2_relabel'
-include { PLINK2_EXTRACT  } from '../../modules/local/plink2_extract'
-include { COMBINE_BIM     } from '../../modules/local/combine_bim'
-include { MATCH_VARIANTS  } from '../../modules/local/match_variants'
-include { SCOREFILE_QC    } from '../../modules/local/scorefile_qc'
-include { SCOREFILE_SPLIT } from '../../modules/local/scorefile_split'
+include { PLINK2_VCF         } from '../../modules/local/plink2_vcf'
+include { PLINK2_RELABELBIM  } from '../../modules/local/plink2_relabelbim'
+include { PLINK2_RELABELPVAR } from '../../modules/local/plink2_relabelpvar'
+include { MATCH_VARIANTS     } from '../../modules/local/match_variants'
 
 workflow MAKE_COMPATIBLE {
     take:
-    bed
-    bim
-    fam
+    geno
+    pheno
+    variants
+    vcf
     scorefile
+    db
 
     main:
     ch_versions = Channel.empty()
 
-    bed
-        .mix(bim, fam)
+    // Relabel input variant information to a common standard ------------------
+    geno
+        .mix(pheno, variants)
         .groupTuple(size: 3, sort: true)
         .map { it.flatten() }
-        .set { pfiles }
+        .set { fileset }
 
-    PLINK2_RELABEL( pfiles )
+    PLINK2_RELABELBIM( fileset )
+    ch_versions = ch_versions.mix(PLINK2_RELABELBIM.out.versions.first())
 
-    ch_versions = ch_versions.mix(PLINK2_RELABEL.out.versions.first())
+    PLINK2_RELABELPVAR( fileset )
+    ch_versions = ch_versions.mix(PLINK2_RELABELPVAR.out.versions.first())
 
-    SCOREFILE_QC( scorefile )
+    // Recode VCF files to common standard -------------------------------------
+    PLINK2_VCF(vcf)
+    ch_versions = ch_versions.mix(PLINK2_VCF.out.versions.first())
 
-    ch_versions = ch_versions.mix(SCOREFILE_QC.out.versions.first())
+    // Combine standardised data into genotype, phenotype, and variant channels
+    PLINK2_RELABELBIM.out.geno
+        .mix(PLINK2_RELABELPVAR.out.geno, PLINK2_VCF.out.pgen)
+        .dump(tag: 'make_compatible')
+        .set{ geno_std }
 
-    // -------------------------------------------------------------------------
-    // Recombine split bim files to check the overlap between target variants
-    // and scorefile variants (plink2 pvar == plink1 bim)
-    //
-    // Why split then recombine? It's easiest to do now, because all files are
-    // guaranteed to be split at this stage even with mixed input. The order of
-    // the combined bim file isn't preserved but it's not necessary for the awk
-    // program in CHECK_OVERLAP. The final scorefile is sorted in CHECK_OVERLAP.
-    PLINK2_RELABEL.out.pvar
-        .map { [it.head().take(2), it.tail()] } // drop chrom from meta for groupTuple
+    PLINK2_RELABELBIM.out.pheno
+        .mix(PLINK2_RELABELPVAR.out.pheno, PLINK2_VCF.out.psam)
+        .dump(tag: 'make_compatible')
+        .set{ pheno_std }
+
+    PLINK2_RELABELBIM.out.variants
+        .mix(PLINK2_RELABELPVAR.out.variants, PLINK2_VCF.out.pvar)
+        .dump(tag: 'make_compatible')
+        .set{ variants_std }
+
+    // Recombine split variant information files to match target variants ------
+
+    // custom groupKey() to set a different group size for each sample ID
+    // different samples may have different numbers of chromosomes
+    // see https://nextflow.io/docs/latest/operator.html#grouptuple
+    // if a size is not provided then nextflow must wait for the entire process
+    // to finish before releasing the grouped tuples, which can be very slow(!)
+
+    variants_std.map { tuple(groupKey(it[0].subMap(['id', 'is_vcf', 'is_bfile', 'is_pfile']), it[0].n_chrom),
+                     it[0].chrom, it[1]) }
         .groupTuple()
-        .map { [it.head(), it.tail().flatten()] } // [[meta], [pvar1, ..., pvarn]]
-        .set { flat_bims }
+        .combine( scorefile )
+        .combine ( db )
+        .dump(tag: 'match_variants_input')
+        .set { ch_variants }
 
-    COMBINE_BIM( flat_bims )
-
-    ch_versions = ch_versions.mix(COMBINE_BIM.out.versions)
-
-    MATCH_VARIANTS (
-        // variants should be matched once per sample
-        // [[meta], combined_pvar, [scoremeta], scorefile]
-        COMBINE_BIM.out.variants
-            .combine(SCOREFILE_QC.out.data)
-    )
+    // variants should be matched once per sample identifier
+    MATCH_VARIANTS ( ch_variants )
+    MATCH_VARIANTS.out.scorefile.dump(tag: 'match_variants_output')
 
     ch_versions = ch_versions.mix(MATCH_VARIANTS.out.versions)
 
-    SCOREFILE_SPLIT (
-        // scorefile split should only happen once per unique accession
-        MATCH_VARIANTS.out.scorefile
-            .unique { it.head().accession },
-        "chromosome"
-    )
-
-    ch_versions = ch_versions.mix(SCOREFILE_SPLIT.out.versions.first())
-
-    // generate a list of chromosome split scorefile - sampleID combinations ---
-    // then emit a flat list of split scorefiles
-    PLINK2_RELABEL.out.pgen
-        .map { it.head().take(1) }
-        .unique { it.id } // unique flat list of sample IDs [id:1], [id:n]
-        .combine(SCOREFILE_SPLIT.out.scorefile) // [[meta], [scoremeta], [[split_score_1], ...]]
-        .flatMap { create_scorefile_channel([it[0] << it[1], it[2]]) } // combine meta and scoremeta
-        .set { ch_scorefile } // flat list [[accession:PGS001229, chrom: 22, id: 1], scorefile]
-
     emit:
-    pgen = PLINK2_RELABEL.out.pgen
-    psam = PLINK2_RELABEL.out.psam
-    pvar = PLINK2_RELABEL.out.pvar
-    scorefile = ch_scorefile
-    versions = ch_versions
-}
-
-// function to get a list of sample-chromosome combinations:
-// [[meta], 22.keep, ..., n.keep] -> [[[meta], 22.keep], [[meta], n.keep]]]
-def create_scorefile_channel(ArrayList chrom) {
-    meta = chrom.head()
-    variant_files = chrom.tail().flatten()
-    combs = [[meta], variant_files].combinations()
-    // now add chr label to meta map using basename of variant keep file
-    // the variant keep file takes its name from the CHROM column of the VCF
-    combs.collect { m, it ->
-        def chrom_map = [:]
-        chrom_map.chrom = (it.getName() - ~/\.\w+$/) // removes file extension
-        [m + chrom_map, it].flatten()
-    }
+    geno       = geno_std
+    pheno      = pheno_std
+    variants   = variants_std
+    scorefiles = MATCH_VARIANTS.out.scorefile
+    db         = MATCH_VARIANTS.out.db
+    versions   = ch_versions
 }

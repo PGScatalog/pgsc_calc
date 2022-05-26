@@ -1,28 +1,52 @@
 process SCOREFILE_CHECK {
-    tag "$meta.accession"
+    label 'process_medium_memory'
 
-    conda (params.enable_conda ? "bioconda::mawk=1.3.4" : null)
+    conda (params.enable_conda ? "conda-forge::pandas=1.1.5 bioconda::pyliftover=0.4" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/mawk:1.3.4--h779adbc_4' :
-        'quay.io/biocontainers/mawk:1.3.4--h779adbc_4' }"
+        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/mulled-v2-afe3324bf2effca1c6ea39313147c33dd2c3686e:20ba75f8224cb981ed077e2d6a4d0bdf96a5bf2d-0' :
+        'dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/mulled-v2-afe3324bf2effca1c6ea39313147c33dd2c3686e:20ba75f8224cb981ed077e2d6a4d0bdf96a5bf2d-0' }"
 
     input:
-    tuple val(meta), path(datafile)
+    path raw_scores
+    path reference
 
     output:
-    tuple val(meta), path("*.txt"), emit: data
-    path "versions.yml"           , emit: versions
+    path "scorefiles.txt"   , emit: scorefiles
+    path "read_scorefile.db", emit: log
+    path "versions.yml"     , emit: versions
 
     script:
-    def prefix  = "${meta.accession}"
-    """
-    mawk -v out=${prefix}_checked.txt \
-        -f ${projectDir}/bin/check_scorefile.awk \
-        ${datafile}
+    def args = task.ext.args ?: ''
 
-    cat <<-END_VERSIONS > versions.yml
-    ${task.process.tokenize(':').last()}:
-        mawk: \$(echo \$(mawk -W version 2>&1) | cut -f 2 -d ' ')
-    END_VERSIONS
-    """
+    if (params.liftover)
+        """
+        # extract chain files from database
+        sqlite3 pgsc_calc_ref.sqlar -Ax hg19ToHg38.over.chain.gz hg38ToHg19.over.chain.gz
+
+        read_scorefile.py -s $raw_scores \
+            --liftover \
+            -t $params.target_build \
+            -o scorefiles.txt \
+            -m $params.min_lift \
+            $args
+
+        cat <<-END_VERSIONS > versions.yml
+        ${task.process.tokenize(':').last()}:
+            python: \$(echo \$(python --version 2>&1) | cut -f 2 -d ' ')
+            pandas: \$(echo \$(python -c 'import pandas as pd; print(pd.__version__)'))
+            pyliftover: \$(echo \$(python -c 'import pyliftover; print(pyliftover.__version__)'))
+        END_VERSIONS
+        """
+    else
+        """
+        read_scorefile.py -s $raw_scores \
+            -o scorefiles.txt
+
+        cat <<-END_VERSIONS > versions.yml
+        ${task.process.tokenize(':').last()}:
+            python: \$(echo \$(python --version 2>&1) | cut -f 2 -d ' ')
+            pandas: \$(echo \$(python -c 'import pandas as pd; print(pd.__version__)'))
+            pyliftover: \$(echo \$(python -c 'import pyliftover; print(pyliftover.__version__)'))
+        END_VERSIONS
+        """
 }
