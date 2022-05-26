@@ -52,7 +52,7 @@ read_scorefiles <- function(path) {
 scorefiles <- list.files(pattern = "*.sscore", all.files = TRUE)
 combined <- purrr::map_dfr(scorefiles, read_scorefiles) %>%
   group_by(dataset, IID) %>%
-  summarise_all(sum, na.rm = TRUE)
+  summarise_all(sum)
 write.table(combined, "aggregated_scores.txt", col.names = TRUE, quote = FALSE, row.names = FALSE)
 ```
 
