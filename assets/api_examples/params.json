@@ -1,0 +1,4 @@
+{
+    "scorefile": "/path/to/scorefile.txt",
+    "format": "json"
+}

@@ -1,0 +1,7 @@
+[
+    {
+        "sample": "example",
+        "vcf_path": "/path/to/genome.vcf.gz",
+        "chrom": 22
+    }
+]
