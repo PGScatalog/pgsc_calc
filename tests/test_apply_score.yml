@@ -6,9 +6,9 @@
   files:
     - path: output/samplesheet/out.json
     - path: output/scorefile/scorefiles.pkl
-    - path: output/plink2/cineca_synthetic_subset_22.bed
-    - path: output/plink2/cineca_synthetic_subset_22.bim
-    - path: output/plink2/cineca_synthetic_subset_22.fam
+    - path: output/plink2/cineca_synthetic_subset_22.pgen
+    - path: output/plink2/cineca_synthetic_subset_22.psam
+    - path: output/plink2/cineca_synthetic_subset_22.pvar
     - path: output/match/22_additive_0.scorefile
     - path: output/match/match_variants.db
     - path: output/match/report.csv

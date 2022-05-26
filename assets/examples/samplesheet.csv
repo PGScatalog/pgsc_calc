@@ -1,2 +1,5 @@
-sample,vcf_path,bfile_path,pfile_path,chrom
-cineca,,,assets/examples/target_genomes/cineca_synthetic_subset,22
+sample,vcf_path,bfile_path,chrom
+1kg,/home/benjamin/Documents/1kg/3.vcf.gz,,3
+1kg,/home/benjamin/Documents/1kg/20.vcf.gz,,20
+1kg,/home/benjamin/Documents/1kg/21.vcf.gz,,21
+1kg,/home/benjamin/Documents/1kg/22.vcf.gz,,22

@@ -2,7 +2,7 @@
 
 nextflow.enable.dsl = 2
 
-include { PLINK2_RELABELBIM } from '../../../../modules/local/plink2_relabelbim'
+include { PLINK2_BFILE } from '../../../../modules/local/plink2_bfile.nf'
 include { PLINK2_SCORE } from '../../../../modules/local/plink2_score.nf'
 
 workflow testscore {
@@ -11,21 +11,23 @@ workflow testscore {
     bed = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.bed')
     fam = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.fam')
 scorefile = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/test.scorefile')
+    optional_allelic_freq = file('NO_FILE')
 
-    def meta = [id: 'test', is_bfile: true, n_samples: 100]
+    def meta = [id: 'test', n_samples: 100]
     def scoremeta = [n_scores: 1]
 
-    PLINK2_RELABELBIM( Channel.of([meta, bed, bim, fam]) )
+    PLINK2_BFILE( [meta, bed, bim, fam] )
 
-    PLINK2_RELABELBIM.out.geno
-        .mix(PLINK2_RELABELBIM.out.pheno, PLINK2_RELABELBIM.out.variants)
+    PLINK2_BFILE.out.pgen
+        .mix(PLINK2_BFILE.out.psam, PLINK2_BFILE.out.pvar)
         .groupTuple(size: 3)
         .map{ it.flatten() }
         .concat(Channel.of(scoremeta, scorefile))
         .collect()
         .set { genomes }
 
-    PLINK2_SCORE( genomes )
+    PLINK2_SCORE( genomes,
+                  optional_allelic_freq )
 }
 
 workflow testsmallscore {
@@ -34,21 +36,23 @@ workflow testsmallscore {
     bed = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.bed')
     fam = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.fam')
     scorefile = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/test.scorefile')
+    optional_allelic_freq = file('NO_FILE')
 
-    def meta = [id: 'test', is_bfile: true, n_samples: 1]
+    def meta = [id: 'test', n_samples: 1]
     def scoremeta = [n_scores: 1]
 
-    PLINK2_RELABELBIM( Channel.of([meta, bed, bim, fam]) )
+    PLINK2_BFILE( [meta, bed, bim, fam] )
 
-    PLINK2_RELABELBIM.out.geno
-        .mix(PLINK2_RELABELBIM.out.pheno, PLINK2_RELABELBIM.out.variants)
+    PLINK2_BFILE.out.pgen
+        .mix(PLINK2_BFILE.out.psam, PLINK2_BFILE.out.pvar)
         .groupTuple(size: 3)
         .map{ it.flatten() }
         .concat(Channel.of(scoremeta, scorefile))
         .collect()
         .set { genomes }
 
-    PLINK2_SCORE( genomes )
+    PLINK2_SCORE( genomes,
+                  optional_allelic_freq )
 }
 
 workflow testmultiscore {
@@ -57,21 +61,23 @@ workflow testmultiscore {
     bim = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.bim')
     bed = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.bed')
     fam = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.fam')
+    optional_allelic_freq = file('NO_FILE')
 
-    def meta = [id: 'test', is_bfile: true, n_samples: 100]
+    def meta = [id: 'test', n_samples: 100]
     def scoremeta = [n_scores: 2]
 
-    PLINK2_RELABELBIM( Channel.of([meta, bed, bim, fam]) )
+    PLINK2_BFILE( [meta, bed, bim, fam] )
 
-    PLINK2_RELABELBIM.out.geno
-        .mix(PLINK2_RELABELBIM.out.pheno, PLINK2_RELABELBIM.out.variants)
+    PLINK2_BFILE.out.pgen
+        .mix(PLINK2_BFILE.out.psam, PLINK2_BFILE.out.pvar)
         .groupTuple(size: 3)
         .map{ it.flatten() }
         .concat(Channel.of(scoremeta, scorefile))
         .collect()
         .set { genomes }
 
-    PLINK2_SCORE( genomes )
+    PLINK2_SCORE( genomes,
+                  optional_allelic_freq )
 
 }
 
@@ -81,21 +87,23 @@ workflow testsmallmultiscore {
     bim = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.bim')
     bed = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.bed')
     fam = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.fam')
+    optional_allelic_freq = file('NO_FILE')
 
-    def meta = [id: 'test', is_bfile: true, n_samples: 1]
+    def meta = [id: 'test', n_samples: 1]
     def scoremeta = [n_scores: 2]
 
-    PLINK2_RELABELBIM( Channel.of([meta, bed, bim, fam]) )
+    PLINK2_BFILE( [meta, bed, bim, fam] )
 
-    PLINK2_RELABELBIM.out.geno
-        .mix(PLINK2_RELABELBIM.out.pheno, PLINK2_RELABELBIM.out.variants)
+    PLINK2_BFILE.out.pgen
+        .mix(PLINK2_BFILE.out.psam, PLINK2_BFILE.out.pvar)
         .groupTuple(size: 3)
         .map{ it.flatten() }
         .concat(Channel.of(scoremeta, scorefile))
         .collect()
         .set { genomes }
 
-    PLINK2_SCORE( genomes )
+    PLINK2_SCORE( genomes,
+                  optional_allelic_freq )
 
 }
 
@@ -107,19 +115,20 @@ workflow testmultiscorefail {
     fam = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.fam')
     optional_allelic_freq = file('NO_FILE')
 
-    def meta = [id: 'test', is_bfile: true, n_samples: 100]
+    def meta = [id: 'test', n_samples: 100]
     def scoremeta = [n_scores: 2]
 
-    PLINK2_RELABELBIM( Channel.of([meta, bed, bim, fam]) )
+    PLINK2_BFILE( [meta, bed, bim, fam] )
 
-    PLINK2_RELABELBIM.out.geno
-        .mix(PLINK2_RELABELBIM.out.pheno, PLINK2_RELABELBIM.out.variants)
+    PLINK2_BFILE.out.pgen
+        .mix(PLINK2_BFILE.out.psam, PLINK2_BFILE.out.pvar)
         .groupTuple(size: 3)
         .map{ it.flatten() }
         .concat(Channel.of(scoremeta, scorefile))
         .collect()
         .set { genomes }
 
-    PLINK2_SCORE( genomes )
+    PLINK2_SCORE( genomes,
+                  optional_allelic_freq )
 
 }
