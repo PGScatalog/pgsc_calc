@@ -3,5 +3,5 @@
   tags:
     - manual_calculation
   files:
-    - path: output/score/aggregated_scores.txt
-    - path: output/score/report.html
+    - path: output/make/aggregated_scores.txt
+    - path: output/make/report.html

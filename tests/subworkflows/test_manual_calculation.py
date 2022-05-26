@@ -117,7 +117,7 @@ def test_plink(bfiles, simple_scorefile, manual_score):
 def test_pgsc_calc(workflow_dir, manual_score):
     ''' Compare pipeline output scores against manual calculation '''
 
-    pgsc_calc_scores = pathlib.Path(workflow_dir, "output/score/aggregated_scores.txt")
+    pgsc_calc_scores = pathlib.Path(workflow_dir, "output/make/aggregated_scores.txt")
     pgsc_calc_df = pd.read_csv(pgsc_calc_scores, sep = ' ')
     scores = pgsc_calc_df.merge(manual_score, on = 'IID', how = 'left')
 
