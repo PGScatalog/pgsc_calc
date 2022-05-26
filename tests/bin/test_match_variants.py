@@ -12,7 +12,7 @@ pl.Config.set_global_string_cache()
 @pytest.fixture
 def score():
     ''' Scorefile dataframe with no effect type '''
-    d = {'chr_name': ['22'], 'chr_position': [17080378], 'effect_allele': 'A', 'other_allele': 'G', 'effect_weight': 1.01, 'effect_type': 'additive', 'accession': 'dummy'}
+    d = {'chr_name': [22], 'chr_position': [17080378], 'effect_allele': 'A', 'other_allele': 'G', 'effect_weight': 1.01, 'effect_type': 'additive', 'accession': 'dummy'}
     pd.DataFrame(d).to_csv('score.txt', sep = '\t', index = False)
     yield 'score.txt'
     os.remove('score.txt')
@@ -21,7 +21,7 @@ def score():
 def score_df(score):
     d = read_scorefile(score)
     assert d.columns == ['chr_name', 'chr_position', 'effect_allele', 'other_allele', 'effect_weight', 'effect_type', 'accession']
-    types = [pl.Utf8, pl.Int64, pl.Categorical, pl.Categorical, pl.Float64, pl.Categorical, pl.Categorical]
+    types = [pl.Int64, pl.Int64, pl.Categorical, pl.Categorical, pl.Float64, pl.Categorical, pl.Categorical]
     assert d.dtypes == types
     return d
 
@@ -33,7 +33,7 @@ def score_df_noOA(score_df):
 def bad_score(score_df):
     ''' Scorefile dataframe with no matches in test target '''
     bad_score = score_df.clone()
-    bad_score.replace('chr_name', pl.Series("chr_name", ['21']))
+    bad_score.replace('chr_name', pl.Series("chr_name", [21]))
     return bad_score
 
 @pytest.fixture
@@ -76,7 +76,7 @@ def target_multiallelic(target):
 @pytest.fixture
 def target_df(target):
     ''' Target genome dataframe '''
-    return read_target(target, 'bim', remove_multiallelic = False, n_threads = 1)
+    return read_target(target, 'bim', remove_multiallelic = False)
 
 @pytest.fixture
 def matches(score_df, target_df):
@@ -146,8 +146,8 @@ def test_unduplicate(matches, match_dup):
 
 def test_multiallelic(target_multiallelic):
     raw_shape = pl.read_csv(target_multiallelic, sep = '\t', header = False).shape
-    ma = read_target(target_multiallelic, 'pvar', remove_multiallelic = False, n_threads = 1)
-    no_ma = read_target(target_multiallelic, 'pvar', remove_multiallelic = True, n_threads = 1)
+    ma = read_target(target_multiallelic, 'pvar', remove_multiallelic = False)
+    no_ma = read_target(target_multiallelic, 'pvar', remove_multiallelic = True)
 
     # every variant is multiallelic, so they should be all removed
     assert no_ma.shape[0] == 0
@@ -163,8 +163,8 @@ def test_format_scorefile(matches):
     split_score = format_scorefile(matches, split = True)
 
     # check dict key = chrom
-    assert list(split_score.keys()) == ['22']
-    assert split_score['22'].frame_equal(formatted_score)
+    assert list(split_score.keys()) == [22]
+    assert split_score[22].frame_equal(formatted_score)
 
     unsplit_score = format_scorefile(matches, split = False)
 
