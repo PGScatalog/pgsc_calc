@@ -46,7 +46,7 @@ def score_dict(accession, accession_two, score):
 @pytest.fixture
 def target():
     ''' Target genome bim path '''
-    bim = req.get('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.bim', timeout = 5)
+    bim = req.get('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.bim')
     with open('data.bim', 'wb') as f:
         f.write(bim.content)
     yield 'data.bim'
