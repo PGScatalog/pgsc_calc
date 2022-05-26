@@ -26,7 +26,7 @@ def parse_args(args=None):
                              'SNPs), which are normally excluded. In this case the program proceeds assuming that the '
                              'genotype data is on the same strand as the GWAS whose summary statistics were used to '
                              'construct the score.'),
-    parser.add_argument('--keep_multiallelic', dest='remove_multiallelic', default=False, action='store_true',
+    parser.add_argument('--keep_multiallelic', dest='remove_multiallelic', default=False, action='store_false',
                         help='Flag to preserve multiallelic variants (default: false).')
     return parser.parse_args(args)
 
