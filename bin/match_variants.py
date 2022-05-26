@@ -19,7 +19,7 @@ def parse_args(args=None):
     parser.add_argument('--db', dest = 'db', help='<Required> path to database')
     parser.add_argument('-m', '--min_overlap', dest='min_overlap', required=True,
                         type = float, help='<Required> Minimum proportion of variants to match before error')
-    parser.add_argument('--keep-ambiguous', dest='remove_ambiguous', default=True, action='store_false',
+    parser.add_argument('--keep-ambiguous', dest='keep_ambiguous', default=False, action='store_true',
                         help='Flag to force the program to keep variants with ambiguous alleles, (e.g. A/T and G/C '
                              'SNPs), which are normally excluded. In this case the program proceeds assuming that the '
                              'genotype data is on the same strand as the GWAS whose summary statistics were used to '
@@ -111,7 +111,7 @@ def match_variants(scorefile, target, EA, OA, match_type):
     # collecting is needed for reordering columns
     return matches[colnames]
 
-def get_all_matches(target, scorefile, remove_ambig):
+def get_all_matches(target, scorefile, remove):
     """ Get intersection of variants using four different schemes, optionally
     removing ambiguous variants (default: true)
 
@@ -132,7 +132,7 @@ def get_all_matches(target, scorefile, remove_ambig):
     altref_flip = match_variants(scorefile, target, EA = 'ALT_FLIP', OA = 'REF_FLIP', match_type = "altref_flip")
     ambig_labelled = label_biallelic_ambiguous(pl.concat([refalt, altref, refalt_flip, altref_flip]))
 
-    if remove_ambig:
+    if remove:
         return ambig_labelled.filter(pl.col("ambiguous") == False)
     else:
         ambig = ambig_labelled.filter((pl.col("ambiguous") == True) & \
@@ -277,7 +277,7 @@ def main(args = None):
     scorefile = read_scorefile(args.scorefile)
 
     # start matching -----------------------------------------------------------
-    matches = get_all_matches(target, scorefile, remove_ambig = args.remove_ambiguous)
+    matches = get_all_matches(target, scorefile, remove = args.keep_ambiguous)
 
     empty_err = ''' ERROR: No target variants match any variants in all scoring files
     This is quite odd!
