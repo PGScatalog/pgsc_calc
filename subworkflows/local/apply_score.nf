@@ -2,8 +2,6 @@
 // Apply a validated scoring file to the QC'd target genomic data
 //
 
-import java.util.logging.Logger
-
 include { PLINK2_SCORE } from '../../modules/local/plink2_score'
 include { SCORE_REPORT    } from '../../modules/local/score_report'
 
@@ -60,12 +58,11 @@ workflow APPLY_SCORE {
 }
 
 def score_error(boolean fail) {
-    Logger logger = Logger.getLogger("")
     if (fail) {
-        logger.severe ("No scores calculated!")
+        log.error "ERROR: No scores calculated!"
         System.exit(1)
     } else {
-        logger.info ("Scores ready for calculation")
+        log.info "INFO: Scores ready for calculation"
     }
 }
 
