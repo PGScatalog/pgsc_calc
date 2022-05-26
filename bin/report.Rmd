@@ -10,7 +10,8 @@ params:
 options(tidyverse.quiet = TRUE)
 knitr::opts_chunk$set(echo = TRUE)
 
-library(tidyverse)
+library(dplyr)
+library(RSQLite)
 ```
 
 ```{r, eval = FALSE, echo=FALSE}
@@ -24,20 +25,44 @@ htmltools::img(src = knitr::image_uri(params$img),
 ## Compatibility summary
 
 ```{r, echo = FALSE, message = FALSE}
-log <- read.csv("log.csv")
+dbs <- list.files(pattern = "*.db", full.names = TRUE)
 
-log %>%
+get_meta <- function(path) {
+  con <- DBI::dbConnect(RSQLite::SQLite(), path)
+  id <- pull(tbl(con, "id"), "id")
+  tbl(con, "meta") %>%
+    collect() %>%
+    mutate(dataset = id)
+}
+
+get_matches <- function(path) {
+  con <- DBI::dbConnect(RSQLite::SQLite(), path)
+  id <- pull(tbl(con, "id"), "id")
+  tbl(con, "matches") %>%
+    collect() %>%
+    mutate(dataset = id)
+}
+
+matches <- purrr::map_dfr(dbs, get_matches)
+meta <- purrr::map_dfr(dbs, get_meta)
+
+matches %>%
   group_by(dataset, accession) %>%
-  count(match_type, input_variants = n()) %>%
-  mutate(match_type = ifelse(is.na(match_type), "no match", match_type)) %>%
-  ungroup() %>%
-  mutate(perc = scales::percent(n / input_variants, accuracy = 0.1)) %>%
-  knitr::kable(align = c(rep('l', 3), rep('r', 3)))
+  summarise(matches = n()) %>%
+  left_join(meta, by = c("accession", "dataset")) %>%
+  mutate(match_success = scales::percent((matches / n_scorefile), accuracy = 0.1)) %>%
+  arrange(desc(match_success)) %>%
+  rename(target_variants = n_target, scorefile_variants = n_scorefile) %>%
+  select(dataset, accession, target_variants, scorefile_variants, everything()) %>%
+  knitr::kable(align = c('l', 'l', rep('r', 4)))
 ```
 
 ## Score summary
 
 ```{r, echo = FALSE, message = FALSE}
+# TODO: update these functions now the container has tidyverse...
+# some weird function choices here but container has a sparse set of libraries 
+# e.g. no dplyr :( no group_by, mutate, map_dfr...
 
 read_scorefiles <- function(path) {
   dataset <- stringr::str_split(path, pattern = "_")[[1]][[1]]
@@ -50,10 +75,9 @@ read_scorefiles <- function(path) {
 }
 
 scorefiles <- list.files(pattern = "*.sscore", all.files = TRUE)
-combined <- purrr::map_dfr(scorefiles, read_scorefiles) %>%
-  group_by(dataset, IID) %>%
-  summarise_all(sum)
-write.table(combined, "aggregated_scores.txt", col.names = TRUE, quote = FALSE, row.names = FALSE)
+combined <- purrr::reduce(purrr::map(scorefiles, read_scorefiles), rbind)
+agg <- aggregate(. ~ IID + dataset, data = combined, sum)
+write.table(agg, "aggregated_scores.txt", col.names = TRUE, quote = FALSE, row.names = FALSE)
 ```
 
 Score peek:
