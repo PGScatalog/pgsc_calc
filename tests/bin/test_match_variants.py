@@ -26,10 +26,6 @@ def score_df(score):
     return d
 
 @pytest.fixture
-def score_df_noOA(score_df):
-    return score_df.with_column(pl.lit(None).alias('other_allele'))
-
-@pytest.fixture
 def bad_score(score_df):
     ''' Scorefile dataframe with no matches in test target '''
     bad_score = score_df.clone()
@@ -218,13 +214,3 @@ def test_args():
     assert args.remove_multiallelic
     assert args.remove_ambiguous
     assert not args.split
-
-def test_match_no_oa(score_df_noOA, target_df):
-    """ Test matching a scorefile without other allele information """
-    x = get_all_matches(target_df, score_df_noOA, remove_ambig = False)
-
-    # all other alleles remain null after matching
-    assert all(x['other_allele'].is_null())
-
-    # a match has occurred (effect allele == ref)
-    assert x.shape[0] == score_df_noOA.shape[0]

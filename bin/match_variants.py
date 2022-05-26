@@ -118,26 +118,16 @@ def match_variants(scorefile: pl.DataFrame,
     colnames: List[str] = ['chr_name', 'chr_position', 'effect_allele', 'other_allele', 'effect_weight', 'effect_type',
                            'accession', 'ID', 'REF', 'ALT', 'REF_FLIP', 'ALT_FLIP', 'match_type']
 
-    if OA:
-        matches: pl.DataFrame = scorefile.join(target,
-                                               left_on=['chr_name', 'chr_position', 'effect_allele', 'other_allele'],
-                                               right_on=['#CHROM', 'POS', EA, OA], how='inner').with_columns([
-            pl.col("*"),
-            pl.col("effect_allele").alias(EA),  # copy the column that's dropped by join
-            pl.col("other_allele").alias(OA),
-            pl.lit(match_type).alias("match_type")
-        ])
-        # join removes matching key, reorder columns for vertical stacking (pl.concat)
-        # collecting is needed for reordering columns
-    else:
-        matches: pl.DataFrame = scorefile.join(target,
-                                                       left_on=['chr_name', 'chr_position', 'effect_allele'],
-                                                       right_on=['#CHROM', 'POS', EA], how='inner').with_columns([
-                    pl.col("*"),
-                    pl.col("effect_allele").alias(EA),  # copy the column that's dropped by join
-                    pl.lit(match_type).alias("match_type")
-                ])
-
+    matches: pl.DataFrame = scorefile.join(target,
+                                           left_on=['chr_name', 'chr_position', 'effect_allele', 'other_allele'],
+                                           right_on=['#CHROM', 'POS', EA, OA], how='inner').with_columns([
+        pl.col("*"),
+        pl.col("effect_allele").alias(EA),  # copy the column that's dropped by join
+        pl.col("other_allele").alias(OA),
+        pl.lit(match_type).alias("match_type")
+    ])
+    # join removes matching key, reorder columns for vertical stacking (pl.concat)
+    # collecting is needed for reordering columns
     return matches[colnames]
 
 
@@ -154,27 +144,15 @@ def get_all_matches(target: pl.DataFrame, scorefile: pl.DataFrame, remove_ambig:
     If not removing ambiguous variants, then it's assumed that the genotype data
     is on the same strand as the GWAS whose summary statistics were used to
     construct the score
-
-    If other_allele is missing, match only using effect_allele using the same process
     """
 
-    scorefile_oa = scorefile.filter(pl.col("other_allele") != None)
-    scorefile_no_oa = scorefile.filter(pl.col("other_allele") == None)
-
-    matches: Dict[str, pl.DataFrame] = {}
-
-    if scorefile_oa:
-        matches['refalt'] = match_variants(scorefile, target, EA='REF', OA='ALT', match_type="refalt")
-        matches['altref'] = match_variants(scorefile, target, EA='ALT', OA='REF', match_type="altref")
-        matches['refalt_flip'] = match_variants(scorefile, target, EA='REF_FLIP', OA='ALT_FLIP', match_type="refalt_flip")
-        matches['altref_flip'] = match_variants(scorefile, target, EA='ALT_FLIP', OA='REF_FLIP', match_type="altref_flip")
-    if scorefile_no_oa:
-        matches['no_oa_ref'] = match_variants(scorefile_no_oa, target, EA='REF', OA=None, match_type="no_oa_ref")
-        matches['no_oa_alt'] = match_variants(scorefile_no_oa, target, EA='ALT', OA=None, match_type="no_oa_alt")
-        matches['no_oa_ref_flip'] = match_variants(scorefile_no_oa, target, EA='REF_FLIP', OA=None, match_type="no_oa_ref_flip")
-        matches['no_oa_alt_flip'] = match_variants(scorefile_no_oa, target, EA='ALT_FLIP', OA=None, match_type="no_oa_alt_flip")
-
-    ambig_labelled: pl.DataFrame = label_biallelic_ambiguous(pl.concat(list(matches.values())))
+    refalt: pl.DataFrame = match_variants(scorefile, target, EA='REF', OA='ALT', match_type="refalt")
+    altref: pl.DataFrame = match_variants(scorefile, target, EA='ALT', OA='REF', match_type="altref")
+    refalt_flip: pl.DataFrame = match_variants(scorefile, target, EA='REF_FLIP', OA='ALT_FLIP',
+                                               match_type="refalt_flip")
+    altref_flip: pl.DataFrame = match_variants(scorefile, target, EA='ALT_FLIP', OA='REF_FLIP',
+                                               match_type="altref_flip")
+    ambig_labelled: pl.DataFrame = label_biallelic_ambiguous(pl.concat([refalt, altref, refalt_flip, altref_flip]))
 
     if remove_ambig:
         print('Removing Ambiguous Matches')
