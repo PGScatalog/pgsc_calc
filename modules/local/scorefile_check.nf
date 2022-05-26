@@ -1,5 +1,5 @@
 process SCOREFILE_CHECK {
-    label 'process_medium_memory'
+    label 'process_low'
 
     conda (params.enable_conda ? "conda-forge::pandas=1.1.5 bioconda::pyliftover=0.4" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
