@@ -47,8 +47,8 @@ workflow INPUT_CHECK {
     }
         .set { ch_bfiles }
 
+    // check scorefiles
     SCOREFILE_CHECK ( scorefile )
-
     ch_versions = ch_versions.mix(SCOREFILE_CHECK.out.versions)
 
     emit:

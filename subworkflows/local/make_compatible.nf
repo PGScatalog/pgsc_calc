@@ -43,18 +43,13 @@ workflow MAKE_COMPATIBLE {
     // see https://nextflow.io/docs/latest/operator.html#grouptuple
     // if a size is not provided then nextflow must wait for the entire process
     // to finish before releasing the grouped tuples, which can be very slow(!)
-
     pvar.map { tuple(groupKey(it[0].subMap(['id', 'is_vcf']), it[0].n_chrom),
                      it[0].chrom, it[1]) }
         .groupTuple()
-        .combine( scorefile )
-        .dump(tag: 'match_variants_input')
-        .set { ch_variants }
+        .set { flat_bims }
 
     // variants should be matched once per sample identifier
-    MATCH_VARIANTS ( ch_variants )
-    MATCH_VARIANTS.out.scorefile.dump(tag: 'match_variants_output')
-
+    MATCH_VARIANTS ( flat_bims.combine(scorefile) )
     ch_versions = ch_versions.mix(MATCH_VARIANTS.out.versions)
 
     emit:
