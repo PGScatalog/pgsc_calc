@@ -3,39 +3,32 @@
 How-to guides
 =============
 
-Calculating polygenic scores 
-----------------------------
+Core functionality
+------------------
 
 .. toctree::
    :maxdepth: 1
 
    samplesheet
    calculate_pgscatalog
-   multiple   
-   
-Making genomic data and scorefiles compatible
----------------------------------------------
-
-.. toctree::
-   :maxdepth: 1
-              
-   calculate_custom   
-   liftover
+   calculate_custom
    effecttype
-   
-Understanding workflow output
------------------------------
+   liftover
+   multiple
+   bigjob
+
+Workflow output
+---------------
 
 .. toctree::
    :maxdepth: 1
 
    interpret
 
-Working with big data
----------------------
+Web platform
+------------
 
 .. toctree::
    :maxdepth: 1
 
-   bigjob
-   yaml
+   api
