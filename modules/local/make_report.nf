@@ -1,7 +1,7 @@
 process MAKE_REPORT {
     label 'process_low'
 
-    conda (params.enable_conda ? "conda-forge::r-tidyverse=1.3.1 conda-forge::r-rsqlite=2.1.1" : null)
+    conda (params.enable_conda ? "conda-forge::r-tidyverse=1.3.1" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'docker://rocker/tidyverse:4.1.2' :
         'rocker/tidyverse:4.1.2' }"
