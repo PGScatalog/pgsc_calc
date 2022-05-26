@@ -4,7 +4,8 @@
 //     - Match variants across scorefile and target data, flipping if necessary
 //
 
-include { PLINK2_VCF     } from '../../modules/local/plink2_vcf'
+include { PLINK2_VCF     } from '../../modules/nf-core/modules/plink2/vcf/main'
+
 include { PLINK2_BFILE   } from '../../modules/local/plink2_bfile'
 include { MATCH_VARIANTS } from '../../modules/local/match_variants'
 

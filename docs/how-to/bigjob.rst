@@ -68,7 +68,7 @@ limits. Here's an example for an LSF cluster:
             time   = 4.h
         }
     } 
-    
+
 In SLURM, queue is equivalent to a partition. Specific cluster parameters can be
 provided by modifying ``clusterOptions``. You should change ``cpus``,
 ``memory``, and ``time`` to match the amount of resources used. Assuming the
@@ -91,10 +91,7 @@ instead:
 
 .. note:: The name of the nextflow and singularity modules will be different in
           your local environment
-          
-.. note:: Your institution may already have `a nextflow profile`_, which can be
-          used instead of setting up a custom config using ``-c``
-          
+   
 .. code-block:: console
             
     $ bsub -M 2GB -q short -o output.txt < run_pgscalc.sh
@@ -105,7 +102,6 @@ each process in the workflow. The nextflow driver requires up to 4GB of RAM
 
 .. _`LSF and PBS`: https://nextflow.io/docs/latest/executor.html#slurm
 .. _`HPC users`: https://www.nextflow.io/blog/2021/5_tips_for_hpc_users.html
-.. _`a nextflow profile`: https://github.com/nf-core/configs
 
 
 Other environments

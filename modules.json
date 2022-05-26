@@ -1,5 +1,11 @@
 {
     "name": "nf-core/pgscalc",
     "homePage": "https://github.com/nf-core/pgscalc",
-    "repos": {}
+    "repos": {
+        "nf-core/modules": {
+            "plink2/vcf": {
+                "git_sha": "8e5eaf1fa442225f8d24e95bba2a19a7e2fc9ce9"
+            }
+        }
+    }
 }

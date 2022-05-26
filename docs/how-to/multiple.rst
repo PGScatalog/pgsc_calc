@@ -29,7 +29,7 @@ way. To do this, set up a spreadsheet that looks like:
      - 22
    * - cineca_synthetic_subset_vcf
      - path/to/vcf.gz
-     -
+     - 
      - 22
 
 Save the file as ``samplesheet.csv``. See :ref:`setup samplesheet` for more details.
@@ -64,10 +64,10 @@ directory ``my_custom_scores/``:
 
 .. code-block:: console
 
-    --scorefile "my_custom_scores/*.txt"
+    --scorefile "my_custom_scores/*.tsv"
 
-Assuming your scorefiles all have a ``.txt`` extension. This will match **all**
-files ending with ``.txt``, so be careful not to include other text files that
+Assuming your scorefiles all have a ``.tsv`` extension. This will match **all**
+files ending with ``.tsv``, so be careful not to include other text files that
 may match the pattern.
 
 Two stars (``**``) will match across multiple directories. This can be useful if
@@ -78,9 +78,9 @@ your scoring files have a structure like:
     $ tree diabetes/
     diabetes/
     ├── type1
-    │   └── type1.txt
+    │   └── type1.tsv
     └── type2
-        └── type2.txt
+        └── type2.tsv
 
     2 directories, 2 files
 
@@ -88,12 +88,12 @@ In this case, using two stars with the scorefile parameter can be helpful:
 
 .. code-block:: console
 
-    --scorefile "diabetes/**.txt"
+    --scorefile "diabetes/**.tsv"
 
 .. note:: - Custom scorefiles **must** have unique filenames
-          - The basename of each file (e.g. ``type1.txt`` -> ``type1``) is used
+          - The basename of each file (e.g. ``type1.tsv`` -> ``type1``) is used
             to label the score in the workflow output
-          - Quotes around stars (``"*.txt"``) are important for matching to work as expected
+          - Quotes around stars (``"*.tsv"``) are important for matching to work as expected
 
 Setting multiple scores in one custom scoring file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -104,7 +104,7 @@ file template. The final column effect_weight can be repeated if every column
 has a suffix:
 
 .. list-table:: Scorefile with multiple effect weights
-   :widths: 20 20 20 20
+   :widths: 20 20 20 20 
    :header-rows: 1
 
    * - chr_name
@@ -123,17 +123,17 @@ effect_weight_suffix, where suffix is a label for each score. Suffixes **must**
 be unique.
 
 Setting effect types for variants is not supported with this format (see
-:ref:`effect type`). An example template is available here.
+:ref:`effect type`). An example template is available here. 
 
 4. Calculate!
 -------------
 
 - If you're using multiple scores from the PGS Catalog:
-
+  
 .. code-block:: console
 
     $ nextflow run pgscatalog/pgscalc \
-        -profile <docker/singularity/conda> \
+        -profile <docker/singularity/conda> \    
         --input samplesheet.csv \
         --accession PGS001229,PGS001405
 
@@ -144,7 +144,7 @@ Setting effect types for variants is not supported with this format (see
     $ nextflow run pgscatalog/pgscalc \
         -profile <docker/singularity/conda> \
         --input samplesheet.csv \
-        --scorefile "my_custom_scores/*.txt"
+        --scorefile "my_custom_scores/*.tsv"    
 
 Congratulations, you've now calculated multiple scores in parallel!
 |:partying_face:|
@@ -157,4 +157,5 @@ report should be available in the ``results/make/`` directory by default. If
 you're interested in more information, see :ref:`interpret`.
 
 If the workflow didn't execute successfully, have a look at the
-:ref:`troubleshoot` section.
+:ref:`troubleshoot` section. 
+
