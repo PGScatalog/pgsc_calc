@@ -3,7 +3,6 @@
 import polars as pl
 import argparse
 import sys
-import glob
 
 def parse_args(args=None):
     parser = argparse.ArgumentParser(description='Read and format scoring files')
@@ -53,7 +52,7 @@ def read_target(path, plink_format):
         x = pl.read_csv(path, sep = '\t', has_header = False, comment_char='#')
 
         # read pvar header
-        x.columns = read_pvarcolumns(glob.glob(path)[0]) # guess from the first file
+        x.columns = read_pvarcolumns(path)
         x = x[['#CHROM', 'POS', 'ID', 'REF', 'ALT']]  # subset to matching columns
 
         # Handle multi-allelic variants
@@ -126,7 +125,7 @@ def get_all_matches(target, scorefile, remove):
     altref = match_variants(scorefile, target, EA = 'ALT', OA = 'REF', match_type = "altref")
     refalt_flip = match_variants(scorefile, target, EA = 'REF_FLIP', OA = 'ALT_FLIP', match_type = "refalt_flip")
     altref_flip = match_variants(scorefile, target, EA = 'ALT_FLIP', OA = 'REF_FLIP', match_type = "altref_flip")
-    return label_biallelic_ambiguous(pl.concat([refalt, altref, refalt_flip, altref_flip]), remove)
+    return label_biallelic_ambiguous(pl.concat([refalt, altref, refalt_flip, altref_flip]), remove=args.keep_ambiguous)
 
 def label_biallelic_ambiguous(matches, remove):
     # A / T or C / G may match multiple times
@@ -251,7 +250,7 @@ def main(args = None):
     scorefile = read_scorefile(args.scorefile)
 
     # start matching -----------------------------------------------------------
-    matches = get_all_matches(target, scorefile, remove = args.keep_ambiguous)
+    matches = get_all_matches(target, scorefile, remove = True)
 
     empty_err = ''' ERROR: No target variants match any variants in all scoring files
     This is quite odd!
