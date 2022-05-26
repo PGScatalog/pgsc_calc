@@ -19,11 +19,8 @@ process PLINK2_BFILE {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.suffix ? "${meta.id}${task.ext.suffix}" : "${meta.id}"
-    def mem_mb = task.memory.toMega() // plink is greedy
     """
     plink2 \\
-        --threads $task.cpus \\
-        --memory $mem_mb \\
         $args \\
         --set-all-var-ids '@:#:\$r:\$a' \\
         --bfile ${bed.baseName} \\
