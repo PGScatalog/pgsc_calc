@@ -61,7 +61,8 @@ html_theme = 'sphinx_book_theme'
 html_sidebars = {
     "**": [
         "search-field.html",
-        "globaltoc.html" ]
+        "globaltoc.html",
+        "sbt-sidebar-footer.html" ]
 }
 
 html_theme_options = {
