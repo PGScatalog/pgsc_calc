@@ -267,11 +267,5 @@
         {
             "$ref": "#/definitions/generic_options"
         }
-    ],
-    "properties": {
-        "split": {
-            "type": "string",
-            "default": "false"
-        }
-    }
+    ]
 }
