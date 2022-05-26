@@ -167,36 +167,14 @@ def unduplicate_variants(df):
     Returns:
         A dict of data frames (keys 'first' and 'dup')
     """
-    # get number of effect alleles per ID (1 or 2) and the two occuring alleles
-    # │ ID              ┆ count ┆ first ┆ last │
-    # │ ---             ┆ ---   ┆ ---   ┆ ---  │
-    # │ str             ┆ u32   ┆ str   ┆ str  │
-    # ╞═════════════════╪═══════╪═══════╪══════╡
-    # │ 1:147825548:C:T ┆ 2     ┆ C     ┆ T    │
-    # ├╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌┼╌╌╌╌╌╌┤
-    # │ 1:85462772:C:G  ┆ 1     ┆ C     ┆ C    │
+    df = df.with_row_count()
+    first = df.unique(subset = "ID", keep = "first")
+    dup = df.unique(subset = "ID", keep = "last")
+    # if there are no duplicates then dup will still contain the first instance
+    # drop row numbers that occur in both dup and first
+    dup_unique = dup[~(first["row_nr"] == dup["row_nr"])]
 
-    ea_count = (df.groupby(["ID", "effect_allele"])
-                .count()
-                .groupby("ID")
-                .agg(
-                    [
-                        pl.count(),
-                        pl.first("effect_allele").alias("first"),
-                        pl.last("effect_allele").alias("last")
-                    ]))
-
-    one_ea = (df
-              .join(ea_count.filter(pl.col("count") == 1), on = "ID", how = "inner")
-              .drop(["count", "first", "last"]))
-
-    first_df = df.join(ea_count.filter(pl.col("count") == 2), left_on = ["ID", "effect_allele"], right_on = ["ID", "first"], how = "inner")
-
-    dup_df = df.join(ea_count.filter(pl.col("count") == 2), left_on = ["ID", "effect_allele"], right_on = ["ID", "last"], how = "inner")
-
-    assert dup_df.shape[0] + first_df.shape[0] + one_ea.shape[0] == df.shape[0]
-
-    return {'first': pl.concat([one_ea, first_df[one_ea.columns]]), 'dup': dup_df }
+    return {'first': first.drop("row_nr"), 'dup': dup_unique.drop("row_nr") }
 
 def format_scorefile(df, split):
     """ Format a dataframe to plink2 --score standard

@@ -55,6 +55,17 @@ def target_df_dup(target_df):
     ''' Target genome dataframe with duplicate ID '''
     return pl.concat([target_df, target_df])
 
+def test_unduplicate_variants(target_df, target_df_dup):
+    ''' Test that duplicate IDs (diff effect allele) are split appropriately '''
+    d = unduplicate_variants(target_df)
+    assert isinstance(d, dict)
+    assert d['first'].shape[0] == target_df.shape[0]
+    assert d['dup'].shape[0] == 0
+
+    f = unduplicate_variants(target_df_dup)
+    assert f['first'].shape == target_df.shape
+    assert f['dup'].shape == target_df.shape
+
 def test_split_effect(score_df):
     ''' Test that scorefiles are split by effect type '''
     split = split_effect_type(score_df)
@@ -71,11 +82,3 @@ def test_bad_match(bad_score, target_df):
    ''' Ensure no matches are returned with a bad scorefile '''
    m = get_all_matches(target = target_df, scorefile = bad_score, remove = True)
    assert m.shape == (0, 14)
-
-def test_unduplicate_variants(score_df, target_df):
-    ''' Test that duplicate IDs (diff effect allele) are split appropriately '''
-    m = get_all_matches(target_df, score_df, remove = False)
-    d = unduplicate_variants(m)
-    assert isinstance(d, dict)
-    assert d['first'].shape[0] == score_df.shape[0]
-    assert d['dup'].shape[0] == 0
