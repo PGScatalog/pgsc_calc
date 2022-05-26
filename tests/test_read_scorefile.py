@@ -93,10 +93,10 @@ def scoring_file_header():
     os.remove('PGS000777.txt')
 
 @pytest.fixture
-def out_scorefile():
+def out_pickle():
     ''' A path to a pickle file (main output) '''
-    yield 'out.txt'
-    os.remove('out.txt')
+    yield 'out.pkl'
+    os.remove('out.pkl')
 
 @pytest.fixture
 def multi_et_scorefile_df(scoring_file_noheader):

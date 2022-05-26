@@ -10,7 +10,7 @@ process SCOREFILE_CHECK {
     path raw_scores
 
     output:
-    path "scorefiles.txt"   , emit: scorefiles
+    path "scorefiles.pkl"   , emit: scorefiles
     path "read_scorefile.db", emit: log
     path "versions.yml"     , emit: versions
 
@@ -22,7 +22,7 @@ process SCOREFILE_CHECK {
         read_scorefile.py -s $raw_scores \
             --liftover \
             -t $params.target_build \
-            -o scorefiles.txt \
+            -o scorefiles.pkl \
             $args
 
         cat <<-END_VERSIONS > versions.yml
@@ -35,7 +35,7 @@ process SCOREFILE_CHECK {
     else
         """
         read_scorefile.py -s $raw_scores \
-            -o scorefiles.txt
+            -o scorefiles.pkl
 
         cat <<-END_VERSIONS > versions.yml
         ${task.process.tokenize(':').last()}:
