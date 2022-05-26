@@ -436,7 +436,7 @@ page. You can view the entire list by running:</p>
 <li><p>scorefile</p></li>
 </ul>
 </td>
-<td colspan="2"><p>Path to a scoring file in PGS Catalog format</p></td>
+<td colspan="2"><p>Path to a scoring file in PGS Catalog format. Multiple scorefiles can be specified using wildcards (e.g., <code class="docutils literal notranslate"><span class="pre">--scorefile</span> <span class="pre">path/to/scores/*.txt</span></code>)</p></td>
 </tr>
 <tr class="row-odd"><td><p>type</p></td>
 <td><p><em>string</em></p></td>
@@ -557,7 +557,7 @@ page. You can view the entire list by running:</p>
 <tr class="row-even"><td><p>default</p></td>
 <td><p>0.95</p></td>
 </tr>
-<tr class="row-odd"><td rowspan="2"><ul class="simple">
+<tr class="row-odd"><td rowspan="3"><ul class="simple">
 <li><p>keep_multiallelic</p></li>
 </ul>
 </td>
@@ -566,14 +566,20 @@ page. You can view the entire list by running:</p>
 <tr class="row-even"><td><p>type</p></td>
 <td><p><em>boolean</em></p></td>
 </tr>
-<tr class="row-odd"><td rowspan="2"><ul class="simple">
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>False</p></td>
+</tr>
+<tr class="row-even"><td rowspan="3"><ul class="simple">
 <li><p>keep_ambiguous</p></li>
 </ul>
 </td>
 <td colspan="2"><p>Keep ambiguous matches</p></td>
 </tr>
-<tr class="row-even"><td><p>type</p></td>
+<tr class="row-odd"><td><p>type</p></td>
 <td><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>False</p></td>
 </tr>
 <tr class="row-odd"><td rowspan="5"><ul class="simple">
 <li><p>min_overlap</p></li>
