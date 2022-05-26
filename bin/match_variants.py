@@ -17,8 +17,6 @@ def parse_args(args=None):
                         help='<Required> A table of target genomic variants (.bim format)')
     parser.add_argument('--split', dest='split', default=False, action='store_true',
                         help='<Required> Split scorefile per chromosome?')
-    parser.add_argument('-n', '--n_threads', dest='n_threads', default = 1, type=int,
-                        help='<Required> Number of threads used to match (default = 1)')
     parser.add_argument('--format', required = True, dest='plink_format', help='<Required> bim or pvar?')
     parser.add_argument('--db', dest='db', required = True, help='<Required> path to database')
     parser.add_argument('-m', '--min_overlap', dest='min_overlap', required=True,
@@ -46,23 +44,19 @@ def read_pvarcolumns(path: str) -> List[str]:
     return header
 
 
-def read_target(path: str, plink_format: str, remove_multiallelic: bool, n_threads: int) -> pl.DataFrame:
+def read_target(path: str, plink_format: str, remove_multiallelic: bool) -> pl.DataFrame:
     """Complementing alleles with a pile of regexes seems weird, but polars string
     functions are limited (i.e. no str.translate). Applying a python complement
     function would be very slow compared to this, unless I develop a function
     in rust. I don't know rust, and I stole the regex idea from Scott.
     """
     if plink_format == 'bim':
-        # set chr_name to be str, fixes vstacking problem with inferred dtypes
-        # ( chr1 + chr2 + chrX = boom )
-        x: pl.DataFrame = pl.read_csv(path, sep='\t', has_header=False, n_threads = n_threads,
-                                      dtype = {'column_1': str})
+        x: pl.DataFrame = pl.read_csv(path, sep='\t', has_header=False)
         x.columns = ['#CHROM', 'ID', 'CM', 'POS', 'REF', 'ALT']
         x = x[['#CHROM', 'POS', 'ID', 'REF', 'ALT']]  # subset to matching columns
     else:
         # plink2 pvar may have VCF comments in header starting ##
-        x: pl.DataFrame = pl.read_csv(path, sep='\t', has_header=False, comment_char='#',
-                                      dtype = {'column_1': str}, n_threads = n_threads)
+        x: pl.DataFrame = pl.read_csv(path, sep='\t', has_header=False, comment_char='#')
 
         # read pvar header
         x.columns = read_pvarcolumns(glob.glob(path)[0])  # guess from the first file
@@ -107,7 +101,7 @@ def read_target(path: str, plink_format: str, remove_multiallelic: bool, n_threa
 
 
 def read_scorefile(path: str) -> pl.DataFrame:
-    scorefile: pl.DataFrame = pl.read_csv(path, sep='\t', dtype = {'chr_name': str})
+    scorefile: pl.DataFrame = pl.read_csv(path, sep='\t')
 
     assert all((scorefile.groupby(['accession', 'chr_name', 'chr_position', 'effect_allele'])
                .count()['count']) == 1), "Multiple effect weights per variant per accession!"
@@ -324,7 +318,6 @@ def read_log(conn: str) -> pl.DataFrame:
     """ Read scorefile input log from database """
     query: str = 'SELECT * from scorefile'
     return pl.read_sql(query, conn).with_columns([
-        pl.col("chr_name").cast(str),
         pl.col("accession").cast(pl.Categorical),
         pl.col("effect_type").cast(pl.Categorical)
     ])
@@ -373,8 +366,7 @@ def main(args=None) -> None:
     assert args.plink_format in ['bim', 'pvar'], "--format bim or --format pvar"
 
     # read inputs --------------------------------------------------------------
-    target: pl.DataFrame = read_target(args.target, args.plink_format,
-                                       args.remove_multiallelic, args.n_threads)
+    target: pl.DataFrame = read_target(args.target, args.plink_format, args.remove_multiallelic)
     scorefile: pl.DataFrame = read_scorefile(args.scorefile)
 
     # start matching -----------------------------------------------------------
