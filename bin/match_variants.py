@@ -18,11 +18,6 @@ def parse_args(args=None):
     parser.add_argument('--db', dest = 'db', help='<Required> path to database')
     parser.add_argument('-m', '--min_overlap', dest='min_overlap', required=True,
                         type = float, help='<Required> Minimum proportion of variants to match before error')
-    parser.add_argument('--keep-ambiguous', dest='keep_ambiguous', default=False, action='store_true',
-                        help='Flag to force the program to keep variants with ambiguous alleles, (e.g. A/T and G/C '
-                             'SNPs), which are normally excluded. In this case the program proceeds assuming that the '
-                             'genotype data is on the same strand as the GWAS whose summary statistics were used to '
-                             'construct the score.')
     return parser.parse_args(args)
 
 def read_target(path, plink_format):
@@ -109,7 +104,7 @@ def get_all_matches(target, scorefile, remove):
     altref = match_variants(scorefile, target, EA = 'ALT', OA = 'REF', match_type = "altref")
     refalt_flip = match_variants(scorefile, target, EA = 'REF_FLIP', OA = 'ALT_FLIP', match_type = "refalt_flip")
     altref_flip = match_variants(scorefile, target, EA = 'ALT_FLIP', OA = 'REF_FLIP', match_type = "altref_flip")
-    return label_biallelic_ambiguous(pl.concat([refalt, altref, refalt_flip, altref_flip]), remove=args.keep_ambiguous)
+    return label_biallelic_ambiguous(pl.concat([refalt, altref, refalt_flip, altref_flip]), remove)
 
 def label_biallelic_ambiguous(matches, remove):
     # A / T or C / G may match multiple times
