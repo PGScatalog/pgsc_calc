@@ -28,7 +28,7 @@
                 },
                 "scorefile": {
                     "type": "string",
-                    "description": "Path to a scoring file in PGS Catalog format. Multiple scorefiles can be specified using wildcards (e.g., ``--scorefile path/to/scores/*.txt``)",
+                    "description": "Path to a scoring file in PGS Catalog format",
                     "fa_icon": "fas fa-file-alt"
                 },
                 "accession": {
@@ -93,13 +93,11 @@
                 },
                 "keep_multiallelic": {
                     "type": "boolean",
-                    "description": "Keep multiallelic alleles?",
-                    "default": false
+                    "description": "Keep multiallelic alleles?"
                 },
                 "keep_ambiguous": {
                     "type": "boolean",
-                    "description": "Keep ambiguous matches",
-                    "default": false
+                    "description": "Keep ambiguous matches"
                 },
                 "min_overlap": {
                     "type": "number",
