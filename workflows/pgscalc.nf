@@ -21,12 +21,6 @@ ch_input = Channel.fromPath(params.input, checkIfExists: true)
 
 // Set up scorefile channels ---------------------------------------------------
 
-if (!params.scorefile & !params.accession) {
-    println " ERROR: You didn't set any scores to use! \
-    Please set --scorefile or --accession parameters and try again (: "
-    System.exit(1)
-}
-
 unique_scorefiles = Channel.empty()
 unique_accessions = Channel.empty()
 
