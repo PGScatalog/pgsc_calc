@@ -34,8 +34,8 @@ def read_pvarcolumns(path):
         line = f_pvar.readline()
         if line.startswith('#CHROM'):
             header = line.strip().split('\t')
-    f_pvar.close()
     return header
+    f_pvar.close()
 
 def read_target(path, plink_format):
     """Complementing alleles with a pile of regexes seems weird, but polars string
