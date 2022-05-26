@@ -147,21 +147,11 @@ def label_biallelic_ambiguous(matches):
         pl.lit(True).alias("ambiguous")
     ])
 
-    matches = matches.with_columns([
-        pl.lit(True).alias("multiallelic"),
-        pl.col("REF").str.lengths().alias("ref_length"),
-        pl.col("ALT").str.lengths().alias("alt_length")
-    ])
-
-    return (matches.with_columns([
-        pl.when((pl.col("ref_length") > 1) | (pl.col("alt_length") > 1))
-        .then(pl.col("multiallelic"))
-        .otherwise(False),
+    return (matches.with_column(
         pl.when((pl.col("effect_allele") == pl.col("ALT_FLIP")) | \
                 (pl.col("effect_allele") == pl.col("REF_FLIP")))
         .then(pl.col("ambiguous"))
-        .otherwise(False)
-    ]))
+        .otherwise(False)))
 
 def unduplicate_variants(df):
     """ Find variant matches that have duplicate identifiers
@@ -239,7 +229,7 @@ def write_scorefile(effect_type, scorefiles, split):
 
         for k, v in df_dict.items():
             path = fout.format(chr = k, et = effect_type, split = i)
-            v.write_csv(path, sep = "\t")
+            df.write_csv(path, sep = "\t")
 
 def connect_db(path):
     ''' Set up sqlite3 connection '''
