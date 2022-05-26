@@ -42,15 +42,13 @@ def chain_files(db):
 
 @pytest.fixture
 def valid_chrom():
-    """ Valid chromosomes should be 1 - 22, X, Y, and MT.
-
-    Validity is not checked or enforced """
-    return '1'
+    ''' Autosomes (1 - 22) are valid, which will cause problems for non-human species '''
+    return 1
 
 @pytest.fixture
-def valid_pos():
-    """ Valid positions are integers. Invalid integers are dropped. """
-    return 1234
+def invalid_chrom():
+    ''' Only integer chromosomes are supported '''
+    return "random string"
 
 @pytest.fixture
 def annotated_chrom():
@@ -65,14 +63,14 @@ def accession():
 @pytest.fixture
 def hg38_coords():
     ''' A dataframe of random variants, pos in GRCh38 '''
-    d = {'rsid' : ['rs11903757', 'rs6061231'], 'chr_name': ['2', '20'], 'chr_position': [191722478, 62381861] }
+    d = {'rsid' : ['rs11903757', 'rs6061231'], 'chr_name': [2, 20], 'chr_position': [191722478, 62381861] }
     return pd.DataFrame(d)
 
 @pytest.fixture
 def hg38_to_hg19_coords(hg38_coords):
     ''' A dataframe containing known good coordinates in GRCh37, from dbSNP '''
-    d = {'lifted_chr': ['2', '20'], 'lifted_pos': [192587204, 60956917], 'liftover': [True, True] }
-    return (hg38_coords.join(pd.DataFrame(d), how = 'outer')
+    d = {'lifted_chr': [2, 20], 'lifted_pos': [192587204, 60956917], 'liftover': [True, True] }
+    return (hg38_coords.join(pd.DataFrame(d, dtype = 'Int64'), how = 'outer')
             .astype({'liftover': bool}))
 
 @pytest.fixture
@@ -118,18 +116,6 @@ def scoring_file_noheader():
             f.write(gzip.decompress(scorefile.content))
         yield 'PGS000802.txt'
         os.remove('PGS000802.txt')
-
-@pytest.fixture
-def scoring_file_sex():
-    """ Fetch a scoring file with X chromosomes """
-    scorefile = get_timeout('https://ftp.ebi.ac.uk/pub/databases/spot/pgs/scores/PGS000049/ScoringFiles/PGS000049.txt.gz')
-    if not scorefile:
-        pytest.skip("Couldn't get file from EBI FTP")
-    else:
-        with open('PGS000049.txt', 'wb') as f:
-            f.write(gzip.decompress(scorefile.content))
-        yield 'PGS000049.txt'
-        os.remove('PGS000049.txt')
 
 @pytest.fixture
 def pgs001229():
@@ -242,12 +228,16 @@ def multiple_weights_per_position():
         yield 'PGS000318.txt'
         os.remove('PGS000318.txt')
 
-def test_valid_chrom_pos(valid_chrom, valid_pos):
-    assert to_int(valid_pos) == 1234
-    assert parse_lifted_chrom(valid_chrom) == str(1)
+def test_valid_chrom(valid_chrom):
+    assert to_int(valid_chrom) == 1
+    assert parse_lifted_chrom(valid_chrom) == 1
+
+def test_invalid_chrom(invalid_chrom):
+    assert to_int(invalid_chrom) is None
+    assert parse_lifted_chrom(invalid_chrom) is None
 
 def test_annotated_chrom(annotated_chrom):
-    assert parse_lifted_chrom(annotated_chrom) == str(22)
+    assert parse_lifted_chrom(annotated_chrom) == 22
 
 def test_remap(hg38_coords, lo_tohg19, lo_tohg38, hg38_to_hg19_coords, hg19_unique_coords):
     ''' Test known genomic coordinates are valid when remapped '''
@@ -431,9 +421,3 @@ def test_multiple_weights_per_position(multiple_weights_per_position):
     x, _ = read_scorefile(multiple_weights_per_position)
 
     assert x['PGS000318'].empty, "Scorefile should be filtered out"
-
-def test_read_sex(scoring_file_sex):
-    x, _ = read_scorefile(scoring_file_sex)
-
-
-    assert (x['PGS000049']['chr_name'] == 'X').any(), "X chromosomes missing after reading"

@@ -27,12 +27,6 @@ if (!params.scorefile & !params.accession) {
     System.exit(1)
 }
 
-if (!params.target_build) {
-    println "ERROR: You didn't set the target build of your target genomes"
-    println "Please set --target_build GRCh37 or --target_build GRCh38"
-    System.exit(1)
-}
-
 unique_scorefiles = Channel.empty()
 unique_accessions = Channel.empty()
 
