@@ -5,7 +5,6 @@ import pickle
 import sqlite3
 import argparse
 import sys
-import re
 from functools import reduce
 
 def parse_args(args=None):
@@ -250,30 +249,13 @@ def make_report(conn, min_overlap):
 
         assert row['pass_filter'], match_error
 
-def read_target(path):
-    ''' Read a pvar or a bim file and set a standard pvar header '''
-
-    with open(path) as f:
-        line = f.readline()
-        if re.search("^#", line):
-            pvar = True
-        else:
-            pvar = False
-
-    if (pvar):
-        return pd.read_csv(path, sep = '\t')
-    else:
-        return (pd.read_csv(path, sep = '\t', header = None)
-                .rename({0: '#CHROM', 1: 'ID', 2: 'CM', 3: 'POS', 4: 'REF', 5: 'ALT'}, axis = 1))
-
 def main(args = None):
     ''' Match variants from scorefiles against target variant information '''
 
     args = parse_args(args)
 
     # read inputs and set up database for logging-------------------------------
-    target = read_target(args.target)
-
+    target = pd.read_csv(args.target, sep = '\t')
     unpickled_scorefiles = read_scorefiles(args.scorefiles) # { accession: df }
     conn = sqlite3.connect('match_variants.db')
 
