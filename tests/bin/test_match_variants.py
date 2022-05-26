@@ -46,19 +46,11 @@ def score_dict(accession, accession_two, score):
 @pytest.fixture
 def target():
     ''' Target genome bim path '''
-    try:
-        bim = req.get('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.bim', timeout = 5)
-    except (req.exceptions.ConnectionError, req.Timeout):
-        bim = []
-
-    if not bim:
-        pytest.skip("Couldn't get test data from network")
-    else:
-        with open('data.bim', 'wb') as f:
-            f.write(bim.content)
-
-        yield 'data.bim'
-        os.remove('data.bim')
+    bim = req.get('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.bim', timeout = 5)
+    with open('data.bim', 'wb') as f:
+        f.write(bim.content)
+    yield 'data.bim'
+    os.remove('data.bim')
 
 @pytest.fixture
 def target_df(target):
