@@ -11,7 +11,7 @@ import io
 import sqlite3
 from functools import reduce
 import pyliftover
-import logging
+
 
 def parse_args(args=None) -> argparse.Namespace:
     parser: argparse.ArgumentParser = argparse.ArgumentParser(description='Read and format scoring files')
@@ -66,14 +66,6 @@ def set_effect_type(x: pd.DataFrame, path: str) -> pd.DataFrame:
             .assign(effect_type=lambda df: df[["is_recessive", "is_dominant", "additive"]].idxmax(1))
             .drop(["is_recessive", "is_dominant", "additive"], axis=1)
         )
-
-    # if there are multiple effect weights per position, remove the score (delete all rows)
-    # only works with single effect weight scoring files
-    if not ((scorefile[['chr_name', 'chr_position', 'effect_weight']]
-             .groupby(['chr_name', 'chr_position'])
-             .count() == 1).all().all()):
-        scorefile = scorefile[0:0]
-        logging.warning("Multiple effect weights detected for one position, skipping score")
 
     if 'other_allele' not in scorefile:
         return scorefile.assign(other_allele = None)
@@ -285,10 +277,7 @@ def write_scorefile(x: Dict[str, pd.DataFrame], outfile: str) -> None:
 
     # reset column order
     cols: List[str] = ['chr_name', 'chr_position', 'effect_allele', 'other_allele', 'effect_weight', 'effect_type', 'accession']
-    scorefile = pd.concat(dfs)[cols]
-
-    assert not scorefile.empty, "Empty scorefile output! Problem with input data"
-    scorefile.to_csv(outfile, index=False, sep='\t')
+    pd.concat(dfs)[cols].to_csv(outfile, index=False, sep='\t')
 
 
 def liftover_summary(lifted_dict: Dict[str, pd.DataFrame],
