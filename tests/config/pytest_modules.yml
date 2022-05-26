@@ -1,3 +1,0 @@
-pgscatalog:
-  - modules/pgscatalog/**
-  - tests/modules/pgscatalog/**
