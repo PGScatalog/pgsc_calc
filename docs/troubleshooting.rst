@@ -29,14 +29,4 @@ docker,test``
 Multiple profiles can be combined with a comma. The test profile is used only
 for checking the pipeline is installed and working correctly.
 
-I'm having problems with VCF input
-----------------------------------
 
-If you use a "chr" prefix in the chromosome column of your VCF, please remove
-it. Here's a simple method to do this (`thanks to Rvtests`_):
-
-.. code-block:: console
-
-    (zgrep ^"#" $your_old_vcf; zgrep -v ^"#" $your_old_vcf | sed 's:^chr::ig' | sort -k1,1n -k2,2n) | bgzip -c > $your_vcf_file.gz 
-
-.. _`thanks to Rvtests`: http://zhanxw.github.io/rvtests/#input-files    
