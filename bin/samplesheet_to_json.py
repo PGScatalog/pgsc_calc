@@ -22,9 +22,6 @@ def check_samplesheet(file_in, file_out):
     cineca_synthetic_subset,cineca_synthetic_subset.vcf.gz,,22,
     """
     csv = pd.read_csv(file_in, sep = ',', header = 0)
-    colnames = {'sample', 'vcf_path', 'bfile_path', 'pfile_path', 'chrom'}
-    colname_err = "ERROR: Samplesheet has bad column names"
-    assert set(csv.columns) == colnames, colname_err
 
     # basic error checking
     check_paths_exclusive(csv)
@@ -33,23 +30,17 @@ def check_samplesheet(file_in, file_out):
     # check target genomic data existence
     csv.vcf_path = csv['vcf_path'].apply(check_vcf_paths)
     csv[['bed', 'bim', 'fam']] = csv['bfile_path'].apply(check_bfile_paths).str.split(',', 3, expand = True)
-    csv[['pgen', 'psam', 'pvar']] = csv['pfile_path'].apply(check_pfile_paths).str.split(',', 3, expand = True)
+    csv.drop('bfile_path', axis=1, inplace=True)
 
-    (csv.drop(['bfile_path', 'pfile_path'], axis=1)
-     .replace(r'^\s*$', np.nan, regex = True)
-     .to_json(file_out, orient = 'records'))
+    # write to JSON
+    csv.to_json(file_out, orient = 'records')
 
 def check_paths_exclusive(df):
-    genome_paths = ['vcf_path', 'bfile_path', 'pfile_path']
-    genome_df = df[genome_paths].fillna("")
-    missing_err = "ERROR: No genome paths specified in a sample"
-
-    assert not (genome_df.applymap(pd.isnull)).all(axis = 1).any(), missing_err
-
-    assert not (genome_df.applymap(len)
-     .apply(lambda x: x > 0, axis = 1)
-     .agg(sum, axis = 1) > 1
-     ).any(), "ERROR: Multiple genome paths set in a sample"
+    # vcf_path and bfile_path are mututally exclusive for each sample
+    both_missing = [pd.isnull(x) and pd.isnull(y) for x, y in zip(df['vcf_path'], df['bfile_path'])]
+    both_present = [not pd.isnull(x) and not pd.isnull(y) for x, y in zip(df['vcf_path'], df['bfile_path'])]
+    assert not all(both_missing), "ERROR: Both vcf_path and bfile_path missing"
+    assert not all(both_present), "ERROR: Both vcf_path and bfile_path present"
 
 def check_chrom(df):
     sample_group = df.groupby(['sample'])
@@ -76,16 +67,6 @@ def check_bfile_paths(path):
         bed = path + ".bed"
         fam = path + ".fam"
         return ','.join([bim, bed, fam])
-
-def check_pfile_paths(path):
-    if pd.isnull(path):
-        pgen = psam = pvar = ''
-        return ','.join([pgen, psam, pvar])
-    else:
-        pgen = path + ".pgen"
-        psam = path + ".psam"
-        pvar = path + ".pvar"
-        return ','.join([pgen, psam, pvar])
 
 def main(args=None):
     args = parse_args(args)
