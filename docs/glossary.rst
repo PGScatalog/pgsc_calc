@@ -40,6 +40,15 @@ Glossary
          A unique and stable identifier. PGS Catalog accessions start with the
          prefix PGS, e.g. `PGS000001`_
 
+     driver pod
+     pod
+         `A pod`_ is a description of one or more containers and its associated
+         computing resources (e.g. number of processes and RAM, but it's more
+         complicated than that). Kubernetes takes this description and tries to
+         make it exist on the cluster. The driver pod is responsible for managing
+         a workflow instance. The driver pod will monitor and submit each job in
+         the workflow as a separate worker pod.
+
      polygenic score
          A `polygenic score`_ (PGS) aggregates the effects of many genetic variants
          into a single number which predicts genetic predisposition for a
@@ -55,7 +64,13 @@ Glossary
          create the polygenic scoring file originally (i.e., those used to
          derive the risk alleles and weights).
 
+     worker pods
+         A pod, managed by the nextflow driver pod, that is responsible for
+         executing an atomic process in the workflow. They are created and
+         destroyed automatically by the driver pod.
+
 .. _CSVs are good: https://www.gov.uk/guidance/using-csv-file-format
+.. _A pod: https://kubernetes.io/docs/concepts/workloads/pods/
 .. _single nucleotide polymorphism: https://en.wikipedia.org/wiki/Single-nucleotide_polymorphism
 .. _UK BioBank: https://www.ukbiobank.ac.uk/    
 .. _PGS Catalog: https://www.pgscatalog.org

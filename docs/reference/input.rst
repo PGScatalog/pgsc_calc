@@ -1,10 +1,8 @@
-Input (samplesheet) schema
-==========================
+Input schema
+============
 
-The documentation below is automatically generated from the schema. The JSON
-file contains additional technical detail not shown in the table below.
+The documentation below is automatically generated from the input schema and
+contains additional technical detail. 
 
-Each row in a samplesheet can only have a single genomic data format (i.e. they
-are mutually exclusive).
-
-.. jsonschema:: ../../assets/schemas/target_genomes.json
+.. jsonschema:: ../../assets/schema_input.json
+.. _`example`: https://github.com/PGScatalog/pgsc_calc/blob/master/assets/api_examples/input.json

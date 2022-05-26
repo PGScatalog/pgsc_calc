@@ -116,8 +116,10 @@ Nextflow also supports submitting jobs platforms like:
 - Google cloud
 - Azure cloud
 - Amazon cloud
-- Kubernetes
-  
-Check the `nextflow documentation`_ for configuration specifics.
+
+Check the `nextflow documentation`_ for configuration specifics. pgsc_calc is
+deployed and tested on a `local Kubernetes cluster`_, but it's not a recommended
+way of running the pipeline for normal users.
 
 .. _`nextflow documentation`: https://nextflow.io/docs/latest/google.html
+.. _`local Kubernetes cluster`: https://github.com/PGScatalog/pgsc_calc/blob/master/conf/k8s.config
