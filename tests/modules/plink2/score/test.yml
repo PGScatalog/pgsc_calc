@@ -1,5 +1,5 @@
 - name: plink2 testscore
-  command: nextflow run ./tests/modules/plink2/score -entry testscore -c ./tests/config/nextflow.config -profile test
+  command: nextflow run ./tests/modules/plink2/score -entry testscore -c ./tests/config/nextflow.config
   tags:
     - plink2
   files:
@@ -12,7 +12,7 @@
         - "no-mean-imputation"
 
 - name: plink2 testsmallscore
-  command: nextflow run ./tests/modules/plink2/score -entry testsmallscore -c ./tests/config/nextflow.config -profile test
+  command: nextflow run ./tests/modules/plink2/score -entry testsmallscore -c ./tests/config/nextflow.config
   tags:
     - plink2
   files:
@@ -25,7 +25,7 @@
         - "no-mean-imputation"
 
 - name: plink2 testmultiscore
-  command: nextflow run ./tests/modules/plink2/score -entry testmultiscore -c ./tests/config/nextflow.config -profile test
+  command: nextflow run ./tests/modules/plink2/score -entry testmultiscore -c ./tests/config/nextflow.config
   tags:
     - plink2
   files:
@@ -38,7 +38,7 @@
         - "--score-col-nums"
 
 - name: plink2 testsmallmultiscore
-  command: nextflow run ./tests/modules/plink2/score -entry testsmallmultiscore -c ./tests/config/nextflow.config -profile test
+  command: nextflow run ./tests/modules/plink2/score -entry testsmallmultiscore -c ./tests/config/nextflow.config
   tags:
     - plink2
   files:
@@ -52,7 +52,7 @@
         - "--score-col-nums"        
         
 - name: plink2 testmultiscorefail
-  command: nextflow run ./tests/modules/plink2/score -entry testmultiscorefail -c ./tests/config/nextflow.config -profile test
+  command: nextflow run ./tests/modules/plink2/score -entry testmultiscorefail -c ./tests/config/nextflow.config
   tags:
     - plink2
   exit_code: 1
