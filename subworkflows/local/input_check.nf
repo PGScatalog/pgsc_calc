@@ -4,6 +4,7 @@
 
 include { SAMPLESHEET_JSON } from '../../modules/local/samplesheet_json'
 include { SCOREFILE_CHECK  } from '../../modules/local/scorefile_check'
+include { PLINK_VCF        } from '../../modules/nf-core/modules/plink/vcf/main'
 
 workflow INPUT_CHECK {
     take:
@@ -18,8 +19,7 @@ workflow INPUT_CHECK {
         SAMPLESHEET_JSON(input)
         ch_versions = ch_versions.mix(SAMPLESHEET_JSON.out.versions)
         SAMPLESHEET_JSON.out.json
-            .flatMap { json_slurp(it) }
-            .buffer ( size: 2 )
+            .map { json_slurp(it) }
             .branch {
                 vcf: it[0].is_vcf
                 bfile: !it[0].is_vcf
@@ -27,14 +27,18 @@ workflow INPUT_CHECK {
             .set { ch_input }
     } else if (format.equals("json")) {
         Channel.from(input)
-            .flatMap { json_slurp(it) }
-            .buffer( size: 2 )
+            .map { json_slurp(it) }
             .branch {
                 vcf: it[0].is_vcf
                 bfile: !it[0].is_vcf
             }
             .set { ch_input }
     }
+
+    PLINK_VCF (
+        ch_input.vcf
+    )
+    ch_versions = ch_versions.mix(PLINK_VCF.out.versions)
 
     // branch is like a switch statement, so only one bed / bim was being
     // returned
@@ -50,10 +54,9 @@ workflow INPUT_CHECK {
     ch_versions = ch_versions.mix(SCOREFILE_CHECK.out.versions)
 
     emit:
-    bed = ch_bfiles.bed
-    bim = ch_bfiles.bim
-    fam = ch_bfiles.fam
-    vcf = ch_input.vcf
+    bed = ch_bfiles.bed.mix(PLINK_VCF.out.bed) // channel: [val(meta), path(bed)]
+    bim = ch_bfiles.bim.mix(PLINK_VCF.out.bim) // channel: [val(meta), path(bim)]
+    fam = ch_bfiles.fam.mix(PLINK_VCF.out.fam) // channel: [val(meta), path(fam)]
     scorefiles = SCOREFILE_CHECK.out.scorefiles
     versions = ch_versions
 }
@@ -68,7 +71,7 @@ def json_slurp(Path input) {
 def json_to_genome(HashMap slurped) {
     def meta    = [:]
     meta.id     = slurped.sample
-    meta.is_vcf = slurped.vcf_path ? true : false
+    meta.is_vcf = slurped.vcf_path?: false
     meta.chrom  = slurped.chrom?: false
 
     def genome_lst = []
