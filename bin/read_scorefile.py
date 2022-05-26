@@ -4,17 +4,15 @@ import numpy as np
 import pandas as pd
 import argparse
 import os.path
-import sys
 import pickle
 
-def parse_args(args=None):
-    parser = argparse.ArgumentParser(description='Read and format scoring files')
-    parser.add_argument('-s','--scorefiles', dest = 'scorefiles', nargs='+',
-                        help='<Required> Scorefile path (wildcard * is OK)', required=True)
-    parser.add_argument('-o', '--outfile', dest = 'outfile', required = False,
-                        default = 'scorefiles.pkl',
-                        help = '<Required> Output path to pickled list of scorefiles, e.g. scorefiles.pkl')
-    return parser.parse_args()
+parser = argparse.ArgumentParser(description='Read and format scoring files')
+parser.add_argument('-s','--scorefiles', dest = 'scorefiles', nargs='+',
+                    help='<Required> Scorefile path (wildcard * is OK)', required=True)
+parser.add_argument('-o', '--outfile', dest = 'outfile', required = False,
+                    default = 'scorefiles.pkl',
+                    help = '<Required> Output path to pickled list of scorefiles, e.g. scorefiles.pkl')
+args = parser.parse_args()
 
 def to_int(i):
     # convert non-numeric chromosomes or positions to NaN
@@ -44,13 +42,15 @@ def set_effect_type(x):
         )
     return scorefile
 
-def quality_control(df):
+def quality_control(df, accession):
     return (
         df.query('effect_allele != "P" | effect_allele != "N"')
         .dropna(subset = ['chr_name', 'chr_position'])
+        .rename(columns={'effect_weight': 'effect_weight_{}'.format(accession)})
     )
 
 def read_scorefile(path):
+    accession = os.path.basename(path).split('.')[0]
     x = pd.read_table(path, converters = { "chr_name": to_int, "chr_pos": to_int
                                            }, comment = "#")
 
@@ -60,18 +60,14 @@ def read_scorefile(path):
     x[["chr_name", "chr_position"]] = x[["chr_name", "chr_position"]].astype(pd.Int64Dtype())
 
     scorefile = set_effect_type(x) # e.g. additive, recessive
-    qc_scorefile = quality_control(scorefile)
+    qc_scorefile = quality_control(scorefile, accession)
 
     return qc_scorefile
 
-def main(args = None):
-    args = parse_args(args)
-    accessions = [os.path.basename(x).split('.')[0] for x in args.scorefiles]
+def process_scorefiles(args):
     scorefiles = [read_scorefile(x) for x in args.scorefiles]
-    score_dict = dict(zip(accessions, scorefiles)) # key: accession, value: df
-
     with open(args.outfile, 'wb') as f:
-        pickle.dump(score_dict, f)
+        pickle.dump(scorefiles, f)
 
 if __name__ == "__main__":
-    sys.exit(main())
+    process_scorefiles(args)
