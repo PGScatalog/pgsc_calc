@@ -117,7 +117,7 @@ jobs:
             ${{ runner.os }}-nextflow-
             
       - name: Run unit tests
-        run: TMPDIR=~ PROFILE=${{ matrix.profile }} pytest --kwdof --symlink --git-aware
+        run: TMPDIR=~ PROFILE=${{ matrix.profile }} pytest --kwdof --symlink
 
       - name: Output log on failure
         if: failure()
