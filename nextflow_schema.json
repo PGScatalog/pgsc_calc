@@ -42,12 +42,6 @@
                     "pattern": "(PGS\\d+)(,\\s*PGS\\d+)*",
                     "fa_icon": "fas fa-star"
                 },
-                "allelic_freq": {
-                    "type": "string",
-                    "default": "NO_FILE",
-                    "description": "(Optional) Path to a plink 2 allelic frequency file (see --read-freq)",
-                    "fa_icon": "fas fa-file-alt"
-                },
                 "outdir": {
                     "type": "string",
                     "description": "Path to the output directory where the results will be saved.",
@@ -63,8 +57,8 @@
                 }
             },
             "required": [
-                "input",
-                "format"
+                "format",
+                "input"
             ]
         },
         "compatibility_options": {
@@ -273,5 +267,11 @@
         {
             "$ref": "#/definitions/generic_options"
         }
-    ]
+    ],
+    "properties": {
+        "split": {
+            "type": "string",
+            "default": "false"
+        }
+    }
 }

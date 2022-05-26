@@ -38,9 +38,6 @@ Channel.fromList(params.accession?.tokenize(','))
     .map { it.join(',') } // join again for calling API
     .set { unique_accessions }
 
-// Don't check existence of optional parameters
-allelic_freq = file(params.allelic_freq)
-
 /*
 ========================================================================================
     IMPORT LOCAL MODULES/SUBWORKFLOWS
@@ -109,8 +106,7 @@ workflow PGSCALC {
         MAKE_COMPATIBLE.out.pgen,
         MAKE_COMPATIBLE.out.psam,
         MAKE_COMPATIBLE.out.pvar,
-        MAKE_COMPATIBLE.out.scorefile,
-        allelic_freq
+        MAKE_COMPATIBLE.out.scorefile
     )
 
     ch_versions = ch_versions.mix(APPLY_SCORE.out.versions)

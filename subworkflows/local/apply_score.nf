@@ -11,7 +11,6 @@ workflow APPLY_SCORE {
     psam // [[id: 1, is_vcf: true, chrom: 21], path(pvar)]
     pvar // [[id: 1, is_vcf: true, chrom: 21], path(pvar)]
     scorefiles // [[id: 1], path(scorefiles)]
-    allelic_freq
 
     main:
     ch_versions = Channel.empty()
@@ -33,7 +32,7 @@ workflow APPLY_SCORE {
         .set { ch_apply }
 
 
-    PLINK2_SCORE ( ch_apply, allelic_freq )
+    PLINK2_SCORE ( ch_apply )
 
     ch_versions = ch_versions.mix(PLINK2_SCORE.out.versions.first())
 

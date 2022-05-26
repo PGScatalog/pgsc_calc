@@ -9,7 +9,6 @@ process PLINK2_SCORE {
 
     input:
     tuple val(meta), path(pgen), path(psam), path(pvar), val(scoremeta), path(scorefile)
-    path(optional_AF) // allelic frequencies
 
     output:
     path "*.sscore"    , emit: scores
@@ -19,17 +18,11 @@ process PLINK2_SCORE {
     def args = task.ext.args ?: ''
     def args2 = task.ext.args2 ?: ''
 
-    // custom args
-    def allelic_freq = optional_AF.name != 'NO_FILE' ? "--read-freq $optional_AF" : ''
-
-    // custom args2
     def maxcol = (scoremeta.n_scores + 2) // id + effect allele = 2 cols
-    def no_imputation = (meta.n_samples < 50) ? 'no-mean-imputation' : ''
+    def no_imputation = (meta.n_samples >= 50) ? '' : ' no-mean-imputation '
     def recessive = (scoremeta.effect_type == 'recessive') ? ' recessive ' : ''
     def dominant = (scoremeta.effect_type == 'dominant') ? ' dominant ' : ''
-
-    args = [args, allelic_freq].join(' ')
-    args2 = [args2, no_imputation, recessive, dominant].join(' ')
+    args2 = args2 + no_imputation + recessive + dominant
 
     if (scoremeta.n_scores == 1)
         """
