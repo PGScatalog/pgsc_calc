@@ -27,7 +27,7 @@ workflow INPUT_CHECK {
             }
             .set { ch_input }
     } else if (format.equals("json")) {
-        input
+        Channel.from(input)
             .map { json_slurp(it) }
             .flatMap { count_chrom(it) }
             .buffer( size: 2 )
