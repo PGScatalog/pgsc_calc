@@ -1,4 +1,4 @@
-process PLINK2_BFILE {
+process PLINK2_RELABEL {
     tag "$meta.id"
     label 'process_low'
 

@@ -3,6 +3,7 @@
 //
 
 include { PLINK2_SCORE } from '../../modules/local/plink2_score'
+include { COMBINE_SCORES } from '../../modules/local/combine_scores'
 include { MAKE_REPORT    } from '../../modules/local/make_report'
 
 workflow APPLY_SCORE {

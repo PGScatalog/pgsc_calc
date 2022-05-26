@@ -4,10 +4,10 @@
 //     - Match variants across scorefile and target data, flipping if necessary
 //
 
-include { PLINK2_VCF     } from '../../modules/nf-core/modules/plink2/vcf/main'
+include { PLINK2_VCF      } from '../../modules/nf-core/modules/plink2/vcf/main'
 
-include { PLINK2_BFILE   } from '../../modules/local/plink2_bfile'
-include { MATCH_VARIANTS } from '../../modules/local/match_variants'
+include { PLINK2_RELABEL  } from '../../modules/local/plink2_relabel'
+include { MATCH_VARIANTS  } from '../../modules/local/match_variants'
 
 workflow MAKE_COMPATIBLE {
     take:
@@ -29,12 +29,12 @@ workflow MAKE_COMPATIBLE {
         .map { it.flatten() }
         .set { pfiles }
 
-    PLINK2_BFILE( pfiles )
-    ch_versions = ch_versions.mix(PLINK2_BFILE.out.versions.first())
+    PLINK2_RELABEL( pfiles )
+    ch_versions = ch_versions.mix(PLINK2_RELABEL.out.versions.first())
 
-    pgen = PLINK2_BFILE.out.pgen.mix(PLINK2_VCF.out.pgen)
-    psam = PLINK2_BFILE.out.psam.mix(PLINK2_VCF.out.psam)
-    pvar = PLINK2_BFILE.out.pvar.mix(PLINK2_VCF.out.pvar)
+    pgen = PLINK2_RELABEL.out.pgen.mix(PLINK2_VCF.out.pgen)
+    psam = PLINK2_RELABEL.out.psam.mix(PLINK2_VCF.out.psam)
+    pvar = PLINK2_RELABEL.out.pvar.mix(PLINK2_VCF.out.pvar)
 
     // Recombine split variant information files to match target variants ------
 
