@@ -84,14 +84,14 @@ def hg19():
     return 'GRCh37'
 
 @pytest.fixture
-def lo_tohg19(chain_files):
+def lo_tohg19():
     ''' pyliftover object reponsible for converting coordinates hg38 -> hg19 '''
-    return LiftOver('hg38ToHg19.over.chain.gz')
+    return LiftOver('hg38', 'hg19')
 
 @pytest.fixture
-def lo_tohg38(chain_files):
+def lo_tohg38():
     ''' pyliftover object reponsible for converting coordinates hg19 -> hg38 '''
-    return LiftOver('hg19ToHg38.over.chain.gz')
+    return LiftOver('hg19', 'hg38')
 
 @pytest.fixture
 def min_lift():
@@ -113,22 +113,6 @@ def scoring_file_noheader():
             f.write(gzip.decompress(scorefile.content))
         yield 'PGS000802.txt'
         os.remove('PGS000802.txt')
-
-@pytest.fixture
-def pgs001229():
-    try:
-        scorefile = req.get('https://ftp.ebi.ac.uk/pub/databases/spot/pgs/scores/PGS001229/ScoringFiles/PGS001229.txt.gz', timeout = 5)
-    except (req.exceptions.ConnectionError, req.Timeout):
-        scorefile = []
-
-    if not scorefile:
-        pytest.skip("Couldn't get file from EBI FTP")
-    else:
-        with open('PGS001229.txt', 'wb') as f:
-            f.write(gzip.decompress(scorefile.content))
-
-        yield 'PGS001229.txt'
-        os.remove('PGS001229.txt')
 
 @pytest.fixture
 def scoring_file_header():
@@ -196,21 +180,7 @@ def multi_score_df(good_score_df):
     ''' A scorefile dataframe with multiple effect weight columns '''
     return (good_score_df
             .rename( columns = { 'effect_weight': 'effect_weight_one' } )
-            .assign( effect_weight_two = 1.5 ))
-
-@pytest.fixture
-def multi_score_file(multi_score_df):
-    multi_score_df.to_csv('multi.txt', sep = '\t', index = False)
-    yield 'multi.txt'
-    os.remove('multi.txt')
-
-@pytest.fixture
-def bad_multi_score_file(multi_score_df):
-    ''' A scorefile with no effect weights '''
-    (multi_score_df.drop(['effect_weight_one', 'effect_weight_two'], axis = 1)
-     .to_csv('badmulti.txt', sep = '\t', index = False))
-    yield 'badmulti.txt'
-    os.remove('badmulti.txt')
+            .assign( effect_weight_two = 1 ))
 
 @pytest.fixture
 def df_cols():
@@ -321,23 +291,6 @@ def test_multi_effect_weights(multi_score_df, df_cols):
     assert set(d['one'].columns) == df_cols
     assert set(d['two'].columns) == df_cols
 
-def test_read_multi_ew(multi_score_file, bad_multi_score_file, multi_score_df):
-    x, y = read_scorefile(multi_score_file)
-
-    one = (multi_score_df.loc[:, :'effect_weight_one']
-     .rename({'effect_weight_one': 'effect_weight'}, axis = 1))
-    two = (multi_score_df.loc[:, :'effect_weight_two']
-           .rename({'effect_weight_two': 'effect_weight'}, axis = 1).
-           drop(['effect_weight_one'], axis = 1))
-
-    assert len(x) == 2 # different effect weights have been split properly
-    assert all(x['one'].loc[:, :'effect_weight'].eq(one))
-    assert all(x['two'].loc[:, :'effect_weight'].eq(two))
-
-    with pytest.raises(AssertionError):
-        read_scorefile(bad_multi_score_file)
-
-
 def test_missing_alleles(scoring_file_noOA, scoring_file_noEA):
     """ Test that reading a scorefile without effect alleles or other alleles
     specified raises an assertion error """
@@ -351,57 +304,3 @@ def test_missing_alleles(scoring_file_noOA, scoring_file_noEA):
         read_scorefile(scoring_file_noEA)
 
     assert "Missing" in str(excinfo_ea.value)
-
-def test_write_scorefile(scoring_file_noheader):
-    df_dict, _ = read_scorefile(scoring_file_noheader)
-    write_scorefile(df_dict, 'scorefile.out')
-    assert os.path.exists('scorefile.out')
-    x = pd.read_csv('scorefile.out', sep = '\t')
-
-    # is dictionary key correctly set as the accession column?
-    assert all(x['accession'] == ''.join(list(df_dict.keys())))
-
-    # is dictinary value equal to the written file?
-    assert all(x.drop(['accession'], axis = 1).eq(df_dict['PGS000802']))
-
-    os.remove('scorefile.out')
-
-def test_liftover_summary(pgs001229, hg19, hg38, min_lift, chain_files):
-    df, summary = read_scorefile(pgs001229)
-    lifted, unlifted = liftover('PGS001229', df['PGS001229'], hg19, hg38, min_lift)
-    lifted_dict = {'PGS001229': lifted }
-    unlifted_dict = {'PGS001229': unlifted }
-    log = liftover_summary(lifted_dict, unlifted_dict, [summary])
-
-    # dicts should be flattened into one big dataframe
-    assert isinstance(log, pd.DataFrame)
-
-    # don't lose variants, failed liftover should stay in df
-    assert log.shape[0] == df['PGS001229'].shape[0]
-
-    # make sure liftover annotations have been added
-    assert {'lifted_pos', 'lifted_chr', 'liftover'}.issubset(log.columns)
-
-    formatted = format_lifted(lifted_dict['PGS001229'])
-
-    # test lifted annotations replace original annotations
-    assert formatted[['chr_name', 'chr_position']].equals(lifted_dict['PGS001229'][['lifted_chr', 'lifted_pos']]
-                                                       .rename(columns={'lifted_chr': 'chr_name', 'lifted_pos': 'chr_position'}))
-
-    con = sqlite3.connect(':memory:')
-    write_log(log, con)
-
-    # make sure log is written to database properly
-    assert pd.read_sql("select * from scorefile", con).shape == log.shape
-
-def test_args():
-    with pytest.raises(SystemExit):
-        # mandatory args: -s, -o
-        parse_args(['-s', 'dummy.txt'])
-
-    args = parse_args(['-s', 'dummy.txt', '-o', 'hi.txt'])
-
-    # check optional arg defaults
-    assert not args.liftover
-    assert not args.target_build
-    assert args.min_lift == 0.95

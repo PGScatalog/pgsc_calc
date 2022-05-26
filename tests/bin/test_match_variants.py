@@ -61,15 +61,6 @@ def target():
         os.remove('data.bim')
 
 @pytest.fixture
-def target_multiallelic(target):
-    """ Make multiallelic target variant data """
-    x = pl.read_csv(target, sep='\t', has_header = False)
-    x.columns = ['#CHROM', 'ID', 'CM', 'POS', 'REF', 'ALT']
-    x.with_column(pl.concat_str([pl.col('ALT'), pl.lit(',G')]).alias("ALT")).write_csv('multiallelic.txt', sep = '\t')
-    yield 'multiallelic.txt'
-    os.remove('multiallelic.txt')
-
-@pytest.fixture
 def target_df(target):
     ''' Target genome dataframe '''
     return read_target(target, 'bim', remove_multiallelic = False)
@@ -139,78 +130,3 @@ def test_unduplicate(matches, match_dup):
     assert d[0].shape[0] == matches.shape[0]
 
     assert d[0]['effect_allele'] == matches['effect_allele']
-
-def test_multiallelic(target_multiallelic):
-    raw_shape = pl.read_csv(target_multiallelic, sep = '\t', header = False).shape
-    ma = read_target(target_multiallelic, 'pvar', remove_multiallelic = False)
-    no_ma = read_target(target_multiallelic, 'pvar', remove_multiallelic = True)
-
-    # every variant is multiallelic, so they should be all removed
-    assert no_ma.shape[0] == 0
-
-    # each variant has two alternate alleles, check if exploding worked OK
-    assert ma.shape[0] == raw_shape[0] * 2
-
-def test_format_scorefile(matches):
-    # manually format a score
-    formatted_score = matches[['ID', 'effect_allele', 'effect_weight']]
-    formatted_score.columns = ['ID', 'effect_allele', 'dummy'] # dummy = accession
-
-    split_score = format_scorefile(matches, split = True)
-
-    # check dict key = chrom
-    assert list(split_score.keys()) == [22]
-    assert split_score[22].frame_equal(formatted_score)
-
-    unsplit_score = format_scorefile(matches, split = False)
-
-    # check dict key = false when not split
-    assert list(unsplit_score.keys()) == ['false']
-
-    assert unsplit_score['false'].frame_equal(formatted_score)
-
-def test_write_scorefile(matches):
-    # manually format a score
-    formatted_score = matches[['ID', 'effect_allele', 'effect_weight']]
-    formatted_score.columns = ['ID', 'effect_allele', 'dummy'] # dummy = accession
-
-    ets: Dict[str, pl.DataFrame] = split_effect_type(matches)
-    unduplicated: Dict[str, pl.DataFrame] = {k: unduplicate_variants(v) for k, v in ets.items()}
-    ea_dict: Dict[str, str] = {'is_dominant': 'dominant', 'is_recessive': 'recessive', 'additive': 'additive'}
-
-    split = False
-    [write_scorefile(ea_dict.get(k), v, split) for k, v in unduplicated.items()]
-
-    # check the written score is equal to a subset of the input dataframe
-    assert pl.read_csv('false_additive_0.scorefile', sep = '\t').frame_equal(formatted_score)
-
-    os.remove('false_additive_0.scorefile')
-
-
-def test_connectdb():
-    assert connect_db('test.db') == 'sqlite://test.db'
-
-
-def test_check_match():
-    # only half of the variants match here
-    df = pl.DataFrame({'accession': ['dummy','dummy'], 'match_type': ['refalt', None]})
-
-    # fail with 95% minimum match rate
-    with pytest.raises(AssertionError):
-        check_match(df, 0.95)
-
-    # pass with 10% minimum match rate
-    assert check_match(df, 0.1) is None
-
-def test_args():
-    with pytest.raises(SystemExit):
-        # mandatory args: -dataset, -target, -scorefile, -min_overlap
-        parse_args(['-d', 'dummy', '-t', 'hi'])
-
-    args = parse_args(['-d', 'dataset', '-t', 'target', '-s', 'scorefile', '-m',
-                       '0.95', '--format', 'bim', '--db', 'test.db'])
-
-    # check default parameters for optional arguments
-    assert args.remove_multiallelic
-    assert args.remove_ambiguous
-    assert not args.split
