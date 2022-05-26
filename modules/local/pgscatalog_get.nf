@@ -4,8 +4,8 @@ process PGSCATALOG_GET {
 
     conda (params.enable_conda ? "bioconda::fastq-scan=1.0.0" : null)
         container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/fastq-scan:1.0.0--h7d875b9_0' :
-        'dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/fastq-scan:1.0.0--h7d875b9_0' }"
+        'https://depot.galaxyproject.org/singularity/fastq-scan:1.0.0--h7d875b9_0' :
+        'quay.io/biocontainers/fastq-scan:1.0.0--h7d875b9_0' }"
 
     input:
     val(accession)

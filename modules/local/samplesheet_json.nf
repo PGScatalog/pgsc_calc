@@ -3,8 +3,8 @@ process SAMPLESHEET_JSON {
 
     conda (params.enable_conda ? "conda-forge::pandas=1.1.5" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/pandas:1.1.5' :
-        'dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/pandas:1.1.5' }"
+        'https://depot.galaxyproject.org/singularity/pandas:1.1.5' :
+        'quay.io/biocontainers/pandas:1.1.5' }"
 
     input:
     path samplesheet

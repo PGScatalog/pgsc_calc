@@ -3,8 +3,8 @@ process SCOREFILE_CHECK {
 
     conda (params.enable_conda ? "conda-forge::pandas=1.1.5 bioconda::pyliftover=0.4" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/mulled-v2-afe3324bf2effca1c6ea39313147c33dd2c3686e:20ba75f8224cb981ed077e2d6a4d0bdf96a5bf2d-0' :
-        'dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/mulled-v2-afe3324bf2effca1c6ea39313147c33dd2c3686e:20ba75f8224cb981ed077e2d6a4d0bdf96a5bf2d-0' }"
+        'https://depot.galaxyproject.org/singularity/mulled-v2-afe3324bf2effca1c6ea39313147c33dd2c3686e:20ba75f8224cb981ed077e2d6a4d0bdf96a5bf2d-0' :
+        'quay.io/biocontainers/mulled-v2-afe3324bf2effca1c6ea39313147c33dd2c3686e:20ba75f8224cb981ed077e2d6a4d0bdf96a5bf2d-0' }"
 
     input:
     path raw_scores
