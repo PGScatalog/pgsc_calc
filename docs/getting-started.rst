@@ -71,7 +71,7 @@ workflow with bundled test data:
           options are mutually exclusive!
 
 Calculate your first polygenic scores
-=====================================
+-------------------------------------
 
 If you've completed the installation process that means you've already
 calculated some polygenic scores |:heart_eyes:| However, these scores were
@@ -79,7 +79,7 @@ calculated from boring synthetic data. Let's try calculating scores with your
 genomic data, which are probably sequenced from real people!
 
 1. Samplesheet setup
---------------------
+~~~~~~~~~~~~~~~~~~~~
 
 First, you need to describe the structure of your genomic data in a standardised
 way. To do this, set up a spreadsheet that looks like:
@@ -124,7 +124,7 @@ example template is `available here`_.
 .. _`available here`: https://github.com/PGScatalog/pgsc_calc/blob/master/assets/examples/example_data/bfile_samplesheet.csv
 
 2. Select scoring files
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
 
 pgsc_calc makes it simple to work with polygenic scores that have been published
 in the PGS Catalog. You can specify one or more scores using the ``--accession``
@@ -150,7 +150,7 @@ The ``--target_build`` parameter only supports builds ``GRCh38`` and
 ``GRCh37``. See :ref:`liftover` for more information.
     
 3. Putting it all together
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For this example, we'll assume that the input genomes are in build GRCh37 and that
 they match the scoring file genome build.
