@@ -85,27 +85,24 @@ First, you need to describe the structure of your genomic data in a standardised
 way. To do this, set up a spreadsheet that looks like:
 
 .. list-table:: Example samplesheet
-   :widths: 20 20 20 20 20
+   :widths: 25 25 25 25
    :header-rows: 1
 
    * - sample
      - vcf_path
      - bfile_path
-     - pfile_path
      - chrom
    * - cineca_synthetic_subset
      -
      - path/to/bfile_prefix
-     -
      - 22
    * - cineca_synthetic_subset_vcf
      - path/to/vcf.gz
-     -
      - 
      - 22
 
-There are five mandatory columns. Columns that specify genomic data paths
-(**vcf_path**, **bfile_path**, and **pfile_path**) are mutually exclusive:
+There are four mandatory columns. Two columns, **vcf_path** and **bfile_path**,
+are mutually exclusive (and specify the genomic file paths):
 
 - **sample**: A text string containing the name of a dataset, which can be split
   across multiple files. Scores generated from files with the same sample name
@@ -117,8 +114,6 @@ There are five mandatory columns. Columns that specify genomic data paths
   binary fileset. For example, if a binary fileset consists of plink.bed,
   plink.bim, and plink.fam then the prefix would be "plink". Must be
   unique. It's best to use full file paths, not relative file paths.
-- **pfile_path**: Like **bfile_path**, but for a PLINK2 format fileset (pgen /
-  psam / pvar)
 - **chrom**: An integer, range 1-22. If the target genomic data file contains
   multiple chromosomes, leave empty. Don't use a mix of empty and integer
   chromosomes in the same sample.
