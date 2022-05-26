@@ -2,8 +2,6 @@
 // Apply a validated scoring file to the QC'd target genomic data
 //
 
-import java.util.logging.Logger
-
 include { PLINK2_SCORE } from '../../modules/local/plink2_score'
 include { MAKE_REPORT    } from '../../modules/local/make_report'
 
@@ -60,13 +58,16 @@ workflow APPLY_SCORE {
 }
 
 def score_error(boolean fail) {
-    Logger logger = Logger.getLogger("")
-    if (fail) {
-        logger.severe ("No scores calculated!")
-        System.exit(1)
-    } else {
-        logger.info ("Scores ready for calculation")
-    }
+    err = """
+    ERROR: No scores and genomes are available for calculating scores.
+    Matching scores and genomes has failed at the final hurdle, which is odd.
+    This is probably caused by a subtle problem in the samplesheet:
+      - Are you sure you set the correct chromosome for your genomic data?
+      - Have you set a chromosome for a mixed-chromosome file?
+      - Could your split genomic data include multiple chromosomes per file?
+    Good luck!
+    """
+    assert fail == false, err
 }
 
 def annotate_scorefiles(ArrayList scorefiles) {
@@ -91,7 +92,6 @@ def annotate_scorefiles(ArrayList scorefiles) {
             // add number of scores to a new meta map
             // this is needed because scorefiles may contain different number of
             // scores when split by effect type (e.g. 4 additive scores, 1
-
             // dominant, 1 recessive). scorefile looks like:
             //     variant ID | effect allele | weight 1 | ... | weight_n
             //     1 score = 2 tab characters, 4 scores = 5

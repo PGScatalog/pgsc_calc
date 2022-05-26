@@ -1,5 +1,5 @@
 - name: manual_calculation
-  command: nextflow run main.nf -profile test -c ./tests/config/nextflow.config --input https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/custom_synthetic/samplesheet.csv --scorefile https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/custom_synthetic/test.scores
+  command: nextflow run main.nf -c ./tests/config/nextflow.config --input https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/custom_synthetic/samplesheet.csv --scorefile https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/custom_synthetic/test.scores
   tags:
     - manual_calculation
   files:

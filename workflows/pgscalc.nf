@@ -50,13 +50,6 @@ if (params.accession) {
         .set { unique_accessions }
 }
 
-ch_reference = Channel.empty()
-
-if (params.ref) {
-    Channel.fromPath(params.ref, checkIfExists: true)
-        .set { ch_reference } 
-}
-
 def run_input_check     = true
 def run_make_compatible = true
 def run_apply_score     = true
@@ -121,8 +114,7 @@ workflow PGSCALC {
         INPUT_CHECK (
             ch_input,
             params.format,
-            ch_scorefile,
-            ch_reference
+            ch_scorefile
         )
         ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
     }
