@@ -42,6 +42,7 @@ def hg38_to_hg19_coords(hg38_coords):
     return (hg38_coords.join(pd.DataFrame(d, dtype = 'Int64'), how = 'outer')
             .astype({'liftover': bool}))
 
+
 @pytest.fixture
 def hg19_unique_coords():
     ''' A dataframe of coordinates that are deleted in hg38 and won't map '''
@@ -92,25 +93,8 @@ def scoring_file_header():
     os.remove('PGS000777.txt')
 
 @pytest.fixture
-def scoring_file_noOA(scoring_file_noheader):
-    ''' A scoring file (path) with no other allele '''
-    f = pd.read_table(scoring_file_noheader, comment = '#')
-    f.drop(['other_allele'], inplace = True, axis = 1)
-    f.to_csv('no_oa.txt', sep = '\t', index = False)
-    yield 'no_oa.txt'
-    os.remove('no_oa.txt')
-
-@pytest.fixture
-def scoring_file_noEA(scoring_file_noheader):
-    ''' A scoring file (path) with no other allele '''
-    f = pd.read_table(scoring_file_noheader, comment = '#')
-    f.drop(['effect_allele'], inplace = True, axis = 1)
-    f.to_csv('no_ea.txt', sep = '\t', index = False)
-    yield 'no_ea.txt'
-    os.remove('no_ea.txt')
-
-@pytest.fixture
 def out_scorefile():
+    ''' A path to a pickle file (main output) '''
     yield 'out.txt'
     os.remove('out.txt')
 
@@ -246,17 +230,3 @@ def test_multi_effect_weights(multi_score_df, df_cols):
     # ... and dict values are dfs with proper columns
     assert set(d['one'].columns) == df_cols
     assert set(d['two'].columns) == df_cols
-
-def test_missing_alleles(scoring_file_noOA, scoring_file_noEA):
-    """ Test that reading a scorefile without effect alleles or other alleles
-    specified raises an assertion error """
-
-    with pytest.raises(AssertionError) as excinfo:
-        read_scorefile(scoring_file_noOA)
-
-    assert "Missing" in str(excinfo.value)
-
-    with pytest.raises(AssertionError) as excinfo_ea:
-        read_scorefile(scoring_file_noEA)
-
-    assert "Missing" in str(excinfo_ea.value)
