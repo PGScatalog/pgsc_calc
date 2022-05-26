@@ -18,13 +18,13 @@ Introduction
 ------------
 
 ``pgsc_calc`` is a bioinformatics best-practice analysis pipeline for applying
-scoring files from the `Polygenic Score (PGS) Catalog
-<https://www.pgscatalog.org/>`_ to target genotyped samples |:dna:|
-|:partying_face:|
+scoring files from the `Polygenic Score (PGS)
+Catalog <https://www.pgscatalog.org/>`_ to target genotyped samples |:dna:| |:partying_face:|
 
 .. note::
 
-   This project is under very active development and updates are frequent
+   This project is under active development and may break at any time but should
+   be ready soon |:tm:|
 
 Quick start
 -----------
@@ -39,7 +39,7 @@ Quick start
     nextflow run pgscatalog/pgsc_calc -profile test,docker
 
 .. note:: The ``docker`` profile option can be replaced with ``singularity`` or
-          ``conda`` depending on your local environment
+          ``conda``.
 
 .. _`Docker`: https://docs.docker.com/get-docker/
 .. _`Singularity`: https://sylabs.io/
@@ -48,18 +48,14 @@ Quick start
 Workflow summary
 ----------------
 
-- Optionally, fetch scoring files from the PGS Catalog API
-- Convert target genomic data to plink 2 binary fileset format automatically
-- Match variants in the scoring files against variants in the target genome
-- Create a set of new scoring files from the matched variant data
-- Calculate scores for each sample from each scoring file
+- Optionally, fetch a scorefile from the PGS Catalog API
+- Convert target genomic data from VCF to plink format automatically
+- Split target genomic data automatically
+- Relabel variants to a common identifier
+- Match variants in the scoring file against variants in the target genome
+- Calculate scores for each sample
 - Produce a summary report
 
-In the future, the calculator will include:
-
-- Build conversion of scoring files
-- Ancestry estimation
-  
 Credits
 -------
 
