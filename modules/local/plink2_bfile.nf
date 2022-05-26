@@ -1,4 +1,4 @@
-process PLINK2_RELABELBIM {
+process PLINK2_BFILE {
     tag "$meta.id"
     label 'process_low'
 
@@ -8,36 +8,27 @@ process PLINK2_RELABELBIM {
         'quay.io/biocontainers/plink2:2.00a2.3--h712d239_1' }"
 
     input:
-    // input is sorted alphabetically -> bed, bim, fam or pgen, psam, pvar
-    tuple val(meta), path(geno), path(variants), path(pheno)
+    tuple val(meta), path(bed), path(bim), path(fam)
 
     output:
-    tuple val(meta), path("*.bed"), emit: geno
-    tuple val(meta), path("*.bim"), emit: variants
-    tuple val(meta), path("*.fam"), emit: pheno
-    path "versions.yml"           , emit: versions
-
-    when:
-    // only execute when bfile because output format is different (bim vs pvar)
-    meta.is_bfile
+    tuple val(meta), path("*.pgen"), emit: pgen
+    tuple val(meta), path("*.psam"), emit: psam
+    tuple val(meta), path("*.pvar"), emit: pvar
+    path "versions.yml"            , emit: versions
 
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.suffix ? "${meta.id}${task.ext.suffix}" : "${meta.id}"
     def mem_mb = task.memory.toMega() // plink is greedy
-
     """
     plink2 \\
         --threads $task.cpus \\
         --memory $mem_mb \\
         $args \\
         --set-all-var-ids '@:#:\$r:\$a' \\
-        --bfile ${geno.baseName} \\
-        --make-just-bim \\
+        --bfile ${bed.baseName} \\
+        --make-pgen \\
         --out ${prefix}_${meta.chrom}
-
-    cp -P $geno ${prefix}_${meta.chrom}.bed
-    cp -P $pheno ${prefix}_${meta.chrom}.fam
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

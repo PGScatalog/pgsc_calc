@@ -1,51 +1,39 @@
-include { PLINK2_VCF         } from '../../modules/local/plink2_vcf'
-include { PLINK2_RELABELBIM  } from '../../modules/local/plink2_relabelbim'
-include { PLINK2_RELABELPVAR } from '../../modules/local/plink2_relabelpvar'
-include { MATCH_VARIANTS     } from '../../modules/local/match_variants'
+//
+// Make the scoring file compatible with the target genomic data by:
+//     - Using a consistent variant labelling format (chr:pos) (PLINK2_RELABEL)
+//     - Match variants across scorefile and target data, flipping if necessary
+//
+
+include { PLINK2_VCF     } from '../../modules/local/plink2_vcf'
+include { PLINK2_BFILE   } from '../../modules/local/plink2_bfile'
+include { MATCH_VARIANTS } from '../../modules/local/match_variants'
 
 workflow MAKE_COMPATIBLE {
     take:
-    geno
-    pheno
-    variants
+    bed
+    bim
+    fam
     vcf
     scorefile
 
     main:
     ch_versions = Channel.empty()
 
-    // Relabel input variant information to a common standard ------------------
-    geno
-        .mix(pheno, variants)
-        .groupTuple(size: 3, sort: true)
-        .map { it.flatten() }
-        .set { fileset }
-
-    PLINK2_RELABELBIM( fileset )
-    ch_versions = ch_versions.mix(PLINK2_RELABELBIM.out.versions.first())
-
-    PLINK2_RELABELPVAR( fileset )
-    ch_versions = ch_versions.mix(PLINK2_RELABELPVAR.out.versions.first())
-
-    // Recode VCF files to common standard -------------------------------------
     PLINK2_VCF(vcf)
     ch_versions = ch_versions.mix(PLINK2_VCF.out.versions.first())
 
-    // Combine standardised data into genotype, phenotype, and variant channels
-    PLINK2_RELABELBIM.out.geno
-        .mix(PLINK2_RELABELPVAR.out.geno, PLINK2_VCF.out.pgen)
-        .dump(tag: 'make_compatible')
-        .set{ geno_std }
+    bed
+        .mix(bim, fam)
+        .groupTuple(size: 3, sort: true)
+        .map { it.flatten() }
+        .set { pfiles }
 
-    PLINK2_RELABELBIM.out.pheno
-        .mix(PLINK2_RELABELPVAR.out.pheno, PLINK2_VCF.out.psam)
-        .dump(tag: 'make_compatible')
-        .set{ pheno_std }
+    PLINK2_BFILE( pfiles )
+    ch_versions = ch_versions.mix(PLINK2_BFILE.out.versions.first())
 
-    PLINK2_RELABELBIM.out.variants
-        .mix(PLINK2_RELABELPVAR.out.variants, PLINK2_VCF.out.pvar)
-        .dump(tag: 'make_compatible')
-        .set{ variants_std }
+    pgen = PLINK2_BFILE.out.pgen.mix(PLINK2_VCF.out.pgen)
+    psam = PLINK2_BFILE.out.psam.mix(PLINK2_VCF.out.psam)
+    pvar = PLINK2_BFILE.out.pvar.mix(PLINK2_VCF.out.pvar)
 
     // Recombine split variant information files to match target variants ------
 
@@ -55,7 +43,7 @@ workflow MAKE_COMPATIBLE {
     // if a size is not provided then nextflow must wait for the entire process
     // to finish before releasing the grouped tuples, which can be very slow(!)
 
-    variants_std.map { tuple(groupKey(it[0].subMap(['id', 'is_vcf']), it[0].n_chrom),
+    pvar.map { tuple(groupKey(it[0].subMap(['id', 'is_vcf']), it[0].n_chrom),
                      it[0].chrom, it[1]) }
         .groupTuple()
         .combine( scorefile )
@@ -69,10 +57,10 @@ workflow MAKE_COMPATIBLE {
     ch_versions = ch_versions.mix(MATCH_VARIANTS.out.versions)
 
     emit:
-    geno       = geno_std
-    pheno      = pheno_std
-    variants   = variants_std
-    scorefiles = MATCH_VARIANTS.out.scorefile
-    db         = MATCH_VARIANTS.out.db
-    versions   = ch_versions
+    pgen
+    psam
+    pvar
+    scorefile = MATCH_VARIANTS.out.scorefile
+    db = MATCH_VARIANTS.out.db
+    versions = ch_versions
 }

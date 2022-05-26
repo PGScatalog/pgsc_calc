@@ -44,6 +44,9 @@ if (params.accession) {
         .set { unique_accessions }
 }
 
+// Don't check existence of optional parameters
+allelic_freq = file(params.allelic_freq)
+
 def run_input_check     = true
 def run_make_compatible = true
 def run_apply_score     = true
@@ -119,9 +122,9 @@ workflow PGSCALC {
 
     if (run_make_compatible) {
         MAKE_COMPATIBLE (
-            INPUT_CHECK.out.geno,
-            INPUT_CHECK.out.pheno,
-            INPUT_CHECK.out.variants,
+            INPUT_CHECK.out.bed,
+            INPUT_CHECK.out.bim,
+            INPUT_CHECK.out.fam,
             INPUT_CHECK.out.vcf,
             INPUT_CHECK.out.scorefiles
         )
@@ -134,10 +137,11 @@ workflow PGSCALC {
 
     if (run_apply_score) {
         APPLY_SCORE (
-            MAKE_COMPATIBLE.out.geno,
-            MAKE_COMPATIBLE.out.pheno,
-            MAKE_COMPATIBLE.out.variants,
-            MAKE_COMPATIBLE.out.scorefiles,
+            MAKE_COMPATIBLE.out.pgen,
+            MAKE_COMPATIBLE.out.psam,
+            MAKE_COMPATIBLE.out.pvar,
+            MAKE_COMPATIBLE.out.scorefile,
+            allelic_freq,
             MAKE_COMPATIBLE.out.db
         )
         ch_versions = ch_versions.mix(APPLY_SCORE.out.versions)
