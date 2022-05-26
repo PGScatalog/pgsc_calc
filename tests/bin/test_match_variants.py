@@ -87,38 +87,28 @@ def test_bad_match(bad_score, target_df):
 def test_unduplicate(matches, match_dup):
     ''' Test that duplicate IDs + diff effect allele are split appropriately '''
 
-    # only tests ID with 2 different effect alleles (not multiallelic)
-
     # test with positive case --------------------------------------------------
     d2 = unduplicate_variants(match_dup)
 
-    assert isinstance(d2, list)
-
+    assert isinstance(d2, dict)
     # no variants should go missing
-    n_vars = 0
-    for df in d2:
-        n_vars += df.shape[0]
-    assert n_vars == match_dup.shape[0]
+    assert d2['first'].shape[0] + d2['dup'].shape[0] == match_dup.shape[0]
 
     # make sure splitting happened
-    assert d2[0].shape[0] == 1
-    assert d2[-1].shape[0] == 1
+    assert d2['first'].shape[0] == 1
+    assert d2['dup'].shape[0] == 1
 
     # make sure alleles are consistent after splitting
-    assert d2[0]['effect_allele'] == pl.Series('effect_allele', ['G'])
-    assert d2[-1]['effect_allele'] == matches['effect_allele']
+    assert d2['first']['effect_allele'] == pl.Series('effect_allele', ['G'])
+    assert d2['dup']['effect_allele'] == matches['effect_allele']
 
     # test with negative case --------------------------------------------------
     d = unduplicate_variants(matches)
 
-    assert isinstance(d, list)
+    assert isinstance(d, dict)
+    assert d['first'].shape[0] + d['dup'].shape[0] == matches.shape[0]
 
-    n_vars = 0
-    for df in d:
-        n_vars += df.shape[0]
+    assert d['first'].shape[0] == matches.shape[0]
+    assert d['dup'].shape[0] == 0
 
-    assert n_vars == matches.shape[0]
-
-    assert d[0].shape[0] == matches.shape[0]
-
-    assert d[0]['effect_allele'] == matches['effect_allele']
+    assert d['first']['effect_allele'] == matches['effect_allele']
