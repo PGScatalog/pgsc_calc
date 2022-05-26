@@ -1,5 +1,5 @@
 process PLINK2_RELABELPVAR {
-    tag "$meta.id chromosome $meta.chrom"
+    tag "$meta.id"
     label 'process_low'
     label "${ params.copy_genomes ? 'copy_genomes' : '' }"
 
