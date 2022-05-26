@@ -1,51 +1,51 @@
 #!/usr/bin/env python3
 
+import numpy as np
 import pandas as pd
 import argparse
 import os.path
 import sys
-from typing import Dict, List, Tuple, Optional, TextIO
+import pickle
 import re
 import gzip
 import io
 import sqlite3
 from functools import reduce
-import pyliftover
+from pyliftover import LiftOver
 
-
-def parse_args(args=None) -> argparse.Namespace:
-    parser: argparse.ArgumentParser = argparse.ArgumentParser(description='Read and format scoring files')
-    parser.add_argument('-s', '--scorefiles', dest='scorefiles', nargs='+',
+def parse_args(args=None):
+    parser = argparse.ArgumentParser(description='Read and format scoring files')
+    parser.add_argument('-s','--scorefiles', dest = 'scorefiles', nargs='+',
                         help='<Required> Scorefile path (wildcard * is OK)', required=True)
     parser.add_argument('--liftover', dest='liftover',
                         help='<Optional> Convert scoring file variants to target genome build?', action='store_true')
-    parser.add_argument('-t', '--target_build', dest='target_build', help='Build of target genome <GRCh37 / GRCh38>',
+    parser.add_argument('-t', '--target_build', dest = 'target_build', help='Build of target genome <GRCh37 / GRCh38>',
                         required='--liftover' in sys.argv)
-    parser.add_argument('-m', '--min_lift', dest='min_lift',
-                        help='<Optional> If liftover, minimum proportion of variants lifted over',
-                        default=0.95, type=float)
-    parser.add_argument('-o', '--outfile', dest='outfile', required=True,
-                        default='scorefiles.pkl',
-                        help='<Required> Output path to pickled list of scorefiles, e.g. scorefiles.pkl')
+    parser.add_argument('-m', '--min_lift', dest = 'min_lift', help='<Optional> If liftover, minimum proportion of variants lifted over',
+                        default = 0.95, type = float)
+    parser.add_argument('-o', '--outfile', dest = 'outfile', required = True,
+                        default = 'scorefiles.pkl',
+                        help = '<Required> Output path to pickled list of scorefiles, e.g. scorefiles.pkl')
     return parser.parse_args(args)
 
-
-def to_int(i: str) -> Optional[int]:
-    """ Convert non-numeric chromosomes or positions to NaN """
+def to_int(i):
+    ''' Convert non-numeric chromosomes or positions to NaN '''
     try:
         return int(i)
     except ValueError:
         return None
 
+def set_effect_type(x, path):
+    ''' Do error checking and extract effect type from single effect weight scorefile '''
+    mandatory_columns = ["chr_name", "chr_position", "effect_allele", "other_allele", "effect_weight"]
+    col_error = "ERROR: Missing mandatory columns"
 
-def set_effect_type(x: pd.DataFrame, path: str) -> pd.DataFrame:
-    """ Do error checking and extract effect type from single effect weight scorefile """
-    mandatory_columns: List[str] = ["chr_name", "chr_position", "effect_allele", "other_allele", "effect_weight"]
-    col_error: str = "ERROR: Missing mandatory columns"
-
-    if not {'is_recessive', 'is_dominant'}.issubset(x.columns):
+    if not { 'is_recessive', 'is_dominant' }.issubset(x.columns):
         assert set(mandatory_columns).issubset(x.columns), col_error
-        scorefile: pd.DataFrame = (x[mandatory_columns].assign(effect_type='additive'))  # default effect type
+        scorefile = (
+            x[mandatory_columns]
+            .assign(effect_type = 'additive') # default effect type
+        )
     else:
         mandatory_columns.extend(["is_recessive", "is_dominant"])
         assert set(mandatory_columns).issubset(x.columns), col_error
@@ -55,104 +55,97 @@ def set_effect_type(x: pd.DataFrame, path: str) -> pd.DataFrame:
         These columns are mutually exclusive (both can't be true)
         Both can be FALSE for additive variant scores
         '''
-        assert not x[['is_dominant', 'is_recessive']].all(axis=1).any(), truth_error.format(path)
+        assert not x[['is_dominant', 'is_recessive']].all(axis = 1).any(), truth_error.format(path)
 
-        scorefile: pd.DataFrame = (
+        scorefile = (
             x[mandatory_columns]
-            .assign(additive=lambda x: (x["is_recessive"] == False) & (x["is_dominant"] == False))
-            .assign(effect_type=lambda df: df[["is_recessive", "is_dominant", "additive"]].idxmax(1))
-            .drop(["is_recessive", "is_dominant", "additive"], axis=1)
+            .assign(additive = lambda x: (x["is_recessive"] == False) & (x["is_dominant"] == False))
+            .assign(effect_type = lambda df: df[["is_recessive", "is_dominant", "additive"]].idxmax(1))
+            .drop(["is_recessive", "is_dominant", "additive"], axis = 1)
         )
     return scorefile
 
+def quality_control(accession, df):
+    ''' Do basic error checking and quality control on scorefile variants '''
 
-def quality_control(accession: str, df: pd.DataFrame) -> pd.DataFrame:
-    """ Do basic error checking and quality control on scorefile variants """
-
-    qc: pd.DataFrame = (
+    qc = (
         df.query('effect_allele != "P" | effect_allele != "N"')
-            .dropna(subset=['chr_name', 'chr_position', 'effect_weight'])
+        .dropna(subset = ['chr_name', 'chr_position', 'effect_weight'])
     )
 
-    unique_err: str = ''' ERROR: Bad scorefile "{}"
+    unique_err = ''' ERROR: Bad scorefile "{}"
     Duplicate variant identifiers in scorefile (chr:pos:effect:other)
     Please use only unique variants and try again!
     '''
 
-    unique_df: pd.Series = qc.groupby(['chr_name', 'chr_position', 'effect_allele', 'other_allele']).size() == 1
+    unique_df = qc.groupby(['chr_name', 'chr_position', 'effect_allele', 'other_allele']).size() == 1
     assert unique_df.all(), unique_err.format(accession)
 
     return qc
 
-
-def score_summary(raw: Dict[str, pd.DataFrame], qc: Dict[str, pd.DataFrame]) -> pd.DataFrame:
-    """ Concatenate and label raw input scores if they pass / fail QC """
-    idx: List[str] = ['chr_name', 'chr_position', 'effect_allele', 'other_allele', 'effect_weight',
-                             'effect_type', 'accession']
-    raw_scores: pd.DataFrame = pd.concat([v.assign(accession=k) for k, v in raw.items()])
-    qc_scores: pd.DataFrame = pd.concat([v.assign(accession=k) for k, v in qc.items()])
+def score_summary(raw, qc):
+    ''' Concatenate and label raw input scores if they pass / fail QC '''
+    idx = ['chr_name', 'chr_position', 'effect_allele', 'other_allele', 'effect_weight', 'effect_type', 'accession']
+    raw_scores = pd.concat([v.assign(accession = k) for k, v in raw.items()])
+    qc_scores = pd.concat([v.assign(accession = k) for k, v in qc.items()])
     # outer join to find raw scores missing from QC and then label with fail
     return (qc_scores
-            .assign(qc=True)
-            .join(raw_scores.set_index(idx), on=idx, how='outer')
-            .fillna(value={'qc': False}))
+        .assign(qc = True)
+        .join(raw_scores.set_index(idx), on = idx, how = 'outer')
+        .fillna(value = {'qc': False}))
 
+def read_scorefile(path):
+    ''' Read essential information from a scorefile '''
 
-def read_scorefile(path: str) -> Tuple[Dict[str, pd.DataFrame], pd.DataFrame]:
-    """ Read essential information from a scorefile """
+    x = pd.read_table(path, converters = { "chr_name": to_int, "chr_pos": to_int
+                                           }, comment = "#")
 
-    df: pd.DataFrame = pd.read_table(path, converters={"chr_name": to_int, "chr_pos": to_int}, comment="#")
-
-    assert len(df.columns) > 1, "ERROR: scorefile not formatted correctly"
-    assert {'chr_name', 'chr_position'}.issubset(df.columns), \
-        "ERROR: Need chr_position and chr_name (rsids not supported yet!)"
-    assert {'effect_allele', 'other_allele'}.issubset(df.columns), "ERROR: Missing effect / other allele columns"
+    assert len(x.columns) > 1, "ERROR: scorefile not formatted correctly"
+    assert { 'chr_name', 'chr_position' }.issubset(x.columns), "ERROR: Need chr_position and chr_name (rsids not supported yet!)"
+    assert { 'effect_allele', 'other_allele' }.issubset(x.columns), "ERROR: Missing effect / other allele columns"
 
     # nullable int is always important
-    df[["chr_name", "chr_position"]] = df[["chr_name", "chr_position"]].astype(pd.Int64Dtype())
+    x[["chr_name", "chr_position"]] = x[["chr_name", "chr_position"]].astype(pd.Int64Dtype())
 
     # check for a single effect weight column called 'effect_weight'
-    columns: List[Optional[re.match]] = [re.search("^effect_weight$", x) for x in df.columns.to_list()]
-    columns_suffix: List[Optional[re.match]] = [re.search("^effect_weight_[A-Za-z0-9]+$", x) for x
-                                                              in df.columns.to_list()]
+    columns = [re.search("^effect_weight$", x) for x in x.columns.to_list()]
+    columns_suffix = [re.search("^effect_weight_[A-Za-z0-9]+$", x) for x in x.columns.to_list()]
 
     if any(col is not None for col in columns):
         # scorefiles with a single effect weight column might have effect types
-        accession: str = get_accession(path)
-        scorefile: Dict[str, pd.DataFrame] = {accession: set_effect_type(df, path)}
+        accession = get_accession(path)
+        scorefile = { accession: set_effect_type(x, path) }
     elif any(col is not None for col in columns_suffix):
         # otherwise effect weights have a suffix e.g. effect_weight_PGS0001
         # need to process these differently
-        scorefile: Dict[str, pd.DataFrame] = multi_ew(df)
+        scorefile = multi_ew(x)
     else:
         assert 0, "ERROR: Missing valid effect weight columns"
 
-    qc_scorefile: Dict[str, pd.DataFrame] = {k: quality_control(k, v) for k, v in scorefile.items()}
+    qc_scorefile = { k: quality_control(k, v) for k, v in scorefile.items() }
 
     return qc_scorefile, score_summary(scorefile, qc_scorefile)
 
-
-def multi_ew(x: pd.DataFrame) -> Dict[str, pd.DataFrame]:
-    """ Split a scorefile with multiple effect weights into a dict of dfs """
+def multi_ew(x):
+    ''' Split a scorefile with multiple effect weights into a dict of dfs '''
 
     # different mandatory columns for multi score (effect weight has a suffix)
-    mandatory_columns: List[str] = ["chr_name", "chr_position", "effect_allele", "other_allele"]
-    col_error: str = "ERROR: Missing mandatory columns"
+    mandatory_columns = ["chr_name", "chr_position", "effect_allele", "other_allele"]
+    col_error = "ERROR: Missing mandatory columns"
     assert set(mandatory_columns).issubset(x.columns), col_error
 
-    ew_cols: List[str] = x.filter(regex="effect_weight_*").columns.to_list()
-    accessions: List[str] = [x.split('_')[-1] for x in ew_cols]
-    split_scores: List[pd.DataFrame] = [
-        (x.filter(items=mandatory_columns + [ew])
-         .rename(columns={ew: 'effect_weight'})
-         .assign(effect_type='additive')
+    ew_cols = x.filter(regex=("effect_weight_*")).columns.to_list()
+    accessions = [x.split('_')[-1] for x in ew_cols]
+    split_scores = [
+        (x.filter(items = mandatory_columns + [ew])
+         .rename(columns = { ew: 'effect_weight' })
+         .assign(effect_type = 'additive')
          )
         for ew in ew_cols]
 
     return dict(zip(accessions, split_scores))
 
-
-def parse_lifted_chrom(i: str) -> Optional[int]:
+def parse_lifted_chrom(i):
     """ Convert lifted chromosomes to tidy integers
 
     liftover needs chr suffix for chromosome input (1 -> chr1), and it also
@@ -166,73 +159,64 @@ def parse_lifted_chrom(i: str) -> Optional[int]:
         except ValueError:
             return None
 
-
-def convert_coordinates(df: pd.DataFrame, lo: pyliftover.LiftOver) -> pd.Series:
-    """ Convert genomic coordinates to different build """
-    chrom: str = 'chr' + str(df['chr_name'])
-    pos: int = int(df['chr_position']) - 1  # liftOver is 0 indexed, VCF is 1 indexed
-    # converted example: [('chr22', 15460378, '+', 3320966530)] or None
-    converted: Optional[List[Tuple[str, int, str, int]]] = lo.convert_coordinate(chrom, pos)
+def convert_coordinates(df, lo):
+    ''' Convert genomic coordinates to different build '''
+    chrom = 'chr' + str(df['chr_name'])
+    pos = int(df['chr_position']) - 1 # liftOver is 0 indexed, VCF is 1 indexed
+    converted = lo.convert_coordinate(chrom, pos)
 
     if converted:
-        lifted_chrom: Optional[int] = parse_lifted_chrom(converted[0][0][3:])  # return first matching liftover
-        lifted_pos: int = int(converted[0][1]) + 1  # reverse 0 indexing
-        return pd.Series([lifted_chrom, lifted_pos], dtype='Int64')
+        # return first matching liftover
+        lifted_chrom = parse_lifted_chrom(converted[0][0][3:])
+        lifted_pos = int(converted[0][1]) + 1 # reverse 0 indexing
+        return pd.Series([lifted_chrom, lifted_pos], dtype = 'Int64')
     else:
-        return pd.Series([None, None], dtype='Int64')
+        return pd.Series([None, None], dtype = 'Int64')
 
+def liftover(accession, df, from_build, to_build, min_lift):
+    ''' Update scorefile dataframe with lifted coordinates '''
+    build_dict = {'GRCh37':'hg19', 'GRCh38':'hg38', 'hg19': 'hg19', 'hg18':'hg18'}
 
-def liftover(accession: str,
-             df: pd.DataFrame,
-             from_build: str,
-             to_build: str,
-             min_lift: float) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """ Update scorefile pd.DataFrame with lifted coordinates """
-    build_dict: dict = {'GRCh37': 'hg19', 'GRCh38': 'hg38', 'hg19': 'hg19', 'hg18': 'hg18'}
-
-    if build_dict[from_build] == build_dict[to_build]:
+    if (build_dict[from_build] == build_dict[to_build]):
         df[['lifted_chr', 'lifted_pos']] = df[['chr_name', 'chr_position']]
-        mapped: pd.DataFrame = df.assign(liftover=None)
-        unmapped: pd.DataFrame = df.assign(liftover=None)[0:0]  # just keep col structure
+        mapped = df.assign(liftover = None)
+        unmapped = df.assign(liftover = None)[0:0] # just keep col structure
 
         return mapped, unmapped
     else:
         # chain paths in working directory, staged by nextflow module:
         # hg19ToHg38.over.chain.gz
         # hg38ToHg19.over.chain.gz
-        chain_path: str = "{}To{}.over.chain.gz".format(build_dict[from_build], build_dict[to_build].capitalize())
-        lo: pyliftover.LiftOver = pyliftover.LiftOver(chain_path)
-        df[['lifted_chr', 'lifted_pos']] = df.apply(lambda x: convert_coordinates(x, lo), axis=1)
-        mapped: pd.DataFrame = df[~df.isnull().any(axis=1)].assign(liftover=True)
-        unmapped: pd.DataFrame = df[df.isnull().any(axis=1)].assign(liftover=False)
+        chain_path = "{}To{}.over.chain.gz".format(build_dict[from_build], build_dict[to_build].capitalize())
+        lo = LiftOver(chain_path)
+        df[['lifted_chr', 'lifted_pos']] = df.apply(lambda x: convert_coordinates(x, lo), axis = 1)
+        mapped = df[~df.isnull().any(axis = 1)].assign(liftover = True)
+        unmapped = df[df.isnull().any(axis = 1)].assign(liftover = False)
         check_liftover({'mapped': mapped, 'unmapped': unmapped}, accession, min_lift)
 
         return mapped, unmapped
 
+def check_liftover(df_dict, accession, min_lift):
+    ''' Write liftover statistics to a database '''
+    n_mapped = df_dict['mapped'].shape[0]
+    n_unmapped = df_dict['unmapped'].shape[0]
+    total = n_mapped + n_unmapped
 
-def check_liftover(df_dict: Dict[str, pd.DataFrame], accession: str, min_lift: float) -> None:
-    """ Write liftover statistics to a database """
-    n_mapped: int = df_dict['mapped'].shape[0]
-    n_unmapped: int = df_dict['unmapped'].shape[0]
-    total: int = n_mapped + n_unmapped
-
-    err: str = "ERROR: Liftover failed for {}, see --min-lift parameter".format(accession)
+    err = "ERROR: Liftover failed for {}, see --min-lift parameter".format(accession)
     assert n_mapped / total > min_lift, err
 
-
-def read_build(path: str) -> Optional[str]:
-    """ Open scorefiles and automatically handle compressed input """
+def read_build(path):
+    ''' Open scorefiles and automatically handle compressed input '''
     try:
-        with io.TextIOWrapper(gzip.open(path, 'r')) as f:
+        with io.TextIOWrapper(io.BufferedReader(gzip.open(path, 'r'))) as f:
             return read_header(f)
     except gzip.BadGzipFile:
         with open(path, 'r') as f:
             return read_header(f)
 
-
-def read_header(f: TextIO) -> Optional[str]:
-    """ Extract genome build of scorefile from PGS Catalog header format """
-    build_dict = {'GRCh37': 'hg19', 'GRCh38': 'hg38', 'hg19': 'hg19', 'hg38': 'hg38'}
+def read_header(f):
+    ''' Extract genome build of scorefile from PGS Catalog header format '''
+    build_dict = {'GRCh37':'hg19', 'GRCh38':'hg38', 'hg19':'hg19', 'hg38':'hg38'}
     for line in f:
         if re.search("^#genome_build", line):
             # get #genome_build=GRCh37 from header
@@ -241,20 +225,18 @@ def read_header(f: TextIO) -> Optional[str]:
             try:
                 return build_dict[header[-1]]
             except KeyError:
-                return None  # bad genome build
-        elif line[0] != '#':
+                return None # bad genome build
+        elif (line[0] != '#'):
             # genome build isn't set in header :( stop the loop and cry
             return None
 
-
-def get_accession(path: str) -> str:
-    """ Return the basename of a scoring file without extension """
+def get_accession(path):
+    ''' Return the basename of a scoring file without extension '''
     return os.path.basename(path).split('.')[0]
 
-
-def check_build(accession: str, build: Optional[str]) -> None:
-    """ Verify a valid build was specified in the scoring file header """
-    build_err: str = ''' ERROR: Build not specified in scoring file header
+def check_build(accession, build):
+    ''' Verify a valid build was specified in the scoring file header '''
+    build_err = ''' ERROR: Build not specified in scoring file header
     Please check file: {}
     Valid header examples:
     #genome_build=GRCh37
@@ -262,18 +244,14 @@ def check_build(accession: str, build: Optional[str]) -> None:
 
     assert build is not None, build_err
 
+def write_scorefile(x, outfile):
+    ''' Serialise an object to file '''
+    dfs = []
+    [ dfs.append(v.assign(accession = k)) for k, v in x.items() ]
+    pd.concat(dfs).to_csv(outfile, index = False, sep = '\t')
 
-def write_scorefile(x: Dict[str, pd.DataFrame], outfile: str) -> None:
-    """ Serialise an object to file """
-    dfs: List[pd.DataFrame] = []
-    [dfs.append(v.assign(accession=k)) for k, v in x.items()]
-    pd.concat(dfs).to_csv(outfile, index=False, sep='\t')
-
-
-def liftover_summary(lifted_dict: Dict[str, pd.DataFrame],
-                     unlifted_dict: Dict[str, pd.DataFrame],
-                     scorefile_summaries: List[pd.DataFrame]) -> pd.DataFrame:
-    """ Flatten pd.DataFrames collections and add liftover status (_chr, _pos).
+def liftover_summary(lifted_dict, unlifted_dict, scorefile_summaries):
+    """ Flatten dataframes collections and add liftover status (_chr, _pos).
 
         Schema:
 
@@ -290,25 +268,22 @@ def liftover_summary(lifted_dict: Dict[str, pd.DataFrame],
             liftover            bool
     """
 
-    summary: pd.DataFrame = pd.concat(scorefile_summaries)
-    lifted: pd.DataFrame = pd.concat([v.assign(accession=k) for k, v in lifted_dict.items()])
-    unlifted: pd.DataFrame = pd.concat([v.assign(accession=k) for k, v in unlifted_dict.items()])
-    all_liftover: pd.DataFrame = pd.concat([lifted, unlifted])
+    summary = pd.concat(scorefile_summaries)
+    lifted = pd.concat([v.assign(accession = k) for k, v in lifted_dict.items()])
+    unlifted = pd.concat([v.assign(accession = k) for k, v in unlifted_dict.items()])
+    liftover = pd.concat([lifted, unlifted])
 
-    idx: List[str] = ['accession', 'chr_name', 'chr_position', 'effect_allele', 'other_allele', 'effect_weight',
-                             'effect_type']
-    return summary.merge(all_liftover, on=idx)
+    idx = ['accession', 'chr_name', 'chr_position', 'effect_allele', 'other_allele', 'effect_weight', 'effect_type']
+    return (summary.merge(liftover, on = idx))
 
-
-def format_lifted(lifted: pd.DataFrame) -> pd.DataFrame:
-    """ Replace original positions with lifted data for matching variants """
-    formatted: pd.DataFrame = (lifted
-                               .drop(['chr_position', 'chr_name', 'liftover'], axis=1)
-                               .rename(columns={'lifted_chr': 'chr_name', 'lifted_pos': 'chr_position'}))
+def format_lifted(lifted):
+    ''' Replace original positions with lifted data for matching variants '''
+    formatted = (lifted
+        .drop(['chr_position', 'chr_name', 'liftover'], axis = 1)
+        .rename(columns = {'lifted_chr': 'chr_name', 'lifted_pos': 'chr_position'}))
     return formatted[['chr_name', 'chr_position', 'effect_allele', 'other_allele', 'effect_weight', 'effect_type']]
 
-
-def write_log(df: pd.DataFrame, conn: sqlite3.Connection) -> None:
+def write_log(df, conn):
     """ Write log to DB. All columns mandatory even if liftover not used:
 
     CREATE TABLE IF NOT EXISTS "scorefile" (
@@ -327,48 +302,41 @@ def write_log(df: pd.DataFrame, conn: sqlite3.Connection) -> None:
 
     qc and liftover are boolean to note if they pass / fail, and must be nullable
     """
-    assert set(df.columns) == {'chr_name', 'chr_position', 'effect_allele',
-                               'other_allele', 'effect_weight', 'effect_type',
-                               'accession', 'qc', 'lifted_chr', 'lifted_pos',
+    assert set(df.columns) == {'chr_name', 'chr_position', 'effect_allele', \
+                               'other_allele', 'effect_weight', 'effect_type', \
+                               'accession', 'qc', 'lifted_chr', 'lifted_pos', \
                                'liftover'}
-    nullable_ints: List[str] = ['liftover', 'qc', 'lifted_chr', 'lifted_pos']
+    nullable_ints = ['liftover', 'qc', 'lifted_chr', 'lifted_pos']
     df[nullable_ints] = df[nullable_ints].astype('Int64')
-    df.to_sql('scorefile', conn, index=False)
+    df.to_sql('scorefile', conn, index = False)
 
+def main(args = None):
+    conn = sqlite3.connect('read_scorefile.db')
 
-def main(args=None):
-    conn: sqlite3.connect = sqlite3.connect('read_scorefile.db')
-
-    args: argparse.Namespace = parse_args(args)
-    accessions: List[str] = [get_accession(x) for x in args.scorefiles]
-
-    scorefiles: List[Dict[str, pd.DataFrame]]
-    scorefile_summaries: List[pd.DataFrame]
+    args = parse_args(args)
+    accessions = [get_accession(x) for x in args.scorefiles]
     scorefiles, scorefile_summaries = map(list, zip(*[read_scorefile(x) for x in args.scorefiles]))
 
     if args.liftover:
-        builds: List[str] = [read_build(x) for x in args.scorefiles]
+        builds = [read_build(x) for x in args.scorefiles]
         [check_build(x, y) for x, y in zip(accessions, builds)]
-        lifted_dict: dict = {}
-        unlifted_dict: dict = {}
+        lifted_dict = {}
+        unlifted_dict = {}
         for score_dict, score_build, accession in zip(scorefiles, builds, accessions):
-            scorefile: pd.DataFrame = score_dict[accession]
-            lifted: pd.DataFrame
-            unlifted: pd.DataFrame
+            scorefile = score_dict.get(accession)
             lifted, unlifted = liftover(accession, scorefile, score_build, args.target_build, args.min_lift)
 
             lifted_dict[accession] = lifted
             unlifted_dict[accession] = unlifted
 
-        log: pd.DataFrame = liftover_summary(lifted_dict, unlifted_dict, scorefile_summaries)
-        write_scorefile({k: format_lifted(v) for k, v in lifted_dict.items()}, args.outfile)
+        log = liftover_summary(lifted_dict, unlifted_dict, scorefile_summaries)
+        write_scorefile({k: format_lifted(v) for k,v in lifted_dict.items()}, args.outfile)
     else:
-        log: pd.DataFrame = (pd.concat(scorefile_summaries)
-               .assign(liftover=None, lifted_chr=None, lifted_pos=None))
-        write_scorefile(reduce(lambda x, y: {**x, **y}, scorefiles), args.outfile)
+        log = (pd.concat(scorefile_summaries)
+            .assign(liftover = None, lifted_chr = None, lifted_pos = None))
+        write_scorefile(reduce(lambda x, y: { **x, **y }, scorefiles), args.outfile)
 
     write_log(log, conn)
-
 
 if __name__ == "__main__":
     sys.exit(main())
