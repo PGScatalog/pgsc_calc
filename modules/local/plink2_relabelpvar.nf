@@ -1,7 +1,6 @@
 process PLINK2_RELABELPVAR {
     tag "$meta.id"
     label 'process_low'
-    label "${ params.copy_genomes ? 'copy_genomes' : '' }"
 
     conda (params.enable_conda ? "bioconda::plink2=2.00a2.3" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
