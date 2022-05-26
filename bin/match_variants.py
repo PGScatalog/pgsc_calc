@@ -132,14 +132,7 @@ def unduplicate_variants(df):
     Returns:
         A dict of data frames (keys 'first' and 'dup')
     """
-    df = df.with_row_count()
-    first = df.unique(subset = "ID", keep = "first")
-    dup = df.unique(subset = "ID", keep = "last")
-    # if there are no duplicates then dup will still contain the first instance
-    # drop row numbers that occur in both dup and first
-    dup_unique = dup[~(first["row_nr"] == dup["row_nr"])]
-
-    return {'first': first, 'dup': dup_unique }
+    return {'first': df[~df["ID"].is_duplicated()], 'dup': df[df["ID"].is_duplicated()]}
 
 def format_scorefile(df, split):
     """ Format a dataframe to plink2 --score standard
