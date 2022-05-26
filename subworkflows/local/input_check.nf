@@ -38,7 +38,7 @@ workflow INPUT_CHECK {
     PLINK_VCF (
         ch_input.vcf
     )
-    ch_versions = ch_versions.mix(PLINK_VCF.out.versions)
+    ch_versions = ch_versions.mix(PLINK_VCF.out.versions.first())
 
     // branch is like a switch statement, so only one bed / bim was being
     // returned
@@ -49,7 +49,6 @@ workflow INPUT_CHECK {
     }
         .set { ch_bfiles }
 
-    // check scorefiles
     SCOREFILE_CHECK ( scorefile )
     ch_versions = ch_versions.mix(SCOREFILE_CHECK.out.versions.first())
 
