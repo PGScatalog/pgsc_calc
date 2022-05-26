@@ -96,7 +96,6 @@ jobs:
         run: |
           python -m ensurepip --upgrade
           pip install pandas pyliftover pytest-workflow requests polars
-          sudo apt install plink2
 
       - name: Set up Singularity
         if: matrix.profile == 'singularity'
