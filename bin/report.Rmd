@@ -1,5 +1,5 @@
 ---
-title: "Calculator summary report"
+title: "PGS Catalog calculator summary report"
 output: html_document
 date: "`r Sys.time()`"
 params:
@@ -14,7 +14,7 @@ library(dplyr)
 library(RSQLite)
 ```
 
-```{r, eval = FALSE, echo=FALSE}
+```{r, echo=FALSE}
 # logo
 htmltools::img(src = knitr::image_uri(params$img),
                alt = 'logo', 
