@@ -12,7 +12,6 @@ workflow APPLY_SCORE {
     pvar // [[id: 1, is_vcf: true, chrom: 21], path(pvar)]
     scorefiles // [[id: 1], path(scorefiles)]
     allelic_freq
-    db // match_variants db
 
     main:
     ch_versions = Channel.empty()
@@ -45,8 +44,7 @@ workflow APPLY_SCORE {
     MAKE_REPORT(
         ch_scores,
         Channel.fromPath("$projectDir/bin/report.Rmd", checkIfExists: true),
-        Channel.fromPath("$projectDir/assets/PGS_Logo.png", checkIfExists: true),
-        db
+        Channel.fromPath("$projectDir/assets/PGS_Logo.png", checkIfExists: true)
     )
 
     ch_versions = ch_versions.mix(MAKE_REPORT.out.versions)

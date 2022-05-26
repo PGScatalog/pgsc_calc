@@ -33,9 +33,8 @@ process MATCH_VARIANTS {
 
     output:
     tuple val(scoremeta), path("*.scorefile"), emit: scorefile
-    path "match_variants.db"                 , emit: db
-    path "report.csv"                        , emit: log
-    path "versions.yml"                      , emit: versions
+    path "report.csv"                   , emit: log
+    path "versions.yml"                 , emit: versions
 
     script:
     def args = task.ext.args ?: ''
@@ -50,7 +49,6 @@ process MATCH_VARIANTS {
 
         match_variants.py \
             $args \
-            --dataset ${meta.id} \
             --scorefile $scorefile \
             --target combined.txt \
             --split
@@ -68,7 +66,6 @@ process MATCH_VARIANTS {
 
         match_variants.py \
             $args \
-            --dataset ${meta.id} \
             --scorefile $scorefile \
             --target combined.txt
 
