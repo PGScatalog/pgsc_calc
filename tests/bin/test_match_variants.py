@@ -63,11 +63,11 @@ def target():
 @pytest.fixture
 def target_df(target):
     ''' Target genome dataframe '''
-    return read_target(target, 'bim', remove_multiallelic = False)
+    return read_target(target, 'bim')
 
 @pytest.fixture
 def matches(score_df, target_df):
-    return get_all_matches(target_df, score_df, remove_ambig = False)
+    return get_all_matches(target_df, score_df, remove = False)
 
 @pytest.fixture
 def match_dup(matches):
@@ -83,13 +83,13 @@ def test_split_effect(score_df):
 
 def test_match(score_df, target_df):
     ''' Test unambiguous matching works OK '''
-    m = get_all_matches(target = target_df, scorefile = score_df, remove_ambig = True)
+    m = get_all_matches(target = target_df, scorefile = score_df, remove = True)
     assert m.shape == (1, 14)
     assert not all(m['ambiguous'])
 
 def test_bad_match(bad_score, target_df):
    ''' Ensure no matches are returned with a bad scorefile '''
-   m = get_all_matches(target = target_df, scorefile = bad_score, remove_ambig = True)
+   m = get_all_matches(target = target_df, scorefile = bad_score, remove = True)
    assert m.shape == (0, 14)
 
 def test_unduplicate(matches, match_dup):

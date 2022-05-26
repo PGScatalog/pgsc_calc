@@ -23,9 +23,7 @@ def parse_args(args=None):
                         help='Flag to force the program to keep variants with ambiguous alleles, (e.g. A/T and G/C '
                              'SNPs), which are normally excluded. In this case the program proceeds assuming that the '
                              'genotype data is on the same strand as the GWAS whose summary statistics were used to '
-                             'construct the score.'),
-    parser.add_argument('--keep-multiallelic', dest='remove_multiallelic', default=False, action='store_false',
-                        help='Flag to preserve multiallelic variants (default: false).')
+                             'construct the score.')
     return parser.parse_args(args)
 
 def read_pvarcolumns(path):
@@ -40,7 +38,7 @@ def read_pvarcolumns(path):
     f_pvar.close()
     return header
 
-def read_target(path, plink_format, remove_multiallelic):
+def read_target(path, plink_format):
     """Complementing alleles with a pile of regexes seems weird, but polars string
     functions are limited (i.e. no str.translate). Applying a python complement
     function would be very slow compared to this, unless I develop a function
@@ -60,11 +58,9 @@ def read_target(path, plink_format, remove_multiallelic):
 
         # Handle multi-allelic variants
         is_ma = x['ALT'].str.contains(',')  # plink2 pvar multi-alleles are comma-separated
-        if is_ma.sum() > 0 and not remove_multiallelic:
+        if is_ma.sum() > 0:
             x.replace('ALT', x['ALT'].str.split(by=','))  # turn ALT to list of variants
             x = x.explode('ALT')  # expand the DF to have all the variants in different rows
-        elif remove_multiallelic:
-            x = x[~is_ma]
 
     x = x.with_columns([
         (pl.col("REF").str.replace_all("A", "V")
@@ -277,11 +273,11 @@ def main(args = None):
     args = parse_args(args)
 
     # read inputs --------------------------------------------------------------
-    target = read_target(args.target, args.plink_format, args.remove_multiallelic)
+    target = read_target(args.target, args.plink_format)
     scorefile = read_scorefile(args.scorefile)
 
     # start matching -----------------------------------------------------------
-    matches = get_all_matches(target, scorefile, args.remove_ambiguous)
+    matches = get_all_matches(target, scorefile, remove_ambig = args.remove_ambiguous)
 
     empty_err = ''' ERROR: No target variants match any variants in all scoring files
     This is quite odd!
