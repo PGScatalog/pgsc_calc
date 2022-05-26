@@ -11,20 +11,17 @@ process MATCH_VARIANTS {
     tuple val(meta), path(target), path(scorefile)
 
     output:
-    tuple val(meta), path("*.scorefile"), emit: scorefile
-    path "report.csv"                   , emit: log
-    path "versions.yml"                 , emit: versions
+    path "*.scorefile" , emit: scorefile
+    path "report.csv"  , emit: log
+    path "versions.yml", emit: versions
 
     script:
     def args = task.ext.args ?: ''
     """
-    sed -i '/##/d' $target # delete annoying plink comment lines before combining
-    awk 'FNR == 1 && NR != 1 { next } { print }' $target > combined.txt
-
     match_variants.py \
         $args \
         --scorefile $scorefile \
-        --target combined.txt
+        --target $target
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
