@@ -29,7 +29,6 @@ jobs:
           - NXF_VER: '21.04.0'
           # Test latest edge release of Nextflow
           - NXF_VER: ''
-    concurrency: ${{ matrix.profile }}
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2
@@ -60,3 +59,61 @@ jobs:
       - name: Run pipeline with test data
         run: |
           nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
+
+  unit_test:
+    name: Run unit tests
+    if: ${{ github.event_name == 'push'}}
+    runs-on: ubuntu-latest
+    env:
+      NXF_VER: ${{ matrix.nxf_ver }}
+      NXF_ANSI_LOG: false
+      CAPSULE_LOG: none    
+    strategy:
+      fail-fast: false        
+      matrix:
+        profile: ["docker", "singularity", "conda"]
+        # Nextflow versions
+        include:
+          # Test pipeline minimum Nextflow version
+          - NXF_VER: '21.04.0'
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install Python dependencies          
+        run: |
+          python -m ensurepip --upgrade
+          pip install pandas pyliftover pytest-workflow requests
+        
+      - name: Set up Singularity
+        if: matrix.profile == 'singularity'
+        uses: eWaterCycle/setup-singularity@v5
+        with:
+          singularity-version: 3.7.1
+          
+      - name: Setup miniconda
+        if: matrix.profile == 'conda'
+        uses: conda-incubator/setup-miniconda@v2.1.1
+        with:
+          auto-update-conda: true
+          channels: conda-forge,bioconda,defaults
+          python-version: ${{ matrix.python-version }}
+
+      - name: Conda clean
+        if: matrix.profile == 'conda'
+        run: conda clean -a
+
+      - name: Install Nextflow
+        run: |
+          wget -qO- get.nextflow.io | bash
+          sudo mv nextflow /usr/local/bin/
+        
+      - name: Run unit tests
+        run: |
+          PROFILE=${{matrix.profile}} pytest ${GITHUB_WORKSPACE}
+          
