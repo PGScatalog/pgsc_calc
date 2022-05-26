@@ -1,8 +1,5 @@
 import pytest
 import pandas as pd
-
-import sys
-sys.path.append("..")
 from bin.samplesheet_to_json import *
 
 @pytest.fixture

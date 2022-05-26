@@ -4,9 +4,6 @@ import pandas as pd
 import requests as req
 import gzip
 from pyliftover import LiftOver
-
-import sys
-sys.path.append("..")
 from bin.read_scorefile import *
 
 @pytest.fixture
