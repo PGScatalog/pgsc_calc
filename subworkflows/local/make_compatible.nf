@@ -10,7 +10,6 @@ workflow MAKE_COMPATIBLE {
     variants
     vcf
     scorefile
-    db
 
     main:
     ch_versions = Channel.empty()
@@ -56,11 +55,10 @@ workflow MAKE_COMPATIBLE {
     // if a size is not provided then nextflow must wait for the entire process
     // to finish before releasing the grouped tuples, which can be very slow(!)
 
-    variants_std.map { tuple(groupKey(it[0].subMap(['id', 'is_vcf', 'is_bfile', 'is_pfile']), it[0].n_chrom),
+    variants_std.map { tuple(groupKey(it[0].subMap(['id', 'is_vcf']), it[0].n_chrom),
                      it[0].chrom, it[1]) }
         .groupTuple()
         .combine( scorefile )
-        .combine ( db )
         .dump(tag: 'match_variants_input')
         .set { ch_variants }
 
