@@ -1,8 +1,7 @@
-process PGSCATALOG_GET {
+process PGSCATALOG_API {
     tag "$accession"
     label 'process_low'
-    maxRetries 5
-    errorStrategy { sleep(Math.pow(2, task.attempt) * 200 as long); return 'retry' }
+    label 'error_retry'
 
     conda (params.enable_conda ? "conda-forge::curl=7.79.1" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -10,25 +9,26 @@ process PGSCATALOG_GET {
         'biocontainers/biocontainers:v1.2.0_cv1' }"
 
     input:
-    tuple val(accession), path(url)
+    val(accession)
 
     output:
-    tuple val(accession), path("PGS*.txt"), emit: scorefile
-    path "versions.yml"                   , emit: versions
+    tuple val(accession), path("*.json"), emit: json
+    path "versions.yml"                 , emit: versions
 
     script:
     """
-    sed -i '1s/^/url = /' ${url}
-    curl --connect-timeout 5 \\
-        --speed-time 10 \\
-        --speed-limit 1000 \\
-         -O -K ${url}
-    gunzip *.txt.gz
+    pgs_api=\$(printf 'https://www.pgscatalog.org/rest/score/%s' ${accession})
+    curl -s \$pgs_api -o ${accession}.json
+
+    # check for a valid response. empty response: {} = 2 chars
+    if [ \$(wc -m < ${accession}.json) -eq 2 ]
+    then
+        echo "PGS Catalog API error. Is --accession valid?"
+        exit 1
+    fi
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
-        sed: \$(sed --version 2>&1 | head -n 1 | cut -f 4 -d ' ')
-        gzip: \$(gzip --version 2>&1 | head -n 1 | cut -f 2 -d ' ')
         curl: \$(curl --version 2>&1 | head -n 1 | sed 's/curl //; s/ (x86.*\$//')
     END_VERSIONS
     """
