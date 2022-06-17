@@ -7,10 +7,9 @@ params:
 ---
 
 ```{r setup, include=FALSE}
-options(tidyverse.quiet = TRUE)
+# sad note: base R + rmarkdown only
+# installing the tidyverse is causing me container problems >:(
 knitr::opts_chunk$set(echo = TRUE)
-
-library(tidyverse)
 ```
 
 ```{r, eval = FALSE, echo=FALSE}
@@ -26,14 +25,16 @@ htmltools::img(src = knitr::image_uri(params$img),
 ```{r, echo = FALSE, message = FALSE}
 log <- read.csv("log.csv")
 log$match_type <- as.character(log$match_type)
+log$match_type <- ifelse(log$match_type == "", "no match", log$match_type)
+match_count <- setNames(aggregate(chr_name ~ dataset + accession + match_type, length, data = log), c("dataset", "accession", "match_type", "count"))
+variant_count <- setNames(aggregate(chr_name ~ dataset + accession, length, data = log),
+                          c("dataset", "accession", "total"))
 
-log %>%
-  group_by(dataset, accession) %>%
-  count(match_type, input_variants = n()) %>%
-  mutate(match_type = ifelse(match_type == "", "no match", match_type)) %>%
-  ungroup() %>%
-  mutate(perc = scales::percent(n / input_variants, accuracy = 0.1)) %>%
-  knitr::kable(align = c(rep('l', 3), rep('r', 3)))
+compat <- merge(match_count, variant_count, by = c("dataset", "accession"))
+compat$perc <- round(compat$count / compat$total * 100, 1)
+compat <- compat[order(compat$count, decreasing = TRUE),] 
+
+knitr::kable(compat, align = c(rep('l', 3), rep('r', 3)))
 ```
 
 ## Score summary
@@ -41,7 +42,7 @@ log %>%
 ```{r, echo = FALSE, message = FALSE}
 
 read_scorefiles <- function(path) {
-  dataset <- stringr::str_split(path, pattern = "_")[[1]][[1]]
+  dataset <- strsplit(path, split = "_")[[1]][[1]]
   df <- read.table(path, header = TRUE, comment.char = "")
   cols <- colnames(df) 
   cols[[1]] <- "IID"
@@ -51,9 +52,8 @@ read_scorefiles <- function(path) {
 }
 
 scorefiles <- list.files(pattern = "*.sscore", all.files = TRUE)
-combined <- purrr::map_dfr(scorefiles, read_scorefiles) %>%
-  group_by(dataset, IID) %>%
-  summarise_all(sum, na.rm = TRUE)
+combined_scorefile <- Reduce(rbind, lapply(scorefiles, read_scorefiles))
+combined <- aggregate(. ~ dataset + IID, sum, data = combined_scorefile)
 write.table(combined, "aggregated_scores.txt", col.names = TRUE, quote = FALSE, row.names = FALSE)
 ```
 
@@ -61,8 +61,7 @@ Score peek:
 
 ```{r, echo = FALSE}
 scores <- read.table("aggregated_scores.txt", header = TRUE, comment.char = "")
-head(scores) %>%
-  knitr::kable()
+knitr::kable(head(scores))
 xfun::embed_file("aggregated_scores.txt", text = "Download all calculated scores")
 ```
 

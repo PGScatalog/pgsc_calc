@@ -1,10 +1,11 @@
 process SCORE_REPORT {
     label 'process_high_memory'
+    stageInMode 'copy'
 
-    conda (params.enable_conda ? "conda-forge::r-tidyverse=1.3.1 conda-forge::r-rsqlite=2.1.1" : null)
+    conda (params.enable_conda ? "$projectDir/environments/report/environment.yml" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/mulled-v2-e5054a4b868f4ffd21311d4e05426694e2c7fb5e:17fe01267c936fedcbd51470941b075c42b08c23-0' :
-        'dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/mulled-v2-e5054a4b868f4ffd21311d4e05426694e2c7fb5e:17fe01267c936fedcbd51470941b075c42b08c23-0' }"
+        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/report:2.14' :
+        'dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/report:2.14' }"
 
     input:
     path scorefiles
@@ -20,10 +21,7 @@ process SCORE_REPORT {
     script:
     def args = task.ext.args ?: ''
     """
-    # dumb workaround symlink & out_dir (rmarkdown)
-    cp $report report.rmd
-
-    R -e 'rmarkdown::render("report.rmd", \
+    R -e 'rmarkdown::render("report.Rmd", \
         output_options = list(self_contained=TRUE))'
 
     cat <<-END_VERSIONS > versions.yml

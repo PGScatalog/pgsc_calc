@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
 import polars as pl
+import pandas as pd
 import argparse
 import sys
 import glob
+import sqlite3
 from typing import List, Dict, Union
 
 def parse_args(args=None):
@@ -320,13 +322,13 @@ def write_scorefile(effect_type: str, scorefiles: pl.DataFrame, split: bool) -> 
 
 def connect_db(path: str) -> str:
     """ Set up sqlite3 connection """
-    return 'sqlite://{}'.format(path)
+    return sqlite3.connect(path)
 
 
 def read_log(conn: str) -> pl.DataFrame:
     """ Read scorefile input log from database """
     query: str = 'SELECT * from scorefile'
-    return pl.read_sql(query, conn).with_columns([
+    return pl.from_pandas(pd.read_sql(query, conn)).with_columns([
         pl.col("chr_name").cast(str),
         pl.col("accession").cast(pl.Categorical),
         pl.col("effect_type").cast(pl.Categorical)
