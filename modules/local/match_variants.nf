@@ -4,8 +4,8 @@ process MATCH_VARIANTS {
 
     conda (params.enable_conda ? "$projectDir/environments/polars/environment.yml" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/polars:0.13.5' :
-        'dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/polars:0.13.5' }"
+        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/polars:0.13.46' :
+        'dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/polars:0.13.46' }"
 
     input:
     tuple val(meta), val(chrom), path('??.vars'), path(scorefile), path(db)
