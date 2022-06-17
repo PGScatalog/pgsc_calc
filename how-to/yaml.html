@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
@@ -29,12 +29,13 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?digest=f31d14ad54b65d19161ba51d4ffff3a77ae00456"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -272,11 +273,11 @@ title="Print to PDF"
               <div>
                 
   <section id="how-to-set-parameters-in-a-file">
-<span id="params-file"></span><h1>How to set parameters in a file<a class="headerlink" href="#how-to-set-parameters-in-a-file" title="Permalink to this headline">#</a></h1>
+<span id="params-file"></span><h1>How to set parameters in a file<a class="headerlink" href="#how-to-set-parameters-in-a-file" title="Permalink to this heading">#</a></h1>
 <p>It can be useful to store workflow parameters in a file if you’re running
 complex jobs or you want to keep track of exactly what type of analysis you did.</p>
 <section id="make-yaml-file">
-<h2>Make YAML file<a class="headerlink" href="#make-yaml-file" title="Permalink to this headline">#</a></h2>
+<h2>Make YAML file<a class="headerlink" href="#make-yaml-file" title="Permalink to this heading">#</a></h2>
 <p>Parameters can be stored in YAML format, for example:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">path/to/samplesheet.csv</span><span class="w"></span>
 <span class="nt">accession</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;PGS001229,PGS000018&#39;</span><span class="w"></span>
@@ -289,7 +290,7 @@ pgsc_calc’s test suite is also available (see <span class="xref std std-ref">t
 of the test suite).</p>
 </section>
 <section id="run-pgsc-calc-with-yaml-file">
-<h2>Run pgsc_calc with YAML file<a class="headerlink" href="#run-pgsc-calc-with-yaml-file" title="Permalink to this headline">#</a></h2>
+<h2>Run pgsc_calc with YAML file<a class="headerlink" href="#run-pgsc-calc-with-yaml-file" title="Permalink to this heading">#</a></h2>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>nextflow run pgscatalog/pgsc_calc <span class="se">\</span>
     -profile &lt;conda/docker/singularity&gt; <span class="se">\</span>
     -params-file my_example_params.yaml

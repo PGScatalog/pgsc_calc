@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
@@ -29,12 +29,13 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/scripts/sphinx-book-theme.js?digest=f31d14ad54b65d19161ba51d4ffff3a77ae00456"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -292,9 +293,9 @@ title="Print to PDF"
               <div>
                 
   <section id="troubleshooting">
-<span id="troubleshoot"></span><h1>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">#</a></h1>
+<span id="troubleshoot"></span><h1>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this heading">#</a></h1>
 <section id="i-get-an-error-about-variant-matching">
-<h2>I get an error about variant matching<a class="headerlink" href="#i-get-an-error-about-variant-matching" title="Permalink to this headline">#</a></h2>
+<h2>I get an error about variant matching<a class="headerlink" href="#i-get-an-error-about-variant-matching" title="Permalink to this heading">#</a></h2>
 <ul class="simple">
 <li><p>Are your target genomes and the scoring file in compatible builds?</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">--min_overlap</span></code> defaults to 0.75 (75% of variants in scoring file must be
@@ -302,12 +303,12 @@ present in target genomes). Try changing this parameter!</p></li>
 </ul>
 </section>
 <section id="the-workflow-isn-t-using-many-resources-e-g-ram-cpu">
-<h2>The workflow isn’t using many resources (e.g. RAM / CPU)<a class="headerlink" href="#the-workflow-isn-t-using-many-resources-e-g-ram-cpu" title="Permalink to this headline">#</a></h2>
+<h2>The workflow isn’t using many resources (e.g. RAM / CPU)<a class="headerlink" href="#the-workflow-isn-t-using-many-resources-e-g-ram-cpu" title="Permalink to this heading">#</a></h2>
 <p>Did you forget to set <code class="docutils literal notranslate"><span class="pre">--max_cpu</span></code> or <code class="docutils literal notranslate"><span class="pre">--max_memory?</span></code></p>
 <p>You can also edit <code class="docutils literal notranslate"><span class="pre">nextflow.config</span></code> to configure cpu and memory permanently.</p>
 </section>
 <section id="when-i-run-the-workflow-i-get-an-error-about-software-not-being-installed">
-<h2>When I run the workflow I get an error about software not being installed<a class="headerlink" href="#when-i-run-the-workflow-i-get-an-error-about-software-not-being-installed" title="Permalink to this headline">#</a></h2>
+<h2>When I run the workflow I get an error about software not being installed<a class="headerlink" href="#when-i-run-the-workflow-i-get-an-error-about-software-not-being-installed" title="Permalink to this heading">#</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">pgsc_calc</span></code> bundles dependencies using containers or conda. Did you remember
 to specify <code class="docutils literal notranslate"><span class="pre">-profile</span></code>? e.g. <code class="docutils literal notranslate"><span class="pre">nextflow</span> <span class="pre">run</span> <span class="pre">pgscatalog/pgsc_calc</span> <span class="pre">-profile</span>
 <span class="pre">docker,test</span></code></p>
@@ -315,7 +316,7 @@ to specify <code class="docutils literal notranslate"><span class="pre">-profile
 for checking the pipeline is installed and working correctly.</p>
 </section>
 <section id="i-m-having-problems-with-vcf-input">
-<h2>I’m having problems with VCF input<a class="headerlink" href="#i-m-having-problems-with-vcf-input" title="Permalink to this headline">#</a></h2>
+<h2>I’m having problems with VCF input<a class="headerlink" href="#i-m-having-problems-with-vcf-input" title="Permalink to this heading">#</a></h2>
 <p>If you use a “chr” prefix in the chromosome column of your VCF, please remove
 it. Here’s a simple method to do this (<a class="reference external" href="http://zhanxw.github.io/rvtests/#input-files">thanks to Rvtests</a>):</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(zgrep ^&quot;#&quot; $your_old_vcf; zgrep -v ^&quot;#&quot; $your_old_vcf | sed &#39;s:^chr::ig&#39; | sort -k1,1n -k2,2n)</span> <span class="go">| bgzip -c &gt; $your_vcf_file.gz</span>

@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
@@ -29,12 +29,13 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?digest=f31d14ad54b65d19161ba51d4ffff3a77ae00456"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -272,13 +273,13 @@ title="Print to PDF"
               <div>
                 
   <section id="how-to-liftover-scoring-files-to-match-your-input-genome-build">
-<span id="liftover"></span><h1>How to liftover scoring files to match your input genome build<a class="headerlink" href="#how-to-liftover-scoring-files-to-match-your-input-genome-build" title="Permalink to this headline">#</a></h1>
+<span id="liftover"></span><h1>How to liftover scoring files to match your input genome build<a class="headerlink" href="#how-to-liftover-scoring-files-to-match-your-input-genome-build" title="Permalink to this heading">#</a></h1>
 <p>pgsc_calc uses genomic coordinates to help match variants in the scoring file to
 variants in your input genomic data. These coordinates may not match if scoring
 files are developed in a different genome build. Luckily, it’s fairly simple to
 automatically remap coordinates (liftover) to different genome builds.</p>
 <section id="lifting-over-pgs-catalog-scoring-files">
-<span id="liftover-pgscatalog"></span><h2>Lifting over PGS Catalog scoring files<a class="headerlink" href="#lifting-over-pgs-catalog-scoring-files" title="Permalink to this headline">#</a></h2>
+<span id="liftover-pgscatalog"></span><h2>Lifting over PGS Catalog scoring files<a class="headerlink" href="#lifting-over-pgs-catalog-scoring-files" title="Permalink to this heading">#</a></h2>
 <p>PGS Catalog scoring files have additional metadata set in a <a class="reference external" href="https://www.pgscatalog.org/downloads/#scoring_header">header</a>. pgsc_calc
 reads this metadata and can automatically liftover scoring files to match your
 input data if you set the following additional parameters at runtime:</p>
@@ -300,7 +301,7 @@ are in build GRCh38:</p>
 </div>
 </section>
 <section id="lifting-over-custom-scoring-files">
-<h2>Lifting over custom scoring files<a class="headerlink" href="#lifting-over-custom-scoring-files" title="Permalink to this headline">#</a></h2>
+<h2>Lifting over custom scoring files<a class="headerlink" href="#lifting-over-custom-scoring-files" title="Permalink to this heading">#</a></h2>
 <p>Custom scoring files need to include metadata in a <a class="reference external" href="https://www.pgscatalog.org/downloads/#scoring_header">header</a>, following the PGS
 Catalog v2 file format standard. A single line can be included at the top of
 your custom scoring file to set the genome build:</p>

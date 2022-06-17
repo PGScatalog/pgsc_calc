@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
@@ -29,12 +29,13 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/scripts/sphinx-book-theme.js?digest=f31d14ad54b65d19161ba51d4ffff3a77ae00456"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -306,7 +307,7 @@ title="Print to PDF"
               <div>
                 
   <section id="get-started">
-<span id="id1"></span><h1>Get started<a class="headerlink" href="#get-started" title="Permalink to this headline">#</a></h1>
+<span id="id1"></span><h1>Get started<a class="headerlink" href="#get-started" title="Permalink to this heading">#</a></h1>
 <p><code class="docutils literal notranslate"><span class="pre">pgsc_calc</span></code> requires Nextflow and one of Docker, Singularity, or Anaconda.</p>
 <ol class="arabic simple">
 <li><p>Start by <a class="reference external" href="https://www.nextflow.io/docs/latest/getstarted.html">installing nextflow</a>:</p></li>
@@ -366,13 +367,13 @@ options are mutually exclusive!</p>
 </div>
 </section>
 <section id="calculate-your-first-polygenic-scores">
-<h1>Calculate your first polygenic scores<a class="headerlink" href="#calculate-your-first-polygenic-scores" title="Permalink to this headline">#</a></h1>
+<h1>Calculate your first polygenic scores<a class="headerlink" href="#calculate-your-first-polygenic-scores" title="Permalink to this heading">#</a></h1>
 <p>If you’ve completed the installation process that means you’ve already
 calculated some polygenic scores 😍 However, these scores were
 calculated from boring synthetic data. Let’s try calculating scores with your
 genomic data, which are probably sequenced from real people!</p>
 <section id="samplesheet-setup">
-<h2>1. Samplesheet setup<a class="headerlink" href="#samplesheet-setup" title="Permalink to this headline">#</a></h2>
+<h2>1. Samplesheet setup<a class="headerlink" href="#samplesheet-setup" title="Permalink to this heading">#</a></h2>
 <p>First, you need to describe the structure of your genomic data in a standardised
 way. To do this, set up a spreadsheet that looks like one of the examples below:</p>
 <table class="colwidths-given table" id="id2">
@@ -488,7 +489,7 @@ chromosomes in the same sample.</p></li>
 example template is <a class="reference external" href="https://github.com/PGScatalog/pgsc_calc/blob/master/assets/examples/example_data/bfile_samplesheet.csv">available here</a>.</p>
 </section>
 <section id="select-scoring-files">
-<h2>2. Select scoring files<a class="headerlink" href="#select-scoring-files" title="Permalink to this headline">#</a></h2>
+<h2>2. Select scoring files<a class="headerlink" href="#select-scoring-files" title="Permalink to this heading">#</a></h2>
 <p>pgsc_calc makes it simple to work with polygenic scores that have been published
 in the PGS Catalog. You can specify one or more scores using the <code class="docutils literal notranslate"><span class="pre">--accession</span></code>
 parameter:</p>
@@ -508,7 +509,7 @@ the scoring files with the <code class="docutils literal notranslate"><span clas
 <code class="docutils literal notranslate"><span class="pre">GRCh37</span></code>. See <a class="reference internal" href="how-to/liftover.html#liftover"><span class="std std-ref">How to liftover scoring files to match your input genome build</span></a> for more information.</p>
 </section>
 <section id="putting-it-all-together">
-<h2>3. Putting it all together<a class="headerlink" href="#putting-it-all-together" title="Permalink to this headline">#</a></h2>
+<h2>3. Putting it all together<a class="headerlink" href="#putting-it-all-together" title="Permalink to this heading">#</a></h2>
 <p>For this example, we’ll assume that the input genomes are in build GRCh37 and that
 they match the scoring file genome build.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>nextflow run pgscatalog/pgsc_calc <span class="se">\</span>

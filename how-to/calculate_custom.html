@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
@@ -29,12 +29,13 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?digest=f31d14ad54b65d19161ba51d4ffff3a77ae00456"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -282,14 +283,14 @@ title="Print to PDF"
               <div>
                 
   <section id="how-to-use-a-custom-scoring-file">
-<span id="calculate-custom"></span><h1>How to use a custom scoring file<a class="headerlink" href="#how-to-use-a-custom-scoring-file" title="Permalink to this headline">#</a></h1>
+<span id="calculate-custom"></span><h1>How to use a custom scoring file<a class="headerlink" href="#how-to-use-a-custom-scoring-file" title="Permalink to this heading">#</a></h1>
 <p>You might want to use a scoring file that you’ve developed using different
 genomic data, or a scoring file somebody else made that isn’t published in the
 PGS Catalog 😢</p>
 <p>Custom scoring files need to follow a specific format. The entire process of
 using a custom scoring file is described below.</p>
 <section id="samplesheet-setup">
-<h2>1. Samplesheet setup<a class="headerlink" href="#samplesheet-setup" title="Permalink to this headline">#</a></h2>
+<h2>1. Samplesheet setup<a class="headerlink" href="#samplesheet-setup" title="Permalink to this heading">#</a></h2>
 <p>First, you need to describe the structure of your genomic data in a standardised
 way. To do this, set up a spreadsheet that looks like:</p>
 <table class="colwidths-given table" id="id1">
@@ -323,7 +324,7 @@ way. To do this, set up a spreadsheet that looks like:</p>
 <p>Save the file as <code class="docutils literal notranslate"><span class="pre">samplesheet.csv</span></code>. See <a class="reference internal" href="samplesheet.html#setup-samplesheet"><span class="std std-ref">How to set up a samplesheet</span></a> for more details.</p>
 </section>
 <section id="scorefile-setup">
-<span id="custom-scorefile-setup"></span><h2>2. Scorefile setup<a class="headerlink" href="#scorefile-setup" title="Permalink to this headline">#</a></h2>
+<span id="custom-scorefile-setup"></span><h2>2. Scorefile setup<a class="headerlink" href="#scorefile-setup" title="Permalink to this heading">#</a></h2>
 <p>Setup your scorefile in a spreadsheet with the following format:</p>
 <table class="colwidths-given table" id="id2">
 <caption><span class="caption-text">Scorefile template</span><a class="headerlink" href="#id2" title="Permalink to this table">#</a></caption>
@@ -372,7 +373,7 @@ the genome build of the new input genomes, see <a class="reference internal" hre
 </div>
 </section>
 <section id="calculate">
-<h2>3. Calculate!<a class="headerlink" href="#calculate" title="Permalink to this headline">#</a></h2>
+<h2>3. Calculate!<a class="headerlink" href="#calculate" title="Permalink to this heading">#</a></h2>
 <p>Set the path of the custom scoring file with the <code class="docutils literal notranslate"><span class="pre">--scorefile</span></code> parameter:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>nextflow run pgscatalog/pgscalc <span class="se">\</span>
     -profile &lt;docker/singularity/conda&gt; <span class="se">\</span>

@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
@@ -29,12 +29,13 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/scripts/sphinx-book-theme.js?digest=f31d14ad54b65d19161ba51d4ffff3a77ae00456"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -336,13 +337,13 @@ title="Print to PDF"
               <div>
                 
   <section id="pgsc-calc-simple-polygenic-score-calculation">
-<h1><code class="docutils literal notranslate"><span class="pre">pgsc_calc</span></code>: Simple polygenic score calculation<a class="headerlink" href="#pgsc-calc-simple-polygenic-score-calculation" title="Permalink to this headline">#</a></h1>
+<h1><code class="docutils literal notranslate"><span class="pre">pgsc_calc</span></code>: Simple polygenic score calculation<a class="headerlink" href="#pgsc-calc-simple-polygenic-score-calculation" title="Permalink to this heading">#</a></h1>
 <p>The <code class="docutils literal notranslate"><span class="pre">pgsc_calc</span></code> workflow makes it easy to calculate polygenic scores using
 scoring files published in the <a class="reference external" href="https://www.pgscatalog.org/">Polygenic Score (PGS) Catalog</a> 🧬
 🥳 If you have custom scoring files not in the catalog, that’s OK
 too!</p>
 <section id="quick-example">
-<h2>Quick example<a class="headerlink" href="#quick-example" title="Permalink to this headline">#</a></h2>
+<h2>Quick example<a class="headerlink" href="#quick-example" title="Permalink to this heading">#</a></h2>
 <ol class="arabic simple">
 <li><p>Install <a class="reference internal" href="getting-started.html"><span class="doc">Nextflow</span></a></p></li>
 <li><p>Install <a class="reference external" href="https://docs.docker.com/get-docker/">Docker</a> or <a class="reference external" href="https://sylabs.io/">Singularity</a> (minimum <code class="docutils literal notranslate"><span class="pre">v3.8.3</span></code>) for full
@@ -388,7 +389,7 @@ reproducibility or <a class="reference external" href="https://conda.io">Conda</
 <a class="reference internal" href="getting-started.html#get-started"><span class="std std-ref">Get started</span></a> section.</p>
 </section>
 <section id="workflow-summary">
-<h2>Workflow summary<a class="headerlink" href="#workflow-summary" title="Permalink to this headline">#</a></h2>
+<h2>Workflow summary<a class="headerlink" href="#workflow-summary" title="Permalink to this heading">#</a></h2>
 <ul class="simple">
 <li><p>Fetch scoring files using the PGS Catalog API</p></li>
 <li><p>Read custom scoring files</p></li>
@@ -405,7 +406,7 @@ computation of scores</p></li>
 </ul>
 </section>
 <section id="documentation">
-<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">#</a></h2>
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this heading">#</a></h2>
 <ul class="simple">
 <li><p><a class="reference internal" href="getting-started.html"><span class="doc">Get started</span></a>: install pgsc_calc and calculate some polygenic scores quickly!</p></li>
 <li><p><a class="reference internal" href="how-to/index.html"><span class="doc">How-to guides</span></a>: step-by-step guides, covering different use cases</p></li>
@@ -415,11 +416,11 @@ questions</p></li>
 </ul>
 </section>
 <section id="changelog">
-<h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">#</a></h2>
+<h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this heading">#</a></h2>
 <p>The <a class="reference internal" href="changelog.html"><span class="doc">Changelog page</span></a> describes fixes and enhancements for each version.</p>
 </section>
 <section id="citations">
-<h2>Citations<a class="headerlink" href="#citations" title="Permalink to this headline">#</a></h2>
+<h2>Citations<a class="headerlink" href="#citations" title="Permalink to this heading">#</a></h2>
 <p>If you use <code class="docutils literal notranslate"><span class="pre">pgscatalog/pgsc_calc</span></code> in your analysis, please cite:</p>
 <blockquote>
 <div><p>PGS Catalog Calculator <cite>(in development)</cite>. PGS Catalog
@@ -431,7 +432,7 @@ doi:<a class="reference external" href="https://doi.org/10.1038/s41588-021-00783
 <p>In addition, please remember to cite the other papers described in the <a class="reference external" href="https://github.com/PGScatalog/pgsc_calc/blob/master/CITATIONS.md">citations file</a>.</p>
 </section>
 <section id="credits">
-<h2>Credits<a class="headerlink" href="#credits" title="Permalink to this headline">#</a></h2>
+<h2>Credits<a class="headerlink" href="#credits" title="Permalink to this heading">#</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">pgscatalog/pgsc_calc</span></code> is developed as part of the PGS Catalog project, a
 collaboration between the University of Cambridge’s Department of Public Health
 and Primary Care (Michael Inouye, Samuel Lambert) and the European
@@ -446,7 +447,7 @@ and Aoife McMahon (EBI). Development of new features, testing, and code review
 is ongoing including Inouye lab members (Rodrigo Canovas) and others. A
 manuscript describing the tool is in preparation (see <a class="reference internal" href="#citations">Citations</a>)</p>
 <section id="others">
-<h3>Others<a class="headerlink" href="#others" title="Permalink to this headline">#</a></h3>
+<h3>Others<a class="headerlink" href="#others" title="Permalink to this heading">#</a></h3>
 <p>This pipeline uses code and infrastructure developed and maintained by the
 <a class="reference external" href="https://nf-co.re">nf-core</a> community, reused here under the <a class="reference external" href="https://github.com/nf-core/tools/blob/master/LICENSE">MIT license</a>:</p>
 <blockquote>
@@ -462,7 +463,7 @@ Union’s Horizon 2020 research and innovation programme under grant agreement N
 101016775 INTERVENE.</p>
 </section>
 <section id="data-references">
-<h3>Data references<a class="headerlink" href="#data-references" title="Permalink to this headline">#</a></h3>
+<h3>Data references<a class="headerlink" href="#data-references" title="Permalink to this heading">#</a></h3>
 <p>The pipeline is distributed with and uses a licensed dataset for testing:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC-BY-NC-SA</a>: <a class="reference external" href="https://doi.org/10.5281/zenodo.5082689">CINECA synthetic cohort Europe CH SIB</a></p></li>

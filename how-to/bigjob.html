@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
@@ -29,12 +29,13 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?digest=f31d14ad54b65d19161ba51d4ffff3a77ae00456"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -282,14 +283,14 @@ title="Print to PDF"
               <div>
                 
   <section id="how-do-i-run-big-jobs-on-a-powerful-computer">
-<span id="big-job"></span><h1>How do I run big jobs on a powerful computer?<a class="headerlink" href="#how-do-i-run-big-jobs-on-a-powerful-computer" title="Permalink to this headline">#</a></h1>
+<span id="big-job"></span><h1>How do I run big jobs on a powerful computer?<a class="headerlink" href="#how-do-i-run-big-jobs-on-a-powerful-computer" title="Permalink to this heading">#</a></h1>
 <p>If you want to calculate many polygenic scores for a very large dataset, like
 the UK BioBank, you might need some extra computing power! You might have access
 to a powerful workstation, a University cluster, or some cloud compute
 resources. This section will show how to set up pgsc_calc to submit work to
 these types of systems.</p>
 <section id="configuring-pgsc-calc-to-use-more-resources-locally">
-<h2>Configuring pgsc_calc to use more resources locally<a class="headerlink" href="#configuring-pgsc-calc-to-use-more-resources-locally" title="Permalink to this headline">#</a></h2>
+<h2>Configuring pgsc_calc to use more resources locally<a class="headerlink" href="#configuring-pgsc-calc-to-use-more-resources-locally" title="Permalink to this heading">#</a></h2>
 <p>If you have a powerful computer available locally, you can configure the amount
 of resources that the workflow uses.</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>process {
@@ -321,7 +322,7 @@ pgsc_calc:</p>
 </div>
 </section>
 <section id="high-performance-computing-cluster">
-<h2>High performance computing cluster<a class="headerlink" href="#high-performance-computing-cluster" title="Permalink to this headline">#</a></h2>
+<h2>High performance computing cluster<a class="headerlink" href="#high-performance-computing-cluster" title="Permalink to this heading">#</a></h2>
 <p>If you have access to a HPC cluster, you’ll need to configure your cluster’s
 unique parameters to set correct queues, user accounts, and resource
 limits. Here’s an example for an LSF cluster:</p>
@@ -379,7 +380,7 @@ each process in the workflow. The nextflow driver requires up to 4GB of RAM
 (bsub’s <code class="docutils literal notranslate"><span class="pre">-M</span></code> parameter) and 2 CPUs to use (see a guide for <a class="reference external" href="https://www.nextflow.io/blog/2021/5_tips_for_hpc_users.html">HPC users</a> here).</p>
 </section>
 <section id="other-environments">
-<h2>Other environments<a class="headerlink" href="#other-environments" title="Permalink to this headline">#</a></h2>
+<h2>Other environments<a class="headerlink" href="#other-environments" title="Permalink to this heading">#</a></h2>
 <p>Nextflow also supports submitting jobs platforms like:</p>
 <ul class="simple">
 <li><p>Google cloud</p></li>

@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
@@ -29,12 +29,13 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?digest=f31d14ad54b65d19161ba51d4ffff3a77ae00456"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -306,14 +307,14 @@ title="Print to PDF"
               <div>
                 
   <section id="how-to-apply-multiple-scores-in-parallel">
-<span id="multiple"></span><h1>How to apply multiple scores in parallel<a class="headerlink" href="#how-to-apply-multiple-scores-in-parallel" title="Permalink to this headline">#</a></h1>
+<span id="multiple"></span><h1>How to apply multiple scores in parallel<a class="headerlink" href="#how-to-apply-multiple-scores-in-parallel" title="Permalink to this heading">#</a></h1>
 <p>pgsc_calc makes it simple to scale up polygenic score calculation by using PLINK
 2’s built-in matrix multiplication. If you want to calculate multiple scores for
 your genetic data it will always be faster to run the pipeline once with the
 parallel method described in this section. Running the workflow many times, once
 for each score, will be much slower 🏃‍♂️</p>
 <section id="samplesheet-setup">
-<h2>1. Samplesheet setup<a class="headerlink" href="#samplesheet-setup" title="Permalink to this headline">#</a></h2>
+<h2>1. Samplesheet setup<a class="headerlink" href="#samplesheet-setup" title="Permalink to this heading">#</a></h2>
 <p>First, you need to describe the structure of your genomic data in a standardised
 way. To do this, set up a spreadsheet that looks like:</p>
 <table class="colwidths-given table" id="id1">
@@ -347,7 +348,7 @@ way. To do this, set up a spreadsheet that looks like:</p>
 <p>Save the file as <code class="docutils literal notranslate"><span class="pre">samplesheet.csv</span></code>. See <a class="reference internal" href="samplesheet.html#setup-samplesheet"><span class="std std-ref">How to set up a samplesheet</span></a> for more details.</p>
 </section>
 <section id="multiple-pgs-catalog-scores">
-<h2>2. Multiple PGS Catalog scores<a class="headerlink" href="#multiple-pgs-catalog-scores" title="Permalink to this headline">#</a></h2>
+<h2>2. Multiple PGS Catalog scores<a class="headerlink" href="#multiple-pgs-catalog-scores" title="Permalink to this heading">#</a></h2>
 <p>It’s simple to run multiple scoring files published in the PGS Catalog. Each
 entry in the PGS Catalog has an accession that starts with the prefix PGS. The
 <code class="docutils literal notranslate"><span class="pre">--accession</span></code> parameter supports multiple entries. List each PGS accession,
@@ -363,7 +364,7 @@ your genomic data, you’ll need to set some additional parameters (see
 <a class="reference internal" href="liftover.html#liftover"><span class="std std-ref">How to liftover scoring files to match your input genome build</span></a>).</p>
 </section>
 <section id="multiple-custom-scorefiles">
-<h2>3. Multiple custom scorefiles<a class="headerlink" href="#multiple-custom-scorefiles" title="Permalink to this headline">#</a></h2>
+<h2>3. Multiple custom scorefiles<a class="headerlink" href="#multiple-custom-scorefiles" title="Permalink to this heading">#</a></h2>
 <p>You might have set up multiple custom scorefiles (see <a class="reference internal" href="calculate_custom.html#calculate-custom"><span class="std std-ref">How to use a custom scoring file</span></a>). The <code class="docutils literal notranslate"><span class="pre">--scorefile</span></code> parameter supports multiple scorefile paths by
 using star characters (<code class="docutils literal notranslate"><span class="pre">*</span></code>). If your custom scorefiles are in the
 directory <code class="docutils literal notranslate"><span class="pre">my_custom_scores/</span></code>:</p>
@@ -399,7 +400,7 @@ to label the score in the workflow output</p></li>
 </ul>
 </div>
 <section id="setting-multiple-scores-in-one-custom-scoring-file">
-<h3>Setting multiple scores in one custom scoring file<a class="headerlink" href="#setting-multiple-scores-in-one-custom-scoring-file" title="Permalink to this headline">#</a></h3>
+<h3>Setting multiple scores in one custom scoring file<a class="headerlink" href="#setting-multiple-scores-in-one-custom-scoring-file" title="Permalink to this heading">#</a></h3>
 <p>The examples above assume each scoring file contains a single score. A single
 custom scoring file can contain multiple scores by using a different scoring
 file template. The final column effect_weight can be repeated if every column
@@ -436,7 +437,7 @@ be unique.</p>
 </section>
 </section>
 <section id="calculate">
-<h2>4. Calculate!<a class="headerlink" href="#calculate" title="Permalink to this headline">#</a></h2>
+<h2>4. Calculate!<a class="headerlink" href="#calculate" title="Permalink to this heading">#</a></h2>
 <ul class="simple">
 <li><p>If you’re using multiple scores from the PGS Catalog:</p></li>
 </ul>
