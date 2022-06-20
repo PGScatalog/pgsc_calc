@@ -13,8 +13,13 @@ run: ## Run an example workflow
 
 test: clean pytest ## Run pytest in a clean environment
 
+testm1: clean pytestm1
+
 pytest:
 	PROFILE=docker pytest --kwdof --git-aware
+
+pytestm1:
+	PROFILE=m1 pytest --kwdof --git-aware
 
 clean: ## Clean temporary files
 	rm -rf ./work ./results ./__pycache__ ./.nextflow.* ./.pytest_cache ./output
@@ -22,4 +27,4 @@ clean: ## Clean temporary files
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-.PHONY: install run test clean pytest help
+.PHONY: install run test clean pytest help testm1 pytestm1
