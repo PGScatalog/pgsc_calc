@@ -27,7 +27,7 @@ process PGSCATALOG_GET {
         exit 1
     fi
 
-    jq '[.results][][].ftp_scoring_file' response.json | sed 's/https:\\/\\///' > urls.txt
+    jq '[.results][][].ftp_scoring_file' response.json | sed 's/https/ftp/' > urls.txt
 
     cat urls.txt | xargs -n 1 wget -T 5
 
