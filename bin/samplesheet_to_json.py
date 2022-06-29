@@ -18,6 +18,13 @@ def parse_args(args=None) -> argparse.Namespace:
     return parser.parse_args(args)
 
 
+def truncate_chrom(chrom):
+    try:
+        return str(int(chrom))  # truncate numeric chromosomes 22.0 -> 22
+    except TypeError:
+        return chrom  # but it's ok to fail
+
+
 def check_samplesheet(file_in: str, file_out: str) -> None:
     """
     This function checks that the samplesheet follows the following structure:
@@ -25,6 +32,9 @@ def check_samplesheet(file_in: str, file_out: str) -> None:
     cineca_synthetic_subset,cineca_synthetic_subset.vcf.gz,,22,
     """
     csv: pd.DataFrame = pd.read_csv(file_in, sep=',', header=0)
+
+    csv['chrom'] = csv['chrom'].apply(truncate_chrom)
+
     colnames: set = {'sample', 'vcf_path', 'bfile_path', 'pfile_path', 'chrom'}
     colname_err: str = "ERROR: Samplesheet has bad column names"
     assert set(csv.columns) == colnames, colname_err
