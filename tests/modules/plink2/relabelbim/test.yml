@@ -8,7 +8,4 @@
     - path: output/plink2/test_null.bim
       md5sum: 2896ac0de91417a6b4d15fe12cd85fc7
     - path: output/plink2/test_null.fam
-      md5sum: 8915d48959a21e827d1db1b192422ba1
-    - path: output/plink2/versions.yml
-      md5sum: 767d4abfc1e39a522a4ac96800586b4b
-    
+      md5sum: 8915d48959a21e827d1db1b192422ba1    
