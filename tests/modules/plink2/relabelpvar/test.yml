@@ -9,6 +9,4 @@
       md5sum: be32a51a5509111327a5deb6a3610b2d
     - path: output/plink2/test_22.pvar
       md5sum: 2ec49ad73889c726e5c3bca1cdce3870
-    - path: output/plink2/versions.yml
-      md5sum: 719dae7273872ed6d48d801c516a3267
     

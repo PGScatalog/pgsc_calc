@@ -253,7 +253,6 @@ def multiple_weights_per_position():
     os.remove(scorefile)
 
 def test_valid_chrom_pos(valid_chrom, valid_pos):
-    assert to_int(valid_pos) == 1234
     assert parse_lifted_chrom(valid_chrom) == str(1)
 
 def test_annotated_chrom(annotated_chrom):

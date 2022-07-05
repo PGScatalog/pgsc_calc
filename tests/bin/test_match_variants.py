@@ -3,7 +3,7 @@ import polars as pl
 import pytest
 import requests as req
 import os
-import sqlite3
+
 import sys
 sys.path.append("..")
 from bin.match_variants import *
@@ -192,7 +192,7 @@ def test_write_scorefile(matches):
 
 
 def test_connectdb():
-    assert type(connect_db('test.db')) == type(sqlite3.connect(':memory:'))
+    assert connect_db('test.db') == 'sqlite://test.db'
 
 
 def test_check_match():
