@@ -29,6 +29,7 @@ process SCOREFILE_CHECK {
             --liftover \
             -t $params.target_build \
             -o scorefiles.txt \
+            -c \$PWD \
             -m $params.min_lift \
             $args
 
