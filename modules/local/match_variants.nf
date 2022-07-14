@@ -26,22 +26,20 @@ process MATCH_VARIANTS {
     scoremeta.id = "$meta.id"
 
     """
-    match_variants.py \
+    match_variants \
         $args \
         --dataset ${meta.id} \
         --scorefile $scorefile \
         --target '*.vars' \
         $split \
-        --format $format \
-        --db \$(readlink -f $db) \
         -n $task.cpus \
         $ambig \
-        $multi
+        $multi \
+        --outdir \$PWD
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
-        python: \$(echo \$(python -V 2>&1) | cut -f 2 -d ' ')
-        sqlite: \$(echo \$(sqlite3 -version 2>&1) | cut -f 1 -d ' ')
+        pgscatalog_utils: \$(echo \$(python -c 'import pgscatalog_utils; print(pgscatalog_utils.__version__)'))
     END_VERSIONS
     """
 }
