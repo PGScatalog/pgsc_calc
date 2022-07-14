@@ -1,7 +1,0 @@
-name: polars
-dependencies:
-- python=3.10
-- pip
-- pip:
-    - polars==0.13.46
-    - pyarrow

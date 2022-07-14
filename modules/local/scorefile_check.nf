@@ -13,9 +13,9 @@ process SCOREFILE_CHECK {
     path reference
 
     output:
-    path "scorefiles.txt"   , emit: scorefiles
-    path "read_scorefile.db", emit: log
-    path "versions.yml"     , emit: versions
+    path "scorefiles.txt", emit: scorefiles
+    path "scorefiles.db" , emit: log
+    path "versions.yml"  , emit: versions
 
     script:
     def args = task.ext.args ?: ''
@@ -25,7 +25,7 @@ process SCOREFILE_CHECK {
         # extract chain files from database
         sqlite3 pgsc_calc_ref.sqlar -Ax hg19ToHg38.over.chain.gz hg38ToHg19.over.chain.gz
 
-        read_scorefile.py -s $raw_scores \
+        combine_scorefiles -s $raw_scores \
             --liftover \
             -t $params.target_build \
             -o scorefiles.txt \
@@ -34,21 +34,18 @@ process SCOREFILE_CHECK {
 
         cat <<-END_VERSIONS > versions.yml
         ${task.process.tokenize(':').last()}:
-            python: \$(echo \$(python --version 2>&1) | cut -f 2 -d ' ')
-            pandas: \$(echo \$(python -c 'import pandas as pd; print(pd.__version__)'))
-            pyliftover: \$(echo \$(python -c 'import pyliftover; print(pyliftover.__version__)'))
+            pgscatalog_utils: \$(echo \$(python -c 'import pgscatalog_utils; print(pgscatalog_utils.__version__)'))
         END_VERSIONS
         """
     else
         """
-        read_scorefile.py -s $raw_scores \
-            -o scorefiles.txt
+        combine_scorefiles -s $raw_scores \
+            -o scorefiles.txt \
+            $args
 
         cat <<-END_VERSIONS > versions.yml
         ${task.process.tokenize(':').last()}:
-            python: \$(echo \$(python --version 2>&1) | cut -f 2 -d ' ')
-            pandas: \$(echo \$(python -c 'import pandas as pd; print(pd.__version__)'))
-            pyliftover: \$(echo \$(python -c 'import pyliftover; print(pyliftover.__version__)'))
+            pgscatalog_utils: \$(echo \$(python -c 'import pgscatalog_utils; print(pgscatalog_utils.__version__)'))
         END_VERSIONS
         """
 }
