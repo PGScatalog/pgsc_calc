@@ -37,8 +37,8 @@ process PLINK2_RELABELBIM {
         --make-just-bim \\
         --out ${prefix}_${meta.chrom}
 
-    cp -P $geno ${prefix}_${meta.chrom}.bed
-    cp -P $pheno ${prefix}_${meta.chrom}.fam
+    cp -RP $geno ${prefix}_${meta.chrom}.bed
+    cp -RP $pheno ${prefix}_${meta.chrom}.fam
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
