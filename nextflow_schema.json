@@ -93,13 +93,11 @@
                 },
                 "keep_multiallelic": {
                     "type": "boolean",
-                    "description": "Keep multiallelic alleles?",
-                    "default": false
+                    "description": "Keep multiallelic alleles?"
                 },
                 "keep_ambiguous": {
                     "type": "boolean",
-                    "description": "Keep ambiguous matches",
-                    "default": false
+                    "description": "Keep ambiguous matches"
                 },
                 "min_overlap": {
                     "type": "number",
@@ -283,8 +281,20 @@
                     "hidden": true,
                     "fa_icon": "fas fa-toolbox",
                     "help_text": "This may be useful for example if you are unable to directly pull Singularity containers to run the pipeline due to http/https proxy issues."
+                },
+                "platform": {
+                    "type": "string",
+                    "default": "amd64",
+                    "enum": [
+                        "amd64",
+                        "arm64"
+                    ],
+                    "description": "What platform is the pipeline executing on?"
                 }
-            }
+            },
+            "required": [
+                "platform"
+            ]
         }
     },
     "allOf": [

@@ -1,10 +1,12 @@
 process SCOREFILE_CHECK {
-    label 'process_medium_memory'
+    label 'process_medium'
+    label 'verbose'
 
-    conda (params.enable_conda ? "conda-forge::pandas=1.1.5 bioconda::pyliftover=0.4" : null)
+    conda (params.enable_conda ? "$projectDir/environments/pgscatalog_utils/environment.yml" : null)
+    def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/pgscatalog_utils:${params.platform}-0.1.0"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/mulled-v2-afe3324bf2effca1c6ea39313147c33dd2c3686e:20ba75f8224cb981ed077e2d6a4d0bdf96a5bf2d-0' :
-        'dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/mulled-v2-afe3324bf2effca1c6ea39313147c33dd2c3686e:20ba75f8224cb981ed077e2d6a4d0bdf96a5bf2d-0' }"
+        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/pgscatalog_utils:amd64-0.1.0' :
+        dockerimg }"
 
     input:
     path raw_scores

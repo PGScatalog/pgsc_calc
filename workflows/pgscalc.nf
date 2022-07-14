@@ -16,6 +16,15 @@ for (param in checkPathParamList) {
     file(param, checkIfExists: true)
 }
 
+
+if (params.platform == 'arm64') {
+    profiles = summary_params['Core Nextflow options'].profile.tokenize(',')
+    if (profiles.contains('singularity') | profiles.contains('conda')) {
+        println "ERROR: arm64 platform only supports -profile docker"
+        System.exit(1)
+    }
+}
+
 // Check mandatory parameters
 ch_input = Channel.fromPath(params.input, checkIfExists: true)
 

@@ -3,9 +3,10 @@ process MATCH_VARIANTS {
     label 'process_medium'
 
     conda (params.enable_conda ? "$projectDir/environments/polars/environment.yml" : null)
+    def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/pgscatalog_utils:${params.platform}-0.1.0"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/polars:0.13.46' :
-        'dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/polars:0.13.46' }"
+        dockerimg }"
 
     input:
     tuple val(meta), val(chrom), path('??.vars'), path(scorefile), path(db)

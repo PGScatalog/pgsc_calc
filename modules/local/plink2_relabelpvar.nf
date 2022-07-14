@@ -4,9 +4,10 @@ process PLINK2_RELABELPVAR {
     label "${ params.copy_genomes ? 'copy_genomes' : '' }"
 
     conda (params.enable_conda ? "bioconda::plink2=2.00a2.3" : null)
+    def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/plink2:${params.platform}-2.00a3"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/plink2:2.00a2.3--h712d239_1' :
-        'dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/plink2:2.00a2.3--h712d239_1' }"
+        dockerimg }"
 
     input:
     // input is sorted alphabetically -> bed, bim, fam or pgen, psam, pvar
@@ -37,8 +38,8 @@ process PLINK2_RELABELPVAR {
         --make-just-pvar \\
         --out ${prefix}_${meta.chrom}
 
-    cp -P $geno ${prefix}_${meta.chrom}.pgen
-    cp -P $pheno ${prefix}_${meta.chrom}.psam
+    cp -RP $geno ${prefix}_${meta.chrom}.pgen
+    cp -RP $pheno ${prefix}_${meta.chrom}.psam
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
