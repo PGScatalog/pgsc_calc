@@ -558,7 +558,7 @@ page. You can view the entire list by running:</p>
 <tr class="row-even"><td><p>default</p></td>
 <td><p>0.95</p></td>
 </tr>
-<tr class="row-odd"><td rowspan="3"><ul class="simple">
+<tr class="row-odd"><td rowspan="2"><ul class="simple">
 <li><p>keep_multiallelic</p></li>
 </ul>
 </td>
@@ -567,20 +567,14 @@ page. You can view the entire list by running:</p>
 <tr class="row-even"><td><p>type</p></td>
 <td><p><em>boolean</em></p></td>
 </tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td><p>False</p></td>
-</tr>
-<tr class="row-even"><td rowspan="3"><ul class="simple">
+<tr class="row-odd"><td rowspan="2"><ul class="simple">
 <li><p>keep_ambiguous</p></li>
 </ul>
 </td>
 <td colspan="2"><p>Keep ambiguous matches</p></td>
 </tr>
-<tr class="row-odd"><td><p>type</p></td>
+<tr class="row-even"><td><p>type</p></td>
 <td><p><em>boolean</em></p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>False</p></td>
 </tr>
 <tr class="row-odd"><td rowspan="5"><ul class="simple">
 <li><p>min_overlap</p></li>
@@ -782,6 +776,21 @@ page. You can view the entire list by running:</p>
 </tr>
 <tr class="row-odd"><td><p>type</p></td>
 <td><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p><strong>platform</strong></p></li>
+</ul>
+</td>
+<td colspan="2"><p>What platform is the pipeline executing on?</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>enum</p></td>
+<td><p>amd64, arm64</p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>amd64</p></td>
 </tr>
 </tbody>
 </table>
