@@ -5,7 +5,7 @@ process MATCH_VARIANTS {
     conda (params.enable_conda ? "$projectDir/environments/polars/environment.yml" : null)
     def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/pgscatalog_utils:${params.platform}-0.1.0"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/polars:0.13.46' :
+        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/pgscatalog_utils:amd64-0.1.0' :
         dockerimg }"
 
     input:
