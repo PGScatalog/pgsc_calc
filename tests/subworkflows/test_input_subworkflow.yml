@@ -12,9 +12,9 @@
   tags:
     - inputcheck
     - subworkflow    
-    - pgscatalog
+    - download
   files:
-    - path: output/pgscatalog/PGS001229.txt.gz
+    - path: output/download/PGS001229.txt.gz
     - path: output/samplesheet/out.json
     - path: output/scorefile/scorefiles.txt
       
@@ -23,10 +23,10 @@
   tags:
     - inputcheck
     - subworkflow    
-    - pgscatalog
+    - download
   files:
-    - path: output/pgscatalog/PGS000802.txt.gz
-    - path: output/pgscatalog/PGS001229.txt.gz    
+    - path: output/download/PGS000802.txt.gz
+    - path: output/download/PGS001229.txt.gz    
     - path: output/samplesheet/out.json
     - path: output/scorefile/scorefiles.txt
 
@@ -35,7 +35,7 @@
   tags:
     - yaml
   files:
-    - path: output/pgscatalog/PGS001229.txt.gz    
+    - path: output/download/PGS001229.txt.gz    
     - path: output/samplesheet/out.json
     - path: output/scorefile/scorefiles.txt
     

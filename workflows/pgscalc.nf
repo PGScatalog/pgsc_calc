@@ -61,7 +61,7 @@ if (params.accession) {
     Channel.fromList(params.accession.replaceAll('\\s','').tokenize(','))
         .unique() // tokenize to ensure unique
         .collect()
-        .map { it.join(',') } // join again for calling API
+        .map { it.join(' ') } // join again for download_scorefiles script
         .set { unique_accessions }
 }
 
@@ -100,7 +100,7 @@ if (params.only_score) {
 ========================================================================================
 */
 
-include { PGSCATALOG_GET       } from '../modules/local/pgscatalog_get'
+include { DOWNLOAD_SCOREFILES  } from '../modules/local/download_scorefiles'
 
 include { INPUT_CHECK          } from '../subworkflows/local/input_check'
 include { MAKE_COMPATIBLE      } from '../subworkflows/local/make_compatible'
@@ -120,8 +120,8 @@ workflow PGSCALC {
     // SUBWORKFLOW: Get scoring file from PGS Catalog accession
     //
     if (params.accession) {
-        PGSCATALOG_GET ( unique_accessions )
-        scorefiles = unique_scorefiles.mix(PGSCATALOG_GET.out.scorefiles)
+        DOWNLOAD_SCOREFILES ( unique_accessions )
+        scorefiles = unique_scorefiles.mix(DOWNLOAD_SCOREFILES.out.scorefiles)
     } else {
         scorefiles = unique_scorefiles
     }
