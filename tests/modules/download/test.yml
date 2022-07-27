@@ -1,0 +1,31 @@
+- name: pgscatalog testaccession
+  command: nextflow run ./tests/modules/download -entry testaccession -c ./tests/config/nextflow.config -profile test
+  tags:
+    - download
+  files:
+    - path: output/download/PGS000001.txt.gz
+      md5sum: efdb0fcb05b178e47cc6ed63fab65916
+
+- name: pgscatalog testmultipleaccessions
+  command: nextflow run ./tests/modules/download -entry testmultipleaccessions -c ./tests/config/nextflow.config -profile test
+  tags:
+    - download
+  files:
+    - path: output/download/PGS000001.txt.gz
+      md5sum: efdb0fcb05b178e47cc6ed63fab65916
+    - path: output/download/PGS000002.txt.gz
+      md5sum: a60862a70ef44b1ec6282ad3e39176df
+
+- name: pgscatalog testbadaccession
+  command: nextflow run ./tests/modules/download -entry testbadaccession -c ./tests/config/nextflow.config -profile test
+  tags:
+    - download
+  exit_code: 1
+
+- name: pgscatalog testmixedaccessions
+  command: nextflow run ./tests/modules/download -entry testmixedaccessions -c ./tests/config/nextflow.config -profile test
+  tags:
+    - download
+  files:
+    - path: output/download/PGS000001.txt.gz
+      md5sum: efdb0fcb05b178e47cc6ed63fab65916
