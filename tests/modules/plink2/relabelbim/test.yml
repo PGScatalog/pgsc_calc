@@ -9,3 +9,6 @@
       md5sum: 2896ac0de91417a6b4d15fe12cd85fc7
     - path: output/plink2/test_null.fam
       md5sum: 8915d48959a21e827d1db1b192422ba1    
+    - path: output/plink2/versions.yml
+      contains:
+        - "plink2: 2.00a3.3"
