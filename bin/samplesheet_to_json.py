@@ -21,9 +21,9 @@ def parse_args(args=None) -> argparse.Namespace:
 def truncate_chrom(chrom):
     try:
         return str(int(chrom))  # truncate numeric chromosomes 22.0 -> 22
-    except TypeError: # it's OK if chrom is a string e.g. MT / X / Y
+    except ValueError: # it's OK if chrom is a string e.g. MT / X / Y
         return chrom
-    except ValueError: # also OK if chrom is missing entirely
+    except TypeError: # also OK if chrom is missing entirely
         return None
 
 
