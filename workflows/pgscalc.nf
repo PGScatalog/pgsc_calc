@@ -51,7 +51,6 @@ if (params.scorefile) {
         .set { scorefiles }
 
     scorefiles
-        .map { it.take(1) }
         .unique()
         .join(scorefiles)
         .set { unique_scorefiles }
