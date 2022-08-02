@@ -1,6 +1,7 @@
 process MATCH_VARIANTS {
     tag "$meta.id"
     label 'process_medium'
+    errorStrategy 'finish'
 
     conda (params.enable_conda ? "$projectDir/environments/polars/environment.yml" : null)
     def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/pgscatalog_utils:${params.platform}-0.1.0"
@@ -30,12 +31,13 @@ process MATCH_VARIANTS {
         $args \
         --dataset ${meta.id} \
         --scorefile $scorefile \
-        --target '*.vars' \
+        --target "\$PWD/*.vars" \
         $split \
         -n $task.cpus \
         $ambig \
         $multi \
-        --outdir \$PWD
+        --outdir \$PWD \
+        -v
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
