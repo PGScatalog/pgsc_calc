@@ -1,6 +1,6 @@
 process DOWNLOAD_SCOREFILES {
     tag "$accession"
-    label 'error_retry'
+    time '5m'
 
     conda (params.enable_conda ? "$projectDir/environments/polars/environment.yml" : null)
     def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/pgscatalog_utils:${params.platform}-0.1.0"
@@ -18,7 +18,7 @@ process DOWNLOAD_SCOREFILES {
 
     script:
     """
-    download_scorefiles -i $accession -o \$PWD
+    download_scorefiles -i $accession -o \$PWD -v
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
