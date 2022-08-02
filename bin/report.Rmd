@@ -1,5 +1,5 @@
 ---
-title: "Calculator summary report"
+title: "PGS Catalog Calculator summary report"
 output: html_document
 date: "`r Sys.time()`"
 params:
@@ -10,6 +10,16 @@ params:
 # sad note: base R + rmarkdown only
 # installing the tidyverse is causing me container problems >:(
 knitr::opts_chunk$set(echo = TRUE)
+library(httr)
+library(jsonlite)
+library(dplyr)
+
+read_log <- function() {
+  log <- read.csv("log.csv")
+  log$match_type <- as.character(log$match_type)
+  log$match_type <- ifelse(log$match_type == "", "no match", log$match_type)
+  return(log)
+}
 ```
 
 ```{r, eval = FALSE, echo=FALSE}
@@ -20,24 +30,84 @@ htmltools::img(src = knitr::image_uri(params$img),
                height = "200px")
 ```
 
-## Compatibility summary
+## Metadata {.tabset}
+
+### PGS Catalog
+
+```{r, echo = FALSE}
+call_api <- function(log) {
+  accessions <- trimws(unique(log$accession))
+  pgs_ids <- paste(accessions[grepl("^PGS[0-9]{6}", accessions)], collapse = ",")
+  api_url <- paste0("https://www.pgscatalog.org/rest/score/search?pgs_ids=", pgs_ids)
+  res <- GET(api_url)
+  return(fromJSON(rawToChar(res$content)))
+}
+
+add_urls <- function(df) {
+  df$pgs_id <- paste0('<a href="https://www.pgscatalog.org/score/', df$pgs_id, '">', df$pgs_id, '</a>')
+  df$pgp_id <- paste0('<a href="https://www.pgscatalog.org/publication/', df$id, '">', df$id, '</a>')
+  df$mapped <- paste0('<a href="', df$url, '">', df$label, '</a>')
+  df$url <- df$label <- df$id <- NULL
+  return(df)
+}
+
+make_publication_table <- function(log) {
+  json <- call_api(log)
+  
+  if (json$size == 0) {
+    return(data.frame())
+  }
+  
+  df <- data.frame(pgs_id = json$results$id)
+  pubs <- json$results$publication[, c("id", "firstauthor", "journal", "date_publication")]
+  traits <- data.frame(reported = json$results$trait_reported,
+                       Reduce(dplyr::bind_rows, json$results$trait_efo)[, c("label", "url")],
+                       n_variants = json$results$variants_number)
+  unformatted <- dplyr::bind_cols(df, pubs, traits)
+  formatted <- add_urls(tidyr::unite(unformatted, "Publication", firstauthor:date_publication, sep = " "))
+  
+  return(formatted[, c("pgs_id", "pgp_id", "Publication", "reported", "mapped", "n_variants")])
+}
+
+log <- read_log()
+meta_tab <- make_publication_table(log)
+
+if (nrow(meta_tab) > 0) {
+  DT::datatable(meta_tab, escape = FALSE,
+              colnames = c("Polygenic Score ID" = "pgs_id", "PGS Publication ID"= "pgp_id", "Reported Trait" = "reported", "Mapped Trait(s)" = "mapped", "Number of Variants" = "n_variants"))
+
+} else {
+  print("No PGS Catalog information available for all input scores")
+}
+```
+
+### Compatibility
 
 ```{r, echo = FALSE, message = FALSE}
-log <- read.csv("log.csv")
-log$match_type <- as.character(log$match_type)
-log$match_type <- ifelse(log$match_type == "", "no match", log$match_type)
 match_count <- setNames(aggregate(chr_name ~ dataset + accession + match_type, length, data = log), c("dataset", "accession", "match_type", "count"))
 variant_count <- setNames(aggregate(chr_name ~ dataset + accession, length, data = log),
                           c("dataset", "accession", "total"))
 
 compat <- merge(match_count, variant_count, by = c("dataset", "accession"))
 compat$perc <- round(compat$count / compat$total * 100, 1)
-compat <- compat[order(compat$count, decreasing = TRUE),] 
+compat <- arrange(compat, )
+compat <- arrange(compat, accession, desc(perc))
 
-knitr::kable(compat, align = c(rep('l', 3), rep('r', 3)))
+# set row colour based on match type
+background <- "value == 'no match' ? '#f1b6da' : value != 'else' ? '#b8e186' : ''"  
+class(background) <- "JS_EVAL"
+
+DT::datatable(compat) %>%
+  DT::formatStyle(
+  'match_type',
+  target = 'row',
+  backgroundColor = background
+)
+
 ```
 
-## Score summary
+
+## Scores {.tabset}
 
 ```{r, echo = FALSE, message = FALSE}
 
@@ -52,16 +122,48 @@ read_scorefiles <- function(path) {
 }
 
 scorefiles <- list.files(pattern = "*.sscore", all.files = TRUE)
-combined_scorefile <- Reduce(rbind, lapply(scorefiles, read_scorefiles))
+combined_scorefile <- Reduce(dplyr::bind_rows, lapply(scorefiles, read_scorefiles))
 combined <- aggregate(. ~ dataset + IID, sum, data = combined_scorefile)
 write.table(combined, "aggregated_scores.txt", col.names = TRUE, quote = FALSE, row.names = FALSE)
 ```
 
-Score peek:
+### Summary
+
+```{asis, echo = nrow(combined) < 50}
+<div class="alert alert-warning", role="alert">
+  <strong>⚠️ Warning: small sample size (n < 50)</strong> 
+  <hr>
+  <p>plink2 uses allele frequency data to <a href="https://www.cog-genomics.org/plink/2.0/score">mean-impute the dosages of missing genotypes</a>. Currently the pipeline disables mean-imputation in these small sample sets to make sure that the calculated PGS is as consistent with the genotype data as possible, as such the resulting score sums may be inconsistent between samples. In these situations the average ([scorename]_AVG)  may be more applicable as it calculates an average weighting over all genotypes present. In the future mean-imputation will be supported in small datasets using ancestry-matched reference datasets to ensure consistent calculation of score sums (e.g. 1000G Genomes).
+  </p>
+</div>
+```
 
 ```{r, echo = FALSE}
 scores <- read.table("aggregated_scores.txt", header = TRUE, comment.char = "")
-knitr::kable(head(scores))
+n_scores <- sum(grepl("*_SUM$", colnames(scores))) - 1
+n_samples <- nrow(scores)
+```
+
+* `r n_scores` scores
+* `r n_samples` samples 
+
+```{r, echo = FALSE}
+# only show one score in extract
+
+if (ncol(scores) < 4) {
+  extract <- scores[, 1:3]
+} else {
+  extract <- scores[, 1:5]
+}
+
+DT::datatable(head(extract), caption = "Extract from calculated scores")  
+```
+
+* See here for an explanation of [plink2 column names](https://www.cog-genomics.org/plink/2.0/formats#sscore).
+
+### Download all scores
+
+```{r, echo = FALSE}
 xfun::embed_file("aggregated_scores.txt", text = "Download all calculated scores")
 ```
 

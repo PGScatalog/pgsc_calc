@@ -5,3 +5,7 @@ channels:
 dependencies:
   - r-rmarkdown=2.14
   - r-mime
+  - r-dplyr
+  - r-httr
+  - r-dt
+  - r-tidyr
