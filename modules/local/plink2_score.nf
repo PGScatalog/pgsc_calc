@@ -27,11 +27,12 @@ process PLINK2_SCORE {
 
     // custom args2
     def maxcol = (scoremeta.n_scores + 2) // id + effect allele = 2 cols
-    def no_imputation = (meta.n_samples < 50) ? 'no-mean-imputation' : ''
+    def no_imputation = (meta.n_samples < 50) ? 'no-mean-imputation cols=+scoreavgs,+scoresums' : ''
+    def cols = (meta.n_samples < 50) ? 'header-read cols=+scoreavgs,+scoresums' : 'header-read cols=scoresums'
     def recessive = (scoremeta.effect_type == 'recessive') ? ' recessive ' : ''
     def dominant = (scoremeta.effect_type == 'dominant') ? ' dominant ' : ''
 
-    args2 = [args2, no_imputation, recessive, dominant].join(' ')
+    args2 = [args2, cols, no_imputation, recessive, dominant].join(' ')
 
     if (scoremeta.n_scores == 1)
         """
