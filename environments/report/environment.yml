@@ -9,3 +9,5 @@ dependencies:
   - r-httr
   - r-dt
   - r-tidyr
+  - r-ggplot2
+  - r-forcats

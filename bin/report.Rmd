@@ -13,6 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(httr)
 library(jsonlite)
 library(dplyr)
+library(ggplot2)
 
 read_log <- function() {
   log <- read.csv("log.csv")
@@ -32,7 +33,7 @@ htmltools::img(src = knitr::image_uri(params$img),
 
 ## Metadata {.tabset}
 
-### PGS Catalog
+### PGS Catalog scores
 
 ```{r, echo = FALSE}
 call_api <- function(log) {
@@ -81,20 +82,19 @@ if (nrow(meta_tab) > 0) {
 }
 ```
 
-### Compatibility
+### Target genome - scoring file compatibility metrics
 
 ```{r, echo = FALSE, message = FALSE}
-match_count <- setNames(aggregate(chr_name ~ dataset + accession + match_type, length, data = log), c("dataset", "accession", "match_type", "count"))
-variant_count <- setNames(aggregate(chr_name ~ dataset + accession, length, data = log),
-                          c("dataset", "accession", "total"))
-
-compat <- merge(match_count, variant_count, by = c("dataset", "accession"))
-compat$perc <- round(compat$count / compat$total * 100, 1)
-compat <- arrange(compat, )
-compat <- arrange(compat, accession, desc(perc))
+log %>%
+  mutate(match_type = forcats::fct_collapse(match_type, fail = "no match", other_level = "pass")) %>%
+  group_by(dataset, accession, match_type) %>%
+  count() %>%
+  group_by(dataset, accession) %>%
+  mutate(percent = round(n / sum(n) * 100, 1)) %>%
+  arrange(accession, desc(percent)) -> compat
 
 # set row colour based on match type
-background <- "value == 'no match' ? '#f1b6da' : value != 'else' ? '#b8e186' : ''"  
+background <- "value == 'fail' ? '#f1b6da' : value != 'else' ? '#b8e186' : ''"  
 class(background) <- "JS_EVAL"
 
 DT::datatable(compat) %>%
@@ -107,10 +107,15 @@ DT::datatable(compat) %>%
 ```
 
 
+### Session information
+
+```{r, echo = FALSE}
+sessionInfo()
+```
+
 ## Scores {.tabset}
 
 ```{r, echo = FALSE, message = FALSE}
-
 read_scorefiles <- function(path) {
   dataset <- strsplit(path, split = "_")[[1]][[1]]
   df <- read.table(path, header = TRUE, comment.char = "")
@@ -123,52 +128,73 @@ read_scorefiles <- function(path) {
 
 scorefiles <- list.files(pattern = "*.sscore", all.files = TRUE)
 combined_scorefile <- Reduce(dplyr::bind_rows, lapply(scorefiles, read_scorefiles))
-combined <- aggregate(. ~ dataset + IID, sum, data = combined_scorefile)
-write.table(combined, "aggregated_scores.txt", col.names = TRUE, quote = FALSE, row.names = FALSE)
+
+combined_scorefile %>%
+  group_by(dataset, IID) %>%
+  summarise(across(matches("SUM$"), sum, na.rm = TRUE),
+            DENOM_SUM = sum(DENOM)) %>%
+  ungroup() %>%
+  mutate(across(matches("SUM$"), ~ .x / DENOM_SUM, .names = "{.col}_AVG")) -> scores
 ```
 
 ### Summary
 
-```{asis, echo = nrow(combined) < 50}
+```{asis, echo = nrow(scores) < 50}
 <div class="alert alert-warning", role="alert">
   <strong>⚠️ Warning: small sample size (n < 50)</strong> 
   <hr>
-  <p>plink2 uses allele frequency data to <a href="https://www.cog-genomics.org/plink/2.0/score">mean-impute the dosages of missing genotypes</a>. Currently the pipeline disables mean-imputation in these small sample sets to make sure that the calculated PGS is as consistent with the genotype data as possible, as such the resulting score sums may be inconsistent between samples. In these situations the average ([scorename]_AVG)  may be more applicable as it calculates an average weighting over all genotypes present. In the future mean-imputation will be supported in small datasets using ancestry-matched reference datasets to ensure consistent calculation of score sums (e.g. 1000G Genomes).
+  <ul>
+  <li>plink2 uses allele frequency data to <a href="https://www.cog-genomics.org/plink/2.0/score">mean-impute the dosages of missing genotypes</a></li>
+  <li>Currently the pipeline disables mean-imputation in these small sample sets to make sure that the calculated PGS is as consistent with the genotype data as possible</li>
+  <li>With a small sample size, the resulting score sums may be inconsistent between samples</li>
+  <li>The average ([scorename]_AVG) may be more applicable as it calculates an average weighting over all genotypes present</li>
+  </ul> 
+  <hr>
+  <p>
+  In the future mean-imputation will be supported in small datasets using ancestry-matched reference datasets to ensure consistent calculation of score sums (e.g. 1000G Genomes).
   </p>
 </div>
 ```
 
+<div class="alert alert-success", role="alert">
+<p>`r sum(grepl("*_SUM$", colnames(scores))) - 2` scores for `r nrow(scores)` samples processed</p>
+</div>
+
 ```{r, echo = FALSE}
-scores <- read.table("aggregated_scores.txt", header = TRUE, comment.char = "")
-n_scores <- sum(grepl("*_SUM$", colnames(scores))) - 1
-n_samples <- nrow(scores)
+fn <- paste0("aggregated_scores_", gsub(" |:|-", "_", Sys.time()), ".txt.gz")
+write.table(scores, gzfile(fn), col.names = TRUE, quote = FALSE, row.names = FALSE)
+xfun::embed_file(fn, text = "Download all calculated scores", class = 'btn btn-primary btn-lg')
 ```
 
-* `r n_scores` scores
-* `r n_samples` samples 
+```{r, echo = FALSE, message=FALSE, warning=FALSE}
+scores %>%
+  ungroup() %>%
+    select(-NAMED_ALLELE_DOSAGE_SUM, -dataset) %>%
+    select(IID, ends_with("SUM")) %>% 
+    tidyr::pivot_longer(-IID) %>%
+    group_by(name) %>%
+  mutate(z_score_group = (value - mean(value)) / sd(value)) %>%
+  ggplot(aes(x = z_score_group, fill = name, alpha = 0.4)) +
+      geom_freqpoly() +
+  theme_bw() +
+  theme(legend.position="none") +
+  labs(x = "z-scaled score", y = "Count (of samples)", title = "Distribution of scores")
+```
+
+
+
+### Score extract
+
+Below is a summary of a single score. It might be useful to double check the sample names and score names are what you expect.
 
 ```{r, echo = FALSE}
 # only show one score in extract
 
-if (ncol(scores) < 4) {
-  extract <- scores[, 1:3]
-} else {
-  extract <- scores[, 1:5]
-}
-
-DT::datatable(head(extract), caption = "Extract from calculated scores")  
+scores %>%
+  select(dataset, IID, ends_with("SUM")) %>%
+  select(1:4) %>%
+  DT::datatable(., caption = "Extract from calculated scores")
 ```
 
 * See here for an explanation of [plink2 column names](https://www.cog-genomics.org/plink/2.0/formats#sscore).
 
-### Download all scores
-
-```{r, echo = FALSE}
-xfun::embed_file("aggregated_scores.txt", text = "Download all calculated scores")
-```
-
-## Session information
-
-```{r}
-sessionInfo()
-```
