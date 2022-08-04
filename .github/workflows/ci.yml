@@ -95,7 +95,7 @@ jobs:
       - name: Install Python dependencies          
         run: |
           python -m ensurepip --upgrade
-          pip install pandas pyliftover pytest-workflow requests polars
+          pip install pandas pytest-workflow requests
           sudo apt install plink2
 
       - name: Set up Singularity
@@ -117,7 +117,7 @@ jobs:
             ${{ runner.os }}-nextflow-
             
       - name: Run unit tests
-        run: TMPDIR=~ PROFILE=${{ matrix.profile }} pytest --kwdof --symlink --git-aware
+        run: TMPDIR=~ PROFILE=${{ matrix.profile }} pytest --kwdof --symlink --git-aware --tag fast
 
       - name: Output log on failure
         if: failure()

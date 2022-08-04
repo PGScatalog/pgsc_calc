@@ -2,12 +2,17 @@ import pytest
 import pathlib
 import numpy as np
 import pandas as pd
+import glob
+import os
+
 
 @pytest.mark.workflow('test apply score subworkflow')
 def test_aggregated_scores(workflow_dir):
     ''' Make sure aggregated scores are floats with no missing values '''
 
-    agg_scores = pathlib.Path(workflow_dir, "output/score/aggregated_scores.txt")
+    score_dir = pathlib.Path(workflow_dir, "output/score/")
+    agg_scores = glob.glob(os.path.join(score_dir, "*.txt.gz"))[0]
+
     df = pd.read_csv(agg_scores, sep = ' ')
 
     assert not df.isnull().any().any(), 'Missing values in aggregated scores'

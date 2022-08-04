@@ -3,6 +3,7 @@
   tags:
     - inputcheck
     - subworkflow
+    - fast
   files:
     - path: output/samplesheet/out.json
     - path: output/scorefile/scorefiles.txt
@@ -13,6 +14,7 @@
     - inputcheck
     - subworkflow    
     - download
+    - fast
   files:
     - path: output/download/PGS001229.txt.gz
     - path: output/samplesheet/out.json
@@ -24,6 +26,7 @@
     - inputcheck
     - subworkflow    
     - download
+    - fast
   files:
     - path: output/download/PGS000802.txt.gz
     - path: output/download/PGS001229.txt.gz    
@@ -34,6 +37,7 @@
   command: nextflow run main.nf -profile test -params-file 'https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/params.yaml' -c ./tests/config/nextflow.config
   tags:
     - yaml
+    - fast
   files:
     - path: output/download/PGS001229.txt.gz    
     - path: output/samplesheet/out.json

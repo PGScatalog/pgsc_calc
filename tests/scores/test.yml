@@ -2,6 +2,7 @@
   command: bash ./tests/scores/run_nxf.sh
   tags:
     - correlation
+    - slow
   stdout:
     contains:
       - "Setup complete"

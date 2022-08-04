@@ -4,6 +4,7 @@
   tags:
     - applyscore
     - subworkflow
+    - fast
   files:
     - path: output/samplesheet/out.json
     - path: output/scorefile/scorefiles.txt
@@ -12,6 +13,5 @@
     - path: output/plink2/cineca_synthetic_subset_22.fam
     - path: output/match/22_additive_0.scorefile
     - path: output/match/log.csv
-    - path: output/score/aggregated_scores.txt
     - path: output/score/report.html
       
