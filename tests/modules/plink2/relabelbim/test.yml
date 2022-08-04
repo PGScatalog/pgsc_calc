@@ -2,6 +2,7 @@
   command: nextflow run ./tests/modules/plink2/relabelbim -entry testrelabelbim -c ./tests/config/nextflow.config -profile test  
   tags:
     - plink2
+    - fast
   files:
     - path: output/plink2/test_null.bed
       md5sum: a8be76ae3301d395563784fcbd571ae2

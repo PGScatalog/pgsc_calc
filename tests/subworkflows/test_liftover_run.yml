@@ -3,6 +3,7 @@
   tags:
     - liftover
     - subworkflow
+    - fast
   files:
     - path: output/samplesheet/out.json
     - path: output/scorefile/scorefiles.txt
@@ -12,6 +13,7 @@
   tags:
     - liftover
     - subworkflow
+    - fast
   files:
     - path: output/samplesheet/out.json
     - path: output/scorefile/scorefiles.txt

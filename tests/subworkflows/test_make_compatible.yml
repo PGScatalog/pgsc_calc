@@ -3,6 +3,7 @@
   tags:
     - makecompatible
     - bfile
+    - fast
   files:
     - path: output/samplesheet/out.json
     - path: output/scorefile/scorefiles.txt
@@ -16,7 +17,8 @@
   command: nextflow run main.nf -profile test --input "https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/samplesheet_vcf.csv" --only_compatible  -c ./tests/config/nextflow.config
   tags:
     - makecompatible
-    - vcf  
+    - vcf
+    - fast
   files:
     - path: output/samplesheet/out.json
     - path: output/scorefile/scorefiles.txt
@@ -31,6 +33,7 @@
   tags:
     - makecompatible
     - pfile
+    - fast
   files:
     - path: output/samplesheet/out.json
     - path: output/scorefile/scorefiles.txt

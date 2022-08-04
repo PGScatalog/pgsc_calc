@@ -10,6 +10,7 @@ import pathlib
 import numpy as np
 import pandas as pd
 import binascii
+import glob
 import os
 
 @pytest.fixture
@@ -102,6 +103,7 @@ def manual_score(fam, simple_scorefile):
     scores['IID'] = fam.iloc[:, 1]
     return scores
 
+@pytest.mark.workflow('manual_calculation')
 def test_plink(bfiles, simple_scorefile, manual_score):
     ''' Test that manual calculation matches plink calculation '''
     plink_cmd = "plink2 --bfile {} --score {} no-mean-imputation"
@@ -117,7 +119,8 @@ def test_plink(bfiles, simple_scorefile, manual_score):
 def test_pgsc_calc(workflow_dir, manual_score):
     ''' Compare pipeline output scores against manual calculation '''
 
-    pgsc_calc_scores = pathlib.Path(workflow_dir, "output/score/aggregated_scores.txt")
+    score_dir = pathlib.Path(workflow_dir, "output/score/")
+    pgsc_calc_scores = glob.glob(os.path.join(score_dir, "*.txt.gz"))[0]
     pgsc_calc_df = pd.read_csv(pgsc_calc_scores, sep = ' ')
     scores = pgsc_calc_df.merge(manual_score, on = 'IID', how = 'left')
 
