@@ -2,8 +2,7 @@
   command: bash ./tests/scores/run_nxf.sh
   tags:
     - correlation
-  files:
-    - path: output/score/aggregated_scores.txt
   stdout:
     contains:
       - "Setup complete"
+      - "Pipeline completed successfully"
