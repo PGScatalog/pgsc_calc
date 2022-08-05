@@ -97,15 +97,15 @@ def annotate_scorefiles(ArrayList scorefiles) {
             it.last().withReader { n_scores = it.readLine().count("\t") - 1 }
             scoremeta.n_scores = n_scores
 
-            // get chromosome from file name of scorefile ----------------------
-            // e.g. chr_effecttype_dup.scorefile -> 22_additive_0.scorefile
-            scoremeta.chrom = it.last().getName().tokenize('_')[0].toString()
+            // file name structure: {dataset}_{chr}_{effect}_{split}.scorefile -
+            // {dataset} is only used to disambiguate files, not for scoremeta
+            scoremeta.chrom = it.last().getName().tokenize('_')[1].toString()
 
             // get effect type from file name of scorefile ---------------------
-            scoremeta.effect_type = it.last().getName().tokenize('_')[1]
+            scoremeta.effect_type = it.last().getName().tokenize('_')[2]
 
             // get score number from file name of scorefile ---------------------
-            scoremeta.n = it.last().getName().tokenize('_')[2].tokenize('.')[0]
+            scoremeta.n = it.last().getName().tokenize('_')[3].tokenize('.')[0]
 
             return [scoremeta, it.last()]
     }

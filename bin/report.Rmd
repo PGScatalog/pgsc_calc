@@ -15,12 +15,16 @@ library(jsonlite)
 library(dplyr)
 library(ggplot2)
 
-read_log <- function() {
-  log <- read.csv("log.csv")
+log_paths <- list.files(pattern = "*_log.csv", full.names = TRUE)
+
+read_log <- function(path) {
+  log <- read.csv(path)
   log$match_type <- as.character(log$match_type)
   log$match_type <- ifelse(log$match_type == "", "no match", log$match_type)
   return(log)
 }
+
+log <- Reduce(dplyr::bind_rows, lapply(log_paths, read_log))
 ```
 
 ```{r, eval = FALSE, echo=FALSE}
@@ -70,7 +74,6 @@ make_publication_table <- function(log) {
   return(formatted[, c("pgs_id", "pgp_id", "Publication", "reported", "mapped", "n_variants")])
 }
 
-log <- read_log()
 meta_tab <- make_publication_table(log)
 
 if (nrow(meta_tab) > 0) {
