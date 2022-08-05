@@ -119,7 +119,7 @@ workflow PGSCALC {
     // SUBWORKFLOW: Get scoring file from PGS Catalog accession
     //
     if (params.accession) {
-        DOWNLOAD_SCOREFILES ( unique_accessions )
+        DOWNLOAD_SCOREFILES ( unique_accessions, params.target_build )
         scorefiles = unique_scorefiles.mix(DOWNLOAD_SCOREFILES.out.scorefiles)
     } else {
         scorefiles = unique_scorefiles

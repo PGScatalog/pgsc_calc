@@ -1,11 +1,5 @@
 name: pgscatalog_utils
 dependencies:
 - python=3.10
-- pandas >=1.4.3
-- pyliftover==0.4
-- requests>=2.28.1
-- pip
 - pip:
-    - polars==0.13.46
-    - pyarrow
-    - jq
+    - pgscatalog_utils==0.1.1

@@ -3,10 +3,10 @@ process MATCH_VARIANTS {
     label 'process_medium'
     errorStrategy 'finish'
 
-    conda (params.enable_conda ? "$projectDir/environments/polars/environment.yml" : null)
-    def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/pgscatalog_utils:${params.platform}-0.1.0"
+    conda (params.enable_conda ? "$projectDir/environments/pgscatalog_utils/environment.yml" : null)
+    def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/pgscatalog_utils:${params.platform}-0.1.1"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/pgscatalog_utils:amd64-0.1.0' :
+        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/pgscatalog_utils:amd64-0.1.1' :
         dockerimg }"
 
     input:
