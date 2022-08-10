@@ -22,6 +22,7 @@ process SCORE_REPORT {
     script:
     def args = task.ext.args ?: ''
     """
+    echo $workflow.commandLine > command.txt
     echo "keep_multiallelic: $params.keep_multiallelic" > params.txt
     echo "keep_ambiguous   : $params.keep_ambiguous"    >> params.txt
     echo "min_overlap      : $params.min_overlap"       >> params.txt

@@ -27,9 +27,9 @@ read_log <- function(path) {
 log <- Reduce(dplyr::bind_rows, lapply(log_paths, read_log))
 ```
 
-```{r, eval = FALSE, echo=FALSE}
+```{r, echo=FALSE}
 # logo
-htmltools::img(src = knitr::image_uri(params$img),
+htmltools::img(src = knitr::image_uri("PGS_Logo.png"),
                alt = 'logo', 
                style = 'position:absolute; top:0; right:0; padding:10px;',
                height = "200px")
@@ -85,6 +85,12 @@ if (nrow(meta_tab) > 0) {
 }
 ```
 
+### Pipeline command 
+
+```{r engine='bash', comment='', echo=FALSE}
+cat command.txt
+```
+
 ### Variant matching
 
 ```{r, echo = FALSE}
@@ -118,8 +124,9 @@ DT::datatable(compat, caption = "Variant matching statistics")
 
 log %>%
   group_by(dataset, accession) %>%
-  count(match_type, ambiguous) %>%
-  mutate(ambiguous = ifelse(ambiguous == "", "true", ambiguous)) %>%
+  count(match_type, ambiguous, is_multiallelic) %>%
+  mutate(ambiguous = ifelse(ambiguous == "", NA, ambiguous),
+         is_multiallelic = ifelse(is_multiallelic == "", NA, is_multiallelic)) %>%
   mutate(percent = round(n / sum(n) * 100, 2)) %>%
   arrange(accession, desc(percent)) %>%
   DT::datatable(caption = "Matching details")
