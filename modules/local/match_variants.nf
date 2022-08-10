@@ -10,7 +10,7 @@ process MATCH_VARIANTS {
         dockerimg }"
 
     input:
-    tuple val(meta), val(chrom), path('??.vars'), path(scorefile), path(db)
+    tuple val(meta), val(chrom), path('??.vars'), path(scorefile)
 
     output:
     tuple val(scoremeta), path("*.scorefile"), emit: scorefile
