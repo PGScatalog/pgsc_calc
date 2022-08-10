@@ -60,7 +60,6 @@ workflow MAKE_COMPATIBLE {
                      it[0].chrom, it[1]) }
         .groupTuple()
         .combine( scorefile )
-        .combine ( db )
         .dump(tag: 'match_variants_input')
         .set { ch_variants }
 
