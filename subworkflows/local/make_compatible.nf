@@ -10,7 +10,6 @@ workflow MAKE_COMPATIBLE {
     variants
     vcf
     scorefile
-    db
 
     main:
     ch_versions = Channel.empty()
