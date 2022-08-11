@@ -24,12 +24,21 @@ Making genomic data and scorefiles compatible
    effecttype
    
 
-Working with big data
----------------------
+Working in different environments
+----------------------------------
 
 .. toctree::
    :maxdepth: 1
 
    bigjob
+   arm
+
+Working with complex datasets
+-----------------------------
+
+.. toctree::
+   :maxdepth: 1
+              
    copygenomes
    yaml
+

@@ -9,6 +9,18 @@ will only occur in major versions with changes noted in this changelog.
 .. _`semantic versioning`: https://semver.org/
 
 
+pgsc_calc v1.1.0 (2022-08-14)
+-----------------------------
+
+This release adds compatibility for every score published in the PGS Catalog.
+
+Features
+~~~~~~~~
+
+- The output report has been improved to be more transparent
+- Support for M1 Macs with ``--platform`` parameter (docker only)
+- Score validation has been integrated with the test suite
+
 pgsc_calc v1.0.0 (2022-05-24)
 --------------------------------
 
