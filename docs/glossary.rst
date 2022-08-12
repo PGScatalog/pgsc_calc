@@ -5,6 +5,10 @@ Glossary
 
 .. glossary::
 
+     accession
+         A unique and stable PGS Catalog score identifier (ID). PGS Catalog IDs start
+         with the prefix PGS, e.g. `PGS000001`_
+
      CSV
          Comma-separated values, a popular plain text file format. `CSVs are
          good`_. Please don't use ``.xlsx`` (Excel), it makes bioinformaticians
@@ -13,6 +17,21 @@ Glossary
      JSON
          Javascript Object Notation. A popular file format and data interchange
          format.
+
+     polygenic score
+         A `polygenic score`_ (PGS), aggregates the effects of many genetic variants
+         into a single number which quantifies an individual's genetic predisposition
+         for a phenotype. PGS are typically composed of hundreds-to-millions of genetic
+         variants (usually SNPs) which are calculated as a weighted sum of allele
+         dosages multiplied by their corresponding effect sizes. The variants and their effect sizes
+         are most often derived from a genome-wide association study (GWAS) using many
+         common software tools (including Pruning/Clumping + Thresholding (e.g. PRSice),
+         LDpred, lassosum, snpnet).
+
+     polygenic risk score
+         A polygenic risk score (PRS) is a subset of PGS that is used to estimate the
+         risk of disease or other clinically relevant outcomes (binary or discrete).
+         Also sometimes referred to as a genetic or genomic risk score (GRS).
 
      PGS Catalog
          The `Polygenic Score (PGS) Catalog`_ is an open database of published polygenic
@@ -37,28 +56,15 @@ Glossary
          `harmonized scoring files`_ with consistently-reported positions in
          common genome builds (GRCh37 and GRCh38). The pipeline
 
-     VCF
-         Variant Call Format. A popular `standard file format`_ used to store
-         genetic variants.
-
-     accession
-         A unique and stable PGS Catalog score identifier (ID). PGS Catalog IDs start
-         with the prefix PGS, e.g. `PGS000001`_
-
-     polygenic score
-         A `polygenic score`_ (PGS) aggregates the effects of many genetic variants
-         into a single number which quantifies an individual's genetic predisposition
-         for a phenotype. PGS are typically composed of hundreds-to-millions of genetic
-         variants (usually SNPs) which are combined using a weighted sum of allele
-         dosages multiplied by their corresponding effect sizes, as estimated from
-         a relevant genome-wide association study (GWAS).
-
-     target genomic data
+     target dataset
          The genomes/genotyping data that you want to calculate polygenic scores for.
          Scores are calculated from an existing scoring file that contains effect alleles
          and associated weights. These genomes should distinct from those used to
          develop the polygenic score originally (i.e., those used to derive the risk alleles
          and weights), as overlapping samples will inflate common metrics of PGS accuracy.
+
+     VCF
+         Variant Call Format. A `standard file format`_ used to store genetic variants and genotypes.
 
 .. _CSVs are good: https://www.gov.uk/guidance/using-csv-file-format
 .. _single nucleotide polymorphism: https://en.wikipedia.org/wiki/Single-nucleotide_polymorphism

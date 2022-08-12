@@ -1,10 +1,10 @@
 :orphan:
    
-``pgsc_calc``: Simple polygenic score calculation
+``pgsc_calc``: a reproducible workflow to calculate polygenic scores
 =================================================
 
-The ``pgsc_calc`` workflow makes it easy to calculate polygenic scores using
-scoring files from PGS published in the `Polygenic Score (PGS) Catalog`_ |:dna:|
+The ``pgsc_calc`` workflow makes it easy to calculate a :term:`polygenic score` using
+scoring files of PGS published in the `Polygenic Score (PGS) Catalog`_ |:dna:|
 and/or custom scoring files.
 
 .. _`Polygenic Score (PGS) Catalog`: https://www.pgscatalog.org/
