@@ -27,6 +27,8 @@ process PLINK2_RELABELPVAR {
     def args = task.ext.args ?: ''
     def prefix = task.ext.suffix ? "${meta.id}${task.ext.suffix}" : "${meta.id}"
     def mem_mb = task.memory.toMega() // plink is greedy
+    // if dropping multiallelic variants, set a generic ID that won't match
+    def set_ma_missing = params.keep_multiallelic ? '' : '--var-id-multi @:#'
 
     """
     plink2 \\
@@ -34,6 +36,7 @@ process PLINK2_RELABELPVAR {
         --memory $mem_mb \\
         $args \\
         --set-all-var-ids '@:#:\$r:\$a' \\
+        $set_ma_missing \\
         --pfile ${geno.baseName} \\
         --make-just-pvar \\
         --out ${prefix}_${meta.chrom}
