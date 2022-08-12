@@ -224,6 +224,5 @@ information, see :ref:`interpret`.
 
 If the workflow didn't execute successfully, have a look at the
 :ref:`troubleshoot` section. Remember to replace ``<docker/singularity/conda>``
-with the software you have installed on your computer, see :ref:`containers` for
-a more detailed explanation.
+with the software you have installed on your computer.
 

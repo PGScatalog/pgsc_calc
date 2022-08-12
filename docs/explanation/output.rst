@@ -1,3 +1,6 @@
+
+.. _interpret:
+
 Understanding workflow output
 =============================
 
@@ -10,7 +13,7 @@ The pipeline outputs are writtent to a results directory
 - ``pipeline_info/``
 
 ``score/``
----------
+----------
 
 Calculated scores are stored in a gzipped-text space-delimted text file called
 ``aggregated_scores`` that is labelled with the date/time (e.g. ``aggregated_scores_YYYY_MM_DD_HH_MM_SS.txt.gz``).
@@ -33,7 +36,7 @@ how well the variants match with the genotyping data, and some simple graphs
 displaying the distribution of scores in your dataset(s).
 
 ``match/``
----------
+----------
 
 This directory contains the raw data that is summarised in the scoring
 report. The log file is a :term:`CSV` that contains a row for each variant in
