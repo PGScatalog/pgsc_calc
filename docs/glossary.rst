@@ -69,7 +69,7 @@ Glossary
 .. _CSVs are good: https://www.gov.uk/guidance/using-csv-file-format
 .. _single nucleotide polymorphism: https://en.wikipedia.org/wiki/Single-nucleotide_polymorphism
 .. _UK BioBank: https://www.ukbiobank.ac.uk/    
-.. _PGS Catalog: https://www.pgscatalog.org
+.. _Polygenic Score (PGS) Catalog: https://www.pgscatalog.org
 .. _submitting them: https://www.pgscatalog.org/submit/
 .. _PGS000001: https://www.pgscatalog.org/score/PGS000001/
 .. _standard file format: https://samtools.github.io/hts-specs/VCFv4.2.pdf
