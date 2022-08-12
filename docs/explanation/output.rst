@@ -16,15 +16,16 @@ Calculated scores are stored in a gzipped-text space-delimted text file called
 ``aggregated_scores`` that is labelled with the date/time (e.g. ``aggregated_scores_YYYY_MM_DD_HH_MM_SS.txt.gz``).
 Each row represents an individual, and there should be at least three columns with the following headers:
 
-- dataset: the name of the input dataset
-- IID: the name of each sample
-- PGS001229_22_SUM: this is the name of the calculated score. It will be
-  different depending on which scores you have chosen to use. 
+- ``dataset``: the name of the input dataset
+- ``IID``: the name of each sample
+- ``[PGS NAME]_SUM``: reports the weighted sum of *effect_allele* dosages multiplied by their *effect_weight*
+  for each matched variant in the scoring file. The column name will be different depending on the scores
+  you have chosen to use (e.g. ``PGS000001_SUM``).
 
-At least one score must be present in this file (the third column). Extra
-columns might be present if you calculated more than one score,
-or if you calculated the PGS on a dataset with a small sample size (n < 50,
-in this cases a column with the _AVG PGS across non-missing genotypes will be added).
+At least one score must be present in this file (the third column). Extra columns might be
+present if you calculated more than one score, or if you calculated the PGS on a dataset with a
+small sample size (n < 50, in this cases a column named ``[PGS NAME]_AVG`` will be added that normalizes the PGS
+using the number of non-missing genotypes to avoid using allele frequency data from the target sample).
 
 A summary report is also available (``report.html``). The report should open in
 a web browser and contain useful information about the PGS that were applied,
