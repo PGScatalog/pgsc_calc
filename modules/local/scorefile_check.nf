@@ -14,7 +14,6 @@ process SCOREFILE_CHECK {
 
     output:
     path "scorefiles.txt", emit: scorefiles
-    path "scorefiles.db" , emit: log
     path "versions.yml"  , emit: versions
 
     script:
