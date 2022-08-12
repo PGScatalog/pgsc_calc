@@ -30,9 +30,9 @@ ch_input = Channel.fromPath(params.input, checkIfExists: true)
 
 // Set up scorefile channels ---------------------------------------------------
 
-if (!params.scorefile & !params.accession) {
+if (![params.scorefile, params.accession, params.trait, params.publication].any()) {
     println " ERROR: You didn't set any scores to use! \
-    Please set --scorefile or --accession parameters and try again (: "
+        Please set --scorefile, --accession, --trait, or --publication"
     System.exit(1)
 }
 
