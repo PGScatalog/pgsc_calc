@@ -22,13 +22,17 @@ process PLINK2_VCF {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     def mem_mb = task.memory.toMega()
+    // rewriting genotypes, so use --max-alleles instead of using generic ID
+    def set_ma_missing = params.keep_multiallelic ? '' : '--max-alleles 2'
     newmeta = meta.clone() // copy hashmap for updating...
     newmeta.is_pfile = true // now it's converted to a pfile :)
+
     """
     plink2 \\
         --threads $task.cpus \\
         --memory $mem_mb \\
         --set-all-var-ids '@:#:\$r:\$a' \\
+        $set_ma_missing \\
         $args \\
         --vcf $vcf \\
         --make-pgen \\
