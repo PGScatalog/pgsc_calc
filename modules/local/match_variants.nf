@@ -18,24 +18,27 @@ process MATCH_VARIANTS {
     path "versions.yml"                      , emit: versions
 
     script:
-    def args = task.ext.args ?: ''
-    def split = !chrom.contains(false) ? '--split': ''
-    def format = meta.is_bfile ? 'bim' : 'pvar'
-    def ambig = params.keep_ambiguous ? '--keep_ambiguous' : ''
+    def args = task.ext.args             ?: ''
+    def fast = params.fast_match         ? '--fast'              : ''
+    def split = !chrom.contains("ALL")   ? '--split'             : ''
+    def format = meta.is_bfile           ? 'bim'                 : 'pvar'
+    def ambig = params.keep_ambiguous    ? '--keep_ambiguous'    : ''
     def multi = params.keep_multiallelic ? '--keep_multiallelic' : ''
     scoremeta = [:]
     scoremeta.id = "$meta.id"
 
     """
+    export POLARS_MAX_THREADS=$task.cpus
+
     match_variants \
         $args \
         --dataset ${meta.id} \
         --scorefile $scorefile \
         --target "\$PWD/*.vars" \
         $split \
-        -n $task.cpus \
         $ambig \
         $multi \
+        $fast \
         --outdir \$PWD \
         -v
 
