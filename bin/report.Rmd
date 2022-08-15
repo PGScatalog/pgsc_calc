@@ -1,5 +1,5 @@
 ---
-title: "PGS Catalog Calculator summary report"
+title: "Report: PGS Catalog Calculator Pipeline"
 output: html_document
 date: "`r Sys.time()`"
 params:
@@ -7,8 +7,6 @@ params:
 ---
 
 ```{r setup, include=FALSE}
-# sad note: base R + rmarkdown only
-# installing the tidyverse is causing me container problems >:(
 knitr::opts_chunk$set(echo = TRUE)
 library(httr)
 library(jsonlite)
@@ -18,10 +16,17 @@ library(ggplot2)
 log_paths <- list.files(pattern = "*_log.csv", full.names = TRUE)
 
 read_log <- function(path) {
-  log <- read.csv(path)
-  log$match_type <- as.character(log$match_type)
-  log$match_type <- ifelse(log$match_type == "", "no match", log$match_type)
-  return(log)
+  log <- read.csv(path, stringsAsFactors = FALSE)
+
+  return(log %>%
+           mutate(match_type = ifelse(log$match_type == "", 
+                                      "no match", 
+                                      log$match_type)) %>%
+           mutate(accession = ifelse(stringr::str_detect(accession, "^PGS"), 
+                              stringr::str_extract(accession, "^PGS[0-9]{6}"),
+                              accession)) %>%
+           mutate(is_multiallelic =  factor(is_multiallelic, levels = c("false", "true")),
+                  ambiguous = factor(ambiguous, levels = c("false", "true"))))
 }
 
 log <- Reduce(dplyr::bind_rows, lapply(log_paths, read_log))
@@ -35,20 +40,32 @@ htmltools::img(src = knitr::image_uri("PGS_Logo.png"),
                height = "200px")
 ```
 
+## Pipeline command 
+
+```{r engine='bash', comment='', echo=FALSE}
+cat command.txt
+```
+
 ## Metadata {.tabset}
 
-### PGS Catalog scores
+### Scoring files
 
 ```{r, echo = FALSE}
+base_table <- function(log) {
+  log %>%
+    count(accession, name = "n_variants")
+}
+
 call_api <- function(log) {
   accessions <- trimws(unique(log$accession))
-  pgs_ids <- paste(accessions[grepl("^PGS[0-9]{6}", accessions)], collapse = ",")
+  pgs_ids <- paste(accessions, collapse = ",")
   api_url <- paste0("https://www.pgscatalog.org/rest/score/search?pgs_ids=", pgs_ids)
   res <- GET(api_url)
   return(fromJSON(rawToChar(res$content)))
 }
 
 add_urls <- function(df) {
+  df$accession <- df$pgs_id
   df$pgs_id <- paste0('<a href="https://www.pgscatalog.org/score/', df$pgs_id, '">', df$pgs_id, '</a>')
   df$pgp_id <- paste0('<a href="https://www.pgscatalog.org/publication/', df$id, '">', df$id, '</a>')
   df$mapped <- paste0('<a href="', df$url, '">', df$label, '</a>')
@@ -63,32 +80,21 @@ make_publication_table <- function(log) {
     return(data.frame())
   }
   
-  df <- data.frame(pgs_id = json$results$id)
+  df <- data.frame(pgs_id = json$results$id) 
   pubs <- json$results$publication[, c("id", "firstauthor", "journal", "date_publication")]
   traits <- data.frame(reported = json$results$trait_reported,
-                       Reduce(dplyr::bind_rows, json$results$trait_efo)[, c("label", "url")],
-                       n_variants = json$results$variants_number)
-  unformatted <- dplyr::bind_cols(df, pubs, traits)
-  formatted <- add_urls(tidyr::unite(unformatted, "Publication", firstauthor:date_publication, sep = " "))
+                       Reduce(dplyr::bind_rows, json$results$trait_efo)[, c("label", "url")])
   
-  return(formatted[, c("pgs_id", "pgp_id", "Publication", "reported", "mapped", "n_variants")])
+  unformatted <- dplyr::bind_cols(df, pubs, traits)
+  
+  return(add_urls(tidyr::unite(unformatted, "Publication", firstauthor:date_publication, sep = " ")))
 }
 
-meta_tab <- make_publication_table(log)
-
-if (nrow(meta_tab) > 0) {
-  DT::datatable(meta_tab, escape = FALSE,
+log %>% 
+  count(accession, name = "n_variants") %>%
+  left_join(make_publication_table(log), by = "accession") %>%
+  DT::datatable(., escape = FALSE,
               colnames = c("Polygenic Score ID" = "pgs_id", "PGS Publication ID"= "pgp_id", "Reported Trait" = "reported", "Mapped Trait(s)" = "mapped", "Number of Variants" = "n_variants"))
-
-} else {
-  print("No PGS Catalog information available for all input scores")
-}
-```
-
-### Pipeline command 
-
-```{r engine='bash', comment='', echo=FALSE}
-cat command.txt
 ```
 
 ### Variant matching
@@ -99,7 +105,7 @@ colnames(params_df) <- c("Parameter", "Value")
 DT::datatable(params_df, caption = "Variant matching parameters")
 ```
 
-```{r, echo = FALSE, message = FALSE, warning=FALSE}
+```{r match_summary, echo = FALSE}
 log %>%
   mutate(match_type = forcats::fct_collapse(match_type, unmatched = "no match", other_level = "matched")) %>%
   group_by(dataset, accession, match_type) %>%
@@ -108,35 +114,38 @@ log %>%
   mutate(percent = round(n / sum(n) * 100, 1)) %>%
   arrange(accession, desc(percent)) %>%
   tidyr::pivot_wider(names_from = match_type, values_from = c(n, percent)) -> compat
+```
 
-# set row colour based on match type
-background <- "percent_pass > 0.75 ? '#f1b6da' : value != 'else' ? '#b8e186' : ''"  
-class(background) <- "JS_EVAL"
+```{r compat_details, echo = FALSE, message = FALSE}
+log %>%
+  mutate(match_type = forcats::fct_collapse(match_type, unmatched = "no match", other_level = "matched")) %>%
+  group_by(dataset, accession) %>%
+  count(match_type, is_multiallelic, ambiguous, .drop = FALSE) %>%
+  filter(match_type == "matched") -> counts
 
-# DT::datatable(compat) %>%
-#   DT::formatStyle(
-#   'percent_pass',
-#   target = 'row',
-#   backgroundColor = background
-# )
+counts %>%
+  filter(is_multiallelic == "true" & match_type == "matched") %>%
+  group_by(dataset, accession) %>%
+  summarise(n_matched_multiallelic = sum(n)) -> n_matched_multiallelic
+  
+counts %>%
+  filter(ambiguous == "true" & match_type == "matched") %>%
+  group_by(dataset, accession) %>%
+  summarise(n_matched_ambiguous = sum(n)) -> n_matched_ambiguous
+```
 
-DT::datatable(compat, caption = "Variant matching statistics")
+```{r match_table, echo = FALSE}
+compat %>%
+  left_join(n_matched_ambiguous, by = c("dataset", "accession")) %>%
+  left_join(n_matched_multiallelic, by = c("dataset", "accession")) %>%
+  DT::datatable(., caption = "Variant matching statistics")
 
 log %>%
   group_by(dataset, accession) %>%
   count(match_type, ambiguous, is_multiallelic) %>%
-  mutate(ambiguous = ifelse(ambiguous == "", NA, ambiguous),
-         is_multiallelic = ifelse(is_multiallelic == "", NA, is_multiallelic)) %>%
   mutate(percent = round(n / sum(n) * 100, 2)) %>%
   arrange(accession, desc(percent)) %>%
   DT::datatable(caption = "Matching details")
-```
-
-
-### Session information
-
-```{r, echo = FALSE}
-sessionInfo()
 ```
 
 ## Scores {.tabset}
@@ -195,12 +204,17 @@ xfun::embed_file(fn, text = "Download all calculated scores", class = 'btn btn-p
 ```{r, echo = FALSE, message=FALSE, warning=FALSE}
 scores %>%
   ungroup() %>%
-    select(-NAMED_ALLELE_DOSAGE_SUM) %>%
-    select(IID, dataset, ends_with("SUM")) %>%
-    group_by(IID, dataset) %>%
-    tidyr::pivot_longer(cols=-group_cols()) %>%
-    filter(name != "DENOM_SUM") %>%
-    group_by(dataset, name) -> long_scores
+  select(-NAMED_ALLELE_DOSAGE_SUM) %>%
+  select(IID, dataset, ends_with("SUM")) %>%
+  group_by(IID, dataset) %>%
+  tidyr::pivot_longer(cols = -group_cols()) %>%
+  ungroup() %>%
+  filter(name != "DENOM_SUM") %>%
+  mutate(name = ifelse(
+    stringr::str_detect(name, "^PGS"),
+    stringr::str_extract(name, "^PGS[0-9]{6}"),
+    name)) %>%
+  group_by(dataset, name) -> long_scores
 
 group_keys(long_scores) %>%
   slice(1:6) -> score_keys
@@ -212,7 +226,7 @@ long_scores %>%
       facet_wrap(~name, ncol = 2, scales = "free_x") +
       theme_bw() +
       theme(legend.position="none") +
-      labs(x = "Score sum", y = "Count (of samples)", title = "Distribution of scores")
+      labs(x = "Score sum", y = "Density", title = "Distribution of scores")
 ```
 
 
@@ -227,8 +241,14 @@ Below is a summary of a single score. It might be useful to double check the sam
 scores %>%
   select(dataset, IID, ends_with("SUM")) %>%
   select(1:4) %>%
+  head() %>%
   DT::datatable(., caption = "Extract from calculated scores")
 ```
 
 * See here for an explanation of [plink2 column names](https://www.cog-genomics.org/plink/2.0/formats#sscore).
 
+## Session information
+
+```{r, echo = FALSE}
+sessionInfo()
+```
