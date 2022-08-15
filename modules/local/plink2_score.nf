@@ -1,5 +1,5 @@
 process PLINK2_SCORE {
-    tag "$meta.id chromosome $meta.chrom"
+    tag "$meta.id chromosome $meta.chrom effect type $scoremeta.effect_type"
     label 'process_low'
 
     conda (params.enable_conda ? "bioconda::plink2=2.00a3.3" : null)
