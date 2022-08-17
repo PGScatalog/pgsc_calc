@@ -10,7 +10,7 @@
     },
     "accession": {
       "type": "string",
-      "description": "PGS Catalog accession, if a list separate with commas",
+      "description": "PGS Catalog accession(s), if a list separate with commas",
       "pattern": "(PGS[0-9]{6}[,]?)+"
     },
     "min_overlap": {

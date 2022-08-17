@@ -1,12 +1,11 @@
 :orphan:
    
-``pgsc_calc``: Simple polygenic score calculation
+``pgsc_calc``: a reproducible workflow to calculate polygenic scores
 =================================================
 
-The ``pgsc_calc`` workflow makes it easy to calculate polygenic scores using
-scoring files published in the `Polygenic Score (PGS) Catalog`_ |:dna:|
-|:partying_face:| If you have custom scoring files not in the catalog, that's OK
-too!
+The ``pgsc_calc`` workflow makes it easy to calculate a :term:`polygenic score` using
+scoring files of PGS published in the `Polygenic Score (PGS) Catalog`_ |:dna:|
+and/or custom scoring files.
 
 .. _`Polygenic Score (PGS) Catalog`: https://www.pgscatalog.org/
 
@@ -64,23 +63,28 @@ If you want to try the workflow with your own data, have a look at the
 Workflow summary
 ----------------
 
-- Fetch scoring files using the PGS Catalog API
-- Read custom scoring files
-- Lift over scoring files to match input genetic data build
-- Match variants in the scoring files against variants in the target genome
-- Automatically combine and split different scoring files for efficient parallel
-  computation of scores  
-- Calculate and aggregate split scores
-- Publish a summary report
+- Fetch scoring files using the PGS Catalog API in a specified genome build (GRCh37 and GRCh38).
+- Read custom scoring files (perform liftover if genotyping data is in a different build).
+- Match variants in the scoring files against variants in the target dataset (in plink bfile/pfile or VCF format)
+- Automatically combine and split different scoring files for efficient parallel computation of multiple PGS
+- Calculate and create aggregate score data for all samples
+- Publish a summary report to visualize score distributions and pipeline metadata (variant matching QC)
 
-In the future, the calculator will include:
+In the future, the calculator will include new features for PGS interpretation:
 
-- Ancestry estimation
+- *Genetic Ancestry*: calculate similarity of target samples to populations in a
+  reference dataset (e.g. `1000 Genomes (1000G)`_, `Human Genome Diversity Project (HGDP)`_)
+  using principal components analysis (PCA).
+- *PGS Normalization*: Using reference population data and/or PCA projections to report
+  individual-level PGS predictions (e.g. percentiles, z-scores) that account for genetic ancestry.
+
+.. _1000 Genomes (1000G): http://www.nature.com/nature/journal/v526/n7571/full/nature15393.html
+.. _Human Genome Diversity Project (HGDP): https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7115999/
 
 Documentation
 -------------
 
-- :doc:`Get started<getting-started>`: install pgsc_calc and calculate some polygenic scores quickly!
+- :doc:`Get started<getting-started>`: install pgsc_calc and calculate some polygenic scores quickly
 - :doc:`How-to guides<how-to/index>`: step-by-step guides, covering different use cases
 - :doc:`Reference guides<reference/index>`: technical information about workflow configuration
 - :doc:`Explanation<explanation/index>`: background, discussion of important topics, answers to high level
@@ -103,7 +107,7 @@ If you use ``pgscatalog/pgsc_calc`` in your analysis, please cite:
     reproducibility and systematic evaluation.  Nature Genetics. 53:420–425
     doi:`10.1038/s41588-021-00783-5`_.
 
-In addition, please remember to cite the other papers described in the `citations file`_.
+In addition, please remember to cite the other papers and software tools described in the `citations file`_.
 
 .. _citations file: https://github.com/PGScatalog/pgsc_calc/blob/master/CITATIONS.md
 .. _10.1038/s41588-021-00783-5: https://doi.org/10.1038/s41588-021-00783-5
@@ -124,8 +128,9 @@ Wu) and PGS Catalog teams (Samuel Lambert, Laurent Gil).
 The adaptation of the codebase and nextflow implementation is written by
 Benjamin Wingfield with input and supervision from Samuel Lambert (PGS Catalog)
 and Aoife McMahon (EBI). Development of new features, testing, and code review
-is ongoing including Inouye lab members (Rodrigo Canovas) and others. A
-manuscript describing the tool is in preparation (see `Citations <Citations_>`_)
+is ongoing including Inouye lab members (Rodrigo Canovas, Scott Ritchie) and others. A
+manuscript describing the tool is in preparation (see `Citations <Citations_>`_) and we
+welcome ongoing community feedback before then.
 
 Others
 ~~~~~~

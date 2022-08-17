@@ -59,7 +59,7 @@
         ]
       },
       "chrom": {
-        "description": "Chromosome of associated genomic data. If multiple chromosomes are in the data, set to an empty string",
+        "description": "Specify the chromosome of associated genotyping data (must be in {1-22, X, XY, Y}). If all chromosomes are in the associated file (e.g. your data is not split by chromosome), set to an empty string.",
         "anyOf": [
           {
             "type": "null"
