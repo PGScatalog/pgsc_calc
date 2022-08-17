@@ -4,7 +4,9 @@ process PLINK2_RELABELBIM {
     label "${ params.copy_genomes ? 'copy_genomes' : '' }"
 
     conda (params.enable_conda ? "bioconda::plink2=2.00a3.3" : null)
-    def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/plink2:${params.platform}-2.00a3.3"
+    def dockerimg = "${ params.platform == 'amd64' ?
+        'quay.io/biocontainers/plink2:2.00a3.3--hb2a7ceb_0' :
+        'dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/plink2:arm64-2.00a3.3' }"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/plink2:2.00a3.3' :
         dockerimg }"
@@ -27,6 +29,8 @@ process PLINK2_RELABELBIM {
     def args = task.ext.args ?: ''
     def prefix = task.ext.suffix ? "${meta.id}${task.ext.suffix}" : "${meta.id}"
     def mem_mb = task.memory.toMega() // plink is greedy
+    // if dropping multiallelic variants, set a generic ID that won't match
+    def set_ma_missing = params.keep_multiallelic ? '' : '--var-id-multi @:#'
 
     """
     plink2 \\
@@ -34,6 +38,7 @@ process PLINK2_RELABELBIM {
         --memory $mem_mb \\
         $args \\
         --set-all-var-ids '@:#:\$r:\$a' \\
+        $set_ma_missing \\
         --bfile ${geno.baseName} \\
         --make-just-bim \\
         --out ${prefix}_${meta.chrom}

@@ -1,9 +1,11 @@
 process PLINK2_SCORE {
-    tag "$meta.id chromosome $meta.chrom"
+    tag "$meta.id chromosome $meta.chrom effect type $scoremeta.effect_type"
     label 'process_low'
 
     conda (params.enable_conda ? "bioconda::plink2=2.00a3.3" : null)
-    def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/plink2:${params.platform}-2.00a3.3"
+    def dockerimg = "${ params.platform == 'amd64' ?
+        'quay.io/biocontainers/plink2:2.00a3.3--hb2a7ceb_0' :
+        'dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/plink2:arm64-2.00a3.3' }"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/plink2:2.00a3.3' :
         dockerimg }"

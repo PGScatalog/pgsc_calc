@@ -30,7 +30,8 @@ Get started
     ...
 
 And check if Docker, Singularity, or Anaconda are working by running the
-workflow with bundled test data:
+workflow with bundled test data and replacing ``<docker/singularity/conda>`` in the command below
+with the specific container manager you intend to use:
 
 .. code-block:: console
                 
@@ -75,8 +76,8 @@ Calculate your first polygenic scores
 
 If you've completed the installation process that means you've already
 calculated some polygenic scores |:heart_eyes:| However, these scores were
-calculated from boring synthetic data. Let's try calculating scores with your
-genomic data, which are probably sequenced from real people!
+calculated using synthetic data from a single chromosome. Let's try calculating scores
+with your genomic data, which are probably genotypes from real people!
 
 1. Samplesheet setup
 --------------------
@@ -176,18 +177,29 @@ parameter:
     --accession PGS001229,PGS001405 # many scores separated by , (no spaces)
         
 If you would like to use a custom scoring file not published in the PGS Catalog,
-that's OK too (see :ref:`calculate custom`). 
+that's OK too (see :ref:`calculate custom`).
 
-Both ``PGS001229`` and ``PGS001405`` were developed with genome build GRCh37. If
-your genomic data are in GRCh38 then you'll need to ask the workflow to liftover
-the scoring files with the ``--liftover`` and ``--target_build`` parameters:
+Users are required to specify the genome build that to their genotyping calls are in reference
+to using the ``--target_build`` parameter. The ``--target_build`` parameter only supports builds
+``GRCh37`` (*hg19*) and ``GRCh38`` (*hg38*).
 
 .. code-block:: console
 
-    --liftover --target_build GRCh38
+    --accession PGS001229,PGS001405 --target_build GRCh38
 
-The ``--target_build`` parameter only supports builds ``GRCh38`` and
-``GRCh37``. See :ref:`liftover` for more information.
+In the case of the example above, both ``PGS001229`` and ``PGS001405`` are reported in genome build GRCh37.
+In cases where the build of your genomic data are different from the original build of the PGS Catalog score
+then the pipeline will download a `harmonized (remapped rsIDs and/or lifted positions)`_  versions of the
+scoring file(s) in the user-specified build.
+
+Custom scoring files can be lifted between genome builds using the ``--liftover`` flag, (see :ref:`liftover`
+for more information). An example would look like:
+
+.. code-block:: console
+
+    ---scorefile MyPGSFile.txt --target_build GRCh38
+
+.. _harmonized (remapped rsIDs and/or lifted positions): https://www.pgscatalog.org/downloads/#dl_ftp_scoring_hm_pos
     
 3. Putting it all together
 --------------------------
@@ -199,7 +211,7 @@ they match the scoring file genome build.
 
     $ nextflow run pgscatalog/pgsc_calc \
         -profile <docker/singularity/conda> \
-        --input samplesheet.csv \
+        --input samplesheet.csv --target_build GRCh37 \
         --accession PGS001229
 
 Congratulations, you've now (`hopefully`) calculated some scores!
@@ -212,6 +224,5 @@ information, see :ref:`interpret`.
 
 If the workflow didn't execute successfully, have a look at the
 :ref:`troubleshoot` section. Remember to replace ``<docker/singularity/conda>``
-with the software you have installed on your computer, see :ref:`containers` for
-a more detailed explanation.
+with the software you have installed on your computer.
 

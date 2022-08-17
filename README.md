@@ -1,6 +1,6 @@
 # The Polygenic Score Catalog Calculator (`pgsc_calc`)
 
-[![Documentation](https://github.com/PGScatalog/pgsc_calc/actions/workflows/docs.yml/badge.svg)](https://pgscatalog.github.io/pgsc_calc/index.html)
+[![Documentation Status](https://readthedocs.org/projects/pgsc-calc/badge/?version=latest)](https://pgsc-calc.readthedocs.io/en/latest/?badge=latest)
 [![pgscatalog/pgsc_calc CI](https://github.com/PGScatalog/pgsc_calc/actions/workflows/ci.yml/badge.svg)](https://github.com/PGScatalog/pgsc_calc/actions/workflows/ci.yml)
 
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A521.04.0-23aa62.svg?labelColor=000000)](https://www.nextflow.io/)
@@ -57,8 +57,7 @@ details.
 
 ## Documentation
 
-[Full documentation is available on Github
-pages.](https://pgscatalog.github.io/pgsc_calc/)
+[Full documentation is available on Read the Docs](https://pgsc-calc.readthedocs.io/en/)
 
 ## Credits
 

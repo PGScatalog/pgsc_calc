@@ -30,6 +30,9 @@ of resources that the workflow uses.
             memory = 64.GB
             time   = 4.h
         }
+        withName: PLINK2_SCORE {
+            maxForks = 4
+        }
     } 
 
 You should change ``cpus``, ``memory``, and ``time`` to match the amount of
@@ -58,6 +61,7 @@ limits. Here's an example for an LSF cluster:
         executor = 'lsf'
         queue = 'short'
         clusterOptions = ''
+        scratch = true
 
         withLabel:process_low {
             cpus   = 2
@@ -69,6 +73,9 @@ limits. Here's an example for an LSF cluster:
             memory = 64.GB
             time   = 4.h
         }
+        withName: PLINK2_SCORE {
+            maxForks = 50
+        }       
     } 
     
 In SLURM, queue is equivalent to a partition. Specific cluster parameters can be
@@ -82,6 +89,8 @@ instead:
 .. code-block:: bash
                 
     export NXF_ANSI_LOG=false
+    export NXF_OPTS="-Xms500M -Xmx2G" 
+    
     module load nextflow-21.10.6-gcc-9.3.0-tkuemwd
     module load singularity-3.7.0-gcc-9.3.0-dp5ffrp
 
@@ -96,6 +105,8 @@ instead:
           
 .. note:: Your institution may already have `a nextflow profile`_, which can be
           used instead of setting up a custom config using ``-c``
+
+.. note:: Think about enabling fast variant matching with ``--fast_match``!      
           
 .. code-block:: console
             
