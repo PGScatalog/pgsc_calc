@@ -9,6 +9,7 @@ Calculating polygenic scores
 .. toctree::
    :maxdepth: 1
 
+   prepare            
    samplesheet
    calculate_pgscatalog
    multiple   

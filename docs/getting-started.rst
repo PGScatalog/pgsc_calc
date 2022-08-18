@@ -79,6 +79,9 @@ calculated some polygenic scores |:heart_eyes:| However, these scores were
 calculated using synthetic data from a single chromosome. Let's try calculating scores
 with your genomic data, which are probably genotypes from real people!
 
+.. warning:: You might need to prepare input genomic data before calculating
+           polygenic scores, see :ref:`prepare`
+
 1. Samplesheet setup
 --------------------
 
