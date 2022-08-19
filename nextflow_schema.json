@@ -31,11 +31,20 @@
                     "description": "Path to a scoring file in PGS Catalog format. Multiple scorefiles can be specified using wildcards (e.g., ``--scorefile \"path/to/scores/*.txt\"``)",
                     "fa_icon": "fas fa-file-alt"
                 },
-                "accession": {
+                "pgs_id": {
                     "type": "string",
-                    "description": "A PGS Catalog accession, multiple accessions can be specified in a comma separated list",
-                    "pattern": "(PGS\\d+)(,\\s*PGS\\d+)*",
-                    "fa_icon": "fas fa-star"
+                    "default": "None",
+                    "description": "A comma separated list of PGS score IDs, e.g. PGS000802"
+                },
+                "pgp_id": {
+                    "type": "string",
+                    "default": "None",
+                    "description": "A comma separated list of PGS Catalog publications, e.g. PGP000001"
+                },
+                "trait_efo": {
+                    "type": "string",
+                    "default": "None",
+                    "description": "A comma separated list of PGS Catalog EFO traits, e.g. EFO_0004214"
                 },
                 "target_build": {
                     "type": "string",
@@ -98,6 +107,10 @@
                 "keep_ambiguous": {
                     "type": "boolean",
                     "description": "Keep matches of scoring file variants to strand ambiguous variants (e.g. A/T and C/G SNPs) in the target dataset. This assumes the scoring file and target dataset report variants on the same strand."
+                },
+                "fast_match": {
+                    "type": "boolean",
+                    "description": "Enable fast matching, which significantly increases RAM usage (32GB minimum recommended)"
                 },
                 "min_overlap": {
                     "type": "number",

@@ -30,7 +30,7 @@ ch_input = Channel.fromPath(params.input, checkIfExists: true)
 
 // Set up scorefile channels ---------------------------------------------------
 
-if (![params.scorefile, params.accession, params.trait, params.publication].any()) {
+if (![params.scorefile, params.pgs_id, params.trait_efo, params.pgp_id].any()) {
     println " ERROR: You didn't set any scores to use! \
         Please set --scorefile, --accession, --trait, or --publication"
     System.exit(1)
@@ -43,11 +43,9 @@ if (!params.target_build) {
 }
 
 unique_scorefiles = Channel.empty()
-unique_accessions = Channel.empty()
 
 if (params.scorefile) {
     Channel.fromPath(params.scorefile, checkIfExists: true)
-        .map { [[accession: it.getBaseName()], it ] }
         .set { scorefiles }
 
     scorefiles
@@ -56,13 +54,17 @@ if (params.scorefile) {
         .set { unique_scorefiles }
 }
 
-if (params.accession) {
-    Channel.fromList(params.accession.replaceAll('\\s','').tokenize(','))
-        .unique() // tokenize to ensure unique
-        .collect()
-        .map { it.join(' ') } // join again for download_scorefiles script
-        .set { unique_accessions }
+def process_accessions(String accession) {
+    if (accession) {
+        return accession.replaceAll('\\s','').tokenize(',').unique().join(' ')
+    } else {
+        return ''
+    }
 }
+
+def String unique_trait_efo = process_accessions(params.trait_efo)
+def String unique_pgp_id    = process_accessions(params.pgp_id)
+def String unique_pgs_id    = process_accessions(params.pgs_id)
 
 ch_reference = Channel.empty()
 
@@ -118,24 +120,27 @@ workflow PGSCALC {
     //
     // SUBWORKFLOW: Get scoring file from PGS Catalog accession
     //
-    if (params.accession) {
-        DOWNLOAD_SCOREFILES ( unique_accessions, params.target_build )
-        scorefiles = unique_scorefiles.mix(DOWNLOAD_SCOREFILES.out.scorefiles)
+    def accessions = [pgs_id: unique_pgs_id, pgp_id: unique_pgp_id,
+                      trait_efo: unique_trait_efo]
+
+    if (!accessions.every( { it.value == '' })) {
+        DOWNLOAD_SCOREFILES ( accessions, params.target_build )
+        scorefiles = DOWNLOAD_SCOREFILES.out.scorefiles.mix(unique_scorefiles)
     } else {
         scorefiles = unique_scorefiles
     }
-
-    scorefiles.map { it[1] }.collect().set{ ch_scorefile }
 
     //
     // SUBWORKFLOW: Validate and stage input files
     //
 
+    scorefiles.collect().set{ ch_scorefiles }
+
     if (run_input_check) {
         INPUT_CHECK (
             ch_input,
             params.format,
-            ch_scorefile,
+            ch_scorefiles,
             ch_reference
         )
         ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
@@ -195,5 +200,9 @@ workflow.onComplete {
 /*
 ========================================================================================
     THE END
-========================================================================================
+    |\__/,|   (`\
+  _.|o o  |_   ) )
+-(((---(((--------
+ ========================================================================================
 */
+
