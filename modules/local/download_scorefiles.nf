@@ -1,6 +1,6 @@
 process DOWNLOAD_SCOREFILES {
-    tag "$accession"
-    time '5m'
+    tag "$meta"
+    time '30m'
 
     conda (params.enable_conda ? "$projectDir/environments/pgscatalog_utils/environment.yml" : null)
     def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/pgscatalog_utils:${params.platform}-0.1.1"
@@ -9,21 +9,28 @@ process DOWNLOAD_SCOREFILES {
         dockerimg }"
 
     input:
-    val(accession)
+    val(meta)
     val(build)
 
     output:
-    tuple val(accession), path("PGS*.txt.gz"), emit: scorefiles
-    path "versions.yml"                      , emit: versions
-    path "PGS*.txt.gz" // for publishDir
+    path "PGS*.txt.gz" , emit: scorefiles
+    path "versions.yml", emit: versions
 
     script:
+    def accession_args = meta.pgs_id   ? "-i $meta.pgs_id"  : ""
+    def traits_args = meta.trait_efo   ? "-t $meta.trait_efo"  : ""
+    def publication_args = meta.pgp_id ? "-p $meta.pgp_id": ""
+
     """
-    download_scorefiles -i $accession -b $build -o \$PWD -v
+    download_scorefiles $accession_args \
+        $traits_args \
+        $publication_args \
+        -b $build \
+        -o \$PWD -v
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
-        jq: \$(jq --version 2>&1 | sed 's/jq-//')
+        pgscatalog_utils: \$(echo \$(python -c 'import pgscatalog_utils; print(pgscatalog_utils.__version__)'))
     END_VERSIONS
     """
 }
