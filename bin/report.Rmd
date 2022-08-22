@@ -363,6 +363,8 @@ long_scores %>%
       facet_wrap(~name, ncol = 2, scales = "free_x") +
       theme_bw() +
       labs(x = "Score sum", y = "Density", title = "Distribution of scores")
+
+ggsave("density.pdf")
 ```
 
 ### Get scores
