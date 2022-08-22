@@ -95,7 +95,7 @@ jobs:
       - name: Install Python dependencies          
         run: |
           python -m ensurepip --upgrade
-          pip install pandas pytest-workflow requests
+          pip install -r tests/requirements.txt
           sudo apt install plink2
 
       - name: Set up Singularity
