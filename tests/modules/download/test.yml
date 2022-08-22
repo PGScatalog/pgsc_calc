@@ -1,35 +1,47 @@
-- name: pgscatalog testaccession
+- name: pgscatalog test --pgs_id
   command: nextflow run ./tests/modules/download -entry testaccession -c ./tests/config/nextflow.config -profile test
   tags:
+    - module
     - download
     - fast
   files:
-    - path: output/download/PGS000001.txt.gz
-      md5sum: efdb0fcb05b178e47cc6ed63fab65916
-
-- name: pgscatalog testmultipleaccessions
+    - path: output/download/PGS000001_hmPOS_GRCh37.txt.gz
+    - path: output/download/versions.yml
+      contains:
+        - "pgscatalog_utils: 0.1.1"
+      
+- name: pgscatalog test --efo_trait --pgp_id and --pgs_id
   command: nextflow run ./tests/modules/download -entry testmultipleaccessions -c ./tests/config/nextflow.config -profile test
   tags:
+    - module
     - download
     - fast
   files:
-    - path: output/download/PGS000001.txt.gz
-      md5sum: efdb0fcb05b178e47cc6ed63fab65916
-    - path: output/download/PGS000002.txt.gz
-      md5sum: a60862a70ef44b1ec6282ad3e39176df
+    - path: output/download/PGS000001_hmPOS_GRCh37.txt.gz
+    - path: output/download/PGS000002_hmPOS_GRCh37.txt.gz
+    - path: output/download/PGS000003_hmPOS_GRCh37.txt.gz
+    - path: output/download/PGS000753_hmPOS_GRCh37.txt.gz
+    - path: output/download/PGS002054_hmPOS_GRCh37.txt.gz
+    - path: output/download/versions.yml
+      contains:
+        - "pgscatalog_utils: 0.1.1"
 
-- name: pgscatalog testbadaccession
+- name: pgscatalog test bad accession
   command: nextflow run ./tests/modules/download -entry testbadaccession -c ./tests/config/nextflow.config -profile test
   tags:
+    - module
     - download
     - fast
   exit_code: 1
 
-- name: pgscatalog testmixedaccessions
+- name: pgscatalog test good and bad accessions (GRCh38)
   command: nextflow run ./tests/modules/download -entry testmixedaccessions -c ./tests/config/nextflow.config -profile test
   tags:
+    - module
     - download
     - fast
   files:
-    - path: output/download/PGS000001.txt.gz
-      md5sum: efdb0fcb05b178e47cc6ed63fab65916
+    - path: output/download/PGS000001_hmPOS_GRCh38.txt.gz
+    - path: output/download/versions.yml
+      contains:
+        - "pgscatalog_utils: 0.1.1"

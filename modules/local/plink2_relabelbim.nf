@@ -3,12 +3,12 @@ process PLINK2_RELABELBIM {
     label 'process_low'
     label "${ params.copy_genomes ? 'copy_genomes' : '' }"
 
-    conda (params.enable_conda ? "bioconda::plink2=2.00a3.3" : null)
+    conda (params.enable_conda ? "bioconda::plink2==2.00a2.3--h712d239_1" : null)
     def dockerimg = "${ params.platform == 'amd64' ?
         'quay.io/biocontainers/plink2:2.00a3.3--hb2a7ceb_0' :
         'dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/plink2:arm64-2.00a3.3' }"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/plink2:2.00a3.3' :
+        'https://depot.galaxyproject.org/singularity/plink2:2.00a2.3--hb2a7ceb_2' :
         dockerimg }"
 
     input:

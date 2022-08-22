@@ -3,6 +3,7 @@
   tags:
     - plink2
     - fast
+    - module
   files:
     - path: output/plink2/test_22.psam
       md5sum: 90f1430b71153d59bc14e9499b0366f4
