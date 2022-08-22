@@ -32,7 +32,7 @@ ch_input = Channel.fromPath(params.input, checkIfExists: true)
 
 if (![params.scorefile, params.pgs_id, params.trait_efo, params.pgp_id].any()) {
     println " ERROR: You didn't set any scores to use! \
-        Please set --scorefile, --accession, --trait, or --publication"
+        Please set --scorefile, --pgs_id, --trait_efo, or --pgp_id"
     System.exit(1)
 }
 

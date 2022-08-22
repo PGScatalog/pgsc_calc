@@ -8,38 +8,25 @@
     - path: output/samplesheet/out.json
     - path: output/scorefile/scorefiles.txt
 
-- name: test input check subworkflow with PGS catalog API
-  command: nextflow run main.nf -profile test --accession PGS001229 --only_input -c ./tests/config/nextflow.config
+- name: test input check subworkflow with PGS catalog API 
+  command: nextflow run main.nf -profile test --pgs_id PGS001229 --only_input -c ./tests/config/nextflow.config --target_build GRCh38
   tags:
     - inputcheck
-    - subworkflow    
-    - download
+    - subworkflow
     - fast
   files:
-    - path: output/download/PGS001229.txt.gz
-    - path: output/samplesheet/out.json
-    - path: output/scorefile/scorefiles.txt
-      
-- name: test input check subworkflow with PGS catalog API and whitespace
-  command: nextflow run main.nf -profile test --accession "PGS001229, PGS000802" --only_input  -c ./tests/config/nextflow.config
-  tags:
-    - inputcheck
-    - subworkflow    
-    - download
-    - fast
-  files:
-    - path: output/download/PGS000802.txt.gz
-    - path: output/download/PGS001229.txt.gz    
+    - path: output/download/PGS001229_hmPOS_GRCh38.txt.gz
     - path: output/samplesheet/out.json
     - path: output/scorefile/scorefiles.txt
 
-- name: test input check subworkflow with YAML parameters
-  command: nextflow run main.nf -profile test -params-file 'https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/params.yaml' -c ./tests/config/nextflow.config
+- name: test input check subworkflow with PGS catalog API and whitespace
+  command: nextflow run main.nf -profile test --pgs_id "PGS001229, PGS000802" --only_input  -c ./tests/config/nextflow.config --target_build GRCh38
   tags:
-    - yaml
+    - inputcheck
+    - subworkflow
     - fast
   files:
-    - path: output/download/PGS001229.txt.gz    
+    - path: output/download/PGS000802_hmPOS_GRCh38.txt.gz
+    - path: output/download/PGS001229_hmPOS_GRCh38.txt.gz
     - path: output/samplesheet/out.json
     - path: output/scorefile/scorefiles.txt
-    
