@@ -12,15 +12,49 @@ will only occur in major versions with changes noted in this changelog.
 pgsc_calc v1.1.0 (2022-08-14)
 -----------------------------
 
-This release adds compatibility for every score published in the PGS Catalog.
+This release adds compatibility for every score published in the PGS
+Catalog. Every scoring file in the PGS Catalog has been processed to provide
+genomic coordinates in builds GRCh37 and GRCh38. The pipeline has been updated
+to take advantage of the harmonised scores.
 
 Features
 ~~~~~~~~
 
 - The output report has been improved to be more transparent
-- Support for M1 Macs with ``--platform`` parameter (docker only)
+  
+- Support for M1 Macs with ``--platform`` parameter (docker executor only)
+  
 - Score validation has been integrated with the test suite
+  
+- Variant matching has been improved to use less RAM by default
+  
+  - A laptop with 16GB of RAM should be able to comfortably calculate scores on
+    the 1000 genomes dataset
+      
+  - Fast matching mode (``--fast_match``) is available if ~32GB of RAM is
+    available and you'd like to calculate scores for larger datasets
 
+- More precise control of variant matching parameters is now possible, like
+  ignoring strand flips
+
+- Automatically calculating every score associated with a trait or publication
+  in the PGS Catalog is now possible with ``--trait`` or ``--publication``
+
+Bug fixes
+~~~~~~~~~
+
+- Implemented a better prioritisation procedure if a variant has multiple
+  candidate matches
+  
+- Fixed processing multiple samplesets in parallel (e.g. 1000 Genomes + UK
+  Biobank)
+  
+- When combining multiple scoring files, all variants are now kept to keep the
+  denominator correct
+  
+- When trying to correct for strand flips the matched effect allele wasn't being
+  correctly complemented
+  
 pgsc_calc v1.0.0 (2022-05-24)
 --------------------------------
 

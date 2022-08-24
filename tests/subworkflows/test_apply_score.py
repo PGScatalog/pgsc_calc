@@ -18,5 +18,5 @@ def test_aggregated_scores(workflow_dir):
     assert not df.isnull().any().any(), 'Missing values in aggregated scores'
 
     numeric_cols = df.select_dtypes(include = ['int64', 'float64'])
-    weight_cols = df.drop(['dataset', 'IID'], axis = 1)
+    weight_cols = df.drop(['sampleset', 'IID'], axis = 1)
     assert weight_cols.equals(numeric_cols), "Weight columns aren't numeric"

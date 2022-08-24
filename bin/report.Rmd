@@ -1,6 +1,11 @@
 ---
 title: "Report: PGS Catalog Calculator Pipeline"
-output: html_document
+output: 
+  html_document:
+    toc: true
+    toc_depth: 5
+    toc_float: 
+      collapsed: false
 date: "`r Sys.time()`"
 params:
   img: PGS_Logo.png
@@ -43,13 +48,15 @@ read_log <- function(path) {
 log <- Reduce(dplyr::bind_rows, lapply(log_paths, read_log))
 ```
 
-```{r, echo=FALSE}
-# logo
-htmltools::img(src = knitr::image_uri("PGS_Logo.png"),
-               alt = 'logo', 
-               style = 'position:absolute; top:0; right:0; padding:10px;',
-               height = "200px")
-```
+<style>
+#TOC {
+  background: url("https://github.com/PGScatalog/pgsc_calc/blob/main/assets/PGS_Logo.png?raw=true");
+  background-size: 33%;
+  background-position: top;
+  padding-top: 100px !important;
+  background-repeat: no-repeat;
+}
+</style>
 
 ## Pipeline command 
 
@@ -57,10 +64,10 @@ htmltools::img(src = knitr::image_uri("PGS_Logo.png"),
 cat command.txt
 ```
 
-## Scoring file metadata {.tabset .tabset-fade}
+## Scoring file metadata 
 
 <div class="alert alert-info", role="alert">
-<p>Additional <a href="https://pgscatalog.github.io/pgsc_calc/explanation/output.html">documentation is available</a> that explains some of the terms used this report in more detail</p>
+<p>Additional <a href="https://pgsc-calc.readthedocs.io/en/dev/explanation/output.html">documentation is available</a> that explains some of the terms used this report in more detail</p>
 </div>
 
 ### Scoring files
@@ -102,53 +109,60 @@ make_publication_table <- function(log) {
   
   unformatted <- dplyr::bind_cols(df, pubs, traits)
   
+  unformatted$genome_build <- json$results$variants_genomebuild
+  
   return(add_urls(tidyr::unite(unformatted, "Publication", firstauthor:date_publication, sep = " ")))
 }
 
 log %>%
   count(accession, name = "n_variants") %>%
   left_join(make_publication_table(log), by = "accession") %>%
-  tidyr::unite("Publication", c(Publication, pgp_id), sep = ";<br>") %>%
-  tidyr::unite("Trait", c(reported, mapped), sep = ";<br>") %>%
+  tidyr::unite("Publication", c(pgp_id, Publication), sep = " | ") %>%
+  mutate(reported = paste0("<u>Reported trait</u>: ", reported),
+         mapped = paste0("<u>Mapped trait</u>: ", mapped)) %>%
+  tidyr::unite("Trait", c(reported, mapped), sep = "<br>") %>%
+  select(accession, pgs_id, Publication, Trait, n_variants, genome_build) %>% 
   DT::datatable(
     rownames = FALSE,
     escape = FALSE,
     colnames = c(
       "Scoring file" = "accession",
       "Polygenic Score ID" = "pgs_id",
-      "Number of variants" = "n_variants"
+      "Number of variants" = "n_variants",
+      "Genome build (reported)" = "genome_build"
     ),
     extensions = 'Buttons',
     options = list(dom = 'Bfrtip',
-                   buttons = c('copy', 'csv', 'excel'))
+                   buttons = c('csv'))
   )
 ```
 
 ### Variant matching
 
+<hr>
 
-<h3>Parameters</h3>
+#### Parameters
 
-```{r match_params, echo = FALSE}
-params_df <- read.table("params.txt", sep = ":")
-colnames(params_df) <- c("Parameter", "Value")
-DT::datatable(params_df, list(dom = "t"), rownames= FALSE)
+```{bash match_params, echo = FALSE}
+cat "params.txt"
 ```
 
 ```{r match_summary, echo = FALSE}
 log %>%
   mutate(match_type = forcats::fct_collapse(match_type, unmatched = "no match", other_level = "matched")) %>%
-  group_by(sampleset, accession, match_type) %>%
+  group_by(sampleset, accession, match_type, match_pass) %>%
   count() %>%
   group_by(sampleset, accession) %>%
   mutate(percent = round(n / sum(n) * 100, 1)) %>%
   arrange(accession, desc(percent)) %>%
-  tidyr::pivot_wider(names_from = match_type, values_from = c(n, percent)) -> compat
+  tidyr::pivot_wider(names_from = match_type, values_from = c(n, percent)) %>%
+  replace(is.na(.), 0) -> compat
 ```
 
 ```{r compat_details, echo = FALSE, message = FALSE}
 log %>%
   mutate(match_type = forcats::fct_collapse(match_type, unmatched = "no match", other_level = "matched")) %>%
+  filter(match_pass == "true") %>%
   group_by(sampleset, accession) %>%
   count(match_type, is_multiallelic, ambiguous, .drop = FALSE) %>%
   filter(match_type == "matched") -> counts
@@ -169,7 +183,8 @@ log %>%
 ```
 
 <hr>
-<h3>Summary</h3>
+
+#### Summary
 
 ```{r match_table, echo = FALSE}
 compat %>%
@@ -179,14 +194,27 @@ compat %>%
   select(sampleset,
          accession,
          n_variants,
+         match_pass,
          percent_matched,
          n_matched,
          n_unmatched) %>%
-  DT::datatable(rownames = FALSE)
+  DT::datatable(rownames = FALSE,
+                extensions = 'Buttons',
+    options = list(dom = 'Bfrtip',
+                   buttons = c('csv')),
+    colnames = c(
+      "Sampleset" = "sampleset",
+      "Scoring file" = "accession",
+      "Number of variants" = "n_variants",
+      "Passed matching" = "match_pass",
+      "Match %" = "percent_matched",
+      "Total matched" = "n_matched",
+      "Total unmatched" = "n_unmatched"
+    ))
 ```
 
 <hr>
-<h3>Detailed results</h3>
+#### Detailed results
 
 ```{r match_table_detailed, echo = FALSE}
 log %>%
@@ -202,14 +230,25 @@ log %>%
              )
            )) %>%
   group_by(sampleset, accession) %>%
-  count(match_type, ambiguous, is_multiallelic) %>%
+  count(match_pass, match_type, ambiguous, is_multiallelic) %>%
   rename(is_ambiguous = ambiguous) %>%
   mutate(percent = round(n / sum(n) * 100, 2)) %>%
   arrange(accession, desc(percent)) %>%
-  DT::datatable(rownames=FALSE)
+  DT::datatable(rownames=FALSE,
+                extensions = 'Buttons',
+    options = list(dom = 'Bfrtip',
+                   buttons = c('csv')),
+    colnames = c(
+      "Sampleset" = "sampleset",
+      "Scoring file" = "accession",
+      "Passed matching" = "match_pass",
+      "Match type" = "match_type",
+      "Ambiguous" = "is_ambiguous",
+      "Multiallelic" = "is_multiallelic"
+    ))
 ```
 
-## Scores {.tabset}
+## Scores 
 
 ```{r, echo = FALSE, message = FALSE}
 read_scorefiles <- function(path) {
@@ -236,8 +275,6 @@ fn <- paste0("aggregated_scores_", gsub(" |:|-", "_", Sys.time()), ".txt.gz")
 write.table(scores, gzfile(fn), col.names = TRUE, quote = FALSE, row.names = FALSE)
 ```
 
-### Summary
-
 ```{asis, echo = nrow(scores) < 50}
 <div class="alert alert-warning", role="alert">
   <strong>⚠️ Warning: small sample size (n < 50)</strong> 
@@ -259,7 +296,43 @@ write.table(scores, gzfile(fn), col.names = TRUE, quote = FALSE, row.names = FAL
 <p>`r sum(grepl("*_SUM$", colnames(scores))) - 2` scores for `r nrow(scores)` samples processed</p>
 </div>
 
-### Density plot
+
+```{r missing_scores, echo = FALSE}
+log %>% 
+  filter(match_pass == "false") %>%
+  group_by(sampleset, accession) %>% 
+  count(match_pass) -> missing_scores
+```
+
+```{asis, echo = nrow(missing_scores) > 0}
+<div class="alert alert-danger", role="alert">
+<p>Some scores are missing because they failed matching, check passed matching column 
+in summary table</p>
+</div>
+```
+
+### Score data {.tabset}
+
+#### Score extract
+
+<div class="alert alert-info", role="alert">
+<p>Below is a summary of the aggregated scores, which might be useful for 
+debugging.</p>
+</div>
+
+
+```{r, echo = FALSE}
+scores %>%
+  select(sampleset, IID, ends_with("SUM")) %>%
+  tibble::as_tibble(.)
+```
+
+<div class="alert alert-info", role="alert">
+<p>See here for an explanation of <a href="https://www.cog-genomics.org/plink/2.0/formats#sscore">plink2 column names</a>
+</p>
+</div>
+
+#### Density plot
 
 <div class="alert alert-info", role="alert">
 <p>The summary density plots show up to six scoring files</p>
@@ -290,26 +363,11 @@ long_scores %>%
       facet_wrap(~name, ncol = 2, scales = "free_x") +
       theme_bw() +
       labs(x = "Score sum", y = "Density", title = "Distribution of scores")
+
+ggsave("density.pdf")
 ```
-
-### Score extract
-
-```{r, echo = FALSE}
-# only show one score in extract
-
-scores %>%
-  select(sampleset, IID, ends_with("SUM")) %>%
-  tibble::as_tibble(.)
-```
-
-<div class="alert alert-info", role="alert">
-<p>See here for an explanation of <a href="https://www.cog-genomics.org/plink/2.0/formats#sscore">plink2 column names</a>
-</p>
-</div>
 
 ### Get scores
 
-<div class="alert alert-info", role="alert">
-<p>All scores can also be found in "aggregated_scores.txt.gz", in the results folder 
-output by the pipeline</p>
-</div>
+All scores can also be found in "aggregated_scores.txt.gz", in the results folder 
+output by the pipeline.
