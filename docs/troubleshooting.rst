@@ -53,14 +53,4 @@ and run plink2 and convert your data to plink files that can be used with the ca
 
 however other methods to filter these variants from VCFs also exist.
 
-VCF file(s) containing variants on non-standard chromsomes or patches (e.g. chr1_gl000191_random) will also currently fail
-our pipeline as it only takes human chromosomes as input (1-22, X, Y, XY). One way to remove these variants is to download
-and run plink2 and convert your data to plink files that can be used with the calculator using the following command:
-
-.. code-block:: console
-
-    plink2 --vcf [yourfile] --allow-extra-chr --chr 1-22, X, Y, XY -make-pgen --out [yourfile]_axy
-
-however other methods to filter these variants from VCFs also exist.
-
 .. _`thanks to Rvtests`: http://zhanxw.github.io/rvtests/#input-files    
