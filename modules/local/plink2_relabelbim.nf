@@ -8,7 +8,7 @@ process PLINK2_RELABELBIM {
         'quay.io/biocontainers/plink2:2.00a3.3--hb2a7ceb_0' :
         'dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/plink2:arm64-2.00a3.3' }"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/plink2:2.00a2.3--hb2a7ceb_2' :
+        'https://depot.galaxyproject.org/singularity/plink2:2.00a3.3--hb2a7ceb_0' :
         dockerimg }"
 
     input:

@@ -7,7 +7,7 @@
     - fast
   files:
     - path: output/samplesheet/out.json
-    - path: output/scorefile/scorefiles.txt
+    - path: output/combine/scorefiles.txt
     - path: output/plink2/cineca_synthetic_subset_22.bed
     - path: output/plink2/cineca_synthetic_subset_22.bim
     - path: output/plink2/cineca_synthetic_subset_22.fam
