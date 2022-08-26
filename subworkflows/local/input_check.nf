@@ -3,7 +3,7 @@
 //
 
 include { SAMPLESHEET_JSON } from '../../modules/local/samplesheet_json'
-include { SCOREFILE_CHECK  } from '../../modules/local/scorefile_check'
+include { COMBINE_SCOREFILES  } from '../../modules/local/combine_scorefiles'
 
 workflow INPUT_CHECK {
     take:
@@ -68,15 +68,15 @@ workflow INPUT_CHECK {
     }
         .set { ch_pfiles }
 
-    SCOREFILE_CHECK ( scorefile, reference )
+    COMBINE_SCOREFILES ( scorefile, reference )
 
-    versions = ch_versions.mix(SCOREFILE_CHECK.out.versions)
+    versions = ch_versions.mix(COMBINE_SCOREFILES.out.versions)
 
     ch_bfiles.bed.mix(ch_pfiles.pgen).dump(tag: 'input').set { geno }
     ch_bfiles.bim.mix(ch_pfiles.pvar).dump(tag: 'input').set { variants }
     ch_bfiles.fam.mix(ch_pfiles.psam).dump(tag: 'input').set { pheno }
     ch_input.vcf.dump(tag: 'input').set{vcf}
-    SCOREFILE_CHECK.out.scorefiles.dump(tag: 'input').set{ scorefiles }
+    COMBINE_SCOREFILES.out.scorefiles.dump(tag: 'input').set{ scorefiles }
 
     emit:
     geno
