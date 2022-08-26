@@ -1,4 +1,4 @@
-process SCOREFILE_CHECK {
+process COMBINE_SCOREFILES {
     label 'process_medium'
     label 'verbose'
 

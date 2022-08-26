@@ -34,7 +34,7 @@
     - fast
   exit_code: 1
 
-- name: pgscatalog test good and bad accessions (GRCh38)
+- name: pgscatalog test good and bad accessions GRCh38
   command: nextflow run ./tests/modules/download -entry testmixedaccessions -c ./tests/config/nextflow.config -profile test
   tags:
     - module
