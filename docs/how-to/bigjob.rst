@@ -1,19 +1,20 @@
 .. _big job:
 
-How do I run big jobs on a powerful computer?
-=============================================
+How do I run `pgsc_calc` on larger datasets and more powerful computers?
+========================================================================
 
-If you want to calculate many polygenic scores for a very large dataset, like
-the UK BioBank, you might need some extra computing power! You might have access
-to a powerful workstation, a University cluster, or some cloud compute
-resources. This section will show how to set up pgsc_calc to submit work to
-these types of systems.
+If you want to calculate many polygenic scores for a very large dataset (e.g. UK BioBank)
+you will likely need to adjust the pipeline settings. You might have access to a powerful workstation,
+a University cluster, or some cloud compute resources. This section will show how to set up
+`pgsc_calc` to submit work to these types of systems by creating and editing `nextflow .config files`_.
 
-Configuring pgsc_calc to use more resources locally
----------------------------------------------------
+.. _nextflow .config files: https://www.nextflow.io/docs/latest/config.html
+
+Configuring `pgsc_calc` to use more resources locally
+-----------------------------------------------------
 
 If you have a powerful computer available locally, you can configure the amount
-of resources that the workflow uses. 
+of resources that each job in the workflow uses.
 
 .. code-block:: text
 
@@ -53,7 +54,13 @@ High performance computing cluster
 
 If you have access to a HPC cluster, you'll need to configure your cluster's
 unique parameters to set correct queues, user accounts, and resource
-limits. Here's an example for an LSF cluster:
+limits.
+
+.. note:: Your institution may already have `a nextflow profile`_ with existing cluster settings
+          that can be adapted instead of setting up a custom config using ``-c``
+
+However, in general you will have to adjust the ``executor`` options and job resource
+allocations (e.g. ``process_low``). Here's an example for an LSF cluster:
 
 .. code-block:: text
 
@@ -74,10 +81,10 @@ limits. Here's an example for an LSF cluster:
             time   = 4.h
         }
         withName: PLINK2_SCORE {
-            maxForks = 50
+            maxForks = 25
         }       
-    } 
-    
+    }
+
 In SLURM, queue is equivalent to a partition. Specific cluster parameters can be
 provided by modifying ``clusterOptions``. You should change ``cpus``,
 ``memory``, and ``time`` to match the amount of resources used. Assuming the
@@ -102,9 +109,6 @@ instead:
 
 .. note:: The name of the nextflow and singularity modules will be different in
           your local environment
-          
-.. note:: Your institution may already have `a nextflow profile`_, which can be
-          used instead of setting up a custom config using ``-c``
 
 .. note:: Think about enabling fast variant matching with ``--fast_match``!      
           
@@ -126,11 +130,11 @@ Other environments
 
 Nextflow also supports submitting jobs platforms like:
 
-- Google cloud
-- Azure cloud
-- Amazon cloud
-- Kubernetes
+- Google cloud (https://www.nextflow.io/docs/latest/google.html)
+- Azure cloud (https://www.nextflow.io/docs/latest/azure.html)
+- Amazon cloud (https://www.nextflow.io/docs/latest/aws.html)
+- Kubernetes (https://www.nextflow.io/docs/latest/kubernetes.html)
   
 Check the `nextflow documentation`_ for configuration specifics.
 
-.. _`nextflow documentation`: https://nextflow.io/docs/latest/google.html
+.. _`nextflow documentation`: https://nextflow.io/docs/latest/

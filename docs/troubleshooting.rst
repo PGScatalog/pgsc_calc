@@ -19,7 +19,8 @@ Did you forget to set ``--max_cpu`` or ``--max_memory?``
 
 You can also edit ``nextflow.config`` to configure cpu and memory permanently. nf-core
 provides a `set of example .config files`_, including examples for both institutional
-compute clusters (e.g. Cambridge, Sanger) and cloud compute providers (e.g. Google, AWS Tower and Batch).
+compute clusters (e.g. Cambridge, Sanger) and cloud compute providers
+(e.g. Google, AWS Tower and Batch). See :ref:`big job` for more information.
 
 .. _set of example .config files : https://github.com/nf-core/configs
 

@@ -229,3 +229,13 @@ If the workflow didn't execute successfully, have a look at the
 :ref:`troubleshoot` section. Remember to replace ``<docker/singularity/conda>``
 with the software you have installed on your computer.
 
+4. Next steps & advanced usage
+------------------------------
+
+The pipeline distributes with settings that easily allow for it to be run on a
+personal computer on smaller datasets (e.g. 1000 Genomes, HGDP).
+
+For information on how to run the pipelines on larger datasets/computers/job-schedulers,
+see :ref:`big job`.
+
+If you are using an newer Mac computer with an M-series chip, see :ref:`arm`.
