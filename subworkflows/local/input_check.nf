@@ -98,7 +98,7 @@ def json_to_genome(HashMap slurped) {
     // parse slurped JSON into [[meta], [path_to_target_genome]]
     def meta      = [:]
 
-    meta.id       = slurped.sample
+    meta.id       = slurped.sampleset
     meta.is_vcf   = slurped.vcf_path ? true : false
     meta.is_bfile = slurped.bed ? true : false
     meta.is_pfile = slurped.pgen ? true : false

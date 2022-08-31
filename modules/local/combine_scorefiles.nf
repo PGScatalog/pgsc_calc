@@ -40,6 +40,7 @@ process COMBINE_SCOREFILES {
     else
         """
         combine_scorefiles -s $raw_scores \
+            -t $params.target_build \
             -o scorefiles.txt \
             $args
 
