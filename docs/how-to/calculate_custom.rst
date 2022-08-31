@@ -20,7 +20,7 @@ way. To do this, set up a spreadsheet that looks like:
    :widths: 25 25 25 25
    :header-rows: 1
 
-   * - sample
+   * - sampleset
      - vcf_path
      - bfile_path
      - chrom

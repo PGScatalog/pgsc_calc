@@ -92,7 +92,7 @@ way. To do this, set up a spreadsheet that looks like one of the examples below:
    :widths: 20 20 20 20 20
    :header-rows: 1
 
-   * - sample
+   * - sampleset
      - vcf_path
      - bfile_path
      - pfile_path
@@ -112,7 +112,7 @@ way. To do this, set up a spreadsheet that looks like one of the examples below:
    :widths: 20 20 20 20 20
    :header-rows: 1
 
-   * - sample
+   * - sampleset
      - vcf_path
      - bfile_path
      - pfile_path
@@ -127,7 +127,7 @@ way. To do this, set up a spreadsheet that looks like one of the examples below:
    :widths: 20 20 20 20 20
    :header-rows: 1
 
-   * - sample
+   * - sampleset
      - vcf_path
      - bfile_path
      - pfile_path
@@ -146,9 +146,12 @@ way. To do this, set up a spreadsheet that looks like one of the examples below:
 There are five mandatory columns. Columns that specify genomic data paths
 (**vcf_path**, **bfile_path**, and **pfile_path**) are mutually exclusive:
 
-- **sample**: A text string containing the name of a dataset, which can be split
-  across multiple files. Scores generated from files with the same sample name
-  are combined in later stages of the analysis.
+- **sampleset**: A text string referring to the name of a :term:`target dataset` of
+  genotyping data containing at least one sample/individual (however cohort datasets
+  will often contain many individuals with combined genotyped/imputed data). Data from a
+  sampleset may be input as a single file, or split across chromosomes into multiple files.
+  Scores generated from files with the same sampleset name are combined in later stages of the
+  analysis.
 - **vcf_path**: A text string of a file path pointing to a multi-sample
   :term:`VCF` file. File names must be unique. It's best to use full file paths,
   not relative file paths.
@@ -158,7 +161,7 @@ There are five mandatory columns. Columns that specify genomic data paths
   unique. It's best to use full file paths, not relative file paths.
 - **pfile_path**: Like **bfile_path**, but for a PLINK2 format fileset (pgen /
   psam / pvar)
-- **chrom**: An integer, range 1-22. If the target genomic data file contains
+- **chrom**: An integer (range 1-22) or string (X, Y). If the target genomic data file contains
   multiple chromosomes, leave empty. Don't use a mix of empty and integer
   chromosomes in the same sample.
 

@@ -57,11 +57,12 @@ Glossary
          common genome builds (GRCh37 and GRCh38). The pipeline
 
      target dataset
-         The genomes/genotyping data that you want to calculate polygenic scores for.
-         Scores are calculated from an existing scoring file that contains effect alleles
-         and associated weights. These genomes should distinct from those used to
-         develop the polygenic score originally (i.e., those used to derive the risk alleles
-         and weights), as overlapping samples will inflate common metrics of PGS accuracy.
+         Also referred to as a **sampleset** within the input samplesheets. The genomes/genotyping
+         data that you want to calculate polygenic scores for. Scores are calculated from an
+         existing scoring file that contains effect alleles and associated weights. These genomes
+         should distinct from those used to develop the polygenic score originally (i.e., those
+         used to derive the risk alleles and weights), as overlapping samples will inflate common
+         metrics of PGS accuracy.
 
      VCF
          Variant Call Format. A `standard file format`_ used to store genetic variants and genotypes.
