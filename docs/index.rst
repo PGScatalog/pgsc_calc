@@ -1,13 +1,32 @@
 :orphan:
    
 ``pgsc_calc``: a reproducible workflow to calculate polygenic scores
-=================================================
+====================================================================
 
-The ``pgsc_calc`` workflow makes it easy to calculate a :term:`polygenic score` using
-scoring files of PGS published in the `Polygenic Score (PGS) Catalog`_ |:dna:|
+The ``pgsc_calc`` workflow makes it easy to calculate a :term:`polygenic score` (PGS) using
+scoring files published in the `Polygenic Score (PGS) Catalog`_ |:dna:|
 and/or custom scoring files.
 
+The calculator workflow automates PGS downloads from the Catalog,
+vairant matching between scoring files and target genotyping samplesets,
+and the paralell calculation of multiple PGS.
+
 .. _`Polygenic Score (PGS) Catalog`: https://www.pgscatalog.org/
+
+Workflow summary
+----------------
+
+Currently the pipeline works
+
+- Fetch scoring files using the PGS Catalog API in a specified genome build (GRCh37 and GRCh38).
+- Read custom scoring files (perform liftover if genotyping data is in a different build).
+- Match variants in the scoring files against variants in the target dataset (in plink bfile/pfile or VCF format)
+- Automatically combine and split different scoring files for efficient parallel computation of multiple PGS
+- Calculate and create aggregate score data for all samples
+- Publish a summary report to visualize score distributions and pipeline metadata (variant matching QC)
+
+See `Features Under Development <Features Under Development_>`_ section for information
+about planned updates.
 
 Quick example
 -------------
@@ -59,27 +78,6 @@ The workflow should output:
 
 If you want to try the workflow with your own data, have a look at the
 :ref:`get started` section.
-     
-Workflow summary
-----------------
-
-- Fetch scoring files using the PGS Catalog API in a specified genome build (GRCh37 and GRCh38).
-- Read custom scoring files (perform liftover if genotyping data is in a different build).
-- Match variants in the scoring files against variants in the target dataset (in plink bfile/pfile or VCF format)
-- Automatically combine and split different scoring files for efficient parallel computation of multiple PGS
-- Calculate and create aggregate score data for all samples
-- Publish a summary report to visualize score distributions and pipeline metadata (variant matching QC)
-
-In the future, the calculator will include new features for PGS interpretation:
-
-- *Genetic Ancestry*: calculate similarity of target samples to populations in a
-  reference dataset (e.g. `1000 Genomes (1000G)`_, `Human Genome Diversity Project (HGDP)`_)
-  using principal components analysis (PCA).
-- *PGS Normalization*: Using reference population data and/or PCA projections to report
-  individual-level PGS predictions (e.g. percentiles, z-scores) that account for genetic ancestry.
-
-.. _1000 Genomes (1000G): http://www.nature.com/nature/journal/v526/n7571/full/nature15393.html
-.. _Human Genome Diversity Project (HGDP): https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7115999/
 
 Documentation
 -------------
@@ -95,22 +93,20 @@ Changelog
 
 The :doc:`Changelog page<changelog>` describes fixes and enhancements for each version.
 
-Citations
----------
+Features Under Development
+--------------------------
 
-If you use ``pgscatalog/pgsc_calc`` in your analysis, please cite:
+In the future, the calculator will include new features for PGS interpretation:
 
-    PGS Catalog Calculator `(in development)`. PGS Catalog
-    Team. https://github.com/PGScatalog/pgsc_calc
+- *Genetic Ancestry*: calculate similarity of target samples to populations in a
+  reference dataset (e.g. `1000 Genomes (1000G)`_, `Human Genome Diversity Project (HGDP)`_)
+  using principal components analysis (PCA).
+- *PGS Normalization*: Using reference population data and/or PCA projections to report
+  individual-level PGS predictions (e.g. percentiles, z-scores) that account for genetic ancestry.
 
-    Lambert `et al.` (2021) The Polygenic Score Catalog as an open database for
-    reproducibility and systematic evaluation.  Nature Genetics. 53:420–425
-    doi:`10.1038/s41588-021-00783-5`_.
+.. _1000 Genomes (1000G): http://www.nature.com/nature/journal/v526/n7571/full/nature15393.html
+.. _Human Genome Diversity Project (HGDP): https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7115999/
 
-In addition, please remember to cite the other papers and software tools described in the `citations file`_.
-
-.. _citations file: https://github.com/PGScatalog/pgsc_calc/blob/master/CITATIONS.md
-.. _10.1038/s41588-021-00783-5: https://doi.org/10.1038/s41588-021-00783-5
 
 Credits
 -------
@@ -131,6 +127,24 @@ and Aoife McMahon (EBI). Development of new features, testing, and code review
 is ongoing including Inouye lab members (Rodrigo Canovas, Scott Ritchie) and others. A
 manuscript describing the tool is in preparation (see `Citations <Citations_>`_) and we
 welcome ongoing community feedback before then.
+
+Citations
+~~~~~~~~~
+
+If you use ``pgscatalog/pgsc_calc`` in your analysis, please cite:
+
+    PGS Catalog Calculator `(in development)`. PGS Catalog
+    Team. https://github.com/PGScatalog/pgsc_calc
+
+    Lambert `et al.` (2021) The Polygenic Score Catalog as an open database for
+    reproducibility and systematic evaluation.  Nature Genetics. 53:420–425
+    doi:`10.1038/s41588-021-00783-5`_.
+
+In addition, please remember to cite the other papers and software tools described in the `citations file`_.
+
+.. _citations file: https://github.com/PGScatalog/pgsc_calc/blob/master/CITATIONS.md
+.. _10.1038/s41588-021-00783-5: https://doi.org/10.1038/s41588-021-00783-5
+
 
 Others
 ~~~~~~
