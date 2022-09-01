@@ -303,6 +303,10 @@
                         "arm64"
                     ],
                     "description": "What platform is the pipeline executing on?"
+                },
+                "parallel": {
+                    "type": "boolean",
+                    "description": "Enable parallel calculation of scores. This is I/O and RAM intensive."
                 }
             },
             "required": [

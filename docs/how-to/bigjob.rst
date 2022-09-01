@@ -1,17 +1,18 @@
 .. _big job:
 
-How do I run `pgsc_calc` on larger datasets and more powerful computers?
-========================================================================
+How do I run ``pgsc_calc`` on larger datasets and more powerful computers?
+==========================================================================
 
-If you want to calculate many polygenic scores for a very large dataset (e.g. UK BioBank)
-you will likely need to adjust the pipeline settings. You might have access to a powerful workstation,
-a University cluster, or some cloud compute resources. This section will show how to set up
-`pgsc_calc` to submit work to these types of systems by creating and editing `nextflow .config files`_.
+If you want to calculate many polygenic scores for a very large dataset (e.g. UK
+BioBank) you will likely need to adjust the pipeline settings. You might have
+access to a powerful workstation, a University cluster, or some cloud compute
+resources. This section will show how to set up ``pgsc_calc`` to submit work to
+these types of systems by creating and editing `nextflow .config files`_.
 
 .. _nextflow .config files: https://www.nextflow.io/docs/latest/config.html
 
-Configuring `pgsc_calc` to use more resources locally
------------------------------------------------------
+Configuring ``pgsc_calc`` to use more resources locally
+-------------------------------------------------------
 
 If you have a powerful computer available locally, you can configure the amount
 of resources that each job in the workflow uses.
@@ -37,7 +38,8 @@ of resources that each job in the workflow uses.
     } 
 
 You should change ``cpus``, ``memory``, and ``time`` to match the amount of
-resources used. Assuming the configuration file you set up is saved as
+resources you have available. The values provided are a sensible starting point
+for very large datasets.  Assuming the configuration file you set up is saved as
 ``my_custom.config`` in your current working directory, you're ready to run
 pgsc_calc:
 
@@ -47,7 +49,12 @@ pgsc_calc:
         -profile <docker/singularity/conda> \
         --input samplesheet.csv \
         --accession PGS001229 \
+        --parallel \
         -c my_custom.config
+
+.. note:: Using the ``parallel`` parameter enables parallel score calculation,
+          which is a RAM and I/O intensive process. It's disabled by default to
+          prevent laptops with 16GB RAM crashing on smaller datasets.
 
 High performance computing cluster
 ----------------------------------
@@ -56,8 +63,9 @@ If you have access to a HPC cluster, you'll need to configure your cluster's
 unique parameters to set correct queues, user accounts, and resource
 limits.
 
-.. note:: Your institution may already have `a nextflow profile`_ with existing cluster settings
-          that can be adapted instead of setting up a custom config using ``-c``
+.. note:: Your institution may already have `a nextflow profile`_ with existing
+          cluster settings that can be adapted instead of setting up a custom
+          config using ``-c``
 
 However, in general you will have to adjust the ``executor`` options and job resource
 allocations (e.g. ``process_low``). Here's an example for an LSF cluster:
@@ -80,9 +88,6 @@ allocations (e.g. ``process_low``). Here's an example for an LSF cluster:
             memory = 64.GB
             time   = 4.h
         }
-        withName: PLINK2_SCORE {
-            maxForks = 25
-        }       
     }
 
 In SLURM, queue is equivalent to a partition. Specific cluster parameters can be
@@ -105,12 +110,18 @@ instead:
         -profile singularity \
         --input samplesheet.csv \
         --accession PGS001229 \
+        --parallel \
         -c my_custom.config
 
 .. note:: The name of the nextflow and singularity modules will be different in
           your local environment
 
-.. note:: Think about enabling fast variant matching with ``--fast_match``!      
+.. note:: Think about enabling fast variant matching with ``--fast_match``!
+
+.. warning:: Make sure to copy input data to fast storage, and run the pipeline
+            on the same fast storage area. You might include these steps in your
+            bash script. Ask your sysadmin for help if you're not sure what this
+            means.
           
 .. code-block:: console
             
