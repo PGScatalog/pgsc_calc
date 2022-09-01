@@ -9,7 +9,7 @@
     - path: output/combine/scorefiles.txt
 
 - name: test input check subworkflow with PGS catalog API 
-  command: nextflow run main.nf -profile test --pgs_id PGS001229 --only_input -c ./tests/config/nextflow.config --target_build GRCh38
+  command: nextflow run main.nf -profile test --pgs_id PGS001229 --only_input -c ./tests/config/nextflow.config --target_build GRCh38 --liftover
   tags:
     - inputcheck
     - subworkflow
@@ -20,7 +20,7 @@
     - path: output/combine/scorefiles.txt
 
 - name: test input check subworkflow with PGS catalog API and whitespace
-  command: nextflow run main.nf -profile test --pgs_id "PGS001229, PGS000802" --only_input  -c ./tests/config/nextflow.config --target_build GRCh38
+  command: nextflow run main.nf -profile test --pgs_id "PGS001229, PGS000802" --only_input  -c ./tests/config/nextflow.config --target_build GRCh38 --liftover
   tags:
     - inputcheck
     - subworkflow
