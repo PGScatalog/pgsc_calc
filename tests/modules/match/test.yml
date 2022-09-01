@@ -18,3 +18,7 @@
         - "other_allele"
         - "effect_weight"
         - "effect_type"
+    - path: output/match/versions.yml
+      contains:
+        - "pgscatalog_utils: 0.1.2"
+        
