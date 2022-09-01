@@ -19,8 +19,8 @@ Calculated scores are stored in a gzipped-text space-delimted text file called
 ``aggregated_scores`` that is labelled with the date/time (e.g. ``aggregated_scores_YYYY_MM_DD_HH_MM_SS.txt.gz``).
 Each row represents an individual, and there should be at least three columns with the following headers:
 
-- ``dataset``: the name of the input dataset
-- ``IID``: the name of each sample
+- ``dataset``: the name of the input sampleset
+- ``IID``: the identifier of each sample within the dataset
 - ``[PGS NAME]_SUM``: reports the weighted sum of *effect_allele* dosages multiplied by their *effect_weight*
   for each matched variant in the scoring file. The column name will be different depending on the scores
   you have chosen to use (e.g. ``PGS000001_SUM``).

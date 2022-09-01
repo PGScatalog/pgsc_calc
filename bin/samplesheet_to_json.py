@@ -30,14 +30,14 @@ def truncate_chrom(chrom):
 def check_samplesheet(file_in: str, file_out: str) -> None:
     """
     This function checks that the samplesheet follows the following structure:
-    sample,vcf_path,bfile_path,chrom,chunk
+    sampleset,vcf_path,bfile_path,chrom,chunk
     cineca_synthetic_subset,cineca_synthetic_subset.vcf.gz,,22,
     """
     csv: pd.DataFrame = pd.read_csv(file_in, sep=',', header=0)
 
     csv['chrom'] = csv['chrom'].apply(truncate_chrom)
 
-    colnames: set = {'sample', 'vcf_path', 'bfile_path', 'pfile_path', 'chrom'}
+    colnames: set = {'sampleset', 'vcf_path', 'bfile_path', 'pfile_path', 'chrom'}
     colname_err: str = "ERROR: Samplesheet has bad column names"
     assert set(csv.columns) == colnames, colname_err
 
@@ -58,24 +58,24 @@ def check_samplesheet(file_in: str, file_out: str) -> None:
 def check_paths_exclusive(df: pd.DataFrame) -> None:
     genome_paths: List[str] = ['vcf_path', 'bfile_path', 'pfile_path']
     genome_df: pd.DataFrame = df[genome_paths].fillna("")
-    missing_err: str = "ERROR: No genome paths specified in a sample"
+    missing_err: str = "ERROR: No genome paths specified in a sampleset"
 
     assert not (genome_df.applymap(pd.isnull)).all(axis=1).any(), missing_err
 
     assert not (genome_df.applymap(len)
                 .apply(lambda x: x > 0, axis=1)
                 .agg(sum, axis=1) > 1
-                ).any(), "ERROR: Multiple genome paths set in a sample"
+                ).any(), "ERROR: Multiple genome paths set in a sampleset"
 
 
 def check_chrom(df: pd.DataFrame) -> None:
-    sample_group: pd.core.groupby.DataFrameGroupBy = df.groupby(['sample'])
-    chrom_unique_error: str = "Chromosomes must be unique for each sample: {}"
-    chrom_nan_error: str = "Multiple samples with same label MUST have unique chroms specified: {}"
-    for sample, group in sample_group:
-        assert len(group['chrom'].unique()) == len(group['chrom']), chrom_unique_error.format(sample)
+    sampleset_group: pd.core.groupby.DataFrameGroupBy = df.groupby(['sampleset'])
+    chrom_unique_error: str = "Chromosomes must be unique for each sampleset: {}"
+    chrom_nan_error: str = "Multiple samplesets with same label MUST have unique chroms specified: {}"
+    for dataset, group in sampleset_group:
+        assert len(group['chrom'].unique()) == len(group['chrom']), chrom_unique_error.format(dataset)
         if group['chrom'].hasnans:
-            assert len(group['chrom']) == 1, chrom_nan_error.format(sample)
+            assert len(group['chrom']) == 1, chrom_nan_error.format(dataset)
 
 
 def check_vcf_paths(path: pd.Series) -> pd.Series:

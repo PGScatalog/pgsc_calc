@@ -9,10 +9,10 @@
   "items": {
     "type": "object",
     "properties": {
-      "sample": {
+      "sampleset": {
         "type": "string",
         "pattern": "^\\S+$",
-        "description": "Sample name must be provided and cannot contain spaces"
+        "description": "Sampleset name must be provided and cannot contain spaces"
       },
       "vcf_path": {
         "type": "string",
