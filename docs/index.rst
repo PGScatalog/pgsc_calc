@@ -128,9 +128,9 @@ ancestry inference implemented in nextflow derived from an existing set of
 tools/scripts developed by Inouye lab (Rodrigo Canovas, Scott Ritchie, Jingqin
 Wu) and PGS Catalog teams (Samuel Lambert, Laurent Gil).
 
-The adaptation of the codebase and nextflow implementation is written by
-Benjamin Wingfield with input and supervision from Samuel Lambert (PGS Catalog)
-and Aoife McMahon (EBI). Development of new features, testing, and code review
+The adaptation of the codebase, nextflow implementation, and PGS Catalog features
+are written by Benjamin Wingfield, Samuel Lambert, Laurent Gil with additional input
+from Aoife McMahon (EBI). Development of new features, testing, and code review
 is ongoing including Inouye lab members (Rodrigo Canovas, Scott Ritchie) and others. A
 manuscript describing the tool is in preparation (see `Citations <Citations_>`_) and we
 welcome ongoing community feedback before then.
@@ -147,42 +147,39 @@ If you use ``pgscatalog/pgsc_calc`` in your analysis, please cite:
     reproducibility and systematic evaluation.  Nature Genetics. 53:420–425
     doi:`10.1038/s41588-021-00783-5`_.
 
-In addition, please remember to cite the other papers and software tools described in the `citations file`_.
+In addition, please remember to cite the primary publications for any PGS Catalog scores
+you use in your analyses, and the underlying data/software tools described in the `citations file`_.
 
 .. _citations file: https://github.com/PGScatalog/pgsc_calc/blob/master/CITATIONS.md
 .. _10.1038/s41588-021-00783-5: https://doi.org/10.1038/s41588-021-00783-5
 
 
-Others
-~~~~~~
+License Information
+~~~~~~~~~~~~~~~~~~~
 
-This pipeline uses code and infrastructure developed and maintained by the
-`nf-core`_ community, reused here under the `MIT license`_:
+This pipeline is distributed  under an `Apache 2.0 license`_, but makes use of
+multiple open-source software and datasets (complete list in the `citations file`_)
+that are distributed under their own licenses. Notably:
 
-    The nf-core framework for community-curated bioinformatics pipelines.
+- `Nextflow (Apache 2.0 license)`_ and `nf-core`_ (`MIT license`_). See & cite
+  `Ewels et al. Nature Biotech (2020)`_ for additional information about the project.
+- PLINK 1/2 software (`GPLv3+`_)
+- `CINECA synthetic cohort <https://doi.org/10.5281/zenodo.5082689>`_ data for test dataset (`CC-BY-NC-SA <https://creativecommons.org/licenses/by-nc-sa/4.0/>`_)
 
-    Philip Ewels, Alexander Peltzer, Sven Fillinger, Harshil Patel, Johannes
-    Alneberg, Andreas Wilm, Maxime Ulysse Garcia, Paolo Di Tommaso & Sven
-    Nahnsen.
+We note that it is up to end-users to ensure that their use of the pipeline
+and test data conforms to the license restrictions.
 
-    Nat Biotechnol. 2020 Feb 13. doi: 10.1038/s41587-020-0439-x.
+.. _GPLv3+: https://www.cog-genomics.org/plink/2.0/dev
+.. _Nextflow (Apache 2.0 license): https://github.com/nextflow-io/nextflow/blob/master/COPYING
+.. _MIT license: https://github.com/nf-core/tools/blob/master/LICENSE
+.. _nf-core: https://nf-co.re
+.. _Apache 2.0 license: https://github.com/PGScatalog/pgsc_calc/blob/master/LICENSE
+.. _Ewels et al. Nature Biotech (2020): https://doi.org/10.1038/s41587-020-0439-x
+
+Funding
+~~~~~~~
 
 This work has received funding from EMBL-EBI core funds, the Baker Institute,
 the University of Cambridge, Health Data Research UK (HDRUK), and the European
 Union’s Horizon 2020 research and innovation programme under grant agreement No
 101016775 INTERVENE.
-
-.. _MIT license: https://github.com/nf-core/tools/blob/master/LICENSE
-.. _nf-core: https://nf-co.re
-
-
-Data references
-~~~~~~~~~~~~~~~
-
-The pipeline is distributed with and uses a licensed dataset for testing:
-
-- `CC-BY-NC-SA <https://creativecommons.org/licenses/by-nc-sa/4.0/>`_: `CINECA synthetic cohort Europe CH SIB <https://doi.org/10.5281/zenodo.5082689>`_
-
-A subset of variants was sampled from the original CINECA synthetic European
-cohort to create the test dataset. It's up to end-users to ensure that their use
-of test data conforms to the license restrictions.
