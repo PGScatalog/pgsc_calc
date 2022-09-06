@@ -8,9 +8,9 @@
 The pipeline outputs are written to a results directory
 (``--outdir`` default is ``./results/``) that contains three subdirectories:
 
-- :ref:``score/``: calculated PGS with summary report
-- :ref:``match/`` : scoring files and variant match metadata
-- :ref:``pipeline_info/`` : nextflow pipeline execution (memory, runtime, etc.)
+- ``score/``: calculated PGS with summary report
+- ``match/`` : scoring files and variant match metadata
+- ``pipeline_info/`` : nextflow pipeline execution (memory, runtime, etc.)
 
 ``score/``
 ----------
