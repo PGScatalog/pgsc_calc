@@ -2,15 +2,15 @@
 .. _interpret:
 
 ``pgsc_calc`` Outputs & Results
-=============================
+===============================
 
 
 The pipeline outputs are written to a results directory
 (``--outdir`` default is ``./results/``) that contains three subdirectories:
 
-- ``score/``
-- ``match/``
-- ``pipeline_info/``
+- ``score/`` : calculated PGS with summary report
+- ``match/`` : scoring files and variant match metadata
+- ``pipeline_info/`` : nextflow pipeline execution (memory, runtime, etc.)
 
 ``score/``
 ----------
@@ -31,8 +31,11 @@ small sample size (n < 50, in this cases a column named ``[PGS NAME]_AVG`` will 
 normalizes the PGS using the number of non-missing genotypes to avoid using allele frequency data
 from the target sample).
 
+Report
+~~~~~~
+
 A summary report is also available (``report.html``). The report should open in
-a web browser and contain useful information about the PGS that were applied,
+a web browser and contains useful information about the PGS that were applied,
 how well the variants match with the genotyping data, and some simple graphs
 displaying the distribution of scores in your dataset(s) as a density plot.
 
@@ -41,17 +44,63 @@ displaying the distribution of scores in your dataset(s) as a density plot.
 
 This directory contains the raw data that is summarised in the scoring
 report. The log file is a :term:`CSV` that contains a row for each variant in
-the aggregated input scoring files. Columns contain information about how each
-variant was matched against the target genomes. For example, a variant in a
-scoring file may be:
+the combined input scoring files. This information might be useful to debug a
+score that is causing problems. Columns contain information about how each
+variant was matched against the target genomes:
 
-- Simple to match, with the effect allele being REF and the other allele being
-  ALT in the target genomes
-- Lifted from its original genome build to match the target genome build
-- The effect allele may have matched ALT and the other allele may have matched
-  REF in the target genomes
 
-This information might be useful to debug a score that is causing problems.
+.. list-table:: ``[sampleset]_log.csv`` metadata
+    :widths: 20, 80
+    :header-rows: 1
+
+    * - ``column_name``
+      - Description
+    * - ``chr_name``
+      - Chromosome name/number associated with the variant.
+    * - ``chr_position``
+      - Chromosomal position associated with the variant.
+    * - ``effect_allele``
+      - The allele that's dosage is counted (e.g. {0, 1, 2}) and multiplied by the variant's weight (effect_weight)
+        when calculating score. The effect allele is also known as the 'risk allele'.
+    * - ``other_allele``
+      - The other non-effect allele(s) at the loci.
+    * - ``effect_weight``
+      - Value of the effect that is multiplied by the dosage of the effect allele (effect_allele) when
+        calculating the score. Additional information on how the effect_weight was derived is in the weight_type
+        field of the header, and score development method in the metadata downloads.
+    * - ``effect_type``
+      - Whether the dosage is calculated as additive ({0, 1, 2}), dominant ({0, 1}) or recessive ({0, 1}).
+    * - ``accession``
+      - Name of the scoring file.
+    * - ``row_nr``
+      - Line number of the variant with reference to the original scoring file (accession).
+    * - ``ID``
+      - Identifier of the matched variant.
+    * - ``REF``
+      - Matched variant: reference allele.
+    * - ``ALT``
+      - Matched variant: alternative allele.
+    * - ``matched_effect_allele``
+      - Which of the REF/ALT alleles is the effect_allele in the target dataset.
+    * - ``match_type``
+      - Record of how the scoring file variant ``effect_allele`` & ``other_allele`` (*if available*) match
+        the REF/ALT orientation of the ID, and whether the variant had to be strand-flipped to acheive a match.
+    * - ``is_duplicated``
+      - True/False flag indicating whether multiple scoring file variants match a single target ID.
+    * - ``is_multiallelic``
+      - True/False flag indicating whether the matched variant is multi-allelic (multiple ALT alleles).
+    * - ``ambiguous``
+      - True/False flag indicating whether the matched variant is strand-ambiguous (e.g. A/T and C/G variants).
+    * - ``passes_pruning``
+      - True/False flag indicating whether the matched variant is included in the final scoring file.
+    * - ``dataset``
+      - Name of the sampleset/genotyping data.
+    * - ``match_pass``
+      - True/False flag indicating whether the current accession was included in the final scoring file(s).
+    * - ``match_rate``
+      - Percentage of variants in the current accession that match the target dataset, combined with minimum
+        overlap flag to determine match_pass.
+
 
 Processed scoring files are also present in this directory. Briefly, variants in
 the scoring files are matched against the target genomes. Common variants across
