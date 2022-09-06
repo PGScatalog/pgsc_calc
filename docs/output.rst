@@ -39,6 +39,11 @@ a web browser and contains useful information about the PGS that were applied,
 how well the variants match with the genotyping data, and some simple graphs
 displaying the distribution of scores in your dataset(s) as a density plot.
 
+.. raw:: html
+
+    <iframe src="../assets/examples/example_report.html"></iframe>
+
+
 ``match/``
 ----------
 
