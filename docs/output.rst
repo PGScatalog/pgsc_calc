@@ -39,9 +39,33 @@ a web browser and contains useful information about the PGS that were applied,
 how well the variants match with the genotyping data, and some simple graphs
 displaying the distribution of scores in your dataset(s) as a density plot.
 
-.. image:: screenshots/Report_1_header.png
-    :width: 400
+The fist section of the report reproduces the nextflow command, and metadata (imported
+from the PGS Catalog for each PGS ID) describing the scoring files that were applied
+to your sampleset(s):
+
+.. image:: screenshots/Report_1_Header.png
+    :width: 600
     :alt: Example PGS Catalog Report: header sections
+
+Within the scoring file metadata section are two tables describing how well the variants within
+each scoring file match with target sampleset(s). The first table provides a summary of the
+number and percentage of variants within each score that have been matched, and whether that
+score passed the ``--min_overlap`` threshold (Passed Matching column) for calculation. The second
+table provides a more detailed summary of variant matches broken down by types of variants (strand ambiguous,
+multi-allelic, duplicates) for the matched and unmatched variants (see ``match/`` section for details):
+
+.. image:: screenshots/Report_2_VariantMatching.png
+    :width: 600
+    :alt: Example PGS Catalog Report: Variant matching/qc tables (summary & detailed)
+
+The final section shows an example of the results table that contains the sample identifiers and
+calculated PGS in the *Score extract* panel. A visual display of the PGS distribution for a set of example
+score(s) (up to 6) is provided in the *Density plot* panel which can be helpful for looking at the distributions in
+multiple dataset(s):
+
+.. image:: screenshots/Report_3_Scores.png
+    :width: 600
+    :alt: Example PGS Catalog Report: Variant matching/qc tables (summary & detailed)
 
 ``match/``
 ----------
@@ -87,8 +111,11 @@ variant was matched against the target genomes:
     * - ``matched_effect_allele``
       - Which of the REF/ALT alleles is the effect_allele in the target dataset.
     * - ``match_type``
-      - Record of how the scoring file variant ``effect_allele`` & ``other_allele`` (*if available*) match
-        the REF/ALT orientation of the ID, and whether the variant had to be strand-flipped to acheive a match.
+      - Record of how the scoring file variant ``effect_allele`` & ``other_allele`` match
+        the REF/ALT orientation of the ID (e.g. *refalt* or *altref*), and whether the variant had to be strand-flipped
+        to achieve a match (match_types ending with ``_flip``). If the non-effect allele (``other_allele``)
+        is missing from the scoring file variant the ``match_type`` will be either (*no_oa_refalt* or *no_oa_altref*)
+        and include information about whether it was flipped.
     * - ``is_multiallelic``
       - True/False flag indicating whether the matched variant is multi-allelic (multiple ALT alleles).
     * - ``ambiguous``
