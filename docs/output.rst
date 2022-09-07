@@ -39,6 +39,9 @@ a web browser and contains useful information about the PGS that were applied,
 how well the variants match with the genotyping data, and some simple graphs
 displaying the distribution of scores in your dataset(s) as a density plot.
 
+.. image:: screenschots/Report_1_header.png
+    :width: 400
+    :alt: Example PGS Catalog Report: header sections
 
 ``match/``
 ----------
@@ -86,14 +89,14 @@ variant was matched against the target genomes:
     * - ``match_type``
       - Record of how the scoring file variant ``effect_allele`` & ``other_allele`` (*if available*) match
         the REF/ALT orientation of the ID, and whether the variant had to be strand-flipped to acheive a match.
-    * - ``is_duplicated``
-      - True/False flag indicating whether multiple scoring file variants match a single target ID.
     * - ``is_multiallelic``
       - True/False flag indicating whether the matched variant is multi-allelic (multiple ALT alleles).
     * - ``ambiguous``
       - True/False flag indicating whether the matched variant is strand-ambiguous (e.g. A/T and C/G variants).
-    * - ``passes_pruning``
-      - True/False flag indicating whether the matched variant is included in the final scoring file.
+    * - ``duplicate``
+      - True/False flag indicating whether multiple scoring file variants match a single target ID.
+    * - ``best_match``
+      - True/False flag indicating whether this candidate match is the best match for the scoring file variant (accession/row_nr).
     * - ``dataset``
       - Name of the sampleset/genotyping data.
     * - ``match_pass``
