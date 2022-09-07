@@ -39,7 +39,7 @@ a web browser and contains useful information about the PGS that were applied,
 how well the variants match with the genotyping data, and some simple graphs
 displaying the distribution of scores in your dataset(s) as a density plot.
 
-.. image:: screenschots/Report_1_header.png
+.. image:: screenshots/Report_1_header.png
     :width: 400
     :alt: Example PGS Catalog Report: header sections
 
