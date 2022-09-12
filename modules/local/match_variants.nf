@@ -14,7 +14,8 @@ process MATCH_VARIANTS {
 
     output:
     tuple val(scoremeta), path("*.scorefile"), emit: scorefile
-    path "*_log.csv"                         , emit: db
+    path "*_summary.csv"                     , emit: summary
+    path "*_log.csv.gz"                      , emit: db
     path "versions.yml"                      , emit: versions
 
     script:

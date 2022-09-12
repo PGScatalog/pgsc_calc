@@ -195,6 +195,8 @@ workflow.onComplete {
         NfcoreTemplate.email(workflow, params, summary_params, projectDir, log, multiqc_report)
     }
     NfcoreTemplate.summary(workflow, params, log)
+    println "Please remember to cite polygenic score authors if you publish with them!"
+    println "Check the output report for citation details"
 }
 
 /*

@@ -12,6 +12,6 @@
     - path: output/plink2/cineca_synthetic_subset_22.bim
     - path: output/plink2/cineca_synthetic_subset_22.fam
     - path: output/match/cineca-synthetic-subset_22_additive_0.scorefile
-    - path: output/match/cineca-synthetic-subset_log.csv
+    - path: output/match/cineca-synthetic-subset_log.csv.gz
     - path: output/score/report.html
       

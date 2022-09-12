@@ -73,6 +73,6 @@ workflow MAKE_COMPATIBLE {
     pheno      = pheno_std
     variants   = variants_std
     scorefiles = MATCH_VARIANTS.out.scorefile
-    db         = MATCH_VARIANTS.out.db
+    db         = MATCH_VARIANTS.out.summary
     versions   = ch_versions
 }

@@ -10,7 +10,8 @@
         - "ID"
         - "effect_allele"
         - "PGS001229"
-    - path: output/match/test_log.csv
+    - path: output/match/test_summary.csv
+    - path: output/match/test_log.csv.gz
       contains:
         - "chr_name"
         - "chr_position"

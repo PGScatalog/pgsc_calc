@@ -18,18 +18,13 @@ library(jsonlite)
 library(dplyr)
 library(ggplot2)
 
-log_paths <- list.files(pattern = "*_log.csv", full.names = TRUE)
+log_paths <- list.files(pattern = "*_summary.csv", full.names = TRUE)
 
 read_log <- function(path) {
   log <- read.csv(path, stringsAsFactors = FALSE)
   
   return(
     log %>%
-      mutate(match_type = ifelse(
-        log$match_type == "",
-        "no match",
-        log$match_type
-      )) %>%
       mutate(
         accession = ifelse(
           stringr::str_detect(accession, "^PGS"),
@@ -149,37 +144,14 @@ cat "params.txt"
 
 ```{r match_summary, echo = FALSE}
 log %>%
-  mutate(match_type = forcats::fct_collapse(match_type, unmatched = "no match", other_level = "matched")) %>%
-  group_by(sampleset, accession, match_type, match_pass) %>%
-  count() %>%
+  mutate(match_status = forcats::fct_collapse(match_status, matched = "matched", other_level = "unmatched")) %>%
+  group_by(sampleset, accession, match_status, score_pass) %>%
+  count(wt = count) %>%
   group_by(sampleset, accession) %>%
-  mutate(percent = round(n / sum(n) * 100, 1)) %>%
+  mutate(percent = round(n / sum(n) * 100, 1), n_variants = sum(n)) %>%
   arrange(accession, desc(percent)) %>%
-  tidyr::pivot_wider(names_from = match_type, values_from = c(n, percent)) %>%
+  tidyr::pivot_wider(names_from = match_status, values_from = c(n, percent)) %>%
   replace(is.na(.), 0) -> compat
-```
-
-```{r compat_details, echo = FALSE, message = FALSE}
-log %>%
-  mutate(match_type = forcats::fct_collapse(match_type, unmatched = "no match", other_level = "matched")) %>%
-  filter(match_pass == "true") %>%
-  group_by(sampleset, accession) %>%
-  count(match_type, is_multiallelic, ambiguous, .drop = FALSE) %>%
-  filter(match_type == "matched") -> counts
-
-counts %>%
-  filter(is_multiallelic == "true" & match_type == "matched") %>%
-  group_by(sampleset, accession) %>%
-  summarise(n_matched_multiallelic = sum(n)) -> n_matched_multiallelic
-  
-counts %>%
-  filter(ambiguous == "true" & match_type == "matched") %>%
-  group_by(sampleset, accession) %>%
-  summarise(n_matched_ambiguous = sum(n)) -> n_matched_ambiguous
-
-log %>%
-  group_by(sampleset) %>%
-  count(accession, name = "n_variants") -> n_variants
 ```
 
 <hr>
@@ -188,16 +160,8 @@ log %>%
 
 ```{r match_table, echo = FALSE}
 compat %>%
-  left_join(n_matched_ambiguous, by = c("sampleset", "accession")) %>%
-  left_join(n_matched_multiallelic, by = c("sampleset", "accession")) %>%
-  left_join(n_variants, by = c("sampleset", "accession")) %>%
-  select(sampleset,
-         accession,
-         n_variants,
-         match_pass,
-         percent_matched,
-         n_matched,
-         n_unmatched) %>%
+  select(sampleset, accession, n_variants, score_pass, percent_matched,
+         n_matched, n_unmatched) %>%
   DT::datatable(rownames = FALSE,
                 extensions = 'Buttons',
     options = list(dom = 'Bfrtip',
@@ -206,7 +170,7 @@ compat %>%
       "Sampleset" = "sampleset",
       "Scoring file" = "accession",
       "Number of variants" = "n_variants",
-      "Passed matching" = "match_pass",
+      "Passed matching" = "score_pass",
       "Match %" = "percent_matched",
       "Total matched" = "n_matched",
       "Total unmatched" = "n_unmatched"
@@ -218,22 +182,12 @@ compat %>%
 
 ```{r match_table_detailed, echo = FALSE}
 log %>%
-  mutate(match_type =
-           suppressWarnings(
-             forcats::fct_collapse(
-               match_type,
-               unmatched = "no match",
-               match_flipped = c("refalt_flip", "altref_flip"),
-               matched_no_other_allele = c("no_oa_alt", "no_oa_ref", 
-                                           "no_oa_alt_flip", "no_oa_ref_flip"),
-               other_level = "matched"
-             )
-           )) %>%
   group_by(sampleset, accession) %>%
-  count(match_pass, match_type, ambiguous, is_multiallelic) %>%
+  count(score_pass, match_status, ambiguous, is_multiallelic, wt = count) %>%
   rename(is_ambiguous = ambiguous) %>%
-  mutate(percent = round(n / sum(n) * 100, 2)) %>%
-  arrange(accession, desc(percent)) %>%
+  mutate(percent = round(n / sum(n) * 100, 2),
+         match_status = forcats::fct_relevel(match_status, "matched", "excluded", "unmatched")) %>%
+  arrange(accession, match_status) %>%
   DT::datatable(rownames=FALSE,
                 extensions = 'Buttons',
     options = list(dom = 'Bfrtip',
@@ -241,8 +195,8 @@ log %>%
     colnames = c(
       "Sampleset" = "sampleset",
       "Scoring file" = "accession",
-      "Passed matching" = "match_pass",
-      "Match type" = "match_type",
+      "Passed matching" = "score_pass",
+      "Match type" = "match_status",
       "Ambiguous" = "is_ambiguous",
       "Multiallelic" = "is_multiallelic"
     ))
@@ -299,9 +253,9 @@ write.table(scores, gzfile(fn), col.names = TRUE, quote = FALSE, row.names = FAL
 
 ```{r missing_scores, echo = FALSE}
 log %>% 
-  filter(match_pass == "false") %>%
+  filter(score_pass == "false") %>%
   group_by(sampleset, accession) %>% 
-  count(match_pass) -> missing_scores
+  count(score_pass) -> missing_scores
 ```
 
 ```{asis, echo = nrow(missing_scores) > 0}
@@ -368,3 +322,13 @@ long_scores %>%
 ### Get scores
 
 All scores can be found in "aggregated_scores.txt.gz", in the results folder output by the pipeline.
+
+## Citations
+
+<div class="alert alert-info", role="alert">
+<p>For scores from the PGS Catalog, please remember to cite the original publications from which they came (these are listed in the metadata table.) </p>
+</div>
+
+> PGS Catalog Calculator (in development). PGS Catalog Team. https://github.com/PGScatalog/pgsc_calc
+
+> Lambert et al. (2021) The Polygenic Score Catalog as an open database for reproducibility and systematic evaluation. Nature Genetics. 53:420–425 doi:10.1038/s41588-021-00783-5.
