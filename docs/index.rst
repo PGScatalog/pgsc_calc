@@ -8,8 +8,8 @@ scoring files published in the `Polygenic Score (PGS) Catalog`_ |:dna:|
 and/or custom scoring files.
 
 The calculator workflow automates PGS downloads from the Catalog,
-vairant matching between scoring files and target genotyping samplesets,
-and the paralell calculation of multiple PGS.
+variant matching between scoring files and target genotyping samplesets,
+and the parallel calculation of multiple PGS.
 
 .. _`Polygenic Score (PGS) Catalog`: https://www.pgscatalog.org/
 

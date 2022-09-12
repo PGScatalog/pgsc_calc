@@ -51,14 +51,16 @@ with the specific container manager you intend to use:
     ------------------------------------------------------
     executor >  local (7)
 
-    [49/d28766] process > PGSC_CALC:PGSCALC:INPUT_CHECK:SAMPLESHEET_JSON (samplesheet.csv)           [100%] 1 of 1 ✔
-    [c3/a8e0d9] process > PGSC_CALC:PGSCALC:INPUT_CHECK:SCOREFILE_CHECK                              [100%] 1 of 1 ✔
-    [-        ] process > PGSC_CALC:PGSCALC:MAKE_COMPATIBLE:PLINK2_VCF                               -
-    [7c/5cca6c] process > PGSC_CALC:PGSCALC:MAKE_COMPATIBLE:PLINK2_BFILE (cineca_synthetic_subset)   [100%] 1 of 1 ✔
-    [3b/ce0e39] process > PGSC_CALC:PGSCALC:MAKE_COMPATIBLE:MATCH_VARIANTS (cineca_synthetic_subset) [100%] 1 of 1 ✔
-    [2e/fb3233] process > PGSC_CALC:PGSCALC:APPLY_SCORE:PLINK2_SCORE (cineca_synthetic_subset)       [100%] 1 of 1 ✔
-    [b5/fc5b1e] process > PGSC_CALC:PGSCALC:APPLY_SCORE:SCORE_REPORT (1)                             [100%] 1 of 1 ✔
-    [03/009cb6] process > PGSC_CALC:PGSCALC:DUMPSOFTWAREVERSIONS (1)                                 [100%] 1 of 1 ✔
+    executor >  local (7)
+    [06/6462a0] process > PGSCATALOG_PGSCALC:PGSCALC:INPUT_CHECK:SAMPLESHEET_JSON (samplesheet.csv)                         [100%] 1 of 1 ✔
+    [b3/d80f09] process > PGSCATALOG_PGSCALC:PGSCALC:INPUT_CHECK:COMBINE_SCOREFILES (1)                                     [100%] 1 of 1 ✔
+    [bd/ad4d8c] process > PGSCATALOG_PGSCALC:PGSCALC:MAKE_COMPATIBLE:PLINK2_RELABELBIM (cineca_synthetic_subset chromoso... [100%] 1 of 1 ✔
+    [-        ] process > PGSCATALOG_PGSCALC:PGSCALC:MAKE_COMPATIBLE:PLINK2_RELABELPVAR                                     -
+    [-        ] process > PGSCATALOG_PGSCALC:PGSCALC:MAKE_COMPATIBLE:PLINK2_VCF                                             -
+    [09/bda9b3] process > PGSCATALOG_PGSCALC:PGSCALC:MAKE_COMPATIBLE:MATCH_VARIANTS (cineca_synthetic_subset)               [100%] 1 of 1 ✔
+    [23/2decd9] process > PGSCATALOG_PGSCALC:PGSCALC:APPLY_SCORE:PLINK2_SCORE (cineca_synthetic_subset chromosome 22 eff... [100%] 1 of 1 ✔
+    [25/6b87fc] process > PGSCATALOG_PGSCALC:PGSCALC:APPLY_SCORE:SCORE_REPORT (1)                                           [100%] 1 of 1 ✔
+    [6b/52087d] process > PGSCATALOG_PGSCALC:PGSCALC:DUMPSOFTWAREVERSIONS (1)                                               [100%] 1 of 1 ✔
     -[pgscatalog/pgsc_calc] Pipeline completed successfully-
     
 
