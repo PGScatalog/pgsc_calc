@@ -50,8 +50,6 @@ with the specific container manager you intend to use:
       https://github.com/pgscatalog/pgsc_calc/blob/master/CITATIONS.md
     ------------------------------------------------------
     executor >  local (7)
-
-    executor >  local (7)
     [06/6462a0] process > PGSCATALOG_PGSCALC:PGSCALC:INPUT_CHECK:SAMPLESHEET_JSON (samplesheet.csv)                         [100%] 1 of 1 ✔
     [b3/d80f09] process > PGSCATALOG_PGSCALC:PGSCALC:INPUT_CHECK:COMBINE_SCOREFILES (1)                                     [100%] 1 of 1 ✔
     [bd/ad4d8c] process > PGSCATALOG_PGSCALC:PGSCALC:MAKE_COMPATIBLE:PLINK2_RELABELBIM (cineca_synthetic_subset chromoso... [100%] 1 of 1 ✔
