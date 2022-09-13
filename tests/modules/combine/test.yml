@@ -5,7 +5,7 @@
     - combine
     - fast
   files:
-    - path: output/combine/scorefiles.txt
+    - path: output/combine/scorefiles.txt.gz
       contains:
         - "chr_name"
         - "chr_position"

@@ -13,8 +13,8 @@ process COMBINE_SCOREFILES {
     path reference
 
     output:
-    path "scorefiles.txt", emit: scorefiles
-    path "versions.yml"  , emit: versions
+    path "scorefiles.txt.gz", emit: scorefiles
+    path "versions.yml"     , emit: versions
 
     script:
     def args = task.ext.args ?: ''
@@ -27,7 +27,7 @@ process COMBINE_SCOREFILES {
         combine_scorefiles -s $raw_scores \
             --liftover \
             -t $params.target_build \
-            -o scorefiles.txt \
+            -o scorefiles.txt.gz \
             -c \$PWD \
             -m $params.min_lift \
             $args
@@ -41,7 +41,7 @@ process COMBINE_SCOREFILES {
         """
         combine_scorefiles -s $raw_scores \
             -t $params.target_build \
-            -o scorefiles.txt \
+            -o scorefiles.txt.gz \
             $args
 
         cat <<-END_VERSIONS > versions.yml

@@ -6,7 +6,7 @@
     - fast
   files:
     - path: output/samplesheet/out.json
-    - path: output/combine/scorefiles.txt
+    - path: output/combine/scorefiles.txt.gz
 
 - name: test input check subworkflow with PGS catalog API 
   command: nextflow run main.nf -profile test --pgs_id PGS001229 --only_input -c ./tests/config/nextflow.config --target_build GRCh38 --liftover
@@ -17,7 +17,7 @@
   files:
     - path: output/download/PGS001229_hmPOS_GRCh38.txt.gz
     - path: output/samplesheet/out.json
-    - path: output/combine/scorefiles.txt
+    - path: output/combine/scorefiles.txt.gz
 
 - name: test input check subworkflow with PGS catalog API and whitespace
   command: nextflow run main.nf -profile test --pgs_id "PGS001229, PGS000802" --only_input  -c ./tests/config/nextflow.config --target_build GRCh38 --liftover
@@ -29,4 +29,4 @@
     - path: output/download/PGS000802_hmPOS_GRCh38.txt.gz
     - path: output/download/PGS001229_hmPOS_GRCh38.txt.gz
     - path: output/samplesheet/out.json
-    - path: output/combine/scorefiles.txt
+    - path: output/combine/scorefiles.txt.gz

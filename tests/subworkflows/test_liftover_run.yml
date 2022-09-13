@@ -6,7 +6,7 @@
     - fast
   files:
     - path: output/samplesheet/out.json
-    - path: output/combine/scorefiles.txt
+    - path: output/combine/scorefiles.txt.gz
     - path: output/combine/versions.yml      
       contains:
         - "pgscatalog_utils: 0.1.2"
@@ -19,7 +19,7 @@
     - fast
   files:
     - path: output/samplesheet/out.json
-    - path: output/combine/scorefiles.txt
+    - path: output/combine/scorefiles.txt.gz
     - path: output/combine/versions.yml
       contains:
         - "pgscatalog_utils: 0.1.2"

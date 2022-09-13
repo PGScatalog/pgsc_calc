@@ -6,7 +6,7 @@
     - fast
   files:
     - path: output/samplesheet/out.json
-    - path: output/combine/scorefiles.txt
+    - path: output/combine/scorefiles.txt.gz
     - path: output/plink2/cineca_synthetic_subset_22.bim
     - path: output/plink2/cineca_synthetic_subset_22.bed
     - path: output/plink2/cineca_synthetic_subset_22.fam
@@ -21,7 +21,7 @@
     - fast
   files:
     - path: output/samplesheet/out.json
-    - path: output/combine/scorefiles.txt
+    - path: output/combine/scorefiles.txt.gz
     - path: output/plink2/vcf_cineca_synthetic_subset_22.pgen
     - path: output/plink2/vcf_cineca_synthetic_subset_22.pvar
     - path: output/plink2/vcf_cineca_synthetic_subset_22.psam
@@ -36,7 +36,7 @@
     - fast
   files:
     - path: output/samplesheet/out.json
-    - path: output/combine/scorefiles.txt
+    - path: output/combine/scorefiles.txt.gz
     - path: output/plink2/cineca_22.pgen
     - path: output/plink2/cineca_22.pvar
     - path: output/plink2/cineca_22.psam
