@@ -68,11 +68,6 @@ cat command.txt
 ### Scoring files
 
 ```{r, echo = FALSE}
-base_table <- function(log) {
-  log %>%
-    count(accession, name = "n_variants")
-}
-
 call_api <- function(log) {
   accessions <- trimws(unique(log$accession))
   pgs_ids <- paste(accessions, collapse = ",")
@@ -110,7 +105,7 @@ make_publication_table <- function(log) {
 }
 
 log %>%
-  count(accession, name = "n_variants") %>%
+  count(accession, wt = count, name = "n_variants") %>%
   left_join(make_publication_table(log), by = "accession") %>%
   tidyr::unite("Publication", c(pgp_id, Publication), sep = " | ") %>%
   mutate(reported = paste0("<u>Reported trait</u>: ", reported),
