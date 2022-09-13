@@ -90,7 +90,7 @@ make_publication_table <- function(log) {
   json <- call_api(log)
   
   if (json$size == 0) {
-    return(data.frame())
+    return(data.frame(accession=NA, pgp_id = NA, Publication = NA, reported = NA, mapped=NA, genome_build=NA,pgs_id=NA))
   }
   
   df <- data.frame(pgs_id = json$results$id) 
