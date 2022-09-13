@@ -195,7 +195,8 @@ log %>%
       "Multiple Potential Matches" = "duplicate_best_match",
       "Duplicated Matched Variants" = "duplicate_ID",
       "Ambiguous" = "is_ambiguous",
-      "Multiallelic" = "is_multiallelic"
+      "Multiallelic" = "is_multiallelic",
+      "%" = "percent"
     ))
 ```
 
