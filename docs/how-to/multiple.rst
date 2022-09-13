@@ -45,7 +45,7 @@ example:
 
 .. code-block:: console
                 
-    --accession PGS001229,PGS000802
+    --pgs_id PGS001229,PGS000802
 
 3. Multiple custom scorefiles
 -----------------------------
@@ -128,7 +128,7 @@ Setting effect types for variants is not supported with this format (see
     $ nextflow run pgscatalog/pgscalc \
         -profile <docker/singularity/conda> \
         --input samplesheet.csv \
-        --accession PGS001229,PGS001405
+        --pgs_id PGS001229,PGS001405
 
 - Or you might be using multiple scoring files in the same directory:
 
@@ -142,7 +142,7 @@ Setting effect types for variants is not supported with this format (see
 Congratulations, you've now calculated multiple scores in parallel!
 |:partying_face:|
 
-.. note:: You can set both ``--accession`` and ``--scorefile`` parameters to
+.. note:: You can set both ``--pgs_id`` and ``--scorefile`` parameters to
           combine scores in the PGS Catalog with your own custom scores
 
 After the workflow executes successfully, the calculated scores and a summary

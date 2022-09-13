@@ -48,7 +48,7 @@ pgsc_calc:
     $ nextflow run pgscatalog/pgsc_calc \
         -profile <docker/singularity/conda> \
         --input samplesheet.csv \
-        --accession PGS001229 \
+        --pgs_id PGS001229 \
         --parallel \
         -c my_custom.config
 
@@ -109,7 +109,7 @@ instead:
     nextflow run pgscatalog/pgsc_calc \
         -profile singularity \
         --input samplesheet.csv \
-        --accession PGS001229 \
+        --pgs_id PGS001229 \
         --parallel \
         -c my_custom.config
 

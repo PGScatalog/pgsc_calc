@@ -14,7 +14,7 @@ Parameters can be stored in YAML format, for example:
 .. code-block:: yaml
 
    input: path/to/samplesheet.csv
-   accession: 'PGS001229,PGS000018'
+   pgs_id: 'PGS001229,PGS000018'
    liftover: true   
    target_build: GRCh37
 

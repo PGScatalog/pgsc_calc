@@ -26,7 +26,7 @@ your custom scoring file to set the genome build:
 
 .. code-block:: console
 
-    #genome_build=GRCh38
+    #genome_build=GRCh37
 
 Valid genome builds are GRCh37 and GRCh38.
 
@@ -48,7 +48,7 @@ are in build GRCh38:
     $ nextflow run pgscatalog/pgsc_calc \
         -profile <docker/singularity/conda> \    
         --input samplesheet.csv \
-        --accession PGS001229 \
+        --scorefile MyCustomFile.txt \
         --liftover \
         --target_build GRCh38
 

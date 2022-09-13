@@ -179,8 +179,8 @@ parameter:
 
 .. code-block:: console
 
-    --accession PGS001229 # one score
-    --accession PGS001229,PGS001405 # many scores separated by , (no spaces)
+    --pgs_id PGS001229 # one score
+    --pgs_id PGS001229,PGS001405 # many scores separated by , (no spaces)
         
 If you would like to use a custom scoring file not published in the PGS Catalog,
 that's OK too (see :ref:`calculate custom`).
@@ -191,7 +191,7 @@ to using the ``--target_build`` parameter. The ``--target_build`` parameter only
 
 .. code-block:: console
 
-    --accession PGS001229,PGS001405 --target_build GRCh38
+    --pgs_id PGS001229,PGS001405 --target_build GRCh38
 
 In the case of the example above, both ``PGS001229`` and ``PGS001405`` are reported in genome build GRCh37.
 In cases where the build of your genomic data are different from the original build of the PGS Catalog score
@@ -218,7 +218,7 @@ they match the scoring file genome build.
     $ nextflow run pgscatalog/pgsc_calc \
         -profile <docker/singularity/conda> \
         --input samplesheet.csv --target_build GRCh37 \
-        --accession PGS001229
+        --pgs_id PGS001229
 
 Congratulations, you've now (`hopefully`) calculated some scores!
 |:partying_face:|

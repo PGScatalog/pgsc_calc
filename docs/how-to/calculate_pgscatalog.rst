@@ -45,13 +45,13 @@ accepts polygenic score IDs:
 
 .. code-block:: console
 
-    --accession PGS001229
+    --pgs_id PGS001229
 
 Multiple scores can be set by using a comma separated list:
 
 .. code-block:: console
 
-    --accession PGS001229,PGS000802
+    --pgs_id PGS001229,PGS000802
 
 .. _`PGS001229`: http://www.pgscatalog.org/score/PGS001229/
 
@@ -86,7 +86,7 @@ Multiple traits can be set by using a comma separated list.
 
 .. _`publication`: https://www.pgscatalog.org/browse/studies/
 
-.. note:: Accessions, traits, and publications can be combined to calculate
+.. note:: PGS, trait, and publication IDs can be combined to calculate
           multiple polygenic scores.
           
 3. Calculate!
@@ -97,7 +97,9 @@ Multiple traits can be set by using a comma separated list.
     $ nextflow run pgscatalog/pgscalc \
         -profile <docker/singularity/conda> \    
         --input samplesheet.csv \
-        --accession PGS001229
+        --pgs_id PGS001229 \
+        --trait EFO_0001645 \
+        --publication PGP000001
 
 .. note:: For more details about calculating multiple scores, see :ref:`multiple` 
 
