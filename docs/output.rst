@@ -52,7 +52,7 @@ each scoring file match with target sampleset(s). The first table provides a sum
 number and percentage of variants within each score that have been matched, and whether that
 score passed the ``--min_overlap`` threshold (Passed Matching column) for calculation. The second
 table provides a more detailed summary of variant matches broken down by types of variants (strand ambiguous,
-multi-allelic, duplicates) for the matched and unmatched variants (see ``match/`` section for details):
+multi-allelic, duplicates) for the matched, excluded, and unmatched variants (see ``match/`` section for details):
 
 .. image:: screenshots/Report_2_VariantMatching.png
     :width: 600
@@ -70,19 +70,71 @@ multiple dataset(s):
 ``match/``
 ----------
 
-This directory contains the raw data that is summarised in the scoring
-report. The log file is a :term:`CSV` that contains a row for each variant in
-the combined input scoring files. This information might be useful to debug a
+This directory contains information about the matching of scoring file variants to
+the genotyping data (samplesets). First a summary file (also displayed in the report)
+details whether each scoring file passes the minimum variant matching threshold, and
+the types of variants that were included in the score:
+
+.. list-table:: ``[sampleset]_summary.csv`` metadata
+    :widths: 20, 20, 60
+    :header-rows: 1
+
+    * - Report Field
+      - ``column_name``
+      - Description
+    * - Sampleset
+      - ``dataset``
+      - Name of the sampleset/genotyping data
+    * - Scoring file
+      - ``accession``
+      - Name of the scoring file.
+    * - Passed matching
+      - ``score_pass``
+      - True/False flag to indicate whether the scoring file passes the ``--min_overlap`` threshold
+        and is included in the final scoring file.
+    * - Match type
+      - ``match_status``
+      - Indicates whether the variant is matched (included in the final scoring file),
+        excluded (matched but removed based on variant filters), or unmatched.
+    * - Ambiguous
+      - ``ambiguous``
+      - True/False flag indicating whether the matched variant is strand-ambiguous (e.g. A/T and C/G variants).
+    * - Multiallelic
+      - ``is_multiallelic``
+      - True/False flag indicating whether the matched variant is multi-allelic (multiple ALT alleles).
+    * - Multiple Potential Matches
+      - ``duplicate_best_match``
+      - True/False flag indicating whether a single scoring file variants has multiple potential matches to the target genome.
+        This usually occurs when the variant has no other_allele, and with variants that have different REF alleles.
+    * - Duplicated Matched Variants
+      - ``duplicate_ID``
+      - True/False flag indicating whether multiple scoring file variants match a single target ID. This usually occurs
+        when scoring files have been lifted across builds and two variants now point to the same position (e.g. rsID mergers).
+    * - N
+      - ``count``
+      - Number of variants with this combination of metadata (grouped by: ``[ match_status, ambiguous, is_multiallelic,
+        duplicate_best_match, duplicate_ID]``
+    * - percent
+      - ``percent``
+      - Percent of the scoring file's variants that have the combination of metadata in count.
+
+
+The log file is a :term:`CSV` that contains all possible matches
+for each variant in the combined input scoring files. This information is useful to debug a
 score that is causing problems. Columns contain information about how each
 variant was matched against the target genomes:
 
 
-.. list-table:: ``[sampleset]_log.csv`` metadata
+.. list-table:: ``[sampleset]_log.csv.gz`` metadata
     :widths: 20, 80
     :header-rows: 1
 
     * - ``column_name``
       - Description
+    * - ``row_nr``
+      - Line number of the variant with reference to the original scoring file (accession).
+    * - ``accession``
+      - Name of the scoring file.
     * - ``chr_name``
       - Chromosome name/number associated with the variant.
     * - ``chr_position``
@@ -98,10 +150,6 @@ variant was matched against the target genomes:
         field of the header, and score development method in the metadata downloads.
     * - ``effect_type``
       - Whether the dosage is calculated as additive ({0, 1, 2}), dominant ({0, 1}) or recessive ({0, 1}).
-    * - ``accession``
-      - Name of the scoring file.
-    * - ``row_nr``
-      - Line number of the variant with reference to the original scoring file (accession).
     * - ``ID``
       - Identifier of the matched variant.
     * - ``REF``
@@ -120,17 +168,17 @@ variant was matched against the target genomes:
       - True/False flag indicating whether the matched variant is multi-allelic (multiple ALT alleles).
     * - ``ambiguous``
       - True/False flag indicating whether the matched variant is strand-ambiguous (e.g. A/T and C/G variants).
-    * - ``duplicate``
+    * - ``duplicate_best_match``
+      - True/False flag indicating whether a single scoring file variants has multiple potential matches to the target genome.
+        This usually occurs when the variant has no other_allele, and with variants that have different REF alleles.
+    * - ``duplicate_ID``
       - True/False flag indicating whether multiple scoring file variants match a single target ID.
-    * - ``best_match``
-      - True/False flag indicating whether this candidate match is the best match for the scoring file variant (accession/row_nr).
+    * - ``match_status``
+      - Indicates whether the variant is matched (included in the final scoring file), excluded (matched but removed
+        based on variant filters), not_best (a different match candidate was selected for this scoring file variant),
+        or unmatched.
     * - ``dataset``
       - Name of the sampleset/genotyping data.
-    * - ``match_pass``
-      - True/False flag indicating whether the current accession was included in the final scoring file(s).
-    * - ``match_rate``
-      - Percentage of variants in the current accession that match the target dataset, combined with minimum
-        overlap flag to determine match_pass.
 
 
 Processed scoring files are also present in this directory. Briefly, variants in
