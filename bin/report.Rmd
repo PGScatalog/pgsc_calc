@@ -178,7 +178,7 @@ compat %>%
 ```{r match_table_detailed, echo = FALSE}
 log %>%
   group_by(sampleset, accession) %>%
-  count(score_pass, match_status, ambiguous, is_multiallelic, wt = count) %>%
+  count(score_pass, match_status, ambiguous, is_multiallelic, duplicate_best_match, duplicate_ID, wt = count) %>%
   rename(is_ambiguous = ambiguous) %>%
   mutate(percent = round(n / sum(n) * 100, 2),
          match_status = forcats::fct_relevel(match_status, "matched", "excluded", "unmatched")) %>%
@@ -192,6 +192,8 @@ log %>%
       "Scoring file" = "accession",
       "Passed matching" = "score_pass",
       "Match type" = "match_status",
+      "Multiple Potential Matches" = "duplicate_best_match",
+      "Duplicated Matched Variants" = "duplicate_ID",
       "Ambiguous" = "is_ambiguous",
       "Multiallelic" = "is_multiallelic"
     ))
