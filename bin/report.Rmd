@@ -137,7 +137,7 @@ log %>%
 cat "params.txt"
 ```
 
-```{r match_summary, echo = FALSE}
+```{r match_summary, echo = FALSE, warning=FALSE}
 log %>%
   mutate(match_status = forcats::fct_collapse(match_status, matched = "matched", other_level = "unmatched")) %>%
   group_by(sampleset, accession, match_status, score_pass) %>%
@@ -175,7 +175,7 @@ compat %>%
 <hr>
 #### Detailed results
 
-```{r match_table_detailed, echo = FALSE}
+```{r match_table_detailed, echo = FALSE, warning=FALSE}
 log %>%
   group_by(sampleset, accession) %>%
   count(score_pass, match_status, ambiguous, is_multiallelic, duplicate_best_match, duplicate_ID, wt = count) %>%
