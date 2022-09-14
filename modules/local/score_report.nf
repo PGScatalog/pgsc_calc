@@ -11,7 +11,7 @@ process SCORE_REPORT {
     path scorefiles
     path report
     path logo
-    path db
+    path '*' // list of summary csvs, staged with original names
 
     output:
     path "*.html"      , emit: report

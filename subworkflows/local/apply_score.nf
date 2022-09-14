@@ -53,7 +53,7 @@ workflow APPLY_SCORE {
         SCORE_AGGREGATE.out.scores,
         Channel.fromPath("$projectDir/bin/report.Rmd", checkIfExists: true),
         Channel.fromPath("$projectDir/assets/PGS_Logo.png", checkIfExists: true),
-        db
+        db.collect()
     )
 
     ch_versions = ch_versions.mix(SCORE_REPORT.out.versions)
