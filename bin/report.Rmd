@@ -81,9 +81,13 @@ add_urls <- function(df) {
   df$accession <- df$pgs_id
   df$pgs_id <- paste0('<a href="https://www.pgscatalog.org/score/', df$pgs_id, '">', df$pgs_id, '</a>')
   df$pgp_id <- paste0('<a href="https://www.pgscatalog.org/publication/', df$id, '">', df$id, '</a>')
-  df$mapped <- paste0('<a href="', df$url, '">', df$label, '</a>')
-  df$url <- df$label <- df$id <- NULL
+  df$id <- NULL
   return(df)
+}
+
+combine_mapped_traits <- function(json_efo_entry){
+  mapped_html <- paste0('<a href="', json_efo_entry$url, '">', json_efo_entry$label, '</a>')
+  return(paste(mapped_html, collapse=', '))
 }
 
 make_publication_table <- function(log) {
@@ -96,7 +100,7 @@ make_publication_table <- function(log) {
   df <- data.frame(pgs_id = json$results$id) 
   pubs <- json$results$publication[, c("id", "firstauthor", "journal", "date_publication")]
   traits <- data.frame(reported = json$results$trait_reported,
-                       Reduce(dplyr::bind_rows, json$results$trait_efo)[, c("label", "url")])
+                       mapped = sapply(json$results$trait_efo, combine_mapped_traits))
   
   unformatted <- dplyr::bind_cols(df, pubs, traits)
   
