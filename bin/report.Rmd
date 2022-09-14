@@ -217,31 +217,6 @@ get_sampleset_name <- function(path) {
   return(strsplit(path, split = "_")[[1]][[1]])
 }
 
-read_and_aggregate <- function(df, path) {
-  sampleset <- get_sampleset_name(path)
-  
-  if (is.null(nrow(df))) {
-    # initialise 
-    message("Reading first scorefile")
-    df <- readr::read_tsv(path, show_col_types = FALSE) %>%
-      rename(IID = `#IID`)
-    df$sampleset <- sampleset
-    return(df)
-  } else {
-    message("Reading next scorefile")
-    df2 <- readr::read_tsv(path, show_col_types = FALSE) %>%
-      rename(IID = `#IID`)
-    df2$sampleset <- sampleset
-    
-    message("Aggregating")
-    dplyr::bind_rows(df, df2) %>%
-      group_by(sampleset, IID) %>%
-      summarise(across(matches("SUM$"), sum, na.rm = TRUE),
-                DENOM_SUM = sum(DENOM, na.rm = TRUE)) %>%
-      return(.)
-  }
-}
-
 scorefiles <- list.files(pattern = "*.sscore")
 
 if (length(scorefiles) == 1) {
@@ -253,9 +228,26 @@ if (length(scorefiles) == 1) {
   scores$sampleset <- get_sampleset_name(scorefiles)
 } else {
   message("Multiple score files detected")
-  scores <- Reduce(read_and_aggregate, scorefiles) %>%
-    ungroup() %>%
-    mutate(across(matches("SUM$"), ~ .x / DENOM_SUM, .names = "{.col}_AVG"))
+
+  message(paste("Reading first scorefile:", scorefiles[1]))
+  scores <-
+    readr::read_tsv(scorefiles[1], show_col_types = FALSE) %>%
+    rename(IID = `#IID`)
+  scores$sampleset <- get_sampleset_name(scorefiles[1])
+
+  for(path in scorefiles[2:length(scorefiles)]){
+    message(paste("Reading next scorefile:", path))
+    df2 <- readr::read_tsv(path, show_col_types = FALSE) %>%
+      rename(IID = `#IID`)
+    df2$sampleset <- get_sampleset_name(path)
+    message("Aggregating")
+    dplyr::bind_rows(scores, df2) %>%
+      group_by(sampleset, IID) %>%
+      summarise(across(matches("SUM$"), sum, na.rm = TRUE),
+                DENOM_SUM = sum(DENOM, na.rm = TRUE)) -> scores
+  }
+  message("Calculating _AVG")
+  scores <- scores %>% mutate(across(matches("SUM$"), ~ .x / DENOM_SUM, .names = "{.col}_AVG"))
 }
 
 fn <-
