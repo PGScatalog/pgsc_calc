@@ -1,6 +1,5 @@
 process SCORE_REPORT {
     label 'process_high_memory'
-    stageInMode 'copy'
 
     def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/report:${params.platform}-2.14"
     conda (params.enable_conda ? "$projectDir/environments/report/environment.yml" : null)
@@ -22,6 +21,9 @@ process SCORE_REPORT {
     script:
     def args = task.ext.args ?: ''
     """
+    cp -LR $report real_report.Rmd
+    mv real_report.Rmd report.Rmd
+
     echo $workflow.commandLine > command.txt
     echo "keep_multiallelic: $params.keep_multiallelic" > params.txt
     echo "keep_ambiguous   : $params.keep_ambiguous"    >> params.txt
