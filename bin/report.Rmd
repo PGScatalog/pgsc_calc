@@ -1,10 +1,10 @@
 ---
 title: "Report: PGS Catalog Calculator Pipeline"
-output: 
+output:
   html_document:
     toc: true
     toc_depth: 5
-    toc_float: 
+    toc_float:
       collapsed: false
 date: "`r Sys.time()`"
 params:
@@ -18,11 +18,13 @@ library(jsonlite)
 library(dplyr)
 library(ggplot2)
 
+options(dplyr.summarise.inform = FALSE)
+
 log_paths <- list.files(pattern = "*_summary.csv", full.names = TRUE)
 
 read_log <- function(path) {
   log <- read.csv(path, stringsAsFactors = FALSE)
-  
+
   return(
     log %>%
       mutate(
@@ -54,13 +56,13 @@ log$sampleset <- gsub("_", " ", log$sampleset)  # page breaking issues
 }
 </style>
 
-## Pipeline command 
+## Pipeline command
 
 ```{r engine='bash', comment='', echo=FALSE}
 cat command.txt
 ```
 
-## Scoring file metadata 
+## Scoring file metadata
 
 <div class="alert alert-info", role="alert">
 <p>Additional <a href="https://pgsc-calc.readthedocs.io/en/dev/explanation/output.html">documentation is available</a> that explains some of the terms used this report in more detail</p>
@@ -92,20 +94,20 @@ combine_mapped_traits <- function(json_efo_entry){
 
 make_publication_table <- function(log) {
   json <- call_api(log)
-  
+
   if (json$size == 0) {
     return(data.frame(accession=NA, pgp_id = NA, Publication = NA, reported = NA, mapped=NA, genome_build=NA,pgs_id=NA))
   }
-  
-  df <- data.frame(pgs_id = json$results$id) 
+
+  df <- data.frame(pgs_id = json$results$id)
   pubs <- json$results$publication[, c("id", "firstauthor", "journal", "date_publication")]
   traits <- data.frame(reported = json$results$trait_reported,
                        mapped = sapply(json$results$trait_efo, combine_mapped_traits))
-  
+
   unformatted <- dplyr::bind_cols(df, pubs, traits)
-  
+
   unformatted$genome_build <- json$results$variants_genomebuild
-  
+
   return(add_urls(tidyr::unite(unformatted, "Publication", firstauthor:date_publication, sep = " ")))
 }
 
@@ -116,7 +118,7 @@ log %>%
   mutate(reported = paste0("<u>Reported trait</u>: ", reported),
          mapped = paste0("<u>Mapped trait</u>: ", mapped)) %>%
   tidyr::unite("Trait", c(reported, mapped), sep = "<br>") %>%
-  select(accession, pgs_id, Publication, Trait, n_variants, genome_build) %>% 
+  select(accession, pgs_id, Publication, Trait, n_variants, genome_build) %>%
   DT::datatable(
     rownames = FALSE,
     escape = FALSE,
@@ -176,7 +178,7 @@ compat %>%
       "Total matched" = "n_matched",
       "Total unmatched" = "n_unmatched"
     )) %>%
-  DT::formatStyle('Scoring file', 
+  DT::formatStyle('Scoring file',
                   valueColumns = 'Passed matching',
                   backgroundColor = DT::styleEqual(c(FALSE, TRUE), c('#c2a5cf', '#a6dba0')))
 ```
@@ -208,43 +210,69 @@ log %>%
     ))
 ```
 
-## Scores 
+## Scores
 
-```{r, echo = FALSE, message = FALSE}
-read_scorefiles <- function(path) {
-  sampleset <- strsplit(path, split = "_")[[1]][[1]]
-  df <- read.table(path, header = TRUE, comment.char = "")
-  cols <- colnames(df) 
-  cols[[1]] <- "IID"
-  colnames(df) <- cols
-  df$sampleset <- sampleset
-  return(df)
+```{r read_and_aggregate, echo = FALSE, message = FALSE}
+get_sampleset_name <- function(path) {
+  return(strsplit(path, split = "_")[[1]][[1]])
 }
 
-scorefiles <- list.files(pattern = "*.sscore", all.files = TRUE)
-combined_scorefile <- Reduce(dplyr::bind_rows, lapply(scorefiles, read_scorefiles))
+read_and_aggregate <- function(df, path) {
+  sampleset <- get_sampleset_name(path)
+  
+  if (is.null(nrow(df))) {
+    # initialise 
+    message("Reading first scorefile")
+    df <- readr::read_tsv(path, show_col_types = FALSE) %>%
+      rename(IID = `#IID`)
+    df$sampleset <- sampleset
+    return(df)
+  } else {
+    message("Reading next scorefile")
+    df2 <- readr::read_tsv(path, show_col_types = FALSE) %>%
+      rename(IID = `#IID`)
+    df2$sampleset <- sampleset
+    
+    message("Aggregating")
+    dplyr::bind_rows(df, df2) %>%
+      group_by(sampleset, IID) %>%
+      summarise(across(matches("SUM$"), sum, na.rm = TRUE),
+                DENOM_SUM = sum(DENOM, na.rm = TRUE)) %>%
+      return(.)
+  }
+}
 
-combined_scorefile %>%
-  group_by(sampleset, IID) %>%
-  summarise(across(matches("SUM$"), sum, na.rm = TRUE),
-            DENOM_SUM = sum(DENOM)) %>%
-  ungroup() %>%
-  mutate(across(matches("SUM$"), ~ .x / DENOM_SUM, .names = "{.col}_AVG")) -> scores
+scorefiles <- list.files(pattern = "*.sscore")
 
-fn <- paste0("aggregated_scores_", gsub(" |:|-", "_", Sys.time()), ".txt.gz")
-write.table(scores, gzfile(fn), col.names = TRUE, quote = FALSE, row.names = FALSE)
+if (length(scorefiles) == 1) {
+  message("One score file detected")
+  # only one input file, no aggregation needed
+  scores <-
+    readr::read_tsv(scorefiles, show_col_types = FALSE) %>%
+    rename(IID = `#IID`)
+  scores$sampleset <- get_sampleset_name(scorefiles)
+} else {
+  message("Multiple score files detected")
+  scores <- Reduce(read_and_aggregate, scorefiles) %>%
+    ungroup() %>%
+    mutate(across(matches("SUM$"), ~ .x / DENOM_SUM, .names = "{.col}_AVG"))
+}
+
+fn <-
+  paste0("aggregated_scores_", gsub(" |:|-", "_", Sys.time()), ".txt.gz")
+readr::write_tsv(scores, fn)
 ```
 
 ```{asis, echo = nrow(scores) < 50}
 <div class="alert alert-warning", role="alert">
-  <strong>⚠️ Warning: small sample size (n < 50)</strong> 
+  <strong>⚠️ Warning: small sample size (n < 50)</strong>
   <hr>
   <ul>
   <li>plink2 uses allele frequency data to <a href="https://www.cog-genomics.org/plink/2.0/score">mean-impute the dosages of missing genotypes</a></li>
   <li>Currently the pipeline disables mean-imputation in these small sample sets to make sure that the calculated PGS is as consistent with the genotype data as possible</li>
   <li>With a small sample size, the resulting score sums may be inconsistent between samples</li>
   <li>The average ([scorename]_AVG) may be more applicable as it calculates an average weighting over all genotypes present</li>
-  </ul> 
+  </ul>
   <hr>
   <p>
   In the future mean-imputation will be supported in small samplesets using ancestry-matched reference samplesets to ensure consistent calculation of score sums (e.g. 1000G Genomes).
@@ -258,15 +286,15 @@ write.table(scores, gzfile(fn), col.names = TRUE, quote = FALSE, row.names = FAL
 
 
 ```{r missing_scores, echo = FALSE}
-log %>% 
+log %>%
   filter(score_pass == "false") %>%
-  group_by(sampleset, accession) %>% 
+  group_by(sampleset, accession) %>%
   count(score_pass) -> missing_scores
 ```
 
 ```{asis, echo = nrow(missing_scores) > 0}
 <div class="alert alert-danger", role="alert">
-<p>Some scores are missing because they failed matching, check passed matching column 
+<p>Some scores are missing because they failed matching, check passed matching column
 in summary table</p>
 </div>
 ```
@@ -276,7 +304,7 @@ in summary table</p>
 #### Score extract
 
 <div class="alert alert-info", role="alert">
-<p>Below is a summary of the aggregated scores, which might be useful for 
+<p>Below is a summary of the aggregated scores, which might be useful for
 debugging.</p>
 </div>
 

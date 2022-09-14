@@ -11,3 +11,4 @@ dependencies:
   - r-tidyr
   - r-ggplot2
   - r-forcats
+  - r-readr
