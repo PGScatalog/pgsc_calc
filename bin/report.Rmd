@@ -228,24 +228,30 @@ if (length(scorefiles) == 1) {
   scores$sampleset <- get_sampleset_name(scorefiles)
 } else {
   message("Multiple score files detected")
-
-  message(paste("Reading first scorefile:", scorefiles[1]))
-  scores <-
-    readr::read_tsv(scorefiles[1], show_col_types = FALSE) %>%
-    rename(IID = `#IID`)
-  scores$sampleset <- get_sampleset_name(scorefiles[1])
-
-  for(path in scorefiles[2:length(scorefiles)]){
-    message(paste("Reading next scorefile:", path))
-    df2 <- readr::read_tsv(path, show_col_types = FALSE) %>%
-      rename(IID = `#IID`)
-    df2$sampleset <- get_sampleset_name(path)
-    message("Aggregating")
-    dplyr::bind_rows(scores, df2) %>%
-      group_by(sampleset, IID) %>%
+  count_score = 0
+  u_chromosomes <- unique(sapply(strsplit(scorefiles, '_'), "[[", 2))
+  for(chrom in u_chromosomes){
+    message(paste("Reading chromosome:",chrom))
+    chrom_scorefiles <- list.files(pattern = glob2rx(paste0("*_", chrom, "_*_*.sscore")))
+    for(path in chrom_scorefiles){
+        if(count_score == 0){
+            message(paste("Reading first scorefile:", scorefiles[1]))
+            scores <- readr::read_tsv(path, show_col_types = FALSE) %>% rename(IID = `#IID`)
+            scores$sampleset <- get_sampleset_name(path)
+        } else {
+            message(paste("Reading next scorefile:", path))
+            df2 <- readr::read_tsv(path, show_col_types = FALSE) %>% rename(IID = `#IID`)
+            df2$sampleset <- get_sampleset_name(path)
+            scores <- dplyr::bind_rows(scores, df2)
+        }
+        count_score <- count_score + 1
+    }
+    message(paste("Aggregating after reading chromosome:", chrom))
+    scores %>% group_by(sampleset, IID) %>%
       summarise(across(matches("SUM$"), sum, na.rm = TRUE),
                 DENOM_SUM = sum(DENOM, na.rm = TRUE)) -> scores
   }
+  if(count_score != length(scorefiles)){stop("Loop Function Is Incorrect")}
   message("Calculating _AVG")
   scores <- scores %>% mutate(across(matches("SUM$"), ~ .x / DENOM_SUM, .names = "{.col}_AVG"))
 }
