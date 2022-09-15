@@ -15,7 +15,6 @@ process SCORE_REPORT {
 
     output:
     path "*.html"      , emit: report
-    path "*.txt.gz"    , emit: scores
     path "versions.yml", emit: versions
 
     script:

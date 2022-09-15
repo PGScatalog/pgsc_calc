@@ -211,28 +211,7 @@ log %>%
 ## Scores 
 
 ```{r, echo = FALSE, message = FALSE}
-read_scorefiles <- function(path) {
-  sampleset <- strsplit(path, split = "_")[[1]][[1]]
-  df <- read.table(path, header = TRUE, comment.char = "")
-  cols <- colnames(df) 
-  cols[[1]] <- "IID"
-  colnames(df) <- cols
-  df$sampleset <- sampleset
-  return(df)
-}
-
-scorefiles <- list.files(pattern = "*.sscore", all.files = TRUE)
-combined_scorefile <- Reduce(dplyr::bind_rows, lapply(scorefiles, read_scorefiles))
-
-combined_scorefile %>%
-  group_by(sampleset, IID) %>%
-  summarise(across(matches("SUM$"), sum, na.rm = TRUE),
-            DENOM_SUM = sum(DENOM)) %>%
-  ungroup() %>%
-  mutate(across(matches("SUM$"), ~ .x / DENOM_SUM, .names = "{.col}_AVG")) -> scores
-
-fn <- paste0("aggregated_scores_", gsub(" |:|-", "_", Sys.time()), ".txt.gz")
-write.table(scores, gzfile(fn), col.names = TRUE, quote = FALSE, row.names = FALSE)
+scores <- readr::read_tsv("aggregated_scores.txt.gz") 
 ```
 
 ```{asis, echo = nrow(scores) < 50}
@@ -301,7 +280,6 @@ scores %>%
 ```{r, echo = FALSE, message=FALSE, warning=FALSE}
 scores %>%
   ungroup() %>%
-  select(-NAMED_ALLELE_DOSAGE_SUM) %>%
   select(IID, sampleset, ends_with("SUM")) %>%
   group_by(IID, sampleset) %>%
   tidyr::pivot_longer(cols = -group_cols()) %>%
