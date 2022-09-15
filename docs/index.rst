@@ -18,12 +18,12 @@ Workflow summary
 
 Currently the pipeline (implemented in `nextflow`_) works by:
 
-- Fetch scoring files using the PGS Catalog API in a specified genome build (GRCh37 and GRCh38).
-- Read custom scoring files (perform liftover if genotyping data is in a different build).
-- Match variants in the scoring files against variants in the target dataset (in plink bfile/pfile or VCF format)
-- Automatically combine and split different scoring files for efficient parallel computation of multiple PGS
-- Calculate and create aggregate score data for all samples
-- Publish a summary report to visualize score distributions and pipeline metadata (variant matching QC)
+- Downloading scoring files using the PGS Catalog API in a specified genome build (GRCh37 and GRCh38).
+- Reading custom scoring files (and performing a liftover if genotyping data is in a different build).
+- Matching variants in the scoring files against variants in the target dataset (in plink bfile/pfile or VCF format)
+- Automatically combines and creates scoring files for efficient parallel computation of multiple PGS
+- Calculates PGS SUMS for all samples
+- Creates a summary report to visualize score distributions and pipeline metadata (variant matching QC)
 
 The pipeline is build on top of `PLINK 2`_ and the `PGS Catalog Utilities`_ python package (for interacting
 with the Catalog API, processing scorefiles, and variant matching).
