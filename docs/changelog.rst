@@ -12,45 +12,54 @@ will only occur in major versions with changes noted in this changelog.
 pgsc_calc v1.1.0 (2022-09-15)
 -----------------------------
 
-This release adds compatibility for every score published in the PGS
-Catalog. Every scoring file in the PGS Catalog has been processed to provide
-genomic coordinates in builds GRCh37 and GRCh38. The pipeline has been updated
-to take advantage of the harmonised scores.
+The first public release of the pgsc_calc pipeline. This release adds compatibility
+for every score published in the PGS Catalog. Each scoring file in the PGS Catalog
+has been processed to provide consistent genomic coordinates in builds GRCh37 and GRCh38.
+The pipeline has been updated to take advantage of the harmonised scoring files (see
+`PGS Catalog downloads`_ for additional details).
+
+.. _PGS Catalog downloads: https://www.pgscatalog.org/downloads/#dl_ftp_scoring_hm_pos
 
 Features
 ~~~~~~~~
 
-- The output report has been improved to be more transparent
-  
-- Support for M1 Macs with ``--platform`` parameter (docker executor only)
-  
+- Many of the underlying software tools are now implemented within a ``pgscatalog_utils``
+  package (``v0.1.2``, https://github.com/PGScatalog/pgscatalog_utils and
+  https://pypi.org/project/pgscatalog-utils/ ). The packaging allows for independent
+  testing and development of tools for downloading and working with the scoring files.
+
+- The output report has been improved to have more detailed metadata describing
+  the scoring files and how well the variants match the target sampleset(s).
+
+- Improvements to variant matching:
+    - More precise control of variant matching parameters is now possible, like
+      ignoring strand flips
+    - ``match_variants`` should now use less RAM by default:
+        - A laptop with 16GB of RAM should be able to comfortably calculate scores on
+          the 1000 genomes dataset
+        - Fast matching mode (``--fast_match``) is available if ~32GB of RAM is
+          available and you'd like to calculate scores for larger datasets
+
+- Groups of scores from the PGS Catalog can be calculated by specifying a specific
+  ``--trait`` (EFO ID) or ``--publication`` (PGP ID), in addition to using individual
+  scoring files ``--pgs_id`` (PGS ID).
+
 - Score validation has been integrated with the test suite
-  
-- Variant matching has been improved to use less RAM by default
-  
-  - A laptop with 16GB of RAM should be able to comfortably calculate scores on
-    the 1000 genomes dataset
-      
-  - Fast matching mode (``--fast_match``) is available if ~32GB of RAM is
-    available and you'd like to calculate scores for larger datasets
 
-- More precise control of variant matching parameters is now possible, like
-  ignoring strand flips
+- Support for M1 Macs with ``--platform`` parameter (docker executor only)
 
-- Automatically calculating every score associated with a trait or publication
-  in the PGS Catalog is now possible with ``--trait`` or ``--publication``
 
 Bug fixes
 ~~~~~~~~~
 
-- Implemented a better prioritisation procedure if a variant has multiple
-  candidate matches
+- Implemented a more robust prioritisation procedure if a variant has multiple
+  candidate matches or duplicated IDs
   
 - Fixed processing multiple samplesets in parallel (e.g. 1000 Genomes + UK
   Biobank)
   
-- When combining multiple scoring files, all variants are now kept to keep the
-  denominator correct
+- When combining multiple scoring files, all variants are now kept to reflect the
+  correct denominator for % matching statistics.
   
 - When trying to correct for strand flips the matched effect allele wasn't being
   correctly complemented
