@@ -1,4 +1,4 @@
-sample,vcf_path,bfile_path,pfile_path,chrom
+sampleset,vcf_path,bfile_path,pfile_path,chrom
 1kg,,,chr1_phase3,1
 1kg,,,chr2_phase3,2
 1kg,,,chr3_phase3,3

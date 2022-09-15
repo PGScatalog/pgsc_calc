@@ -14,5 +14,5 @@ nextflow run main.nf \
     --max_cpus 1 \
     --max_memory 16.GB \
     --target_build GRCh37 \
-    --scorefile "$scores" \
+    --pgs_id PGS000018,PGS000027,PGS000049,PGS000137,PGS000337,PGS000904 \
     --keep_multiallelic false

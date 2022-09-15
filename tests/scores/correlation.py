@@ -7,24 +7,13 @@ import os
 @pytest.mark.workflow('test score correlation')
 def test_correlation(workflow_dir):
     scores_dir = pathlib.Path(workflow_dir, "output/score/")
-    calculated_scores = read_calculated_scores(scores_dir)
-    baseline_scores = read_baseline()
+    df = pd.read_table("output/score/aggregated_scores.txt.gz")
+    df = df.filter(['IID'] + list(df.filter(regex='SUM').columns))
+    df.columns = df.columns.str.removesuffix('_hmPOS_GRCh37_SUM')
+
+    baseline_scores = pd.read_table("tests/scores/1000G.sscore.gz", sep="\t")
+
     corr = baseline_scores.corrwith(calculated_scores)
+    corr.to_csv("correlations.csv")
     for index, value in corr.items():
         assert value > 0.99, f'Score {index} fails correlation test with r {value}'
-
-
-def read_calculated_scores(workflow_dir):
-    # scores have datetime in their name
-    scores = glob.glob(os.path.join(workflow_dir, "*.txt.gz"))[0]
-    df = pd.read_table(scores, sep = " ")
-    score_cols = (df.filter(regex='_SUM$')
-                  .drop(['NAMED_ALLELE_DOSAGE_SUM', 'DENOM_SUM'], axis = 1))
-    score_df = pd.concat([df[['IID']], score_cols], axis = 1)
-    score_df.columns = score_df.columns.str.rstrip('_SUM')
-    return score_df
-
-
-def read_baseline(workflow_dir):
-    path = pathlib.Path(workflow_dir, "tests/scores/1000G.sscore.gz")
-    return pd.read_table(path, sep = "\t")  # why tabs?!
