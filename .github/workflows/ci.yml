@@ -7,10 +7,6 @@ on:
   release:
     types: [published]
 
-env:
-  NXF_ANSI_LOG: false
-  CAPSULE_LOG: none
-  
 jobs:
   test:
     name: Run standard workflow test
@@ -24,7 +20,7 @@ jobs:
       fail-fast: false        
       matrix:
         test_profile: ["test", "test_json"]
-        profile: ["docker", "singularity", "conda"]
+        profile: ["docker"]
         include:
           # Test pipeline minimum Nextflow version
           - NXF_VER: '21.04.0'
@@ -69,17 +65,42 @@ jobs:
           nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile}},${{ matrix.profile }}          
 
   unit_test:
-    name: Run unit tests
+    name: ${{ matrix.profile }} ${{ matrix.tags }} 
     if: ${{ github.event_name == 'push'}}
     runs-on: ubuntu-latest
     env:
-      NXF_VER: ${{ matrix.nxf_ver }}
       NXF_ANSI_LOG: false
       CAPSULE_LOG: none
     strategy:
       fail-fast: false        
       matrix:
-        profile: ["docker", "singularity"]      
+        profile: ["docker"]
+        tags:
+          - "pgscatalog test --pgs_id"
+          - "pgscatalog test --efo_trait --pgp_id and --pgs_id"
+          - "pgscatalog test bad accession"
+          - "pgscatalog test good and bad accessions GRCh38"
+          - "test match module"
+          - "test combine scorefiles module"
+          - "plink2 testscore"
+          - "plink2 testsmallscore"
+          - "plink2 testmultiscore"
+          - "plink2 testsmallmultiscore"
+          - "plink2 testmultiscorefail"
+          - "plink2 testrelabelbim"
+          - "plink2 testrelabelpvar"
+          - "test apply score subworkflow"
+          - "test input check subworkflow"
+          - "test input check subworkflow with PGS catalog API"
+          - "test input check subworkflow with PGS catalog API and whitespace"
+          - "test input check subworkflow with liftover 38to37"
+          - "test input check subworkflow with liftover 37to38"
+          - "test make compatible subworkflow with bfile"
+          - "test make compatible subworkflow with vcf"
+          - "test make compatible subworkflow with pfile"
+          - "test input check subworkflow"
+          - "test input check subworkflow with PGS catalog API"
+          - "test input check subworkflow with PGS catalog API and whitespace"
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2
@@ -89,13 +110,14 @@ jobs:
         with:
           python-version: '3.x'
 
-      - uses: actions/cache@v2
+      - name: Setup Pip Cache
+        uses: actions/cache@v2
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
-          
+                      
       - name: Install Python dependencies          
         run: |
           python -m ensurepip --upgrade
@@ -107,21 +129,22 @@ jobs:
         uses: eWaterCycle/setup-singularity@v5
         with:
           singularity-version: 3.7.1
-        
+
+      - name: Restore Keys
+        uses: actions/cache@v2
+        with:
+          path: /usr/local/bin/nextflow
+          key: ${{ runner.os }}-nextflow
+          restore-keys: |
+            ${{ runner.os }}-nextflow-
+            
       - name: Install Nextflow
         run: |
           wget -qO- get.nextflow.io | bash
           sudo mv nextflow /usr/local/bin/
 
-      - uses: actions/cache@v2
-        with:
-          path: /usr/local/bin/nextflow
-          key: ${{ runner.os }}
-          restore-keys: |
-            ${{ runner.os }}-nextflow-
-            
       - name: Run unit tests
-        run: TMPDIR=~ PROFILE=${{ matrix.profile }} pytest --kwdof --symlink --git-aware --tag fast --wt 2
+        run: TMPDIR=~ PROFILE=${{ matrix.profile }} pytest --kwdof --symlink --git-aware --wt 2 --tag "${{ matrix.tags }}" --ignore tests/bin
 
       - name: Output log on failure
         if: failure()
