@@ -67,6 +67,9 @@ limits.
           cluster settings that can be adapted instead of setting up a custom
           config using ``-c``
 
+.. warning:: You'll probably want to use ``-profile singularity`` on a HPC. The
+          pipeline requires Singularity v3.7 minimum.
+   
 However, in general you will have to adjust the ``executor`` options and job resource
 allocations (e.g. ``process_low``). Here's an example for an LSF cluster:
 
