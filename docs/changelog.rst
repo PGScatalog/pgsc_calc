@@ -9,7 +9,7 @@ will only occur in major versions with changes noted in this changelog.
 .. _`semantic versioning`: https://semver.org/
 
 
-pgsc_calc v1.1.0 (2022-08-14)
+pgsc_calc v1.1.0 (2022-09-15)
 -----------------------------
 
 This release adds compatibility for every score published in the PGS
