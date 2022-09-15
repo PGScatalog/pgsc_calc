@@ -214,9 +214,9 @@ log %>%
 scores <- readr::read_tsv("aggregated_scores.txt.gz") 
 ```
 
-```{asis, echo = nrow(scores) < 50}
+```{asis, echo = any(table(scores$sampleset) < 50)}
 <div class="alert alert-warning", role="alert">
-  <strong>⚠️ Warning: small sample size (n < 50)</strong> 
+  <strong>⚠️ Warning: small sampleset size (n < 50)</strong>
   <hr>
   <ul>
   <li>plink2 uses allele frequency data to <a href="https://www.cog-genomics.org/plink/2.0/score">mean-impute the dosages of missing genotypes</a></li>
@@ -232,7 +232,7 @@ scores <- readr::read_tsv("aggregated_scores.txt.gz")
 ```
 
 <div class="alert alert-success", role="alert">
-<p>`r sum(grepl("*_SUM$", colnames(scores))) - 2` scores for `r nrow(scores)` samples processed</p>
+<p>`r sum(grepl("*_SUM$", colnames(scores)))` scores for `r nrow(scores)` samples processed</p>
 </div>
 
 
