@@ -7,6 +7,10 @@ on:
   release:
     types: [published]
 
+env:
+  NXF_ANSI_LOG: false
+  CAPSULE_LOG: none
+  
 jobs:
   test:
     name: Run standard workflow test
@@ -117,7 +121,7 @@ jobs:
             ${{ runner.os }}-nextflow-
             
       - name: Run unit tests
-        run: TMPDIR=~ PROFILE=${{ matrix.profile }} pytest --kwdof --symlink --git-aware --tag fast
+        run: TMPDIR=~ PROFILE=${{ matrix.profile }} pytest --kwdof --symlink --git-aware --tag fast --wt 2
 
       - name: Output log on failure
         if: failure()

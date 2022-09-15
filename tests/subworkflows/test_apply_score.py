@@ -13,7 +13,7 @@ def test_aggregated_scores(workflow_dir):
     score_dir = pathlib.Path(workflow_dir, "output/score/")
     agg_scores = glob.glob(os.path.join(score_dir, "*.txt.gz"))[0]
 
-    df = pd.read_csv(agg_scores, sep = ' ')
+    df = pd.read_csv(agg_scores, sep = '\t')
 
     assert not df.isnull().any().any(), 'Missing values in aggregated scores'
 
