@@ -249,7 +249,8 @@ requirements to run on these smaller datasets are:
 
 .. warning:: If you use macOS, Docker will use 50% of your memory at most by
              default. This means that if you have a Mac with 16GB RAM,
-             ``pgsc_calc`` will probably run out of RAM.
+             ``pgsc_calc`` may run out of RAM (most likely during the variant
+             matching step).
 
 For information on how to run the pipelines on larger datasets/computers/job-schedulers,
 see :ref:`big job`.
