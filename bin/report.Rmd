@@ -200,8 +200,8 @@ log %>%
       "Sampleset" = "sampleset",
       "Scoring file" = "accession",
       "Match type" = "match_status",
-      "Multiple Potential Matches" = "duplicate_best_match",
-      "Duplicated Matched Variants" = "duplicate_ID",
+      "Multiple potential matches" = "duplicate_best_match",
+      "Duplicated matched variants" = "duplicate_ID",
       "Ambiguous" = "is_ambiguous",
       "Multiallelic" = "is_multiallelic",
       "%" = "percent"

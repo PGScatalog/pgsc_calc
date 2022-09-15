@@ -16,8 +16,8 @@ The pipeline outputs are written to a results directory
 ----------
 
 Calculated scores are stored in a gzipped-text space-delimted text file called
-``aggregated_scores`` that is labelled with the date/time (e.g. ``aggregated_scores_YYYY_MM_DD_HH_MM_SS.txt.gz``).
-Each row represents an individual, and there should be at least three columns with the following headers:
+``aggregated_scores.txt.gz``. Each row represents an individual, and there should
+be at least three columns with the following headers:
 
 - ``dataset``: the name of the input sampleset
 - ``IID``: the identifier of each sample within the dataset
@@ -52,7 +52,7 @@ each scoring file match with target sampleset(s). The first table provides a sum
 number and percentage of variants within each score that have been matched, and whether that
 score passed the ``--min_overlap`` threshold (Passed Matching column) for calculation. The second
 table provides a more detailed summary of variant matches broken down by types of variants (strand ambiguous,
-multi-allelic, duplicates) for the matched, excluded, and unmatched variants (see ``match/`` section for details):
+multiallelic, duplicates) for the matched, excluded, and unmatched variants (see ``match/`` section for details):
 
 .. image:: screenshots/Report_2_VariantMatching.png
     :width: 600
@@ -102,19 +102,19 @@ the types of variants that were included in the score:
     * - Multiallelic
       - ``is_multiallelic``
       - True/False flag indicating whether the matched variant is multi-allelic (multiple ALT alleles).
-    * - Multiple Potential Matches
+    * - Multiple potential matches
       - ``duplicate_best_match``
       - True/False flag indicating whether a single scoring file variants has multiple potential matches to the target genome.
         This usually occurs when the variant has no other_allele, and with variants that have different REF alleles.
-    * - Duplicated Matched Variants
+    * - Duplicated matched variants
       - ``duplicate_ID``
       - True/False flag indicating whether multiple scoring file variants match a single target ID. This usually occurs
         when scoring files have been lifted across builds and two variants now point to the same position (e.g. rsID mergers).
-    * - N
+    * - n
       - ``count``
       - Number of variants with this combination of metadata (grouped by: ``[ match_status, ambiguous, is_multiallelic,
         duplicate_best_match, duplicate_ID]``
-    * - percent
+    * - %
       - ``percent``
       - Percent of the scoring file's variants that have the combination of metadata in count.
 
