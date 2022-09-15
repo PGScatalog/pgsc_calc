@@ -1,11 +1,12 @@
 :orphan:
-   
+
 .. _get started:
 
 Get started
 ===========
 
-``pgsc_calc`` requires Nextflow and one of Docker, Singularity, or Anaconda.
+``pgsc_calc`` requires Nextflow and one of Docker, Singularity, or
+Anaconda. You will need a POSIX compatible system, like Linux or macOS, to run ``pgsc_calc``.
 
 1. Start by `installing nextflow`_:
 
@@ -30,11 +31,11 @@ Get started
     ...
 
 And check if Docker, Singularity, or Anaconda are working by running the
-workflow with bundled test data and replacing ``<docker/singularity/conda>`` in the command below
-with the specific container manager you intend to use:
+workflow with bundled test data and replacing ``<docker/singularity/conda>`` in
+the command below with the specific container manager you intend to use:
 
 .. code-block:: console
-                
+
     $ nextflow run pgscatalog/pgsc_calc -profile test,<docker/singularity/conda>
     ... <configuration messages intentionally not shown> ...
     ------------------------------------------------------
@@ -60,7 +61,7 @@ with the specific container manager you intend to use:
     [25/6b87fc] process > PGSCATALOG_PGSCALC:PGSCALC:APPLY_SCORE:SCORE_REPORT (1)                                           [100%] 1 of 1 ✔
     [6b/52087d] process > PGSCATALOG_PGSCALC:PGSCALC:DUMPSOFTWAREVERSIONS (1)                                               [100%] 1 of 1 ✔
     -[pgscatalog/pgsc_calc] Pipeline completed successfully-
-    
+
 
 .. _`installing nextflow`: https://www.nextflow.io/docs/latest/getstarted.html
 .. _`install Docker`: https://docs.docker.com/engine/install/
@@ -121,8 +122,8 @@ way. To do this, set up a spreadsheet that looks like one of the examples below:
      -
      - /full/path/to/bfile_prefix
      -
-     - 
-     
+     -
+
 .. list-table:: Example split VCF samplesheet
    :widths: 20 20 20 20 20
    :header-rows: 1
@@ -133,16 +134,16 @@ way. To do this, set up a spreadsheet that looks like one of the examples below:
      - pfile_path
      - chrom
    * - cineca_synthetic_subset_vcf
-     - /full/path/to/vcf.gz     
+     - /full/path/to/vcf.gz
      -
      -
      - 22
    * - cineca_synthetic_subset_vcf
      - /full/path/to/vcf.gz
-     -       
      -
-     - 21       
-       
+     -
+     - 21
+
 There are five mandatory columns. Columns that specify genomic data paths
 (**vcf_path**, **bfile_path**, and **pfile_path**) are mutually exclusive:
 
@@ -181,7 +182,7 @@ parameter:
 
     --pgs_id PGS001229 # one score
     --pgs_id PGS001229,PGS001405 # many scores separated by , (no spaces)
-        
+
 If you would like to use a custom scoring file not published in the PGS Catalog,
 that's OK too (see :ref:`calculate custom`).
 
@@ -206,7 +207,7 @@ for more information). An example would look like:
     ---scorefile MyPGSFile.txt --target_build GRCh38
 
 .. _harmonized (remapped rsIDs and/or lifted positions): https://www.pgscatalog.org/downloads/#dl_ftp_scoring_hm_pos
-    
+
 3. Putting it all together
 --------------------------
 
@@ -236,7 +237,19 @@ with the software you have installed on your computer.
 ------------------------------
 
 The pipeline distributes with settings that easily allow for it to be run on a
-personal computer on smaller datasets (e.g. 1000 Genomes, HGDP).
+personal computer on smaller datasets (e.g. 1000 Genomes, HGDP). The minimum
+requirements to run on these smaller datasets are:
+
+* Linux
+    - 16GB RAM
+    - 2 CPUs
+* macOS
+    - 32GB RAM
+    - 2 CPUs
+
+.. warning:: If you use macOS, Docker will use 50% of your memory at most by
+             default. This means that if you have a Mac with 16GB RAM,
+             ``pgsc_calc`` will probably run out of RAM.
 
 For information on how to run the pipelines on larger datasets/computers/job-schedulers,
 see :ref:`big job`.

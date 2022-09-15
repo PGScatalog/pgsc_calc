@@ -1,7 +1,7 @@
 
 .. _interpret:
 
-``pgsc_calc`` Outputs & Results
+``pgsc_calc`` Outputs & results
 ===============================
 
 
