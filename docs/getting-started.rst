@@ -2,8 +2,8 @@
 
 .. _get started:
 
-Get started
-===========
+Getting started
+===============
 
 ``pgsc_calc`` requires Nextflow and one of Docker, Singularity, or
 Anaconda. You will need a POSIX compatible system, like Linux or macOS, to run ``pgsc_calc``.
@@ -169,13 +169,18 @@ There are five mandatory columns. Columns that specify genomic data paths
 Save this spreadsheet in :term:`CSV` format (e.g., ``samplesheet.csv``). An
 example template is `available here`_.
 
+.. note::
+    All samplesets have to be in the same genome build (either GRCh37 or GRCh38) which is specified
+    using the ``--target_build [GRCh3#]`` command. All scoring files are downloaded or mapped to match the specified
+    genome build, no liftover/re-mapping of the genotyping data is performed within the pipeline.
+
 .. _`available here`: https://github.com/PGScatalog/pgsc_calc/blob/master/assets/examples/example_data/bfile_samplesheet.csv
 
 2. Select scoring files
 -----------------------
 
 pgsc_calc makes it simple to work with polygenic scores that have been published
-in the PGS Catalog. You can specify one or more scores using the ``--accession``
+in the PGS Catalog. You can specify one or more scores using the ``--pgs_id``
 parameter:
 
 .. code-block:: console
@@ -197,7 +202,7 @@ to using the ``--target_build`` parameter. The ``--target_build`` parameter only
 In the case of the example above, both ``PGS001229`` and ``PGS001405`` are reported in genome build GRCh37.
 In cases where the build of your genomic data are different from the original build of the PGS Catalog score
 then the pipeline will download a `harmonized (remapped rsIDs and/or lifted positions)`_  versions of the
-scoring file(s) in the user-specified build.
+scoring file(s) in the user-specified build of the genotyping datasets.
 
 Custom scoring files can be lifted between genome builds using the ``--liftover`` flag, (see :ref:`liftover`
 for more information). An example would look like:
