@@ -1,0 +1,25 @@
+- name: test match module
+  command: nextflow run ./tests/modules/match -entry testmatch -c ./tests/config/nextflow.config -profile test
+  tags:
+    - module
+    - match
+    - fast
+  files:
+    - path: output/match/test_ALL_additive_0.scorefile
+      contains:
+        - "ID"
+        - "effect_allele"
+        - "PGS001229"
+    - path: output/match/test_summary.csv
+    - path: output/match/test_log.csv.gz
+      contains:
+        - "chr_name"
+        - "chr_position"
+        - "effect_allele"
+        - "other_allele"
+        - "effect_weight"
+        - "effect_type"
+    - path: output/match/versions.yml
+      contains:
+        - "pgscatalog_utils: 0.1.2"
+        

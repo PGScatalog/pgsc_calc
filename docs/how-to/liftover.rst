@@ -13,31 +13,9 @@ automatically remap coordinates (liftover) to different genome builds.
 Lifting over PGS Catalog scoring files
 --------------------------------------
 
-PGS Catalog scoring files have additional metadata set in a `header`_. pgsc_calc
-reads this metadata and can automatically liftover scoring files to match your
-input data if you set the following additional parameters at runtime:
-
-.. code-block:: console
-
-    --liftover --target_build GRCh38
-
-Where ``--target_build`` can be GRCh37 or GRCh38. Some scoring files in the PGS
-Catalog do not contain genome build data and cannot be remapped, see
-:ref:`limitations`.
-
-Putting everything together for an example run, assuming the input genomic data
-are in build GRCh38:
-
-.. code-block:: console
-
-    $ nextflow run pgscatalog/pgsc_calc \
-        -profile <docker/singularity/conda> \    
-        --input samplesheet.csv \
-        --accession PGS001229 \
-        --liftover \
-        --target_build GRCh38
-
-.. _`header`: https://www.pgscatalog.org/downloads/#scoring_header
+The PGS Catalog provides scoring files in builds GRCh37 and GRCh38. The pipeline
+queries the PGS Catalog API and automatically downloads the appropriate scoring
+files to match the input target genome build.
 
 Lifting over custom scoring files
 ---------------------------------
@@ -48,12 +26,33 @@ your custom scoring file to set the genome build:
 
 .. code-block:: console
 
-    #genome_build=GRCh38
+    #genome_build=GRCh37
 
-Valid genome builds are GRCh37 and GRCh38.     
+Valid genome builds are GRCh37 and GRCh38.
 
-Then use the same procedure described in :ref:`liftover pgscatalog` to
-automatically remap a scoring file against your genomic data build.
+Once your scores have valid headers, the pipeline can automatically liftover
+scoring files to match your input data if you set the following additional
+parameters at runtime:
+
+.. code-block:: console
+
+    --liftover --target_build GRCh38
+
+Where ``--target_build`` can be GRCh37 or GRCh38.
+
+Putting everything together for an example run, assuming the input genomic data
+are in build GRCh38:
+
+.. code-block:: console
+
+    $ nextflow run pgscatalog/pgsc_calc \
+        -profile <docker/singularity/conda> \    
+        --input samplesheet.csv \
+        --scorefile MyCustomFile.txt \
+        --liftover \
+        --target_build GRCh38
+
+.. _`header`: https://www.pgscatalog.org/downloads/#scoring_header
 
 .. note:: If you're calculating multiple scores (see :ref:`multiple`) and you
           want to liftover some of the scorefiles, then **all** scorefiles need

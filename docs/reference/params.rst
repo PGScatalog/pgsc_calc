@@ -1,7 +1,7 @@
 .. _param ref:
 
-Parameter reference
-===================
+Reference: Input Parameters/Flags
+=================================
 
 The documentation below is automatically generated from the input schema and
 contains additional technical detail. **Parameters in bold** are required and

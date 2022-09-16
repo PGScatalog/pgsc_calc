@@ -2,7 +2,7 @@
     "$schema": "http://json-schema.org/draft-07/schema",
     "$id": "https://raw.githubusercontent.com/pgscatalog/pgsc_calc/master/nextflow_schema.json",
     "title": "pgscatalog/pgsc_calc pipeline parameters",
-    "description": "This pipeline applies scoring files from the PGS Catalog to target genotyped samples",
+    "description": "This pipeline applies scoring files from the PGS Catalog to target set(s) of genotyped samples",
     "type": "object",
     "definitions": {
         "input_output_options": {
@@ -28,14 +28,23 @@
                 },
                 "scorefile": {
                     "type": "string",
-                    "description": "Path to a scoring file in PGS Catalog format. Multiple scorefiles can be specified using wildcards (e.g., ``--scorefile path/to/scores/*.txt``)",
+                    "description": "Path to a scoring file in PGS Catalog format. Multiple scorefiles can be specified using wildcards (e.g., ``--scorefile \"path/to/scores/*.txt\"``)",
                     "fa_icon": "fas fa-file-alt"
                 },
-                "accession": {
+                "pgs_id": {
                     "type": "string",
-                    "description": "A PGS Catalog accession, multiple accessions can be specified in a comma separated list",
-                    "pattern": "(PGS\\d+)(,\\s*PGS\\d+)*",
-                    "fa_icon": "fas fa-star"
+                    "default": "None",
+                    "description": "A comma separated list of PGS score IDs, e.g. PGS000802"
+                },
+                "pgp_id": {
+                    "type": "string",
+                    "default": "None",
+                    "description": "A comma separated list of PGS Catalog publications, e.g. PGP000001"
+                },
+                "trait_efo": {
+                    "type": "string",
+                    "default": "None",
+                    "description": "A comma separated list of PGS Catalog EFO traits, e.g. EFO_0004214"
                 },
                 "target_build": {
                     "type": "string",
@@ -52,7 +61,7 @@
                 },
                 "copy_genomes": {
                     "type": "boolean",
-                    "description": "Copy harmonised genomes to outdir"
+                    "description": "Copy harmonised genomes (plink2 pgen/pvar/psam files) to outdir"
                 },
                 "outdir": {
                     "type": "string",
@@ -93,13 +102,15 @@
                 },
                 "keep_multiallelic": {
                     "type": "boolean",
-                    "description": "Keep multiallelic alleles?",
-                    "default": false
+                    "description": "Allow matches of scoring file variants to multiallelic variants in the target dataset"
                 },
                 "keep_ambiguous": {
                     "type": "boolean",
-                    "description": "Keep ambiguous matches",
-                    "default": false
+                    "description": "Keep matches of scoring file variants to strand ambiguous variants (e.g. A/T and C/G SNPs) in the target dataset. This assumes the scoring file and target dataset report variants on the same strand."
+                },
+                "fast_match": {
+                    "type": "boolean",
+                    "description": "Enable fast matching, which significantly increases RAM usage (32GB minimum recommended)"
                 },
                 "min_overlap": {
                     "type": "number",
@@ -283,8 +294,24 @@
                     "hidden": true,
                     "fa_icon": "fas fa-toolbox",
                     "help_text": "This may be useful for example if you are unable to directly pull Singularity containers to run the pipeline due to http/https proxy issues."
+                },
+                "platform": {
+                    "type": "string",
+                    "default": "amd64",
+                    "enum": [
+                        "amd64",
+                        "arm64"
+                    ],
+                    "description": "What platform is the pipeline executing on?"
+                },
+                "parallel": {
+                    "type": "boolean",
+                    "description": "Enable parallel calculation of scores. This is I/O and RAM intensive."
                 }
-            }
+            },
+            "required": [
+                "platform"
+            ]
         }
     },
     "allOf": [

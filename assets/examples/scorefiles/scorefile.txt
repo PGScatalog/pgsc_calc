@@ -1,3 +1,5 @@
+#pgs_name=PGS001229_22
+#genome_build=GRCh37
 chr_name	chr_position	effect_allele	other_allele	effect_weight
 22	17080378	G	A	0.01045457
 22	17300230	A	G	0.0001411475

@@ -1,29 +1,34 @@
 process SCORE_REPORT {
     label 'process_high_memory'
 
-    conda (params.enable_conda ? "conda-forge::r-tidyverse=1.3.1 conda-forge::r-rsqlite=2.1.1" : null)
+    def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/report:${params.platform}-2.14"
+    conda (params.enable_conda ? "$projectDir/environments/report/environment.yml" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/mulled-v2-e5054a4b868f4ffd21311d4e05426694e2c7fb5e:17fe01267c936fedcbd51470941b075c42b08c23-0' :
-        'dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/mulled-v2-e5054a4b868f4ffd21311d4e05426694e2c7fb5e:17fe01267c936fedcbd51470941b075c42b08c23-0' }"
+        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/report:2.14' :
+        dockerimg }"
 
     input:
     path scorefiles
     path report
     path logo
-    path db
+    path '*' // list of summary csvs, staged with original names
 
     output:
     path "*.html"      , emit: report
-    path "*.txt"       , emit: scores
     path "versions.yml", emit: versions
 
     script:
     def args = task.ext.args ?: ''
     """
-    # dumb workaround symlink & out_dir (rmarkdown)
-    cp $report report.rmd
+    cp -LR $report real_report.Rmd
+    mv real_report.Rmd report.Rmd
 
-    R -e 'rmarkdown::render("report.rmd", \
+    echo $workflow.commandLine > command.txt
+    echo "keep_multiallelic: $params.keep_multiallelic" > params.txt
+    echo "keep_ambiguous   : $params.keep_ambiguous"    >> params.txt
+    echo "min_overlap      : $params.min_overlap"       >> params.txt
+
+    R -e 'rmarkdown::render("report.Rmd", \
         output_options = list(self_contained=TRUE))'
 
     cat <<-END_VERSIONS > versions.yml

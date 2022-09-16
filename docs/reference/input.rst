@@ -1,5 +1,5 @@
-Input (samplesheet) schema
-==========================
+Reference: Samplesheet schema
+=============================
 
 The documentation below is automatically generated from the schema. The JSON
 file contains additional technical detail not shown in the table below.

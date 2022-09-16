@@ -3,10 +3,13 @@ process PLINK2_VCF {
     label 'process_medium'
     label "${ params.copy_genomes ? 'copy_genomes' : '' }"
 
-    conda (params.enable_conda ? "bioconda::plink2=2.00a2.3" : null)
+    conda (params.enable_conda ? "bioconda::plink2==2.00a3.3" : null)
+    def dockerimg = "${ params.platform == 'amd64' ?
+        'quay.io/biocontainers/plink2:2.00a3.3--hb2a7ceb_0' :
+        'dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/plink2:arm64-2.00a3.3' }"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/plink2:2.00a2.3--h712d239_1' :
-        'dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/plink2:2.00a2.3--h712d239_1' }"
+        'https://depot.galaxyproject.org/singularity/plink2:2.00a3.3--hb2a7ceb_0' :
+        dockerimg }"
 
     input:
     tuple val(meta), path(vcf)
@@ -21,13 +24,17 @@ process PLINK2_VCF {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     def mem_mb = task.memory.toMega()
+    // rewriting genotypes, so use --max-alleles instead of using generic ID
+    def set_ma_missing = params.keep_multiallelic ? '' : '--max-alleles 2'
     newmeta = meta.clone() // copy hashmap for updating...
     newmeta.is_pfile = true // now it's converted to a pfile :)
+
     """
     plink2 \\
         --threads $task.cpus \\
         --memory $mem_mb \\
         --set-all-var-ids '@:#:\$r:\$a' \\
+        $set_ma_missing \\
         $args \\
         --vcf $vcf \\
         --make-pgen \\

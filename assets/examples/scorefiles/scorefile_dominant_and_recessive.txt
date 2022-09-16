@@ -1,3 +1,5 @@
+#pgs_name=PGS001229_22_DominantRecessiveExample
+#genome_build=GRCh37
 chr_name	chr_position	effect_allele	other_allele	effect_weight	is_dominant	is_recessive
 22	17080378	G	A	0.01045457	TRUE	FALSE
 22	17300230	A	G	0.0001411475	FALSE	TRUE

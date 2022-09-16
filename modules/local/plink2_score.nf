@@ -1,11 +1,15 @@
 process PLINK2_SCORE {
-    tag "$meta.id chromosome $meta.chrom"
+    tag "$meta.id chromosome $meta.chrom effect type $scoremeta.effect_type"
     label 'process_low'
 
-    conda (params.enable_conda ? "bioconda::plink2=2.00a2.3" : null)
+    conda (params.enable_conda ? "bioconda::plink2==2.00a3.3" : null)
+    def dockerimg = "${ params.platform == 'amd64' ?
+        'quay.io/biocontainers/plink2:2.00a3.3--hb2a7ceb_0' :
+        'dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/plink2:arm64-2.00a3.3' }"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/plink2:2.00a2.3--h712d239_1' :
-        'dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/plink2:2.00a2.3--h712d239_1' }"
+        'https://depot.galaxyproject.org/singularity/plink2:2.00a3.3--hb2a7ceb_0' :
+        dockerimg }"
+
 
     input:
     tuple val(meta), path(geno), path(pheno), path(variants), val(scoremeta), path(scorefile)
@@ -26,10 +30,11 @@ process PLINK2_SCORE {
     // custom args2
     def maxcol = (scoremeta.n_scores + 2) // id + effect allele = 2 cols
     def no_imputation = (meta.n_samples < 50) ? 'no-mean-imputation' : ''
+    def cols = (meta.n_samples < 50) ? 'header-read cols=+scoresums,+denom,-fid' : 'header-read cols=+scoresums,+denom,-fid'
     def recessive = (scoremeta.effect_type == 'recessive') ? ' recessive ' : ''
     def dominant = (scoremeta.effect_type == 'dominant') ? ' dominant ' : ''
 
-    args2 = [args2, no_imputation, recessive, dominant].join(' ')
+    args2 = [args2, cols, no_imputation, recessive, dominant].join(' ')
 
     if (scoremeta.n_scores == 1)
         """

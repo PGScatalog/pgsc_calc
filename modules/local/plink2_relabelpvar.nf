@@ -3,10 +3,13 @@ process PLINK2_RELABELPVAR {
     label 'process_low'
     label "${ params.copy_genomes ? 'copy_genomes' : '' }"
 
-    conda (params.enable_conda ? "bioconda::plink2=2.00a2.3" : null)
+    conda (params.enable_conda ? "bioconda::plink2==2.00a3.3" : null)
+    def dockerimg = "${ params.platform == 'amd64' ?
+        'quay.io/biocontainers/plink2:2.00a3.3--hb2a7ceb_0' :
+        'dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/plink2:arm64-2.00a3.3' }"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/plink2:2.00a2.3--h712d239_1' :
-        'dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/plink2:2.00a2.3--h712d239_1' }"
+        'https://depot.galaxyproject.org/singularity/plink2:2.00a3.3--hb2a7ceb_0' :
+        dockerimg }"
 
     input:
     // input is sorted alphabetically -> bed, bim, fam or pgen, psam, pvar
@@ -26,6 +29,8 @@ process PLINK2_RELABELPVAR {
     def args = task.ext.args ?: ''
     def prefix = task.ext.suffix ? "${meta.id}${task.ext.suffix}" : "${meta.id}"
     def mem_mb = task.memory.toMega() // plink is greedy
+    // if dropping multiallelic variants, set a generic ID that won't match
+    def set_ma_missing = params.keep_multiallelic ? '' : '--var-id-multi @:#'
 
     """
     plink2 \\
@@ -33,12 +38,13 @@ process PLINK2_RELABELPVAR {
         --memory $mem_mb \\
         $args \\
         --set-all-var-ids '@:#:\$r:\$a' \\
+        $set_ma_missing \\
         --pfile ${geno.baseName} \\
         --make-just-pvar \\
         --out ${prefix}_${meta.chrom}
 
-    cp -P $geno ${prefix}_${meta.chrom}.pgen
-    cp -P $pheno ${prefix}_${meta.chrom}.psam
+    cp -RP $geno ${prefix}_${meta.chrom}.pgen
+    cp -RP $pheno ${prefix}_${meta.chrom}.psam
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

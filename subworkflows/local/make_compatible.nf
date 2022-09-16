@@ -10,7 +10,6 @@ workflow MAKE_COMPATIBLE {
     variants
     vcf
     scorefile
-    db
 
     main:
     ch_versions = Channel.empty()
@@ -60,7 +59,6 @@ workflow MAKE_COMPATIBLE {
                      it[0].chrom, it[1]) }
         .groupTuple()
         .combine( scorefile )
-        .combine ( db )
         .dump(tag: 'match_variants_input')
         .set { ch_variants }
 
@@ -75,6 +73,6 @@ workflow MAKE_COMPATIBLE {
     pheno      = pheno_std
     variants   = variants_std
     scorefiles = MATCH_VARIANTS.out.scorefile
-    db         = MATCH_VARIANTS.out.db
+    db         = MATCH_VARIANTS.out.summary
     versions   = ch_versions
 }

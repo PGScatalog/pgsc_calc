@@ -2,6 +2,8 @@
   command: nextflow run ./tests/modules/plink2/relabelpvar -entry testrelabelpvar -c ./tests/config/nextflow.config -profile test
   tags:
     - plink2
+    - fast
+    - module
   files:
     - path: output/plink2/test_22.psam
       md5sum: 90f1430b71153d59bc14e9499b0366f4
@@ -10,5 +12,6 @@
     - path: output/plink2/test_22.pvar
       md5sum: 2ec49ad73889c726e5c3bca1cdce3870
     - path: output/plink2/versions.yml
-      md5sum: 719dae7273872ed6d48d801c516a3267
+      contains:
+        - "plink2: 2.00a3.3"
     

@@ -1,73 +1,318 @@
 ---
-title: "Calculator summary report"
-output: html_document
+title: "Report: PGS Catalog Calculator Pipeline"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 5
+    toc_float: 
+      collapsed: false
 date: "`r Sys.time()`"
 params:
   img: PGS_Logo.png
 ---
 
 ```{r setup, include=FALSE}
-options(tidyverse.quiet = TRUE)
 knitr::opts_chunk$set(echo = TRUE)
+library(httr)
+library(jsonlite)
+library(dplyr)
+library(ggplot2)
 
-library(tidyverse)
+log_paths <- list.files(pattern = "*_summary.csv", full.names = TRUE)
+
+read_log <- function(path) {
+  log <- read.csv(path, stringsAsFactors = FALSE)
+  
+  return(
+    log %>%
+      mutate(
+        accession = ifelse(
+          stringr::str_detect(accession, "^PGS"),
+          stringr::str_extract(accession, "^PGS[0-9]{6}"),
+          accession
+        )
+      ) %>%
+      mutate(
+        is_multiallelic =  factor(is_multiallelic, levels = c("false", "true")),
+        ambiguous = factor(ambiguous, levels = c("false", "true"))
+      ) %>%
+      rename(sampleset = dataset)
+  )
+}
+
+log <- Reduce(dplyr::bind_rows, lapply(log_paths, read_log))
+log$sampleset <- gsub("_", " ", log$sampleset)  # page breaking issues
 ```
 
-```{r, eval = FALSE, echo=FALSE}
-# logo
-htmltools::img(src = knitr::image_uri(params$img),
-               alt = 'logo', 
-               style = 'position:absolute; top:0; right:0; padding:10px;',
-               height = "200px")
+<style>
+#TOC {
+  background: url("https://github.com/PGScatalog/pgsc_calc/blob/main/assets/PGS_Logo.png?raw=true");
+  background-size: 33%;
+  background-position: top;
+  padding-top: 100px !important;
+  background-repeat: no-repeat;
+}
+</style>
+
+## Pipeline command 
+
+```{r engine='bash', comment='', echo=FALSE}
+cat command.txt
 ```
 
-## Compatibility summary
+## Scoring file metadata 
 
-```{r, echo = FALSE, message = FALSE}
-log <- read.csv("log.csv")
-log$match_type <- as.character(log$match_type)
+<div class="alert alert-info", role="alert">
+<p>Additional <a href="https://pgsc-calc.readthedocs.io/en/dev/explanation/output.html">documentation is available</a> that explains some of the terms used this report in more detail</p>
+</div>
 
-log %>%
-  group_by(dataset, accession) %>%
-  count(match_type, input_variants = n()) %>%
-  mutate(match_type = ifelse(match_type == "", "no match", match_type)) %>%
-  ungroup() %>%
-  mutate(perc = scales::percent(n / input_variants, accuracy = 0.1)) %>%
-  knitr::kable(align = c(rep('l', 3), rep('r', 3)))
-```
+### Scoring files
 
-## Score summary
+```{r, echo = FALSE}
+call_api <- function(log) {
+  accessions <- trimws(unique(log$accession))
+  pgs_ids <- paste(accessions, collapse = ",")
+  api_url <- paste0("https://www.pgscatalog.org/rest/score/search?pgs_ids=", pgs_ids)
+  res <- GET(api_url)
+  return(fromJSON(rawToChar(res$content)))
+}
 
-```{r, echo = FALSE, message = FALSE}
-
-read_scorefiles <- function(path) {
-  dataset <- stringr::str_split(path, pattern = "_")[[1]][[1]]
-  df <- read.table(path, header = TRUE, comment.char = "")
-  cols <- colnames(df) 
-  cols[[1]] <- "IID"
-  colnames(df) <- cols
-  df$dataset <- dataset
+add_urls <- function(df) {
+  df$accession <- df$pgs_id
+  df$pgs_id <- paste0('<a href="https://www.pgscatalog.org/score/', df$pgs_id, '">', df$pgs_id, '</a>')
+  df$pgp_id <- paste0('<a href="https://www.pgscatalog.org/publication/', df$id, '">', df$id, '</a>')
+  df$id <- NULL
   return(df)
 }
 
-scorefiles <- list.files(pattern = "*.sscore", all.files = TRUE)
-combined <- purrr::map_dfr(scorefiles, read_scorefiles) %>%
-  group_by(dataset, IID) %>%
-  summarise_all(sum, na.rm = TRUE)
-write.table(combined, "aggregated_scores.txt", col.names = TRUE, quote = FALSE, row.names = FALSE)
+combine_mapped_traits <- function(json_efo_entry){
+  mapped_html <- paste0('<a href="', json_efo_entry$url, '">', json_efo_entry$label, '</a>')
+  return(paste(mapped_html, collapse=', '))
+}
+
+make_publication_table <- function(log) {
+  json <- call_api(log)
+  
+  if (json$size == 0) {
+    return(data.frame(accession=NA, pgp_id = NA, Publication = NA, reported = NA, mapped=NA, genome_build=NA,pgs_id=NA))
+  }
+  
+  df <- data.frame(pgs_id = json$results$id) 
+  pubs <- json$results$publication[, c("id", "firstauthor", "journal", "date_publication")]
+  traits <- data.frame(reported = json$results$trait_reported,
+                       mapped = sapply(json$results$trait_efo, combine_mapped_traits))
+  
+  unformatted <- dplyr::bind_cols(df, pubs, traits)
+  
+  unformatted$genome_build <- json$results$variants_genomebuild
+  
+  return(add_urls(tidyr::unite(unformatted, "Publication", firstauthor:date_publication, sep = " ")))
+}
+
+log %>%
+  count(accession, wt = count, name = "n_variants") %>%
+  left_join(make_publication_table(log), by = "accession") %>%
+  tidyr::unite("Publication", c(pgp_id, Publication), sep = " | ") %>%
+  mutate(reported = paste0("<u>Reported trait</u>: ", reported),
+         mapped = paste0("<u>Mapped trait</u>: ", mapped)) %>%
+  tidyr::unite("Trait", c(reported, mapped), sep = "<br>") %>%
+  select(accession, pgs_id, Publication, Trait, n_variants, genome_build) %>% 
+  DT::datatable(
+    rownames = FALSE,
+    escape = FALSE,
+    colnames = c(
+      "Scoring file" = "accession",
+      "Polygenic Score ID" = "pgs_id",
+      "Number of variants" = "n_variants",
+      "Genome build (reported)" = "genome_build"
+    ),
+    extensions = 'Buttons',
+    options = list(dom = 'Bfrtip',
+                   buttons = c('csv'))
+  )
 ```
 
-Score peek:
+### Variant matching
+
+<hr>
+
+#### Parameters
+
+```{bash match_params, echo = FALSE}
+cat "params.txt"
+```
+
+```{r match_summary, echo = FALSE, warning=FALSE}
+log %>%
+  mutate(match_status = forcats::fct_collapse(match_status, matched = "matched", other_level = "unmatched")) %>%
+  group_by(sampleset, accession, match_status, score_pass) %>%
+  count(wt = count) %>%
+  group_by(sampleset, accession) %>%
+  mutate(percent = round(n / sum(n) * 100, 1), n_variants = sum(n)) %>%
+  arrange(accession, desc(percent)) %>%
+  tidyr::pivot_wider(names_from = match_status, values_from = c(n, percent)) %>%
+  replace(is.na(.), 0) -> compat
+```
+
+<hr>
+
+#### Summary
+
+```{r match_table, echo = FALSE}
+compat %>%
+  select(sampleset, accession, n_variants, score_pass, percent_matched,
+         n_matched, n_unmatched) %>%
+  mutate(score_pass = as.logical(score_pass)) %>%
+  DT::datatable(rownames = FALSE,
+                extensions = 'Buttons',
+    options = list(dom = 'Bfrtip',
+                   buttons = c('csv')),
+    colnames = c(
+      "Sampleset" = "sampleset",
+      "Scoring file" = "accession",
+      "Number of variants" = "n_variants",
+      "Passed matching" = "score_pass",
+      "Match %" = "percent_matched",
+      "Total matched" = "n_matched",
+      "Total unmatched" = "n_unmatched"
+    )) %>%
+  DT::formatStyle('Scoring file', 
+                  valueColumns = 'Passed matching',
+                  backgroundColor = DT::styleEqual(c(FALSE, TRUE), c('#c2a5cf', '#a6dba0')))
+```
+
+<hr>
+#### Detailed results
+
+```{r match_table_detailed, echo = FALSE, warning=FALSE}
+log %>%
+  group_by(sampleset, accession) %>%
+  count(match_status, ambiguous, is_multiallelic, duplicate_best_match, duplicate_ID, wt = count) %>%
+  rename(is_ambiguous = ambiguous) %>%
+  mutate(percent = round(n / sum(n) * 100, 2),
+         match_status = forcats::fct_relevel(match_status, "matched", "excluded", "unmatched")) %>%
+  arrange(accession, match_status) %>%
+  DT::datatable(rownames=FALSE,
+                extensions = 'Buttons',
+    options = list(dom = 'Bfrtip',
+                   buttons = c('csv')),
+    colnames = c(
+      "Sampleset" = "sampleset",
+      "Scoring file" = "accession",
+      "Match type" = "match_status",
+      "Multiple potential matches" = "duplicate_best_match",
+      "Duplicated matched variants" = "duplicate_ID",
+      "Ambiguous" = "is_ambiguous",
+      "Multiallelic" = "is_multiallelic",
+      "%" = "percent"
+    ))
+```
+
+## Scores 
+
+```{r, echo = FALSE, message = FALSE}
+scores <- readr::read_tsv("aggregated_scores.txt.gz") 
+```
+
+```{asis, echo = any(table(scores$sampleset) < 50)}
+<div class="alert alert-warning", role="alert">
+  <strong>⚠️ Warning: small sampleset size (n < 50)</strong>
+  <hr>
+  <ul>
+  <li>plink2 uses allele frequency data to <a href="https://www.cog-genomics.org/plink/2.0/score">mean-impute the dosages of missing genotypes</a></li>
+  <li>Currently the pipeline disables mean-imputation in these small sample sets to make sure that the calculated PGS is as consistent with the genotype data as possible</li>
+  <li>With a small sample size, the resulting score sums may be inconsistent between samples</li>
+  <li>The average ([scorename]_AVG) may be more applicable as it calculates an average weighting over all genotypes present</li>
+  </ul> 
+  <hr>
+  <p>
+  In the future mean-imputation will be supported in small samplesets using ancestry-matched reference samplesets to ensure consistent calculation of score sums (e.g. 1000G Genomes).
+  </p>
+</div>
+```
+
+<div class="alert alert-success", role="alert">
+<p>`r sum(grepl("*_SUM$", colnames(scores)))` scores for `r nrow(scores)` samples processed</p>
+</div>
+
+
+```{r missing_scores, echo = FALSE}
+log %>% 
+  filter(score_pass == "false") %>%
+  group_by(sampleset, accession) %>% 
+  count(score_pass) -> missing_scores
+```
+
+```{asis, echo = nrow(missing_scores) > 0}
+<div class="alert alert-danger", role="alert">
+<p>Some scores are missing because they failed matching, check passed matching column 
+in summary table</p>
+</div>
+```
+
+### Score data {.tabset}
+
+#### Score extract
+
+<div class="alert alert-info", role="alert">
+<p>Below is a summary of the aggregated scores, which might be useful for 
+debugging.</p>
+</div>
+
 
 ```{r, echo = FALSE}
-scores <- read.table("aggregated_scores.txt", header = TRUE, comment.char = "")
-head(scores) %>%
-  knitr::kable()
-xfun::embed_file("aggregated_scores.txt", text = "Download all calculated scores")
+scores %>%
+  select(sampleset, IID, ends_with("SUM")) %>%
+  tibble::as_tibble(.)
 ```
 
-## Session information
+<div class="alert alert-info", role="alert">
+<p>See here for an explanation of <a href="https://www.cog-genomics.org/plink/2.0/formats#sscore">plink2 column names</a>
+</p>
+</div>
 
-```{r}
-sessionInfo()
+#### Density plot
+
+<div class="alert alert-info", role="alert">
+<p>The summary density plots show up to six scoring files</p>
+</div>
+
+```{r, echo = FALSE, message=FALSE, warning=FALSE}
+scores %>%
+  ungroup() %>%
+  select(IID, sampleset, ends_with("SUM")) %>%
+  group_by(IID, sampleset) %>%
+  tidyr::pivot_longer(cols = -group_cols()) %>%
+  ungroup() %>%
+  filter(name != "DENOM_SUM") %>%
+  mutate(name = ifelse(
+    stringr::str_detect(name, "^PGS"),
+    stringr::str_extract(name, "^PGS[0-9]{6}"),
+    name)) %>%
+  group_by(sampleset, name) -> long_scores
+
+group_keys(long_scores) %>%
+  slice(1:6) -> score_keys
+
+long_scores %>%
+  inner_join(score_keys) %>%
+  ggplot(aes(x = value, fill = sampleset)) +
+      geom_density(alpha = 0.3) +
+      facet_wrap(~name, ncol = 2, scales = "free") +
+      theme_bw() +
+      labs(x = "PGS (SUM)", y = "Density", title = "PGS Distribution(s)")
 ```
+
+### Get scores
+
+All scores can be found in "aggregated_scores.txt.gz", in the results folder output by the pipeline.
+
+## Citations
+
+<div class="alert alert-info", role="alert">
+<p>For scores from the PGS Catalog, please remember to cite the original publications from which they came (these are listed in the metadata table.) </p>
+</div>
+
+> PGS Catalog Calculator (in development). PGS Catalog Team. https://github.com/PGScatalog/pgsc_calc
+
+> Lambert et al. (2021) The Polygenic Score Catalog as an open database for reproducibility and systematic evaluation. Nature Genetics. 53:420–425 doi:10.1038/s41588-021-00783-5.

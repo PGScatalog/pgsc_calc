@@ -1,6 +1,6 @@
 # The Polygenic Score Catalog Calculator (`pgsc_calc`)
 
-[![Documentation](https://github.com/PGScatalog/pgsc_calc/actions/workflows/docs.yml/badge.svg)](https://pgscatalog.github.io/pgsc_calc/index.html)
+[![Documentation Status](https://readthedocs.org/projects/pgsc-calc/badge/?version=latest)](https://pgsc-calc.readthedocs.io/en/latest/?badge=latest)
 [![pgscatalog/pgsc_calc CI](https://github.com/PGScatalog/pgsc_calc/actions/workflows/ci.yml/badge.svg)](https://github.com/PGScatalog/pgsc_calc/actions/workflows/ci.yml)
 
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A521.04.0-23aa62.svg?labelColor=000000)](https://www.nextflow.io/)
@@ -57,8 +57,7 @@ details.
 
 ## Documentation
 
-[Full documentation is available on Github
-pages.](https://pgscatalog.github.io/pgsc_calc/)
+[Full documentation is available on Read the Docs](https://pgsc-calc.readthedocs.io/en/)
 
 ## Credits
 
@@ -72,10 +71,10 @@ ancestry inference implemented in nextflow derived from an existing set of
 tools/scripts developed by Inouye lab (Rodrigo Canovas, Scott Ritchie, Jingqin
 Wu) and PGS Catalog teams (Samuel Lambert, Laurent Gil).
 
-The adaptation of the codebase and nextflow implementation is written by
-Benjamin Wingfield with input and supervision from Samuel Lambert (PGS Catalog)
-and Aoife McMahon (EBI). Development of new features, testing, and code review
-is ongoing including Inouye lab members (Rodrigo Canovas) and others. A
+The adaptation of the codebase, nextflow implementation, and PGS Catalog features
+are written by Benjamin Wingfield, Samuel Lambert, Laurent Gil with additional input
+from Aoife McMahon (EBI). Development of new features, testing, and code review
+is ongoing including Inouye lab members (Rodrigo Canovas, Scott Ritchie) and others. A
 manuscript describing the tool is in preparation. In the meantime if you use the
 tool we ask you to cite the repo and the paper describing the PGS Catalog
 resource:
@@ -86,17 +85,12 @@ resource:
 reproducibility and systematic evaluation.  Nature Genetics. 53:420–425
 doi:[10.1038/s41588-021-00783-5](https://doi.org/10.1038/s41588-021-00783-5).
 
-This pipeline uses code and infrastructure developed and maintained by the
-[nf-core](https://nf-co.re) community, reused here under the [MIT
-license](https://github.com/nf-core/tools/blob/master/LICENSE).
+This pipeline is distrubuted under an [Apache License](LICENSE) amd uses code and 
+infrastructure developed and maintained by the [nf-core](https://nf-co.re) community 
+(Ewels *et al. Nature Biotech* (2020) doi:[10.1038/s41587-020-0439-x](https://doi.org/10.1038/s41587-020-0439-x)), 
+reused here under the [MIT license](https://github.com/nf-core/tools/blob/master/LICENSE).
 
-> The nf-core framework for community-curated bioinformatics pipelines.
->
-> Philip Ewels, Alexander Peltzer, Sven Fillinger, Harshil Patel, Johannes Alneberg, Andreas Wilm, Maxime Ulysse Garcia, Paolo Di Tommaso & Sven Nahnsen.
->
-> Nat Biotechnol. 2020 Feb 13. doi: 10.1038/s41587-020-0439-x.
-
-In addition, references of tools and data used in this pipeline are described in
+Additional references of open-source tools and data used in this pipeline are described in
 [`CITATIONS.md`](CITATIONS.md).
 
 This work has received funding from EMBL-EBI core funds, the Baker Institute,

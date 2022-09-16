@@ -1,0 +1,20 @@
+- name: test combine scorefiles module
+  command: nextflow run ./tests/modules/combine -entry testcombine -c ./tests/config/nextflow.config -profile test --target_build GRCh38
+  tags:
+    - module
+    - combine
+    - fast
+  files:
+    - path: output/combine/scorefiles.txt.gz
+      contains:
+        - "chr_name"
+        - "chr_position"
+        - "effect_allele"
+        - "other_allele"
+        - "effect_weight"
+        - "effect_type"
+    - path: output/combine/versions.yml
+      contains:
+        - "pgscatalog_utils: 0.1.2"
+    
+

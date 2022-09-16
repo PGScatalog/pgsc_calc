@@ -8,7 +8,7 @@ from bin.samplesheet_to_json import *
 @pytest.fixture
 def samplesheet():
     ''' A samplesheet dataframe '''
-    d = { 'sample': ['cineca_synthetic_subset'], 'vcf_path': [None], 'bfile_path': ['https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset'], 'pfile_path': [None], 'chrom': [22] }
+    d = { 'sampleset': ['cineca_synthetic_subset'], 'vcf_path': [None], 'bfile_path': ['https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset'], 'pfile_path': [None], 'chrom': [22] }
     return pd.DataFrame(d)
 
 @pytest.fixture

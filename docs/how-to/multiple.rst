@@ -3,11 +3,11 @@
 How to apply multiple scores in parallel
 ========================================
 
-pgsc_calc makes it simple to scale up polygenic score calculation by using PLINK
-2's built-in matrix multiplication. If you want to calculate multiple scores for
-your genetic data it will always be faster to run the pipeline once with the
-parallel method described in this section. Running the workflow many times, once
-for each score, will be much slower |:man_running:|
+pgsc_calc makes it simple to scale up polygenic score calculation. If you want
+to calculate multiple scores for your genetic data it will always be faster to
+run the pipeline once with the parallel method described in this
+section. Running the workflow many times, once for each score, will be much
+slower |:man_running:|
 
 1. Samplesheet setup
 --------------------
@@ -37,22 +37,15 @@ Save the file as ``samplesheet.csv``. See :ref:`setup samplesheet` for more deta
 2. Multiple PGS Catalog scores
 ------------------------------
 
-It's simple to run multiple scoring files published in the PGS Catalog. Each
-entry in the PGS Catalog has an accession that starts with the prefix PGS. The
-``--accession`` parameter supports multiple entries. List each PGS accession,
-separating each accession with commas (no whitespace):
+As described in :ref:`calculate pgscatalog`, use a comma separated list to
+select multiple accessions, traits, or publications. The pipeline will
+automatically query the PGS Catalog API, download unique scoring files in the
+correct genome build, and use your target genomes to calculate scores. For
+example:
 
 .. code-block:: console
-
-    --accession PGS001229,PGS001405
-
-That's all you need to do! |:partying_face:|
-
-In this simple example all PGS Catalog accessions are scoring files in build
-GRCh37. You might find that some scores don't match the genome build of your
-genomic data as you use more scores. To make sure all scores match the build of
-your genomic data, you'll need to set some additional parameters (see
-:ref:`liftover`).
+                
+    --pgs_id PGS001229,PGS000802
 
 3. Multiple custom scorefiles
 -----------------------------
@@ -135,7 +128,7 @@ Setting effect types for variants is not supported with this format (see
     $ nextflow run pgscatalog/pgscalc \
         -profile <docker/singularity/conda> \
         --input samplesheet.csv \
-        --accession PGS001229,PGS001405
+        --pgs_id PGS001229,PGS001405
 
 - Or you might be using multiple scoring files in the same directory:
 
@@ -149,7 +142,7 @@ Setting effect types for variants is not supported with this format (see
 Congratulations, you've now calculated multiple scores in parallel!
 |:partying_face:|
 
-.. note:: You can set both ``--accession`` and ``--scorefile`` parameters to
+.. note:: You can set both ``--pgs_id`` and ``--scorefile`` parameters to
           combine scores in the PGS Catalog with your own custom scores
 
 After the workflow executes successfully, the calculated scores and a summary

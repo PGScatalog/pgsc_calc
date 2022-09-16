@@ -16,14 +16,23 @@ for (param in checkPathParamList) {
     file(param, checkIfExists: true)
 }
 
+
+if (params.platform == 'arm64') {
+    profiles = summary_params['Core Nextflow options'].profile.tokenize(',')
+    if (profiles.contains('singularity') | profiles.contains('conda')) {
+        println "ERROR: arm64 platform only supports -profile docker"
+        System.exit(1)
+    }
+}
+
 // Check mandatory parameters
 ch_input = Channel.fromPath(params.input, checkIfExists: true)
 
 // Set up scorefile channels ---------------------------------------------------
 
-if (!params.scorefile & !params.accession) {
+if (![params.scorefile, params.pgs_id, params.trait_efo, params.pgp_id].any()) {
     println " ERROR: You didn't set any scores to use! \
-    Please set --scorefile or --accession parameters and try again (: "
+        Please set --scorefile, --pgs_id, --trait_efo, or --pgp_id"
     System.exit(1)
 }
 
@@ -34,27 +43,28 @@ if (!params.target_build) {
 }
 
 unique_scorefiles = Channel.empty()
-unique_accessions = Channel.empty()
 
 if (params.scorefile) {
     Channel.fromPath(params.scorefile, checkIfExists: true)
-        .map { [[accession: it.getBaseName()], it ] }
         .set { scorefiles }
 
     scorefiles
-        .map { it.take(1) }
         .unique()
         .join(scorefiles)
         .set { unique_scorefiles }
 }
 
-if (params.accession) {
-    Channel.fromList(params.accession.replaceAll('\\s','').tokenize(','))
-        .unique() // tokenize to ensure unique
-        .collect()
-        .map { it.join(',') } // join again for calling API
-        .set { unique_accessions }
+def process_accessions(String accession) {
+    if (accession) {
+        return accession.replaceAll('\\s','').tokenize(',').unique().join(' ')
+    } else {
+        return ''
+    }
 }
+
+def String unique_trait_efo = process_accessions(params.trait_efo)
+def String unique_pgp_id    = process_accessions(params.pgp_id)
+def String unique_pgs_id    = process_accessions(params.pgs_id)
 
 ch_reference = Channel.empty()
 
@@ -91,7 +101,7 @@ if (params.only_score) {
 ========================================================================================
 */
 
-include { PGSCATALOG_GET       } from '../modules/local/pgscatalog_get'
+include { DOWNLOAD_SCOREFILES  } from '../modules/local/download_scorefiles'
 
 include { INPUT_CHECK          } from '../subworkflows/local/input_check'
 include { MAKE_COMPATIBLE      } from '../subworkflows/local/make_compatible'
@@ -110,24 +120,27 @@ workflow PGSCALC {
     //
     // SUBWORKFLOW: Get scoring file from PGS Catalog accession
     //
-    if (params.accession) {
-        PGSCATALOG_GET ( unique_accessions )
-        scorefiles = unique_scorefiles.mix(PGSCATALOG_GET.out.scorefiles)
+    def accessions = [pgs_id: unique_pgs_id, pgp_id: unique_pgp_id,
+                      trait_efo: unique_trait_efo]
+
+    if (!accessions.every( { it.value == '' })) {
+        DOWNLOAD_SCOREFILES ( accessions, params.target_build )
+        scorefiles = DOWNLOAD_SCOREFILES.out.scorefiles.mix(unique_scorefiles)
     } else {
         scorefiles = unique_scorefiles
     }
-
-    scorefiles.map { it[1] }.collect().set{ ch_scorefile }
 
     //
     // SUBWORKFLOW: Validate and stage input files
     //
 
+    scorefiles.collect().set{ ch_scorefiles }
+
     if (run_input_check) {
         INPUT_CHECK (
             ch_input,
             params.format,
-            ch_scorefile,
+            ch_scorefiles,
             ch_reference
         )
         ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
@@ -144,7 +157,6 @@ workflow PGSCALC {
             INPUT_CHECK.out.variants,
             INPUT_CHECK.out.vcf,
             INPUT_CHECK.out.scorefiles,
-            INPUT_CHECK.out.db
         )
         ch_versions = ch_versions.mix(MAKE_COMPATIBLE.out.versions)
     }
@@ -183,10 +195,16 @@ workflow.onComplete {
         NfcoreTemplate.email(workflow, params, summary_params, projectDir, log, multiqc_report)
     }
     NfcoreTemplate.summary(workflow, params, log)
+    println "Please remember to cite polygenic score authors if you publish with them!"
+    println "Check the output report for citation details"
 }
 
 /*
 ========================================================================================
     THE END
-========================================================================================
+    |\__/,|   (`\
+  _.|o o  |_   ) )
+-(((---(((--------
+ ========================================================================================
 */
+

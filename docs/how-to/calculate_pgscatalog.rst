@@ -33,23 +33,62 @@ Save the file as ``samplesheet.csv``. See :ref:`setup samplesheet` for more deta
 
 .. _`PGS Catalog`: http://www.pgscatalog.org/
 
-2. Set PGS Catalog accession
-----------------------------
+2. Pick scores from the PGS Catalog 
+-----------------------------------
 
-First, search the `PGS Catalog`_ to find traits or studies you're interested
-in. Once you've found something (e.g., standing height), note the Polygenic Score ID
-that starts with with the prefix "PGS". For example, `PGS001229`_. The parameter
-``--accession`` accepts polygenic score IDs:
+Accessions
+~~~~~~~~~~
+
+Individual scores can be used by using Polygenic Score IDs that start with with
+the prefix "PGS". For example, `PGS001229`_. The parameter ``--accession``
+accepts polygenic score IDs:
 
 .. code-block:: console
 
-    --accession PGS001229
+    --pgs_id PGS001229
 
-.. note:: If you've found a score but the genome build doesn't match your input
-          genomes, :ref:`liftover` may be helpful
-          
+Multiple scores can be set by using a comma separated list:
+
+.. code-block:: console
+
+    --pgs_id PGS001229,PGS000802
+
 .. _`PGS001229`: http://www.pgscatalog.org/score/PGS001229/
 
+Traits
+~~~~~~
+
+If you would like to calculate every polygenic score in the Catalog for a
+`trait`_, like `coronary artery disease`_, then you can use the ``--trait``
+parameter:
+
+.. code-block:: console
+
+    --trait EFO_0001645
+
+Multiple traits can be set by using a comma separated list.
+
+.. _`trait`: https://www.pgscatalog.org/browse/traits/
+.. _`coronary artery disease`: https://www.pgscatalog.org/trait/EFO_0001645/
+
+
+Publications
+~~~~~~~~~~~~
+
+If you would like to calculate every polygenic score associated with a
+`publication`_ in the PGS Catalog, you can use the ``--publication`` parameter:
+
+.. code-block:: console
+
+    --publication PGP000001
+
+Multiple traits can be set by using a comma separated list.
+
+.. _`publication`: https://www.pgscatalog.org/browse/studies/
+
+.. note:: PGS, trait, and publication IDs can be combined to calculate
+          multiple polygenic scores.
+          
 3. Calculate!
 -------------
 
@@ -58,18 +97,9 @@ that starts with with the prefix "PGS". For example, `PGS001229`_. The parameter
     $ nextflow run pgscatalog/pgscalc \
         -profile <docker/singularity/conda> \    
         --input samplesheet.csv \
-        --accession PGS001229
+        --pgs_id PGS001229 \
+        --trait EFO_0001645 \
+        --publication PGP000001
 
-.. note:: If you want to use multiple scores, see :ref:`multiple` 
+.. note:: For more details about calculating multiple scores, see :ref:`multiple` 
 
-.. _limitations:
-
-Limitations
------------
-
-Some scores in the PGS Catalog are not compatible with this workflow, including:
-
-- Scores missing genomic coordinates (some use rsids instead)
-- Some scores don't have genome build information. They may work OK with your
-  genomic data, but lifting over will not work.
-- Scores in genome builds older than GRCh37
