@@ -17,17 +17,20 @@ and/or user-defined PGS/PRS.
 
 ## Pipeline summary
 
-1. Optionally, fetch a scorefile from the PGS Catalog API
-2. Validate and optionally liftover PGS Catalog and/or user-defined scoring file
-   formats
-3. Standardise variant data to a common specification (PLINK2)
-4. Match variants in the scoring file against variants in the genotyping data
-5. Calculate scores for each sample (handling multiple scores in paralell)
-6. Produce a summary report
+1. Downloading scoring files using the PGS Catalog API in a specified genome build (GRCh37 and GRCh38).
+2. Reading custom scoring files (and performing a liftover if genotyping data is in a different build).
+3. Automatically combines and creates scoring files for efficient parallel computation of multiple PGS
+    - Matching variants in the scoring files against variants in the target dataset (in plink bfile/pfile or VCF format)
+4. Calculates PGS for all samples (linear sum of weights and dosages)
+5. Creates a summary report to visualize score distributions and pipeline metadata (variant matching QC)
 
 ### Features in development
 
-1. Ancestry estimation using reference datasets
+- *Genetic Ancestry*: calculate similarity of target samples to populations in a
+  reference dataset (e.g. [1000 Genomes (1000G)](http://www.nature.com/nature/journal/v526/n7571/full/nature15393.html), 
+  [Human Genome Diversity Project (HGDP)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7115999/)) using principal components analysis (PCA).
+- *PGS Normalization*: Using reference population data and/or PCA projections to report
+  individual-level PGS predictions (e.g. percentiles, z-scores) that account for genetic ancestry.
 
 ## Quick start
 
@@ -48,16 +51,16 @@ and/or user-defined PGS/PRS.
 4. Start running your own analysis!
 
     ```console
-    nextflow run pgscatalog/pgsc_calc -profile <docker/singularity/conda> --input samplesheet.csv --accession PGS001229
+    nextflow run pgscatalog/pgsc_calc -profile <docker/singularity/conda> --input samplesheet.csv --pgs_id PGS001229
     ```
 
 See [getting
-started](https://pgscatalog.github.io/pgsc_calc/getting-started.html) for more
+started](https://pgsc-calc.readthedocs.io/en/latest/getting-started.html) for more
 details.
 
 ## Documentation
 
-[Full documentation is available on Read the Docs](https://pgsc-calc.readthedocs.io/en/)
+[Full documentation is available on Read the Docs](https://pgsc-calc.readthedocs.io/)
 
 ## Credits
 

@@ -22,7 +22,7 @@ Currently the pipeline (implemented in `nextflow`_) works by:
 - Reading custom scoring files (and performing a liftover if genotyping data is in a different build).
 - Matching variants in the scoring files against variants in the target dataset (in plink bfile/pfile or VCF format)
 - Automatically combines and creates scoring files for efficient parallel computation of multiple PGS
-- Calculates PGS SUMS for all samples
+- Calculates PGS for all samples (linear sum of weights and dosages)
 - Creates a summary report to visualize score distributions and pipeline metadata (variant matching QC)
 
 The pipeline is build on top of `PLINK 2`_ and the `PGS Catalog Utilities`_ python package (for interacting
