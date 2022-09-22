@@ -1,5 +1,6 @@
 process PLINK2_RELABELPVAR {
     tag "$meta.id chromosome $meta.chrom"
+    storeDir "$workDir/genomes/${meta.id}/${meta.chrom}/"
     label 'process_low'
     label "${ params.copy_genomes ? 'copy_genomes' : '' }"
 
