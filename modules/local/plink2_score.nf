@@ -15,7 +15,7 @@ process PLINK2_SCORE {
     tuple val(meta), path(geno), path(pheno), path(variants), val(scoremeta), path(scorefile)
 
     output:
-    path "*.sscore"    , emit: scores
+    path "*.sscore.zst", emit: scores
     path "versions.yml", emit: versions
     path "*.log"       , emit: log
 
@@ -25,7 +25,7 @@ process PLINK2_SCORE {
     def mem_mb = task.memory.toMega() // plink is greedy
 
     // dynamic input option
-    def input = (meta.is_pfile) ? '--pfile' : '--bfile'
+    def input = (meta.is_pfile) ? '--pfile vzs' : '--bfile vzs'
 
     // custom args2
     def maxcol = (scoremeta.n_scores + 2) // id + effect allele = 2 cols
@@ -43,7 +43,7 @@ process PLINK2_SCORE {
             --memory $mem_mb \\
             --seed 31 \\
             $args \\
-            --score $scorefile $args2 \\
+            --score $scorefile $args2 zs \\
             $input ${geno.baseName} \\
             --out ${meta.id}_${meta.chrom}_${scoremeta.effect_type}_${scoremeta.n}
 
@@ -59,7 +59,7 @@ process PLINK2_SCORE {
             --memory $mem_mb \\
             --seed 31 \\
             $args \\
-            --score $scorefile $args2 \\
+            --score $scorefile $args2 zs \\
             --score-col-nums 3-$maxcol \\
             $input ${geno.baseName} \\
             --out ${meta.id}_${meta.chrom}_${scoremeta.effect_type}_${scoremeta.n}

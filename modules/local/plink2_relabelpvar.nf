@@ -17,7 +17,7 @@ process PLINK2_RELABELPVAR {
 
     output:
     tuple val(meta), path("*.pgen"), emit: geno
-    tuple val(meta), path("*.pvar"), emit: variants
+    tuple val(meta), path("*.zst") , emit: variants
     tuple val(meta), path("*.psam"), emit: pheno
     path "versions.yml"            , emit: versions
 
@@ -40,7 +40,7 @@ process PLINK2_RELABELPVAR {
         --set-all-var-ids '@:#:\$r:\$a' \\
         $set_ma_missing \\
         --pfile ${geno.baseName} \\
-        --make-just-pvar \\
+        --make-just-pvar zs \\
         --out ${prefix}_${meta.chrom}
 
     cp -RP $geno ${prefix}_${meta.chrom}.pgen

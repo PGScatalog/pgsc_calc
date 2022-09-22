@@ -17,7 +17,7 @@ process PLINK2_RELABELBIM {
 
     output:
     tuple val(meta), path("*.bed"), emit: geno
-    tuple val(meta), path("*.bim"), emit: variants
+    tuple val(meta), path("*.zst"), emit: variants
     tuple val(meta), path("*.fam"), emit: pheno
     path "versions.yml"           , emit: versions
 
@@ -40,7 +40,7 @@ process PLINK2_RELABELBIM {
         --set-all-var-ids '@:#:\$r:\$a' \\
         $set_ma_missing \\
         --bfile ${geno.baseName} \\
-        --make-just-bim \\
+        --make-just-bim zs \\
         --out ${prefix}_${meta.chrom}
 
     cp -RP $geno ${prefix}_${meta.chrom}.bed

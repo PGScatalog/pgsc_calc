@@ -4,19 +4,19 @@ process MATCH_VARIANTS {
     errorStrategy 'finish'
 
     conda (params.enable_conda ? "$projectDir/environments/pgscatalog_utils/environment.yml" : null)
-    def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/pgscatalog_utils:${params.platform}-0.1.2"
+    def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/pgscatalog_utils:${params.platform}-0.2.0"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/pgscatalog_utils:amd64-0.1.2' :
+        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/pgscatalog_utils:amd64-0.2.0' :
         dockerimg }"
 
     input:
     tuple val(meta), val(chrom), path('??.vars'), path(scorefile)
 
     output:
-    tuple val(scoremeta), path("*.scorefile"), emit: scorefile
-    path "*_summary.csv"                     , emit: summary
-    path "*_log.csv.gz"                      , emit: db
-    path "versions.yml"                      , emit: versions
+    tuple val(scoremeta), path("*.scorefile.gz"), emit: scorefile
+    path "*_summary.csv"                        , emit: summary
+    path "*_log.csv.gz"                         , emit: db
+    path "versions.yml"                         , emit: versions
 
     script:
     def args = task.ext.args             ?: ''
