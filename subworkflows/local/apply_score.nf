@@ -1,6 +1,7 @@
 //
 // Apply a validated scoring file to the QC'd target genomic data
 //
+import java.util.zip.GZIPInputStream
 
 include { PLINK2_SCORE }    from '../../modules/local/plink2_score'
 include { SCORE_AGGREGATE } from '../../modules/local/score_aggregate'
@@ -93,14 +94,10 @@ def annotate_scorefiles(ArrayList scorefiles) {
             // add number of scores to a new meta map
             // this is needed because scorefiles may contain different number of
             // scores when split by effect type (e.g. 4 additive scores, 1
-
             // dominant, 1 recessive). scorefile looks like:
             //     variant ID | effect allele | weight 1 | ... | weight_n
-            //     1 score = 2 tab characters, 4 scores = 5
             // one weight is mandatory, extra weight columns are optional
-            def n_scores
-            it.last().withReader { n_scores = it.readLine().count("\t") - 1 }
-            scoremeta.n_scores = n_scores
+            scoremeta.n_scores = count_scores(it.last())
 
             // file name structure: {dataset}_{chr}_{effect}_{split}.scorefile -
             // {dataset} is only used to disambiguate files, not for scoremeta
@@ -136,4 +133,13 @@ def annotate_genomic(ArrayList target) {
     meta.n_samples = n
 
     return [meta, paths]
+}
+
+def count_scores(Path f) {
+    // count number of calculated scores in a gzipped plink .scorefile
+    // try-with-resources block automatically closes streams
+    try (buffered = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(f.toFile()))))) {
+        n_extra_cols = 2 // ID, effect_allele
+        return buffered.readLine().split("\t").length - n_extra_cols
+    }
 }
