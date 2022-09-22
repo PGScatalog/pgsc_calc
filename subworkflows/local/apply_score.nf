@@ -13,7 +13,7 @@ workflow APPLY_SCORE {
     pheno
     variants
     scorefiles
-    db // TO DO: improve database..
+    db
 
     main:
     ch_versions = Channel.empty()
@@ -126,10 +126,11 @@ def annotate_genomic(ArrayList target) {
     meta.chrom = meta.chrom.toString()
 
     paths = target.last()
-    psam = paths[1] // sorted path input! or we'll count the wrong file
+    sample = paths.collect { it ==~ /.*fam$|.*psam$/ }
+    psam = paths[sample.indexOf(true)]
+
     def n = -1 // skip header
     psam.eachLine { n++ }
-
     meta.n_samples = n
 
     return [meta, paths]
