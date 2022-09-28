@@ -24,43 +24,26 @@ process PLINK2_VCF {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     def mem_mb = task.memory.toMega()
+    def dosage_options = meta.vcf_import_dosage ? 'dosage=DS' : ''
     // rewriting genotypes, so use --max-alleles instead of using generic ID
     def set_ma_missing = params.keep_multiallelic ? '' : '--max-alleles 2'
     newmeta = meta.clone() // copy hashmap for updating...
     newmeta.is_pfile = true // now it's converted to a pfile :)
 
-    if (meta.vcf_import_dosage)
-        """
-        plink2 \\
-            --threads $task.cpus \\
-            --memory $mem_mb \\
-            --set-all-var-ids '@:#:\$r:\$a' \\
-            $set_ma_missing \\
-            $args \\
-            --vcf $vcf dosage=DS \\
-            --make-pgen \\
-            --out vcf_${prefix}_${meta.chrom} # 'vcf_' prefix is important
+    """
+    plink2 \\
+        --threads $task.cpus \\
+        --memory $mem_mb \\
+        --set-all-var-ids '@:#:\$r:\$a' \\
+        $set_ma_missing \\
+        $args \\
+        --vcf $vcf $dosage_options \\
+        --make-pgen \\
+        --out vcf_${prefix}_${meta.chrom} # 'vcf_' prefix is important
 
-        cat <<-END_VERSIONS > versions.yml
-        "${task.process}":
-            plink2: \$(plink2 --version 2>&1 | sed 's/^PLINK v//; s/ 64.*\$//' )
-        END_VERSIONS
-        """
-    else
-        """
-        plink2 \\
-            --threads $task.cpus \\
-            --memory $mem_mb \\
-            --set-all-var-ids '@:#:\$r:\$a' \\
-            $set_ma_missing \\
-            $args \\
-            --vcf $vcf \\
-            --make-pgen \\
-            --out vcf_${prefix}_${meta.chrom} # 'vcf_' prefix is important
-
-        cat <<-END_VERSIONS > versions.yml
-        "${task.process}":
-            plink2: \$(plink2 --version 2>&1 | sed 's/^PLINK v//; s/ 64.*\$//' )
-        END_VERSIONS
-        """
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        plink2: \$(plink2 --version 2>&1 | sed 's/^PLINK v//; s/ 64.*\$//' )
+    END_VERSIONS
+    """
 }
