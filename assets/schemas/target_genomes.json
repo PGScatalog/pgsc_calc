@@ -30,6 +30,18 @@
           }
         ]
       },
+      "vcf_genotype_field": {
+        "description": "Specify whether to import genotypes (default: GT), or imputed dosages (DS) from the VCF file.",
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "/^(GT|DS)$/"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
       "bfile_path": {
         "description": "Plink 1 binary fileset prefix, must not end with bed / bim / fam, mutually exclusive with other formats",
         "anyOf": [
