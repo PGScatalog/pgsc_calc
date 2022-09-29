@@ -54,4 +54,8 @@ and run plink2 and convert your data to plink files that can be used with the ca
 
 however other methods to filter these variants from VCFs also exist.
 
+By default the pipeline uses the genotypes present in the ``GT`` field of the VCF file. If you would like
+to use imputed dosages you must add a ``vcf_genotype_field`` field column to the samplesheet with the ``DS`` value.
+See :ref:`setup samplesheet` for more information.
+
 .. _`thanks to Rvtests`: http://zhanxw.github.io/rvtests/#input-files    
