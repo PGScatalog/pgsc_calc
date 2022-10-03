@@ -1,0 +1,78 @@
+- name: plink2 testscore
+  command: nextflow run ./tests/modules/plink2/score -entry testscore -c ./tests/config/nextflow.config -profile test
+  tags:
+    - module
+    - plink2
+    - fast
+  files:
+    - path: output/plink2/test_null_null_null.sscore
+      contains:
+        - "PGS001229_22_SUM"
+    - path: output/plink2/test_null_null_null.log
+      must_not_contain:
+        - "no-mean-imputation"
+    - path: output/plink2/versions.yml
+      contains:
+        - "plink2: 2.00a3.3"
+
+- name: plink2 testsmallscore
+  command: nextflow run ./tests/modules/plink2/score -entry testsmallscore -c ./tests/config/nextflow.config -profile test
+  tags:
+    - module
+    - plink2
+    - fast
+  files:
+    - path: output/plink2/test_null_null_null.sscore
+      contains:
+        - "PGS001229_22_SUM"
+    - path: output/plink2/test_null_null_null.log
+      contains:
+        - "no-mean-imputation"
+    - path: output/plink2/versions.yml
+      contains:
+        - "plink2: 2.00a3.3"
+
+- name: plink2 testmultiscore
+  command: nextflow run ./tests/modules/plink2/score -entry testmultiscore -c ./tests/config/nextflow.config -profile test
+  tags:
+    - module
+    - plink2
+    - fast
+  files:
+    - path: output/plink2/test_null_null_null.sscore
+      contains:
+        - "PGS001229_22_SUM"
+        - "second_score_SUM"
+    - path: output/plink2/test_null_null_null.log
+      contains:
+        - "--score-col-nums"
+    - path: output/plink2/versions.yml
+      contains:
+        - "plink2: 2.00a3.3"
+
+- name: plink2 testsmallmultiscore
+  command: nextflow run ./tests/modules/plink2/score -entry testsmallmultiscore -c ./tests/config/nextflow.config -profile test
+  tags:
+    - module
+    - plink2
+    - fast
+  files:
+    - path: output/plink2/test_null_null_null.sscore
+      contains:
+        - "PGS001229_22_SUM"
+        - "second_score_SUM"
+    - path: output/plink2/test_null_null_null.log
+      contains:
+        - "no-mean-imputation"
+        - "--score-col-nums"
+    - path: output/plink2/versions.yml
+      contains:
+        - "plink2: 2.00a3.3"
+
+- name: plink2 testmultiscorefail
+  command: nextflow run ./tests/modules/plink2/score -entry testmultiscorefail -c ./tests/config/nextflow.config -profile test
+  tags:
+    - module
+    - plink2
+    - fast
+  exit_code: 1
