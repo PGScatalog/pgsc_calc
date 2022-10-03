@@ -1,6 +1,7 @@
 process PLINK2_VCF {
     tag "$meta.id chromosome $meta.chrom"
-    storeDir "$workDir/genomes/${meta.id}/${meta.chrom}/"
+    storeDir ( params.genotypes_cache ? "$params.genotypes_cache/${meta.id}/${meta.chrom}" :
+              "$workDir/genomes/${meta.id}/${meta.chrom}/")
     label 'process_medium'
     label "${ params.copy_genomes ? 'copy_genomes' : '' }"
 
