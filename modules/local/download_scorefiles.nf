@@ -26,7 +26,8 @@ process DOWNLOAD_SCOREFILES {
         $traits_args \
         $publication_args \
         -b $build \
-        -o \$PWD -v
+        -o \$PWD -v \
+        -c pgsc_calc/$workflow.manifest.version
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
