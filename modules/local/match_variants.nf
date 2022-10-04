@@ -35,7 +35,7 @@ process MATCH_VARIANTS {
         $args \
         --dataset ${meta.id} \
         --scorefile $scorefile \
-        --target "\$PWD/*.vars" \
+        --target *.vars \
         $split \
         $ambig \
         $multi \

@@ -16,7 +16,7 @@ process SCORE_AGGREGATE {
 
     script:
     """
-    aggregate_scores -s *.sscore.zst -o . -v
+    aggregate_scores -s $scorefiles -o . -v
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
