@@ -10,12 +10,11 @@ process PLINK2_SCORE {
         'https://depot.galaxyproject.org/singularity/plink2:2.00a3.3--hb2a7ceb_0' :
         dockerimg }"
 
-
     input:
     tuple val(meta), path(geno), path(pheno), path(variants), val(scoremeta), path(scorefile)
 
     output:
-    path "*.sscore.zst", emit: scores
+    path "*.{sscore,sscore.zst}", emit: scores  // optional compression
     path "versions.yml", emit: versions
     path "*.log"       , emit: log
 
@@ -43,7 +42,7 @@ process PLINK2_SCORE {
             --memory $mem_mb \\
             --seed 31 \\
             $args \\
-            --score $scorefile $args2 zs \\
+            --score $scorefile $args2 \\
             $input ${geno.baseName} \\
             --out ${meta.id}_${meta.chrom}_${scoremeta.effect_type}_${scoremeta.n}
 
@@ -59,7 +58,7 @@ process PLINK2_SCORE {
             --memory $mem_mb \\
             --seed 31 \\
             $args \\
-            --score $scorefile $args2 zs \\
+            --score $scorefile $args2 \\
             --score-col-nums 3-$maxcol \\
             $input ${geno.baseName} \\
             --out ${meta.id}_${meta.chrom}_${scoremeta.effect_type}_${scoremeta.n}
