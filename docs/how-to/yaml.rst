@@ -20,8 +20,7 @@ Parameters can be stored in YAML format, for example:
 
 
 Save this file as ``my_example_params.yaml``. An `example template`_ used in
-pgsc_calc's test suite is also available (see :ref:`testing` for an explanation
-of the test suite).
+pgsc_calc's test suite is also available.
 
 .. _`example template`:  https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/params.yaml
 

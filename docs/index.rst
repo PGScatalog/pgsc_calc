@@ -92,8 +92,7 @@ Documentation
 - :doc:`Get started<getting-started>`: install pgsc_calc and calculate some polygenic scores quickly
 - :doc:`How-to guides<how-to/index>`: step-by-step guides, covering different use cases
 - :doc:`Reference guides<reference/index>`: technical information about workflow configuration
-- :doc:`Explanation<explanation/index>`: background, discussion of important topics, answers to high level
-  questions
+
 
 Changelog
 ---------

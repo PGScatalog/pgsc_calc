@@ -1,6 +1,4 @@
 :orphan:
-
-.. _license:
    
 License
 -------

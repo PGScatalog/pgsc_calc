@@ -3,9 +3,8 @@
 How do I prepare my input genomes?
 ==================================
 
-The pipeline checks :term:`target genomic data` to make sure it's consistent
-with the data that's described in the samplesheet (see :ref:`setup
-samplesheet`).
+The pipeline checks target genomic data to make sure it's consistent with the
+data that's described in the samplesheet (see :ref:`setup samplesheet`).
 
 Only human chromosomes 1 -- 22, X, Y, and XY are supported by the pipeline,
 although sex chromosomes are rarely used in scoring files. If input data contain

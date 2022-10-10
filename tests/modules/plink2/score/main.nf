@@ -18,7 +18,7 @@ workflow testscore {
     PLINK2_RELABELBIM( Channel.of([meta, bed, bim, fam]) )
 
     PLINK2_RELABELBIM.out.geno
-        .mix(PLINK2_RELABELBIM.out.pheno, PLINK2_RELABELBIM.out.variants)
+        .concat(PLINK2_RELABELBIM.out.pheno, PLINK2_RELABELBIM.out.variants)
         .groupTuple(size: 3)
         .map{ it.flatten() }
         .concat(Channel.of(scoremeta, scorefile))
@@ -41,7 +41,7 @@ workflow testsmallscore {
     PLINK2_RELABELBIM( Channel.of([meta, bed, bim, fam]) )
 
     PLINK2_RELABELBIM.out.geno
-        .mix(PLINK2_RELABELBIM.out.pheno, PLINK2_RELABELBIM.out.variants)
+        .concat(PLINK2_RELABELBIM.out.pheno, PLINK2_RELABELBIM.out.variants)
         .groupTuple(size: 3)
         .map{ it.flatten() }
         .concat(Channel.of(scoremeta, scorefile))
@@ -64,7 +64,7 @@ workflow testmultiscore {
     PLINK2_RELABELBIM( Channel.of([meta, bed, bim, fam]) )
 
     PLINK2_RELABELBIM.out.geno
-        .mix(PLINK2_RELABELBIM.out.pheno, PLINK2_RELABELBIM.out.variants)
+        .concat(PLINK2_RELABELBIM.out.pheno, PLINK2_RELABELBIM.out.variants)
         .groupTuple(size: 3)
         .map{ it.flatten() }
         .concat(Channel.of(scoremeta, scorefile))
@@ -88,7 +88,7 @@ workflow testsmallmultiscore {
     PLINK2_RELABELBIM( Channel.of([meta, bed, bim, fam]) )
 
     PLINK2_RELABELBIM.out.geno
-        .mix(PLINK2_RELABELBIM.out.pheno, PLINK2_RELABELBIM.out.variants)
+        .concat(PLINK2_RELABELBIM.out.pheno, PLINK2_RELABELBIM.out.variants)
         .groupTuple(size: 3)
         .map{ it.flatten() }
         .concat(Channel.of(scoremeta, scorefile))
@@ -113,7 +113,7 @@ workflow testmultiscorefail {
     PLINK2_RELABELBIM( Channel.of([meta, bed, bim, fam]) )
 
     PLINK2_RELABELBIM.out.geno
-        .mix(PLINK2_RELABELBIM.out.pheno, PLINK2_RELABELBIM.out.variants)
+        .concat(PLINK2_RELABELBIM.out.pheno, PLINK2_RELABELBIM.out.variants)
         .groupTuple(size: 3)
         .map{ it.flatten() }
         .concat(Channel.of(scoremeta, scorefile))

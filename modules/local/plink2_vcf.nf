@@ -1,5 +1,7 @@
 process PLINK2_VCF {
     tag "$meta.id chromosome $meta.chrom"
+    storeDir ( params.genotypes_cache ? "$params.genotypes_cache/${meta.id}/${meta.chrom}" :
+              "$workDir/genomes/${meta.id}/${meta.chrom}/")
     label 'process_medium'
     label "${ params.copy_genomes ? 'copy_genomes' : '' }"
 
@@ -17,7 +19,7 @@ process PLINK2_VCF {
     output:
     tuple val(newmeta), path("*.pgen"), emit: pgen
     tuple val(newmeta), path("*.psam"), emit: psam
-    tuple val(newmeta), path("*.pvar"), emit: pvar
+    tuple val(newmeta), path("*.zst") , emit: pvar
     path "versions.yml"            , emit: versions
 
     script:
@@ -37,7 +39,7 @@ process PLINK2_VCF {
         $set_ma_missing \\
         $args \\
         --vcf $vcf \\
-        --make-pgen \\
+        --make-pgen vzs \\
         --out vcf_${prefix}_${meta.chrom} # 'vcf_' prefix is important
 
     cat <<-END_VERSIONS > versions.yml

@@ -3,6 +3,9 @@
 # This file only contains a selection of the most common options. For a full
 # list see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
+import os.path
+import re
+import subprocess
 
 # -- Path setup --------------------------------------------------------------
 
@@ -19,7 +22,7 @@
 
 project = 'Polygenic Score (PGS) Catalog Calculator'
 copyright = 'Polygenic Score (PGS) Catalog team (licensed under Apache License V2)'
-#author = 'Polygenic Score (PGS) Catalog team'
+# author = 'Polygenic Score (PGS) Catalog team'
 
 
 # -- General configuration ---------------------------------------------------
@@ -45,7 +48,6 @@ templates_path = ['_templates']
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -61,8 +63,11 @@ html_theme = 'sphinx_book_theme'
 html_sidebars = {
     "**": [
         "search-field.html",
-        "globaltoc.html" ]
+        "globaltoc.html"]
 }
+
+# for link checking
+user_agent = 'Mozilla/5.0 (X11; Linux x86_64; rv:25.0) Gecko/20100101 Firefox/25.0'
 
 html_theme_options = {
     "repository_url": "https://github.com/pgscatalog/pgsc_calc",
@@ -70,3 +75,38 @@ html_theme_options = {
     "use_issues_button": False,
     "extra_navbar": ""
 }
+
+def write_containers():
+    base_singularity = get_unique_containers("singularity", "depot")  # biocontainers
+    custom_singularity = get_unique_containers("singularity", "oras")  # private containers
+    base_docker = get_unique_containers("docker", "quay")
+    custom_docker = get_unique_containers("docker", "\"dockerhub")
+    if not os.path.exists("_build"):
+        os.mkdir("_build")
+
+    with open('_build/singularity_containers.txt', 'w') as f:
+        f.write('\n'.join(base_singularity + custom_singularity))
+
+    with open('_build/docker_containers.txt', 'w') as f:
+        f.write('\n'.join(base_docker + custom_docker))
+
+
+def get_unique_containers(engine: str, grep_string: str) -> list[str]:
+    git: subprocess.CompletedProcess = subprocess.run(["git", "grep", "-h", grep_string, "../*.nf"],
+                                                      capture_output=True)
+    messy_containers: str = git.stdout.decode("utf-8").strip()
+    match engine:
+        case "docker":
+            # custom containers use double quotes for closures
+            containers = list(set(re.findall(r'"([^"]*)"', messy_containers)))
+            if not containers:
+                # biocontainers use single quotes
+                containers = list(set(re.findall('\'([^\']*)\'', messy_containers)))
+        case "singularity":
+            # all singularity images use single quotes
+            containers = list(set(re.findall('\'([^\']*)\'', messy_containers)))
+
+    return containers
+
+
+write_containers()
