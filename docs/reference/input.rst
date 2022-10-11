@@ -13,4 +13,4 @@ are mutually exclusive). This reference is helpful if you want to:
 
 **But this schema probably isn't very helpful for most users, so it's OK to ignore it!**
 
-.. jsonschema:: ../../assets/schemas/target_genomes.json
+.. jsonschema:: ../../assets/schemas/samplesheet.json
