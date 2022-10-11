@@ -16,12 +16,16 @@ and the parallel calculation of multiple PGS.
 Workflow summary
 ----------------
 
+.. image:: https://user-images.githubusercontent.com/11425618/195053396-a3eaf31c-b3d5-44ff-a36c-4ef6d7958668.png
+    :width: 600
+    :alt: `pgsc_calc` workflow diagram
+
 Currently the pipeline (implemented in `nextflow`_) works by:
 
 - Downloading scoring files using the PGS Catalog API in a specified genome build (GRCh37 and GRCh38).
 - Reading custom scoring files (and performing a liftover if genotyping data is in a different build).
-- Matching variants in the scoring files against variants in the target dataset (in plink bfile/pfile or VCF format)
 - Automatically combines and creates scoring files for efficient parallel computation of multiple PGS
+    - Matching variants in the scoring files against variants in the target dataset (in plink bfile/pfile or VCF format)
 - Calculates PGS for all samples (linear sum of weights and dosages)
 - Creates a summary report to visualize score distributions and pipeline metadata (variant matching QC)
 
