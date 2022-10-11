@@ -166,15 +166,13 @@ There are five mandatory columns. Columns that specify genomic data paths
   multiple chromosomes, leave empty. Don't use a mix of empty and integer
   chromosomes in the same sample.
 
-Save this spreadsheet in :term:`CSV` format (e.g., ``samplesheet.csv``). An
-example template is `available here`_.
+Save this spreadsheet in :term:`CSV` format (e.g., ``samplesheet.csv``).
 
 .. note::
     All samplesets have to be in the same genome build (either GRCh37 or GRCh38) which is specified
     using the ``--target_build [GRCh3#]`` command. All scoring files are downloaded or mapped to match the specified
     genome build, no liftover/re-mapping of the genotyping data is performed within the pipeline.
 
-.. _`available here`: https://github.com/PGScatalog/pgsc_calc/blob/master/assets/examples/example_data/bfile_samplesheet.csv
 
 2. Select scoring files
 -----------------------

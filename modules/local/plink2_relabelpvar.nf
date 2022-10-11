@@ -1,5 +1,7 @@
 process PLINK2_RELABELPVAR {
     tag "$meta.id chromosome $meta.chrom"
+    storeDir ( params.genotypes_cache ? "$params.genotypes_cache/${meta.id}/${meta.chrom}" :
+              "$workDir/genomes/${meta.id}/${meta.chrom}/")
     label 'process_low'
     label "${ params.copy_genomes ? 'copy_genomes' : '' }"
 
@@ -17,7 +19,7 @@ process PLINK2_RELABELPVAR {
 
     output:
     tuple val(meta), path("*.pgen"), emit: geno
-    tuple val(meta), path("*.pvar"), emit: variants
+    tuple val(meta), path("*.zst") , emit: variants
     tuple val(meta), path("*.psam"), emit: pheno
     path "versions.yml"            , emit: versions
 
@@ -31,6 +33,7 @@ process PLINK2_RELABELPVAR {
     def mem_mb = task.memory.toMega() // plink is greedy
     // if dropping multiallelic variants, set a generic ID that won't match
     def set_ma_missing = params.keep_multiallelic ? '' : '--var-id-multi @:#'
+    def compressed = params.vzs ? 'vzs' : ''
 
     """
     plink2 \\
@@ -39,8 +42,8 @@ process PLINK2_RELABELPVAR {
         $args \\
         --set-all-var-ids '@:#:\$r:\$a' \\
         $set_ma_missing \\
-        --pfile ${geno.baseName} \\
-        --make-just-pvar \\
+        --pfile ${geno.baseName} $compressed \\
+        --make-just-pvar zs \\
         --out ${prefix}_${meta.chrom}
 
     cp -RP $geno ${prefix}_${meta.chrom}.pgen

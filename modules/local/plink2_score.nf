@@ -10,12 +10,11 @@ process PLINK2_SCORE {
         'https://depot.galaxyproject.org/singularity/plink2:2.00a3.3--hb2a7ceb_0' :
         dockerimg }"
 
-
     input:
     tuple val(meta), path(geno), path(pheno), path(variants), val(scoremeta), path(scorefile)
 
     output:
-    path "*.sscore"    , emit: scores
+    path "*.{sscore,sscore.zst}", emit: scores  // optional compression
     path "versions.yml", emit: versions
     path "*.log"       , emit: log
 
@@ -25,7 +24,7 @@ process PLINK2_SCORE {
     def mem_mb = task.memory.toMega() // plink is greedy
 
     // dynamic input option
-    def input = (meta.is_pfile) ? '--pfile' : '--bfile'
+    def input = (meta.is_pfile) ? '--pfile vzs' : '--bfile vzs'
 
     // custom args2
     def maxcol = (scoremeta.n_scores + 2) // id + effect allele = 2 cols

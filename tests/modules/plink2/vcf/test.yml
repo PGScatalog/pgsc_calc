@@ -1,0 +1,13 @@
+- name: plink2 vcf
+  command: nextflow run ./tests/modules/plink2/vcf -entry testvcf -c ./tests/config/nextflow.config -profile test
+  tags:
+    - module
+    - plink2
+    - fast
+  files:
+    - path: output/plink2/vcf_test_null.pgen
+    - path: output/plink2/vcf_test_null.psam
+    - path: output/plink2/vcf_test_null.pvar.zst
+    - path: output/plink2/versions.yml
+      contains:
+        - "plink2: 2.00a3.3"
