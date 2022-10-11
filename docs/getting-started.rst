@@ -155,7 +155,9 @@ There are five mandatory columns. Columns that specify genomic data paths
   analysis.
 - **vcf_path**: A text string of a file path pointing to a multi-sample
   :term:`VCF` file. File names must be unique. It's best to use full file paths,
-  not relative file paths.
+  not relative file paths. By default hard-called genotypes (``GT`` field) are imported,
+  if you would like to import dosages (``DS``) a it needs to be specified in the ``vcf_genotype_field``
+  column, see :ref:`setup samplesheet` for additional information.
 - **bfile_path**: A text string of a file path pointing to the prefix of a plink
   binary fileset. For example, if a binary fileset consists of plink.bed,
   plink.bim, and plink.fam then the prefix would be "plink". Must be

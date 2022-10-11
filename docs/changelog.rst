@@ -16,17 +16,21 @@ This release is focused on improving memory and storage usage.
 Features
 ~~~~~~~~
 
-- Allow `dosage import`_ from VCF to be specified in samplesheet (default: GT / hard calls)
+- Allow genotype dosages to be imported from VCF to be specified in ``vcf_genotype_field``
+  of samplesheet_ (default: GT / hard calls)
+
+- Makes use of `durable caching`_ when relabelling and recoding target genomes (``--genotypes_cache``)
+
+- Improvements to use less storage space:
+
+  - All intermediate files are now compressed by default
   
-- All intermediate files are now compressed by default
-  
-- Add parameter to support zstd compressed input files
+  - Add parameter to support zstd compressed input files
 
-- Use more `durable caching`_ when relabelling and recoding target genomes (``--genotypes_cache``)
+- Improved memory usage when matching variants (``pgscatalog_utils=v0.1.2``
+  https://github.com/PGScatalog/pgscatalog_utils)
 
-- Improved memory usage when matching variants
-
-.. _dosage import: https://pgsc-calc.readthedocs.io/en/dev/reference/input.html
+.. _samplesheet: https://pgsc-calc.readthedocs.io/en/dev/reference/input.html
 .. _durable caching: https://pgsc-calc.readthedocs.io/en/dev/reference/params.html#parameter-schema
 
 pgsc_calc v1.1.0 (2022-09-15)
