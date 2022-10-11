@@ -66,6 +66,9 @@ Glossary
 
      VCF
          Variant Call Format. A `standard file format`_ used to store genetic variants and genotypes.
+         By default the pipeline (& plink) use the sample genotypes present in the ``GT`` field. However,
+         users can import imputed ALT allele dosages by adding a ``DS`` flag to the ``vcf_genotype_field`` column of the
+         samplesheet, see :ref:`setup samplesheet` for more information.
 
 .. _CSVs are good: https://www.gov.uk/guidance/using-csv-file-format
 .. _single nucleotide polymorphism: https://en.wikipedia.org/wiki/Single-nucleotide_polymorphism

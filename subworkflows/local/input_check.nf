@@ -108,6 +108,7 @@ def json_to_genome(HashMap slurped) {
 
     if (meta.is_vcf) {
         vcf_path   = file(slurped.vcf_path, checkIfExists: true)
+        meta.vcf_import_dosage = slurped.vcf_import_dosage ? true : false
         genome_lst = [ meta, [ vcf_path ] ]
     } else if (meta.is_bfile) {
         if (params.vzs) { // compressed variant information

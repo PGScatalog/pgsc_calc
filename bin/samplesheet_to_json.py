@@ -37,9 +37,9 @@ def check_samplesheet(file_in: str, file_out: str) -> None:
 
     csv['chrom'] = csv['chrom'].apply(truncate_chrom)
 
-    colnames: set = {'sampleset', 'vcf_path', 'bfile_path', 'pfile_path', 'chrom'}
-    colname_err: str = "ERROR: Samplesheet has bad column names"
-    assert set(csv.columns) == colnames, colname_err
+    colnames_required: set = {'sampleset', 'vcf_path', 'bfile_path', 'pfile_path', 'chrom'}
+    assert all([x in csv.columns for x in colnames_required]), \
+        "ERROR: Samplesheet is missing required column names {}".format(colnames_required.difference(csv.columns))
 
     # basic error checking
     check_paths_exclusive(csv)
@@ -49,6 +49,13 @@ def check_samplesheet(file_in: str, file_out: str) -> None:
     csv.vcf_path = csv['vcf_path'].apply(check_vcf_paths)
     csv[['bed', 'bim', 'fam']] = csv['bfile_path'].apply(check_bfile_paths).str.split(',', 3, expand=True)
     csv[['pgen', 'psam', 'pvar']] = csv['pfile_path'].apply(check_pfile_paths).str.split(',', 3, expand=True)
+
+    # check whether dosages are specified
+    csv['vcf_import_dosage'] = False
+    if 'vcf_genotype_field' in csv.columns:
+        assert all([x in [None, 'GT', 'DS'] for x in csv['vcf_genotype_field']]), \
+            'Invalid items specified in vcf_genotype_field column: {}'.format(list(csv['vcf_genotype_field'].unique()))
+        csv.loc[csv['vcf_genotype_field'] == 'DS', 'vcf_import_dosage'] = True
 
     (csv.drop(['bfile_path', 'pfile_path'], axis=1)
      .replace(r'^\s*$', np.nan, regex=True)
