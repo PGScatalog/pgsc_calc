@@ -17,7 +17,9 @@ and/or user-defined PGS/PRS.
 
 ## Pipeline summary
 
-![pgsc_calc_v1 2 0-2](https://user-images.githubusercontent.com/11425618/194911285-916dc2dd-deb7-48a4-87ce-1c5f472a5c22.png)
+<p align="center">
+  <img width="70%" src="https://user-images.githubusercontent.com/11425618/195053396-a3eaf31c-b3d5-44ff-a36c-4ef6d7958668.png">
+</p>
 
 * Downloading scoring files using the PGS Catalog API in a specified genome build (GRCh37 and GRCh38).
 * Reading custom scoring files (and performing a liftover if genotyping data is in a different build).
