@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "https://raw.githubusercontent.com/pgscatalog/pgsc_calc/dev/assets/schemas/target_genomes.json",
+  "$id": "https://raw.githubusercontent.com/pgscatalog/pgsc_calc/dev/assets/schemas/samplesheet.json",
   "title": "Target genome schema",
   "description": "Validates the JSON representation of a samplesheet",
   "type": "array",

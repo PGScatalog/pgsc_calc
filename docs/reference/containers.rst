@@ -33,7 +33,7 @@ Other containers are hosted on a Gitlab container registry:
     * Contains R, RMarkdown, and the tidyverse to produce the summary report
           
 .. _`Biocontainers`: https://biocontainers.pro
-.. _`plink2 2.00a3.3`: _`https://www.cog-genomics.org/plink/2.0/`
+.. _`plink2 2.00a3.3`: https://www.cog-genomics.org/plink/2.0/
 .. _`multiqc`: https://quay.io/repository/biocontainers/multiqc?tab=info
 .. _`pgscatalog_utils`: https://github.com/PGScatalog/pgscatalog_utils
 
