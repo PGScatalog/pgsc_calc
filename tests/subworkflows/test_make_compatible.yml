@@ -7,10 +7,10 @@
   files:
     - path: output/samplesheet/out.json
     - path: output/combine/scorefiles.txt.gz
-    - path: output/plink2/cineca_synthetic_subset_22.bim
+    - path: output/plink2/cineca_synthetic_subset_22.bim.zst
     - path: output/plink2/cineca_synthetic_subset_22.bed
     - path: output/plink2/cineca_synthetic_subset_22.fam
-    - path: output/match/cineca-synthetic-subset_22_additive_0.scorefile      
+    - path: output/match/cineca-synthetic-subset_22_additive_0.scorefile.gz
     - path: output/match/cineca-synthetic-subset_log.csv.gz
 
 - name: test make compatible subworkflow with vcf
@@ -23,9 +23,9 @@
     - path: output/samplesheet/out.json
     - path: output/combine/scorefiles.txt.gz
     - path: output/plink2/vcf_cineca_synthetic_subset_22.pgen
-    - path: output/plink2/vcf_cineca_synthetic_subset_22.pvar
+    - path: output/plink2/vcf_cineca_synthetic_subset_22.pvar.zst
     - path: output/plink2/vcf_cineca_synthetic_subset_22.psam
-    - path: output/match/cineca-synthetic-subset_22_additive_0.scorefile
+    - path: output/match/cineca-synthetic-subset_22_additive_0.scorefile.gz
     - path: output/match/cineca-synthetic-subset_log.csv.gz
 
 - name: test make compatible subworkflow with pfile
@@ -38,7 +38,7 @@
     - path: output/samplesheet/out.json
     - path: output/combine/scorefiles.txt.gz
     - path: output/plink2/cineca_22.pgen
-    - path: output/plink2/cineca_22.pvar
+    - path: output/plink2/cineca_22.pvar.zst
     - path: output/plink2/cineca_22.psam
-    - path: output/match/cineca_22_additive_0.scorefile
+    - path: output/match/cineca_22_additive_0.scorefile.gz
     - path: output/match/cineca_log.csv.gz

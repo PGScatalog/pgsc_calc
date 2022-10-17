@@ -3,9 +3,9 @@ process DOWNLOAD_SCOREFILES {
     time '30m'
 
     conda (params.enable_conda ? "$projectDir/environments/pgscatalog_utils/environment.yml" : null)
-    def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/pgscatalog_utils:${params.platform}-0.1.2"
+    def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/pgscatalog_utils:${params.platform}-0.2.0"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/pgscatalog_utils:amd64-0.1.2' :
+        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/pgscatalog_utils:amd64-0.2.0' :
         dockerimg }"
 
     input:
@@ -26,7 +26,8 @@ process DOWNLOAD_SCOREFILES {
         $traits_args \
         $publication_args \
         -b $build \
-        -o \$PWD -v
+        -o \$PWD -v \
+        -c pgsc_calc/$workflow.manifest.version
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

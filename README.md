@@ -17,12 +17,16 @@ and/or user-defined PGS/PRS.
 
 ## Pipeline summary
 
-1. Downloading scoring files using the PGS Catalog API in a specified genome build (GRCh37 and GRCh38).
-2. Reading custom scoring files (and performing a liftover if genotyping data is in a different build).
-3. Automatically combines and creates scoring files for efficient parallel computation of multiple PGS
+<p align="center">
+  <img width="70%" src="https://user-images.githubusercontent.com/11425618/195053396-a3eaf31c-b3d5-44ff-a36c-4ef6d7958668.png">
+</p>
+
+* Downloading scoring files using the PGS Catalog API in a specified genome build (GRCh37 and GRCh38).
+* Reading custom scoring files (and performing a liftover if genotyping data is in a different build).
+* Automatically combines and creates scoring files for efficient parallel computation of multiple PGS
     - Matching variants in the scoring files against variants in the target dataset (in plink bfile/pfile or VCF format)
-4. Calculates PGS for all samples (linear sum of weights and dosages)
-5. Creates a summary report to visualize score distributions and pipeline metadata (variant matching QC)
+* Calculates PGS for all samples (linear sum of weights and dosages)
+* Creates a summary report to visualize score distributions and pipeline metadata (variant matching QC)
 
 ### Features in development
 

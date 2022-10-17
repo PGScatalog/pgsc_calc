@@ -108,18 +108,26 @@ def json_to_genome(HashMap slurped) {
 
     if (meta.is_vcf) {
         vcf_path   = file(slurped.vcf_path, checkIfExists: true)
+        meta.vcf_import_dosage = slurped.vcf_import_dosage ? true : false
         genome_lst = [ meta, [ vcf_path ] ]
     } else if (meta.is_bfile) {
-        bed        = file(slurped.bed, checkIfExists: true)
-        bim        = file(slurped.bim, checkIfExists: true)
-        fam        = file(slurped.fam, checkIfExists: true)
+        if (params.vzs) { // compressed variant information
+            bim = file(slurped.bim + '.zst', checkIfExists: true)
+        } else {
+            bim = file(slurped.bim, checkIfExists: true)
+        }
+        bed = file(slurped.bed, checkIfExists: true)
+        fam = file(slurped.fam, checkIfExists: true)
         genome_lst = [ meta, [ bed, bim, fam ] ]
     } else if (meta.is_pfile) {
-        pgen       = file(slurped.pgen, checkIfExists: true)
-        psam       = file(slurped.psam, checkIfExists: true)
-        pvar       = file(slurped.pvar, checkIfExists: true)
+        if (params.vzs) { // compressed variant information
+            pvar = file(slurped.pvar + '.zst', checkIfExists: true)
+        } else {
+            pvar = file(slurped.pvar, checkIfExists: true)
+        }
+        pgen = file(slurped.pgen, checkIfExists: true)
+        psam = file(slurped.psam, checkIfExists: true)
         genome_lst = [ meta, [ pgen, psam, pvar ] ]
-
     }
     return genome_lst
 }

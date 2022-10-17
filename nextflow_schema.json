@@ -59,9 +59,17 @@
                     "default": "https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/reference_data/pgsc_calc_ref.sqlar",
                     "description": "Path to reference database"
                 },
+                "vzs": {
+                    "type": "boolean",
+                    "description": "Assume plink inputs (.bim / .pvar) are compressed with zstd"
+                },
                 "copy_genomes": {
                     "type": "boolean",
                     "description": "Copy harmonised genomes (plink2 pgen/pvar/psam files) to outdir"
+                },
+                "genotypes_cache": {
+                    "type": "string",
+                    "default": null
                 },
                 "outdir": {
                     "type": "string",

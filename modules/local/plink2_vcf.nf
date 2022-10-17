@@ -1,5 +1,7 @@
 process PLINK2_VCF {
     tag "$meta.id chromosome $meta.chrom"
+    storeDir ( params.genotypes_cache ? "$params.genotypes_cache/${meta.id}/${meta.chrom}" :
+              "$workDir/genomes/${meta.id}/${meta.chrom}/")
     label 'process_medium'
     label "${ params.copy_genomes ? 'copy_genomes' : '' }"
 
@@ -17,13 +19,14 @@ process PLINK2_VCF {
     output:
     tuple val(newmeta), path("*.pgen"), emit: pgen
     tuple val(newmeta), path("*.psam"), emit: psam
-    tuple val(newmeta), path("*.pvar"), emit: pvar
+    tuple val(newmeta), path("*.zst") , emit: pvar
     path "versions.yml"            , emit: versions
 
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     def mem_mb = task.memory.toMega()
+    def dosage_options = meta.vcf_import_dosage ? 'dosage=DS' : ''
     // rewriting genotypes, so use --max-alleles instead of using generic ID
     def set_ma_missing = params.keep_multiallelic ? '' : '--max-alleles 2'
     newmeta = meta.clone() // copy hashmap for updating...
@@ -36,8 +39,8 @@ process PLINK2_VCF {
         --set-all-var-ids '@:#:\$r:\$a' \\
         $set_ma_missing \\
         $args \\
-        --vcf $vcf \\
-        --make-pgen \\
+        --vcf $vcf $dosage_options \\
+        --make-pgen vzs\\
         --out vcf_${prefix}_${meta.chrom} # 'vcf_' prefix is important
 
     cat <<-END_VERSIONS > versions.yml

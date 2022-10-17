@@ -89,6 +89,7 @@ jobs:
           - "plink2 testmultiscorefail"
           - "plink2 testrelabelbim"
           - "plink2 testrelabelpvar"
+          - "plink2 vcf"          
           - "test apply score subworkflow"
           - "test input check subworkflow"
           - "test input check subworkflow with PGS catalog API"

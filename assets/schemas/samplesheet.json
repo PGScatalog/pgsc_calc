@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "https://raw.githubusercontent.com/pgscatalog/pgsc_calc/dev/assets/schemas/target_genomes.json",
+  "$id": "https://raw.githubusercontent.com/pgscatalog/pgsc_calc/dev/assets/schemas/samplesheet.json",
   "title": "Target genome schema",
   "description": "Validates the JSON representation of a samplesheet",
   "type": "array",
@@ -27,6 +27,18 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 0
+          }
+        ]
+      },
+      "vcf_genotype_field": {
+        "description": "Specify whether to import genotypes (default: GT), or imputed dosages (DS) from the VCF file.",
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "/^(GT|DS)$/"
+          },
+          {
+            "type": "null"
           }
         ]
       },

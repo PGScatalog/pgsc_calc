@@ -8,6 +8,30 @@ will only occur in major versions with changes noted in this changelog.
 
 .. _`semantic versioning`: https://semver.org/
 
+pgsc_calc v1.2.0 (2022-10-11)
+-----------------------------
+
+This release is focused on improving memory and storage usage.
+
+Features
+~~~~~~~~
+
+- Allow genotype dosages to be imported from VCF to be specified in ``vcf_genotype_field``
+  of samplesheet_ (default: GT / hard calls)
+
+- Makes use of `durable caching`_ when relabelling and recoding target genomes (``--genotypes_cache``)
+
+- Improvements to use less storage space:
+
+  - All intermediate files are now compressed by default
+  
+  - Add parameter to support zstd compressed input files
+
+- Improved memory usage when matching variants (``pgscatalog_utils=v0.1.2``
+  https://github.com/PGScatalog/pgscatalog_utils)
+
+.. _samplesheet: https://pgsc-calc.readthedocs.io/en/dev/reference/input.html
+.. _durable caching: https://pgsc-calc.readthedocs.io/en/dev/reference/params.html#parameter-schema
 
 pgsc_calc v1.1.0 (2022-09-15)
 -----------------------------
