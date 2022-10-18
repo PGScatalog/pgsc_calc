@@ -1,5 +1,5 @@
-process MATCH_VARIANTS {
-    tag "$meta.id chromosome $meta.chrom"
+process MATCH_AGGREGATE {
+    tag "$meta.id"
     label 'process_medium'
     errorStrategy 'finish'
 
@@ -10,32 +10,27 @@ process MATCH_VARIANTS {
         dockerimg }"
 
     input:
-    tuple val(meta), path(pvar), path(scorefile)
+    tuple val(meta), path('??.ipc.zst'), path(scorefile)
 
     output:
-    tuple val(meta), path("*_log.ipc.zst"), emit: log
-    path "versions.yml"                   , emit: versions
+    tuple val(scoremeta), path("*.scorefile.gz"), emit: scorefile
+    path "*_summary.csv"                        , emit: summary
+    path "*_log.csv.gz"                         , emit: db
+    path "versions.yml"                         ,  emit: versions
 
     script:
     def args = task.ext.args                ?: ''
-    def fast = params.fast_match            ? '--fast'              : ''
-    def ambig = params.keep_ambiguous       ? '--keep_ambiguous'    : ''
-    def multi = params.keep_multiallelic    ? '--keep_multiallelic' : ''
-    def chrom = !meta.chrom.contains("ALL") ? "--chrom $meta.chrom" : ''
+    scoremeta = [:]
+    scoremeta.id = "$meta.id"
     """
     export POLARS_MAX_THREADS=$task.cpus
 
-    match_variants \
+    aggregate_matches \
         $args \
-        --dataset ${meta.id} \
+        --dataset $meta.id \
         --scorefile $scorefile \
-        --target $pvar \
-        $chrom \
-        $ambig \
-        $multi \
-        $fast \
+        --logs '*.ipc.zst' \
         --outdir \$PWD \
-        -n $task.cpus \
         -v
 
     cat <<-END_VERSIONS > versions.yml
