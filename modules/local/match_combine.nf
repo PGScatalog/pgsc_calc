@@ -1,4 +1,4 @@
-process MATCH_AGGREGATE {
+process MATCH_COMBINE {
     tag "$meta.id"
     label 'process_medium'
     errorStrategy 'finish'
@@ -25,7 +25,7 @@ process MATCH_AGGREGATE {
     """
     export POLARS_MAX_THREADS=$task.cpus
 
-    aggregate_matches \
+    combine_matches \
         $args \
         --dataset $meta.id \
         --scorefile $scorefile \

@@ -2,7 +2,7 @@ include { PLINK2_VCF         } from '../../modules/local/plink2_vcf'
 include { PLINK2_RELABELBIM  } from '../../modules/local/plink2_relabelbim'
 include { PLINK2_RELABELPVAR } from '../../modules/local/plink2_relabelpvar'
 include { MATCH_VARIANTS     } from '../../modules/local/match_variants'
-include { MATCH_AGGREGATE    } from '../../modules/local/match_aggregate'
+include { MATCH_COMBINE      } from '../../modules/local/match_combine'
 
 workflow MAKE_COMPATIBLE {
     take:
@@ -69,7 +69,7 @@ workflow MAKE_COMPATIBLE {
         .dump(tag: 'match_variants_output')
         .set { matches }
 
-    MATCH_AGGREGATE ( matches )
+    MATCH_COMBINE ( matches )
 
     ch_versions = ch_versions.mix(MATCH_VARIANTS.out.versions)
 
@@ -77,7 +77,7 @@ workflow MAKE_COMPATIBLE {
     geno       = geno_std
     pheno      = pheno_std
     variants   = variants_std
-    scorefiles = MATCH_AGGREGATE.out.scorefile
-    db         = MATCH_AGGREGATE.out.summary
+    scorefiles = MATCH_COMBINE.out.scorefile
+    db         = MATCH_COMBINE.out.summary
     versions   = ch_versions
 }
