@@ -27,9 +27,10 @@ process MATCH_COMBINE {
 
     combine_matches \
         $args \
+        --min_overlap $params.min_overlap \
         --dataset $meta.id \
         --scorefile $scorefile \
-        --logs '*.ipc.zst' \
+        --matches '*.ipc.zst' \
         --outdir \$PWD \
         -v
 

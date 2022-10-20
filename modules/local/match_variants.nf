@@ -13,8 +13,11 @@ process MATCH_VARIANTS {
     tuple val(meta), path(pvar), path(scorefile)
 
     output:
-    tuple val(meta), path("*_log.ipc.zst"), emit: log
-    path "versions.yml"                   , emit: versions
+    tuple val(meta), path("*_matches.ipc.zst"), emit: matches, optional: true
+    tuple val(scoremeta), path("*.scorefile.gz"), emit: scorefile, optional: true
+    path "*_summary.csv", emit: summary, optional: true
+    path "*_log.csv.gz", emit: db, optional: true
+    path "versions.yml", emit: versions
 
     script:
     def args = task.ext.args                ?: ''
@@ -22,25 +25,53 @@ process MATCH_VARIANTS {
     def ambig = params.keep_ambiguous       ? '--keep_ambiguous'    : ''
     def multi = params.keep_multiallelic    ? '--keep_multiallelic' : ''
     def chrom = !meta.chrom.contains("ALL") ? "--chrom $meta.chrom" : ''
-    """
-    export POLARS_MAX_THREADS=$task.cpus
+    def only_match = !meta.chrom.contains("ALL") ? true : false
+    scoremeta = [:]
+    scoremeta.id = "$meta.id"
 
-    match_variants \
-        $args \
-        --dataset ${meta.id} \
-        --scorefile $scorefile \
-        --target $pvar \
-        $chrom \
-        $ambig \
-        $multi \
-        $fast \
-        --outdir \$PWD \
-        -n $task.cpus \
-        -v
+    if (only_match)
+        """
+        export POLARS_MAX_THREADS=$task.cpus
 
-    cat <<-END_VERSIONS > versions.yml
-    ${task.process.tokenize(':').last()}:
-        pgscatalog_utils: \$(echo \$(python -c 'import pgscatalog_utils; print(pgscatalog_utils.__version__)'))
-    END_VERSIONS
-    """
+        match_variants \
+            $args \
+            --dataset ${meta.id} \
+            --scorefile $scorefile \
+            --target $pvar \
+            --only_match \
+            $chrom \
+            $ambig \
+            $multi \
+            $fast \
+            --outdir \$PWD \
+            -n $task.cpus \
+            -v
+
+        cat <<-END_VERSIONS > versions.yml
+        ${task.process.tokenize(':').last()}:
+            pgscatalog_utils: \$(echo \$(python -c 'import pgscatalog_utils; print(pgscatalog_utils.__version__)'))
+        END_VERSIONS
+        """
+    else
+        """
+        export POLARS_MAX_THREADS=$task.cpus
+
+        match_variants \
+            $args \
+            --dataset ${meta.id} \
+            --scorefile $scorefile \
+            --target $pvar \
+            --min_overlap $params.min_overlap \
+            $ambig \
+            $multi \
+            $fast \
+            --outdir \$PWD \
+            -n $task.cpus \
+            -v
+
+        cat <<-END_VERSIONS > versions.yml
+        ${task.process.tokenize(':').last()}:
+            pgscatalog_utils: \$(echo \$(python -c 'import pgscatalog_utils; print(pgscatalog_utils.__version__)'))
+        END_VERSIONS
+        """
 }

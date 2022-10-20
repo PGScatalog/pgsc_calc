@@ -61,7 +61,7 @@ workflow MAKE_COMPATIBLE {
     // wait for the entire process to finish before releasing the grouped
     // tuples. setting a groupKey size avoids lots of unnecessary waiting.
     // note: chrom is dropped from the meta map to get groupTuple() working
-    MATCH_VARIANTS.out.log.map{
+    MATCH_VARIANTS.out.matches.map{
         tuple(groupKey(it[0].subMap(['id', 'is_vcf', 'is_bfile', 'is_pfile']), it[0].n_chrom), it[1])
     }
         .groupTuple()
@@ -71,13 +71,17 @@ workflow MAKE_COMPATIBLE {
 
     MATCH_COMBINE ( matches )
 
+    scorefiles = MATCH_COMBINE.out.scorefile.mix(MATCH_VARIANTS.out.scorefile)
+    db = MATCH_COMBINE.out.summary.mix(MATCH_VARIANTS.out.summary)
+
+
     ch_versions = ch_versions.mix(MATCH_VARIANTS.out.versions)
 
     emit:
     geno       = geno_std
     pheno      = pheno_std
     variants   = variants_std
-    scorefiles = MATCH_COMBINE.out.scorefile
-    db         = MATCH_COMBINE.out.summary
+    scorefiles = scorefiles
+    db         = db
     versions   = ch_versions
 }
