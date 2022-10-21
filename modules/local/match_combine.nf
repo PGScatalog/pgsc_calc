@@ -10,7 +10,7 @@ process MATCH_COMBINE {
         dockerimg }"
 
     input:
-    tuple val(meta), path('??.ipc.zst'), path(scorefile)
+    tuple val(meta), path(matches), path(scorefile)
 
     output:
     tuple val(scoremeta), path("*.scorefile.gz"), emit: scorefile
@@ -30,7 +30,7 @@ process MATCH_COMBINE {
         --min_overlap $params.min_overlap \
         --dataset $meta.id \
         --scorefile $scorefile \
-        --matches '*.ipc.zst' \
+        --matches $matches \
         --outdir \$PWD \
         -v
 
