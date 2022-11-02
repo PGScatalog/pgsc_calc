@@ -30,6 +30,9 @@ Features
 - Improved memory usage when matching variants (``pgscatalog_utils=v0.1.2``
   https://github.com/PGScatalog/pgscatalog_utils)
 
+- Revised interface to select scores from the PGS Catalog using flags:
+  ``--trait_efo`` (EFO ID / traits), ``--pgp_id`` (PGP ID / publications), ``--pgs_id`` (PGS ID, individual scores).
+
 .. _samplesheet: https://pgsc-calc.readthedocs.io/en/dev/reference/input.html
 .. _durable caching: https://pgsc-calc.readthedocs.io/en/dev/reference/params.html#parameter-schema
 
