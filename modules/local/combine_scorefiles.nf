@@ -14,6 +14,7 @@ process COMBINE_SCOREFILES {
 
     output:
     path "scorefiles.txt.gz", emit: scorefiles
+    path "log_scorefiles.json", emit: log_scorefiles
     path "versions.yml"     , emit: versions
 
     script:
@@ -28,6 +29,7 @@ process COMBINE_SCOREFILES {
             --liftover \
             -t $params.target_build \
             -o scorefiles.txt.gz \
+            -l log_scorefiles.json \
             -c \$PWD \
             -m $params.min_lift \
             $args
@@ -42,6 +44,7 @@ process COMBINE_SCOREFILES {
         combine_scorefiles -s $raw_scores \
             -t $params.target_build \
             -o scorefiles.txt.gz \
+            -l log_scorefiles.json \
             $args
 
         cat <<-END_VERSIONS > versions.yml
