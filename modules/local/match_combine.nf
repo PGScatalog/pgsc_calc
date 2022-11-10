@@ -20,6 +20,8 @@ process MATCH_COMBINE {
 
     script:
     def args = task.ext.args                ?: ''
+    def ambig = params.keep_ambiguous       ? '--keep_ambiguous'    : ''
+    def multi = params.keep_multiallelic    ? '--keep_multiallelic' : ''
     scoremeta = [:]
     scoremeta.id = "$meta.id"
     """
@@ -27,11 +29,14 @@ process MATCH_COMBINE {
 
     combine_matches \
         $args \
-        --min_overlap $params.min_overlap \
         --dataset $meta.id \
         --scorefile $scorefile \
         --matches $matches \
+        --min_overlap $params.min_overlap \
+        $ambig \
+        $multi \
         --outdir \$PWD \
+        --split \
         -v
 
     cat <<-END_VERSIONS > versions.yml

@@ -40,8 +40,6 @@ process MATCH_VARIANTS {
             --target $pvar \
             --only_match \
             $chrom \
-            $ambig \
-            $multi \
             $fast \
             --outdir \$PWD \
             -n $task.cpus \
