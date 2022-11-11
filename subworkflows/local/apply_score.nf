@@ -143,6 +143,8 @@ def count_scores(Path f) {
     // try-with-resources block automatically closes streams
     try (buffered = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(f.toFile()))))) {
         n_extra_cols = 2 // ID, effect_allele
-        return buffered.readLine().split("\t").length - n_extra_cols
+        n_scores = buffered.readLine().split("\t").length - n_extra_cols
+        assert n_scores > 0 : "Counting scores failed, please check scoring file"
+        return n_scores
     }
 }
