@@ -9,6 +9,7 @@ process SCORE_REPORT {
 
     input:
     path scorefiles
+    path log_scorefiles
     path report
     path logo
     path '*' // list of summary csvs, staged with original names

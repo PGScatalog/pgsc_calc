@@ -13,6 +13,7 @@ workflow APPLY_SCORE {
     pheno
     variants
     scorefiles
+    log_scorefiles
     db
 
     main:
@@ -52,6 +53,7 @@ workflow APPLY_SCORE {
 
     SCORE_REPORT(
         SCORE_AGGREGATE.out.scores,
+        log_scorefiles,
         Channel.fromPath("$projectDir/bin/report.Rmd", checkIfExists: true),
         Channel.fromPath("$projectDir/assets/PGS_Logo.png", checkIfExists: true),
         db.collect()

@@ -13,7 +13,7 @@ process MATCH_VARIANTS {
     tuple val(meta), path(pvar), path(scorefile)
 
     output:
-    tuple val(meta), path("*_matches.ipc.zst"), emit: matches, optional: true
+    tuple val(meta), path("matches/*.ipc.zst"), emit: matches, optional: true
     tuple val(scoremeta), path("*.scorefile.gz"), emit: scorefile, optional: true
     path "*_summary.csv", emit: summary, optional: true
     path "*_log.csv.gz", emit: db, optional: true
