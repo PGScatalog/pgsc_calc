@@ -89,7 +89,7 @@ parse_json2rows <- function(score_header){
   result[['pgs_id']] <- pgs_id
   
   # pgp_id
-  pgp_id <- NA
+  pgp_id <- ''
   if(is.null(score_header[['pgp_id']]) == FALSE){
     pgp_id <- paste0('<a href="https://www.pgscatalog.org/publication/', score_header[['pgp_id']], '">', score_header[['pgp_id']], '</a>')
   }
