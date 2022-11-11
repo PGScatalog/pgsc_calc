@@ -8,7 +8,7 @@
     - path: output/download/PGS000001_hmPOS_GRCh37.txt.gz
     - path: output/download/versions.yml
       contains:
-        - "pgscatalog_utils: 0.2.0"
+        - "pgscatalog_utils: 0.3.0"
       
 - name: pgscatalog test --efo_trait --pgp_id and --pgs_id
   command: nextflow run ./tests/modules/download -entry testmultipleaccessions -c ./tests/config/nextflow.config -profile test
@@ -24,7 +24,7 @@
     - path: output/download/PGS002054_hmPOS_GRCh37.txt.gz
     - path: output/download/versions.yml
       contains:
-        - "pgscatalog_utils: 0.2.0"
+        - "pgscatalog_utils: 0.3.0"
 
 - name: pgscatalog test bad accession
   command: nextflow run ./tests/modules/download -entry testbadaccession -c ./tests/config/nextflow.config -profile test
@@ -44,4 +44,4 @@
     - path: output/download/PGS000001_hmPOS_GRCh38.txt.gz
     - path: output/download/versions.yml
       contains:
-        - "pgscatalog_utils: 0.2.0"
+        - "pgscatalog_utils: 0.3.0"
