@@ -34,6 +34,29 @@ docker,test``
 Multiple profiles can be combined with a comma. The test profile is used only
 for checking the pipeline is installed and working correctly.
 
+Cannot access directory error when relabelling genotypes
+--------------------------------------------------------
+
+You might get an error just before one of the following processes finishes:
+
+- ``PLINK2_RELABELPVAR``
+- ``PLINK2_RELABELBIM``
+- ``PLINK2_VCF``
+
+.. code-block:: console
+
+    Error executing process > 'PGSCATALOG_PGSCALC:PGSCALC:MAKE_COMPATIBLE:PLINK2_RELABELPVAR (all_phase3 chromosome ALL)'
+
+    Caused by:
+      Cannot access directory: <path/to/work/dir>/genomes/all_phase3/ALL
+
+This is caused by certain local storage configurations.
+
+Rerunning the pipeline with ``-resume`` will fix the problem.
+
+To avoid the problem happening, set the ``--genotypes_cache`` parameter to a
+directory that already exists on your file system.
+
 I'm having problems with VCF input
 ----------------------------------
 

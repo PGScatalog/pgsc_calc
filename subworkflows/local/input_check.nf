@@ -77,6 +77,7 @@ workflow INPUT_CHECK {
     ch_bfiles.fam.mix(ch_pfiles.psam).dump(tag: 'input').set { pheno }
     ch_input.vcf.dump(tag: 'input').set{vcf}
     COMBINE_SCOREFILES.out.scorefiles.dump(tag: 'input').set{ scorefiles }
+    COMBINE_SCOREFILES.out.log_scorefiles.dump(tag: 'input').set{ log_scorefiles }
 
     emit:
     geno
@@ -84,6 +85,7 @@ workflow INPUT_CHECK {
     pheno
     vcf
     scorefiles
+    log_scorefiles
     versions
 }
 

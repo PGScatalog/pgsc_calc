@@ -2,6 +2,7 @@ include { PLINK2_VCF         } from '../../modules/local/plink2_vcf'
 include { PLINK2_RELABELBIM  } from '../../modules/local/plink2_relabelbim'
 include { PLINK2_RELABELPVAR } from '../../modules/local/plink2_relabelpvar'
 include { MATCH_VARIANTS     } from '../../modules/local/match_variants'
+include { MATCH_COMBINE      } from '../../modules/local/match_combine'
 
 workflow MAKE_COMPATIBLE {
     take:
@@ -47,24 +48,32 @@ workflow MAKE_COMPATIBLE {
         .dump(tag: 'make_compatible')
         .set{ variants_std }
 
-    // Recombine split variant information files to match target variants ------
-
-    // custom groupKey() to set a different group size for each sample ID
-    // different samples may have different numbers of chromosomes
-    // see https://nextflow.io/docs/latest/operator.html#grouptuple
-    // if a size is not provided then nextflow must wait for the entire process
-    // to finish before releasing the grouped tuples, which can be very slow(!)
-
-    variants_std.map { tuple(groupKey(it[0].subMap(['id', 'is_vcf', 'is_bfile', 'is_pfile']), it[0].n_chrom),
-                     it[0].chrom, it[1]) }
-        .groupTuple()
+    variants_std
         .combine( scorefile )
         .dump(tag: 'match_variants_input')
         .set { ch_variants }
 
-    // variants should be matched once per sample identifier
     MATCH_VARIANTS ( ch_variants )
-    MATCH_VARIANTS.out.scorefile.dump(tag: 'match_variants_output')
+
+    // create custom groupKey() to set a different group size for each
+    // sampleset.  different samplesets may have different numbers of
+    // chromosomes. so if a groupKey size is not provided then nextflow must
+    // wait for the entire process to finish before releasing the grouped
+    // tuples. setting a groupKey size avoids lots of unnecessary waiting.
+    // note: chrom is dropped from the meta map to get groupTuple() working
+    MATCH_VARIANTS.out.matches.map{
+        tuple(groupKey(it[0].subMap(['id', 'is_vcf', 'is_bfile', 'is_pfile']), it[0].n_chrom), it[1])
+    }
+        .groupTuple()
+        .combine( scorefile )
+        .dump(tag: 'match_variants_output')
+        .set { matches }
+
+    MATCH_COMBINE ( matches )
+
+    scorefiles = MATCH_COMBINE.out.scorefile.mix(MATCH_VARIANTS.out.scorefile)
+    db = MATCH_COMBINE.out.summary.mix(MATCH_VARIANTS.out.summary)
+
 
     ch_versions = ch_versions.mix(MATCH_VARIANTS.out.versions)
 
@@ -72,7 +81,7 @@ workflow MAKE_COMPATIBLE {
     geno       = geno_std
     pheno      = pheno_std
     variants   = variants_std
-    scorefiles = MATCH_VARIANTS.out.scorefile
-    db         = MATCH_VARIANTS.out.summary
+    scorefiles = scorefiles
+    db         = db
     versions   = ch_versions
 }
