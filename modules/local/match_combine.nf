@@ -10,7 +10,7 @@ process MATCH_COMBINE {
         dockerimg }"
 
     input:
-    tuple val(meta), path(matches), path(scorefile)
+    tuple val(meta), val(chrom), path(matches), path(scorefile)
 
     output:
     tuple val(scoremeta), path("*.scorefile.gz"), emit: scorefile
@@ -19,11 +19,13 @@ process MATCH_COMBINE {
     path "versions.yml"                         ,  emit: versions
 
     script:
-    def args = task.ext.args                ?: ''
+    def args  = task.ext.args               ?: ''
     def ambig = params.keep_ambiguous       ? '--keep_ambiguous'    : ''
     def multi = params.keep_multiallelic    ? '--keep_multiallelic' : ''
+    def split = !chrom.contains("ALL") ? '--split' : ''
     scoremeta = [:]
     scoremeta.id = "$meta.id"
+
     """
     export POLARS_MAX_THREADS=$task.cpus
 
@@ -36,7 +38,7 @@ process MATCH_COMBINE {
         $ambig \
         $multi \
         --outdir \$PWD \
-        --split \
+        $split \
         -v
 
     cat <<-END_VERSIONS > versions.yml

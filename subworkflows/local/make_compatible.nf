@@ -60,9 +60,11 @@ workflow MAKE_COMPATIBLE {
     // chromosomes. so if a groupKey size is not provided then nextflow must
     // wait for the entire process to finish before releasing the grouped
     // tuples. setting a groupKey size avoids lots of unnecessary waiting.
-    // note: chrom is dropped from the meta map to get groupTuple() working
     MATCH_VARIANTS.out.matches.map{
-        tuple(groupKey(it[0].subMap(['id', 'is_vcf', 'is_bfile', 'is_pfile']), it[0].n_chrom), it[1])
+        tuple(groupKey(it[0].subMap(['id', 'is_vcf', 'is_bfile', 'is_pfile']),
+                       it[0].n_chrom),
+              it[0].chrom,
+              it[1])
     }
         .groupTuple()
         .combine( scorefile )
@@ -71,8 +73,8 @@ workflow MAKE_COMPATIBLE {
 
     MATCH_COMBINE ( matches )
 
-    scorefiles = MATCH_COMBINE.out.scorefile.mix(MATCH_VARIANTS.out.scorefile)
-    db = MATCH_COMBINE.out.summary.mix(MATCH_VARIANTS.out.summary)
+    scorefiles = MATCH_COMBINE.out.scorefile
+    db = MATCH_COMBINE.out.summary
 
 
     ch_versions = ch_versions.mix(MATCH_VARIANTS.out.versions)
