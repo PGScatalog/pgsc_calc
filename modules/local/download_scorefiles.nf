@@ -20,11 +20,13 @@ process DOWNLOAD_SCOREFILES {
     def accession_args = meta.pgs_id   ? "-i $meta.pgs_id"  : ""
     def traits_args = meta.trait_efo   ? "-t $meta.trait_efo"  : ""
     def publication_args = meta.pgp_id ? "-p $meta.pgp_id": ""
+    def efo_direct = params.efo_direct ? '-e' : ''
 
     """
     download_scorefiles $accession_args \
         $traits_args \
         $publication_args \
+        $efo_direct \
         -b $build \
         -o \$PWD -v \
         -c pgsc_calc/$workflow.manifest.version
