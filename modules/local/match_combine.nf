@@ -34,6 +34,7 @@ process MATCH_COMBINE {
         --dataset $meta.id \
         --scorefile $scorefile \
         --matches *.ipc.zst \
+        -n $task.cpus \
         --min_overlap $params.min_overlap \
         $ambig \
         $multi \
