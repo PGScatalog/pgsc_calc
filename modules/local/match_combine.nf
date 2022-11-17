@@ -1,5 +1,6 @@
 process MATCH_COMBINE {
     tag "$meta.id"
+    scratch true
     label 'process_medium'
     errorStrategy 'finish'
 

@@ -1,5 +1,6 @@
 process MATCH_VARIANTS {
     tag "$meta.id chromosome $meta.chrom"
+    scratch true
     label 'process_medium'
     errorStrategy 'finish'
 
