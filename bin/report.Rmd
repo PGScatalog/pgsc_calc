@@ -26,13 +26,6 @@ read_log <- function(path) {
   return(
     log %>%
       mutate(
-        accession = ifelse(
-          stringr::str_detect(accession, "^PGS"),
-          stringr::str_extract(accession, "^PGS[0-9]{6}"),
-          accession
-        )
-      ) %>%
-      mutate(
         is_multiallelic =  factor(is_multiallelic, levels = c("false", "true")),
         ambiguous = factor(ambiguous, levels = c("false", "true"))
       ) %>%
@@ -97,10 +90,12 @@ parse_json2rows <- function(score_header){
     if(pgp_id == ''){
       pgp_id <- paste0('<small>', score_header[['citation']], '</small>')
     }else{
-      pgp_id <- paste(pgp_id, paste0('<small>', score_header[['citation']], '</small>'))
+      pgp_id <- paste(pgp_id, paste0('<br><small>', score_header[['citation']], '</small>'))
     }
   }
-  result[['Publication']] <- pgp_id
+  if(pgp_id != ''){
+    result[['Publication']] <- pgp_id
+  }
 
   # Trait
   trait_mapped <- NA
@@ -111,6 +106,8 @@ parse_json2rows <- function(score_header){
   }
   if(is.null(score_header[['trait_reported']])){
     result[['Trait']] <- trait_mapped
+  }else if(is.na(trait_mapped)){
+    result[['Trait']] <- paste0('<u>Reported trait</u>: ', score_header[['trait_reported']])
   }else{
     result[['Trait']] <- paste0('<u>Reported trait</u>: ', score_header[['trait_reported']], "<br>", trait_mapped)
   }
