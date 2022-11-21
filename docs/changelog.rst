@@ -1,5 +1,5 @@
 :orphan:
-   
+
 Changelog
 ---------
 
@@ -7,6 +7,31 @@ Versions follow `semantic versioning`_ (``major.minor.patch``). Breaking changes
 will only occur in major versions with changes noted in this changelog.
 
 .. _`semantic versioning`: https://semver.org/
+
+pgsc_calc v1.3.0 (2022-11-21)
+-----------------------------
+
+This release is focused on improving scalability.
+
+Features
+~~~~~~~~
+
+- Variant matching is made more efficient using a split - apply - combine
+  approach when the data is split across chromosomes. This supports parallel PGS
+  calculation for the largest traits (e.g. cancer, 418 PGS [avg 261,000
+  variants/score) ) in the PGS Catalog on big datasets such as UK Biobank.
+
+- Better support for running in offline environments:
+
+  - Internet access is only required to download scores by ID. Scores can be
+    pre-downloaded using the utils package
+    (https://pypi.org/project/pgscatalog-utils/)
+
+  - Scoring file metadata is read from headers and displayed in the report
+    (removed API calls during report generation)
+
+- Implemented flag (--efo_direct) to return only PGS tagged with exact EFO term
+  (e.g. no PGS for child/descendant terms in the ontology)
 
 pgsc_calc v1.2.0 (2022-10-11)
 -----------------------------
@@ -24,7 +49,7 @@ Features
 - Improvements to use less storage space:
 
   - All intermediate files are now compressed by default
-  
+
   - Add parameter to support zstd compressed input files
 
 - Improved memory usage when matching variants (``pgscatalog_utils=v0.1.2``
@@ -81,16 +106,16 @@ Bug fixes
 
 - Implemented a more robust prioritisation procedure if a variant has multiple
   candidate matches or duplicated IDs
-  
+
 - Fixed processing multiple samplesets in parallel (e.g. 1000 Genomes + UK
   Biobank)
-  
+
 - When combining multiple scoring files, all variants are now kept to reflect the
   correct denominator for % matching statistics.
-  
+
 - When trying to correct for strand flips the matched effect allele wasn't being
   correctly complemented
-  
+
 pgsc_calc v1.0.0 (2022-05-24)
 --------------------------------
 
@@ -120,7 +145,7 @@ Features
 - Simplified JSON input processes
 - Add first draft of documentation
 - Add JSON schemas for validating input data (mostly for web platform)
-  
+
 pgsc_calc v0.1.2dev (2022-01-17)
 --------------------------------
 
