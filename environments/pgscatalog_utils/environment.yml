@@ -3,4 +3,4 @@ dependencies:
 - python=3.10
 - pip
 - pip:
-    - pgscatalog_utils==0.2.0
+    - pgscatalog_utils==0.3.0

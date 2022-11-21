@@ -3,9 +3,9 @@ process COMBINE_SCOREFILES {
     label 'verbose'
 
     conda (params.enable_conda ? "$projectDir/environments/pgscatalog_utils/environment.yml" : null)
-    def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/pgscatalog_utils:${params.platform}-0.2.0"
+    def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/pgscatalog_utils:${params.platform}-0.3.0"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/pgscatalog_utils:amd64-0.2.0' :
+        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/pgscatalog_utils:amd64-0.3.0' :
         dockerimg }"
 
     input:
@@ -14,6 +14,7 @@ process COMBINE_SCOREFILES {
 
     output:
     path "scorefiles.txt.gz", emit: scorefiles
+    path "log_scorefiles.json", emit: log_scorefiles
     path "versions.yml"     , emit: versions
 
     script:
@@ -28,6 +29,7 @@ process COMBINE_SCOREFILES {
             --liftover \
             -t $params.target_build \
             -o scorefiles.txt.gz \
+            -l log_scorefiles.json \
             -c \$PWD \
             -m $params.min_lift \
             $args
@@ -42,6 +44,7 @@ process COMBINE_SCOREFILES {
         combine_scorefiles -s $raw_scores \
             -t $params.target_build \
             -o scorefiles.txt.gz \
+            -l log_scorefiles.json \
             $args
 
         cat <<-END_VERSIONS > versions.yml

@@ -46,6 +46,10 @@
                     "default": "None",
                     "description": "A comma separated list of PGS Catalog EFO traits, e.g. EFO_0004214"
                 },
+                "efo_direct": {
+                    "type": "boolean",
+                    "description": "Return only PGS tagged with exact EFO term (e.g. no PGS for child/descendant terms in the ontology)"
+                },
                 "target_build": {
                     "type": "string",
                     "enum": [
@@ -69,7 +73,7 @@
                 },
                 "genotypes_cache": {
                     "type": "string",
-                    "default": null
+                    "default": "None"
                 },
                 "outdir": {
                     "type": "string",

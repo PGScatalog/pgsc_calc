@@ -9,6 +9,7 @@ process SCORE_REPORT {
 
     input:
     path scorefiles
+    path log_scorefiles
     path report
     path logo
     path '*' // list of summary csvs, staged with original names
@@ -20,8 +21,11 @@ process SCORE_REPORT {
     script:
     def args = task.ext.args ?: ''
     """
+    # R and symlinks don't get along
     cp -LR $report real_report.Rmd
     mv real_report.Rmd report.Rmd
+    cp -LR $log_scorefiles log_combined.json
+
 
     echo $workflow.commandLine > command.txt
     echo "keep_multiallelic: $params.keep_multiallelic" > params.txt

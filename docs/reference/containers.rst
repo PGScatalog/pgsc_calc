@@ -7,13 +7,10 @@ software that we need to calculate scores. Below is a list of container images
 for reference, which might be helpful if you'd like to download and inspect them
 manually.
 
+Software
+--------
+
 .. note:: 4 containers are currently required to run ``pgsc_calc``
-
-Docker
--------------
-
-.. include:: ../_build/docker_containers.txt
-    :literal:
 
 
 Some containers are made by `Biocontainers`_, and hosted on their container
@@ -36,6 +33,13 @@ Other containers are hosted on a Gitlab container registry:
 .. _`plink2 2.00a3.3`: https://www.cog-genomics.org/plink/2.0/
 .. _`multiqc`: https://quay.io/repository/biocontainers/multiqc?tab=info
 .. _`pgscatalog_utils`: https://github.com/PGScatalog/pgscatalog_utils
+          
+          
+Docker
+------
+
+.. include:: ../_build/docker_containers.txt
+    :literal:
 
 
 Choosing a container architecture

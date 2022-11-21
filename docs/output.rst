@@ -175,9 +175,9 @@ variant was matched against the target genomes:
     * - ``duplicate_ID``
       - True/False flag indicating whether multiple scoring file variants match a single target ID.
     * - ``match_status``
-      - Indicates whether the variant is matched (included in the final scoring file), excluded (matched but removed
-        based on variant filters), not_best (a different match candidate was selected for this scoring file variant),
-        or unmatched.
+      - Indicates whether the variant is *matched* (included in the final scoring file), *excluded* (matched but removed
+        based on variant filters), *not_best* (a different match candidate was selected for this scoring file variant),
+        or *unmatched*.
     * - ``dataset``
       - Name of the sampleset/genotyping data.
 

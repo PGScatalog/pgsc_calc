@@ -76,7 +76,6 @@ allocations (e.g. ``process_low``). Here's an example for an LSF cluster:
 .. code-block:: text
 
     process {
-        executor = 'lsf'
         queue = 'short'
         clusterOptions = ''
         scratch = true
@@ -92,6 +91,11 @@ allocations (e.g. ``process_low``). Here's an example for an LSF cluster:
             time   = 4.h
         }
     }
+
+    executor {
+        name = 'lsf'
+        jobName = { "$task.hash" }
+    } 
 
 In SLURM, queue is equivalent to a partition. Specific cluster parameters can be
 provided by modifying ``clusterOptions``. You should change ``cpus``,

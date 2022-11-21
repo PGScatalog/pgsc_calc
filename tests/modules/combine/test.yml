@@ -15,6 +15,6 @@
         - "effect_type"
     - path: output/combine/versions.yml
       contains:
-        - "pgscatalog_utils: 0.2.0"
+        - "pgscatalog_utils: 0.3.0"
     
 

@@ -26,13 +26,6 @@ read_log <- function(path) {
   return(
     log %>%
       mutate(
-        accession = ifelse(
-          stringr::str_detect(accession, "^PGS"),
-          stringr::str_extract(accession, "^PGS[0-9]{6}"),
-          accession
-        )
-      ) %>%
-      mutate(
         is_multiallelic =  factor(is_multiallelic, levels = c("false", "true")),
         ambiguous = factor(ambiguous, levels = c("false", "true"))
       ) %>%
@@ -69,53 +62,69 @@ cat command.txt
 ### Scoring files
 
 ```{r, echo = FALSE}
-call_api <- function(log) {
-  accessions <- trimws(unique(log$accession))
-  pgs_ids <- paste(accessions, collapse = ",")
-  api_url <- paste0("https://www.pgscatalog.org/rest/score/search?pgs_ids=", pgs_ids)
-  res <- GET(api_url)
-  return(fromJSON(rawToChar(res$content)))
-}
+json_scorefiles <- read_json('log_combined.json', simplifyVector=TRUE)
 
-add_urls <- function(df) {
-  df$accession <- df$pgs_id
-  df$pgs_id <- paste0('<a href="https://www.pgscatalog.org/score/', df$pgs_id, '">', df$pgs_id, '</a>')
-  df$pgp_id <- paste0('<a href="https://www.pgscatalog.org/publication/', df$id, '">', df$id, '</a>')
-  df$id <- NULL
-  return(df)
-}
-
-combine_mapped_traits <- function(json_efo_entry){
-  mapped_html <- paste0('<a href="', json_efo_entry$url, '">', json_efo_entry$label, '</a>')
-  return(paste(mapped_html, collapse=', '))
-}
-
-make_publication_table <- function(log) {
-  json <- call_api(log)
+parse_json2rows <- function(score_header){
+  result <- list(pgs_id=NA, Publication = NA, Trait=NA, n_variants = as.integer(score_header[['variants_number']]), genome_build=NA)
+  # pgs_id
+  pgs_id <- ''
+  if(is.null(score_header[['pgs_id']]) == FALSE){
+    pgs_id <- paste0('<a href="https://www.pgscatalog.org/score/', score_header[['pgs_id']], '">', score_header[['pgs_id']], '</a>')
+  }
+  # Add name
+  if(is.null(score_header[['pgs_name']]) == FALSE){
+    if(pgs_id == ''){
+      pgs_id <- score_header[['pgs_name']]
+    }else{
+      pgs_id <- paste0(pgs_id, '<br><small>(', score_header[['pgs_name']], ')</small>')
+    }
+  }
+  result[['pgs_id']] <- pgs_id
   
-  if (json$size == 0) {
-    return(data.frame(accession=NA, pgp_id = NA, Publication = NA, reported = NA, mapped=NA, genome_build=NA,pgs_id=NA))
+  # pgp_id
+  pgp_id <- ''
+  if(is.null(score_header[['pgp_id']]) == FALSE){
+    pgp_id <- paste0('<a href="https://www.pgscatalog.org/publication/', score_header[['pgp_id']], '">', score_header[['pgp_id']], '</a>')
+  }
+  if(is.null(score_header[['citation']]) == FALSE){
+    if(pgp_id == ''){
+      pgp_id <- paste0('<small>', score_header[['citation']], '</small>')
+    }else{
+      pgp_id <- paste(pgp_id, paste0('<br><small>', score_header[['citation']], '</small>'))
+    }
+  }
+  if(pgp_id != ''){
+    result[['Publication']] <- pgp_id
+  }
+
+  # Trait
+  trait_mapped <- NA
+  if(length(score_header[['trait_efo']]) > 0){
+    efo <- data.frame(label = score_header[['trait_mapped']], id = score_header[['trait_efo']])
+    efo$display <- paste0('<a href="http://www.ebi.ac.uk/efo/', efo$id, '">', efo$label,'</a>')
+    trait_mapped <- paste0('<u>Mapped trait</u>: ', paste(efo$display, collapse=" "))
+  }
+  if(is.null(score_header[['trait_reported']])){
+    result[['Trait']] <- trait_mapped
+  }else if(is.na(trait_mapped)){
+    result[['Trait']] <- paste0('<u>Reported trait</u>: ', score_header[['trait_reported']])
+  }else{
+    result[['Trait']] <- paste0('<u>Reported trait</u>: ', score_header[['trait_reported']], "<br>", trait_mapped)
   }
   
-  df <- data.frame(pgs_id = json$results$id) 
-  pubs <- json$results$publication[, c("id", "firstauthor", "journal", "date_publication")]
-  traits <- data.frame(reported = json$results$trait_reported,
-                       mapped = sapply(json$results$trait_efo, combine_mapped_traits))
+  # Genome build
+  build_info <- paste0('<u>Reported</u>: ', score_header[['genome_build']])
+  if(score_header[['use_harmonised']] == TRUE){
+    build_info <- paste0(build_info, '<br><u>Harmonized Build</u>: ', score_header[['HmPOS_build']])
+  }
+  result[['genome_build']] <- build_info
   
-  unformatted <- dplyr::bind_cols(df, pubs, traits)
-  
-  unformatted$genome_build <- json$results$variants_genomebuild
-  
-  return(add_urls(tidyr::unite(unformatted, "Publication", firstauthor:date_publication, sep = " ")))
-}
+  return(result)
+} 
+df_scorefiles <- do.call(rbind.data.frame, lapply(json_scorefiles, parse_json2rows))
+df_scorefiles$accession <- rownames(df_scorefiles)
 
-log %>%
-  count(accession, wt = count, name = "n_variants") %>%
-  left_join(make_publication_table(log), by = "accession") %>%
-  tidyr::unite("Publication", c(pgp_id, Publication), sep = " | ") %>%
-  mutate(reported = paste0("<u>Reported trait</u>: ", reported),
-         mapped = paste0("<u>Mapped trait</u>: ", mapped)) %>%
-  tidyr::unite("Trait", c(reported, mapped), sep = "<br>") %>%
+df_scorefiles %>%
   select(accession, pgs_id, Publication, Trait, n_variants, genome_build) %>% 
   DT::datatable(
     rownames = FALSE,
@@ -124,7 +133,7 @@ log %>%
       "Scoring file" = "accession",
       "Polygenic Score ID" = "pgs_id",
       "Number of variants" = "n_variants",
-      "Genome build (reported)" = "genome_build"
+      "Genome build" = "genome_build"
     ),
     extensions = 'Buttons',
     options = list(dom = 'Bfrtip',
