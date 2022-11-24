@@ -8,10 +8,19 @@
       "type": "string",
       "description": "Path to a scoring file"
     },
-    "accession": {
+    "pgs_id": {
       "type": "string",
-      "description": "PGS Catalog accession(s), if a list separate with commas",
+      "description": "PGS Catalog score ID(s), if a list separate with commas",
       "pattern": "(PGS[0-9]{6}[,]?)+"
+    },
+    "pgp_id": {
+      "type": "string",
+      "description": "PGS Catalog publication ID(s), if a list separate with commas",
+      "pattern": "(PGP[0-9]{6}[,]?)+"
+    },
+    "trait_efo": {
+      "type": "string",
+      "description": "PGS Catalog trait ID(s), if a list separate with commas"
     },
     "min_overlap": {
       "type": "number",
@@ -34,19 +43,36 @@
     },
     "target_build": {
       "type": "string",
-      "enum": ["GRCh37", "GRCh38"],
+      "enum": [
+        "GRCh37",
+        "GRCh38"
+      ],
       "description": "Genome build of target (i.e. input) genomes"
     }
   },
-  "required": ["target_build"],
+  "required": [
+    "target_build"
+  ],
   "oneOf": [
-    { "required": [
-          "scorefile"
-         ]
+    {
+      "required": [
+        "scorefile"
+      ]
     },
-        { "required": [
-          "accession"
-         ]
+    {
+      "required": [
+        "pgs_id"
+      ]
+    },
+    {
+      "required": [
+        "pgp_id"
+      ]
+    },
+    {
+      "required": [
+        "trait_efo"
+      ]
     }
   ]
 }
