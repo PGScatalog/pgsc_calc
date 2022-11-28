@@ -83,7 +83,7 @@
       }
     },
     "required": [
-      "sample",
+      "sampleset",
       "chrom"
     ],
     "oneOf": [
