@@ -1,0 +1,9 @@
+﻿reference,build,type,url
+1000G,GRCh38,pgen,https://www.dropbox.com/s/e5n8yr4n7y91fyp/all_hg38.pgen.zst?dl=1
+1000G,GRCh38,psam,https://www.dropbox.com/s/3j9zg103fi8cjfs/hg38_corrected.psam?dl=1
+1000G,GRCh38,pvar,https://www.dropbox.com/s/vx09262b4k1kszy/all_hg38_noannot.pvar.zst?dl=1
+1000G,GRCh37,pgen,https://www.dropbox.com/s/y6ytfoybz48dc0u/all_phase3.pgen.zst?dl=1
+1000G,GRCh37,psam,https://www.dropbox.com/s/6ppo144ikdzery5/phase3_corrected.psam?dl=1
+1000G,GRCh37,pvar,https://www.dropbox.com/s/c95n8quqwqww4s0/all_phase3_noannot.pvar.zst?dl=1
+1000G,GRCh37,king,https://www.dropbox.com/s/zj8d14vv9mp6x3c/deg2_phase3.king.cutoff.out.id?dl=1
+1000G,GRCh38,king,https://www.dropbox.com/s/129gx0gl2v7ndg6/deg2_hg38.king.cutoff.out.id?dl=1
