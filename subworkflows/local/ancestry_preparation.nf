@@ -1,4 +1,5 @@
 #!/usr/bin/env nextflow
+
 nextflow.enable.dsl = 2
 
 def drop_type(ArrayList it) {
@@ -28,7 +29,7 @@ process SETUP_PLINK_RESOURCE {
     tuple val(meta), path(pgen), path(psam), path(pvar)
     
     output:
-    tuple val(meta), path("*.pgen"), path("*.psam"), path("*.pvar.zst")
+    tuple val(meta), path("*.pgen"), path("*.psam"), path("*.pvar.zst"), emit: plink
     
     """
     # standardise plink prefix on pgen
@@ -38,9 +39,38 @@ process SETUP_PLINK_RESOURCE {
     """
 }
 
+process QUALITY_CONTROL {
+    input:
+    tuple val(meta), path(king), path(pgen), path(psam), path(pvar)
+
+    output:
+    tuple val(meta), path("*.pgen"), path("*.psam"), path("*.pvar.zst"), emit: plink
+
+    """
+    plink2 --zst-decompress $pvar \
+        | grep -vE "^#" \
+        | awk '{if(\$4 \$5 == "AT" || \$4 \$5 == "TA" || \$4 \$5 == "CG" || \$4 \$5 == "GC") print \$3}' \
+        > 1000G_StrandAmb.txt
+
+    plink2 --pfile ${pgen.simpleName} vzs \
+        --remove $king \
+        --exclude 1000G_StrandAmb.txt \
+        --max-alleles 2 \
+        --snps-only just-acgt \
+        --rm-dup exclude-all \
+        --geno 0.1 \
+        --mind 0.1 \
+        --maf 0.01 \
+        --hwe 0.000001 \
+        --autosome \
+        --make-pgen vzs \
+        --allow-extra-chr \
+        --out ${pgen.simpleName}_qc
+    """
+}
 
 workflow {
-  main:
+    main:
     samplesheet = Channel.fromPath(params.reference)
 
     samplesheet
@@ -56,6 +86,7 @@ workflow {
         .groupTuple(size: 3, sort: { it.toString().split(".p")[-1] } )
     // dropping type after branch simplifies joining later
         .map { drop_type(it) }
+    // TODO: remove
         .take(1)
         .map { it.flatten() }
         .set { ch_plink }
@@ -64,7 +95,10 @@ workflow {
 
     ref.king
         .map { drop_type(it) }
-        .join(ch_plink)
+        .join(SETUP_PLINK_RESOURCE.out.plink)
         .set { ch_raw_ref }
 
+    QUALITY_CONTROL(ch_raw_ref)
+
+    QUALITY_CONTROL.out.plink.view()
 }
