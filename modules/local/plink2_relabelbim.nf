@@ -29,6 +29,7 @@ process PLINK2_RELABELBIM {
 
     script:
     def args = task.ext.args ?: ''
+    def compressed = variants.getName().endsWith("zst") ? 'vzs' : ''
     def prefix = task.ext.suffix ? "${meta.id}${task.ext.suffix}" : "${meta.id}"
     def mem_mb = task.memory.toMega() // plink is greedy
     // if dropping multiallelic variants, set a generic ID that won't match
@@ -41,7 +42,7 @@ process PLINK2_RELABELBIM {
         $args \\
         --set-all-var-ids '@:#:\$r:\$a' \\
         $set_ma_missing \\
-        --bfile ${geno.baseName} \\
+        --bfile ${geno.baseName} $compressed \\
         --make-just-bim zs \\
         --out ${prefix}_${meta.chrom}
 

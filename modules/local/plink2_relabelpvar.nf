@@ -29,11 +29,12 @@ process PLINK2_RELABELPVAR {
 
     script:
     def args = task.ext.args ?: ''
+    def compressed = variants.getName().endsWith("zst") ? 'vzs' : ''
     def prefix = task.ext.suffix ? "${meta.id}${task.ext.suffix}" : "${meta.id}"
     def mem_mb = task.memory.toMega() // plink is greedy
     // if dropping multiallelic variants, set a generic ID that won't match
     def set_ma_missing = params.keep_multiallelic ? '' : '--var-id-multi @:#'
-    def compressed = params.vzs ? 'vzs' : ''
+
 
     """
     plink2 \\
