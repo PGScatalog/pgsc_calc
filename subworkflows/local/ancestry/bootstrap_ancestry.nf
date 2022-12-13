@@ -5,14 +5,16 @@ nextflow.enable.dsl = 2
 include { SETUP_RESOURCE } from '../../../modules/local/ancestry/setup_resource'
 include { PLINK2_RELABELPVAR } from '../../../modules/local/plink2_relabelpvar'
 include { QUALITY_CONTROL } from '../../../modules/local/ancestry/quality_control'
-
+include { MAKE_DATABASE } from '../../../modules/local/ancestry/make_database'
 
 workflow BOOTSTRAP_ANCESTRY {
-    main:
-    // TODO: replace with take: section when integrating
-    samplesheet = Channel.fromPath(params.reference)
+    take:
+    reference_samplesheet
 
-    samplesheet
+    main:
+    ch_versions = Channel.empty()
+
+    reference_samplesheet
         .splitCsv(header: true).map { create_ref_input_channel(it) }
         .branch {
             king: !it.first().is_pfile
@@ -28,8 +30,10 @@ workflow BOOTSTRAP_ANCESTRY {
         .set { ch_plink }
 
     SETUP_RESOURCE( ch_plink )
+    ch_versions = ch_versions.mix(SETUP_RESOURCE.out.versions)
 
     PLINK2_RELABELPVAR( SETUP_RESOURCE.out.plink )
+    ch_versions = ch_versions.mix(PLINK2_RELABELPVAR.out.versions.first())
 
     PLINK2_RELABELPVAR.out.geno
         .concat(PLINK2_RELABELPVAR.out.pheno, PLINK2_RELABELPVAR.out.variants)
@@ -44,38 +48,28 @@ workflow BOOTSTRAP_ANCESTRY {
         .set { ch_raw_ref }
 
     QUALITY_CONTROL(ch_raw_ref)
+    ch_versions = ch_versions.mix(QUALITY_CONTROL.out.versions.first())
+
+    // grab chain files
+    hg19tohg38 = Channel.fromPath("https://hgdownload.cse.ucsc.edu/goldenpath/hg19/liftOver/hg19ToHg38.over.chain.gz")
+    hg38tohg19 = Channel.fromPath("https://hgdownload.soe.ucsc.edu/goldenPath/hg38/liftOver/hg38ToHg19.over.chain.gz")
 
     QUALITY_CONTROL.out.plink
         .flatten()
-        .filter(Path)
+        .filter(Path) // drop meta hashmaps
+        .concat( hg19tohg38, hg38tohg19 )
+        .flatten()
         .collect()
-    // [geno, pheno, var, ..., geno, pheno, var]
         .set { ch_qc_ref }
 
     MAKE_DATABASE( ch_qc_ref )
+    ch_versions = ch_versions.mix(MAKE_DATABASE.out.versions)
+
+    emit:
+    reference_database = MAKE_DATABASE.out.reference
+    versions = ch_versions
 }
 
-process MAKE_DATABASE {
-    stageInMode: 'copy' // for creation of database
-    afterScript 'find . -not -name "*.sqlar"' // TODO: clean up copied files
-
-    label 'process_low'
-
-    conda (params.enable_conda ? "$projectDir/environments/pgscatalog_utils/environment.yml" : null)
-    def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/pgscatalog_utils:${params.platform}-0.3.0"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/pgscatalog_utils:amd64-0.3.0' :
-        dockerimg }"
-
-    input:
-    path '*'
-
-    """
-    # TODO: grab chain files
-    # TODO: think about globbing in the database
-    ls
-    """
-}
 
 def drop_meta_keys(ArrayList it) {
     // input: [[meta hashmap], [file1, file2, file3]]

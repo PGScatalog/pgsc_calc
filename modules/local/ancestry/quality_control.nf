@@ -15,6 +15,7 @@ process QUALITY_CONTROL {
 
     output:
     tuple val(meta), path("*.pgen"), path("*.psam"), path("*.pvar.zst"), emit: plink
+    path "versions.yml", emit: versions
 
     """
     plink2 --zst-decompress $pvar \
@@ -36,5 +37,10 @@ process QUALITY_CONTROL {
         --make-pgen vzs \
         --allow-extra-chr \
         --out ${pgen.simpleName}_${meta.build}_qc
+
+    cat <<-END_VERSIONS > versions.yml
+    ${task.process.tokenize(':').last()}:
+        plink2: \$(plink2 --version 2>&1 | sed 's/^PLINK v//; s/ 64.*\$//' )
+    END_VERSIONS
     """
 }

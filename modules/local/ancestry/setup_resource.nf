@@ -15,11 +15,17 @@ process SETUP_RESOURCE {
 
     output:
     tuple val(meta), path("*.pgen"), path("*.psam"), path("*.pvar.zst"), emit: plink
+    path "versions.yml", emit: versions
 
     """
     # standardise plink prefix on pgen
     mv $psam ${pgen.simpleName}.psam
     plink2 --zst-decompress $pgen > ${pgen.simpleName}.pgen
     mv $pvar ${pgen.simpleName}.pvar.zst
+
+    cat <<-END_VERSIONS > versions.yml
+    ${task.process.tokenize(':').last()}:
+        plink2: \$(plink2 --version 2>&1 | sed 's/^PLINK v//; s/ 64.*\$//' )
+    END_VERSIONS
     """
 }
