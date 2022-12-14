@@ -105,6 +105,7 @@ def json_to_genome(HashMap slurped) {
     meta.is_bfile = slurped.bed ? true : false
     meta.is_pfile = slurped.pgen ? true : false
     meta.chrom    = slurped.chrom? slurped.chrom.toString() : "ALL"
+    meta.build    = params.target_build
 
     def genome_lst = []
 

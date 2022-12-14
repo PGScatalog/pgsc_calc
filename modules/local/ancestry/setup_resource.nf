@@ -17,10 +17,12 @@ process SETUP_RESOURCE {
     tuple val(meta), path("*.pgen"), path("*.psam"), path("*.pvar.zst"), emit: plink
     path "versions.yml", emit: versions
 
+    script:
     """
     # standardise plink prefix on pgen
     mv $psam ${pgen.simpleName}.psam
-    plink2 --zst-decompress $pgen > ${pgen.simpleName}.pgen
+    # --zst-decompress can't be used with mem / threads flags
+    plink2 --zst-decompress $pgen ${pgen.simpleName}.pgen
     mv $pvar ${pgen.simpleName}.pvar.zst
 
     cat <<-END_VERSIONS > versions.yml

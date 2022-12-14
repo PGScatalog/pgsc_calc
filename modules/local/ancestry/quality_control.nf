@@ -17,13 +17,20 @@ process QUALITY_CONTROL {
     tuple val(meta), path("*.pgen"), path("*.psam"), path("*.pvar.zst"), emit: plink
     path "versions.yml", emit: versions
 
+    script:
+    def mem_mb = task.memory.toMega() // plink is greedy
     """
-    plink2 --zst-decompress $pvar \
+    # --zst-decompress can't be used with mem / threads flags
+    plink2 \
+        --zst-decompress $pvar \
         | grep -vE "^#" \
         | awk '{if(\$4 \$5 == "AT" || \$4 \$5 == "TA" || \$4 \$5 == "CG" || \$4 \$5 == "GC") print \$3}' \
         > 1000G_StrandAmb.txt
 
-    plink2 --pfile ${pgen.simpleName} vzs \
+    plink2 \
+        --threads $task.cpus \
+        --memory $mem_mb \
+        --pfile ${pgen.simpleName} vzs \
         --remove $king \
         --exclude 1000G_StrandAmb.txt \
         --max-alleles 2 \
@@ -36,7 +43,7 @@ process QUALITY_CONTROL {
         --autosome \
         --make-pgen vzs \
         --allow-extra-chr \
-        --out ${pgen.simpleName}_${meta.build}_qc
+        --out ${meta.build}_reference
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

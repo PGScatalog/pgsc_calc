@@ -15,6 +15,7 @@ process MAKE_DATABASE {
     path "pgsc_calc.tar.gz", emit: reference
     path "versions.yml"    , emit: versions
 
+    script:
     """
     echo $workflow.start > meta.txt
     echo $workflow.repository > meta.txt

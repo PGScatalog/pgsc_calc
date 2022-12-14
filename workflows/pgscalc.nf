@@ -66,33 +66,51 @@ def String unique_trait_efo = process_accessions(params.trait_efo)
 def String unique_pgp_id    = process_accessions(params.pgp_id)
 def String unique_pgs_id    = process_accessions(params.pgs_id)
 
-ch_reference = Channel.empty()
 
-if (params.ref) {
-    Channel.fromPath(params.ref, checkIfExists: true)
-        .set { ch_reference } 
-}
-
+def run_bootstrap       = true
 def run_input_check     = true
 def run_make_compatible = true
+def run_pca             = true
 def run_apply_score     = true
 
+if (params.only_bootstrap) {
+    run_bootstrap = true
+    run_input_check = false
+    run_make_compatible = false
+    run_pca = false
+    run_apply_score = false
+}
+
 if (params.only_input) {
+    run_bootstrap = false
     run_input_check = true
     run_make_compatible = false
+    run_pca = false
     run_apply_score = false
 }
 
 if (params.only_compatible) {
+    run_bootstrap = false
     run_input_check = true
     run_make_compatible = true
+    run_pca = false
+    run_apply_score = false
+}
+
+if (params.only_pca) {
+    run_bootstrap = true
+    run_input_check = true
+    run_make_compatible = true
+    run_pca = true
     run_apply_score = false
 }
 
 if (params.only_score) {
+    run_bootstrap = true
     run_input_check = true
     run_make_compatible = true
     run_apply_score = true
+    run_pca = false
 }
 
 /*
@@ -103,8 +121,10 @@ if (params.only_score) {
 
 include { DOWNLOAD_SCOREFILES  } from '../modules/local/download_scorefiles'
 
+include { BOOTSTRAP_ANCESTRY   } from '../subworkflows/local/ancestry/bootstrap_ancestry'
 include { INPUT_CHECK          } from '../subworkflows/local/input_check'
 include { MAKE_COMPATIBLE      } from '../subworkflows/local/make_compatible'
+include { PCA_ANCESTRY         } from '../subworkflows/local/ancestry/pca_ancestry'
 include { APPLY_SCORE          } from '../subworkflows/local/apply_score'
 include { DUMPSOFTWAREVERSIONS } from '../modules/local/dumpsoftwareversions'
 
@@ -116,6 +136,22 @@ include { DUMPSOFTWAREVERSIONS } from '../modules/local/dumpsoftwareversions'
 
 workflow PGSCALC {
     ch_versions = Channel.empty()
+
+    //
+    // SUBWORKFLOW: Create reference database for ancestry inference
+    //
+    if (run_bootstrap) {
+        if (params.ref) {
+            log.info "Reference database provided: skipping bootstrap"
+            ch_reference = Channel.fromPath(params.ref, checkIfExists: true)
+        } else {
+            log.info "Creating ancestry database from source data"
+            reference_samplesheet = Channel.fromPath(params.ref_samplesheet)
+            BOOTSTRAP_ANCESTRY ( reference_samplesheet )
+            ch_reference = BOOTSTRAP_ANCESTRY.out.reference_database
+            ch_versions = ch_versions.mix(BOOTSTRAP_ANCESTRY.out.versions)
+        }
+    }
 
     //
     // SUBWORKFLOW: Get scoring file from PGS Catalog accession
@@ -162,6 +198,18 @@ workflow PGSCALC {
     }
 
     //
+    // SUBWORKFLOW: Run ancestry inference
+    //
+    if (run_pca) {
+        PCA_ANCESTRY (
+            MAKE_COMPATIBLE.out.geno,
+            MAKE_COMPATIBLE.out.pheno,
+            MAKE_COMPATIBLE.out.variants,
+            ch_reference
+        )
+    }
+
+    //
     // SUBWORKFLOW: Apply a scoring file to target genomic data
     //
 
@@ -177,7 +225,8 @@ workflow PGSCALC {
         ch_versions = ch_versions.mix(APPLY_SCORE.out.versions)
     }
 
-    //
+
+
     // MODULE: Dump software versions for all tools used in the workflow
     //
     DUMPSOFTWAREVERSIONS (

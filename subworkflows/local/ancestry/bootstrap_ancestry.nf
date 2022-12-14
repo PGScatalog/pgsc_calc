@@ -1,7 +1,6 @@
-#!/usr/bin/env nextflow
-
-nextflow.enable.dsl = 2
-
+//
+// Create a database containing reference data required for ancestry inference
+//
 include { SETUP_RESOURCE } from '../../../modules/local/ancestry/setup_resource'
 include { PLINK2_RELABELPVAR } from '../../../modules/local/plink2_relabelpvar'
 include { QUALITY_CONTROL } from '../../../modules/local/ancestry/quality_control'
