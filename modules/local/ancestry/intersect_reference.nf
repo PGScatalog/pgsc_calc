@@ -54,7 +54,7 @@ process INTERSECT_REFERENCE {
         plink2 \
             --threads $task.cpus \
             --memory $mem_mb \
-            --pfile vzs ${geno.simpleName} \
+            --pfile vzs ${ref_geno.simpleName} \
             --extract shared_vid.txt.gz \
             --indep-pairwise 1000 50 0.05 \
             --exclude range $ld \
@@ -97,7 +97,7 @@ process INTERSECT_REFERENCE {
         plink2 \
             --threads $task.cpus \
             --memory $mem_mb \
-            --bfile vzs ${geno.simpleName} \
+            --bfile vzs ${ref_geno.simpleName} \
             --extract shared_vid.txt.gz \
             --indep-pairwise 1000 50 0.05 \
             --exclude range $ld \
