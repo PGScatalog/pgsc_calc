@@ -1,5 +1,5 @@
 process SCORE_AGGREGATE {
-    label 'process_low'
+    label 'process_high_memory'
 
     conda (params.enable_conda ? "$projectDir/environments/pgscatalog_utils/environment.yml" : null)
     def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/pgscatalog_utils:${params.platform}-0.3.0"
