@@ -1,4 +1,5 @@
 process PLINK2_PROJECT {
+    tag "$meta.id chromosome $meta.chrom"
     label 'process_low'
 
     conda (params.enable_conda ? "bioconda::plink2==2.00a3.3" : null)
@@ -10,17 +11,23 @@ process PLINK2_PROJECT {
         dockerimg }"
 
     input:
-    tuple val(meta), path(geno), path(pheno), path(variants), path(pruned)
+    tuple val(meta), path(geno), path(pheno), path(variants), path(afreq), path(eigenvec)
 
     output:
-    tuple val(meta), path("*.afreq"), emit: afreq
-    tuple val(meta), path("*.eigenvec.var"), emit: eigenvec_var
+    tuple val(meta), path("*_proj.sscore.zst"), emit: projections
     path "versions.yml", emit: versions
 
     script:
+    def input = (meta.is_pfile) ? '--pfile vzs' : '--bfile vzs'
     def mem_mb = task.memory.toMega() // plink is greedy
     """
-    # TODO
+    plink2 $input ${geno.simpleName} \
+        --threads $task.cpus \
+        --memory $mem_mb \
+        --read-freq $afreq \
+        --score $eigenvec 2 4 header-read variance-standardize cols=-scoreavgs,+scoresums zs \
+        --score-col-nums 5-14 \
+        --out ${geno.simpleName}_proj
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

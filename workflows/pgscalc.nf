@@ -70,14 +70,14 @@ def String unique_pgs_id    = process_accessions(params.pgs_id)
 def run_bootstrap       = true
 def run_input_check     = true
 def run_make_compatible = true
-def run_pca             = true
+def run_projection      = true
 def run_apply_score     = true
 
 if (params.only_bootstrap) {
     run_bootstrap = true
     run_input_check = false
     run_make_compatible = false
-    run_pca = false
+    run_projection = false
     run_apply_score = false
 }
 
@@ -85,7 +85,7 @@ if (params.only_input) {
     run_bootstrap = false
     run_input_check = true
     run_make_compatible = false
-    run_pca = false
+    run_projection = false
     run_apply_score = false
 }
 
@@ -93,15 +93,15 @@ if (params.only_compatible) {
     run_bootstrap = false
     run_input_check = true
     run_make_compatible = true
-    run_pca = false
+    run_projection = false
     run_apply_score = false
 }
 
-if (params.only_pca) {
+if (params.only_projection) {
     run_bootstrap = true
     run_input_check = true
     run_make_compatible = true
-    run_pca = true
+    run_projection = true
     run_apply_score = false
 }
 
@@ -109,8 +109,8 @@ if (params.only_score) {
     run_bootstrap = true
     run_input_check = true
     run_make_compatible = true
+    run_projection = false
     run_apply_score = true
-    run_pca = false
 }
 
 /*
@@ -124,7 +124,7 @@ include { DOWNLOAD_SCOREFILES  } from '../modules/local/download_scorefiles'
 include { BOOTSTRAP_ANCESTRY   } from '../subworkflows/local/ancestry/bootstrap_ancestry'
 include { INPUT_CHECK          } from '../subworkflows/local/input_check'
 include { MAKE_COMPATIBLE      } from '../subworkflows/local/make_compatible'
-include { PCA_ANCESTRY         } from '../subworkflows/local/ancestry/pca_ancestry'
+include { ANCESTRY_PROJECTION  } from '../subworkflows/local/ancestry/ancestry_projection'
 include { APPLY_SCORE          } from '../subworkflows/local/apply_score'
 include { DUMPSOFTWAREVERSIONS } from '../modules/local/dumpsoftwareversions'
 
@@ -198,15 +198,16 @@ workflow PGSCALC {
     }
 
     //
-    // SUBWORKFLOW: Run ancestry inference
+    // SUBWORKFLOW: Run ancestry projection
     //
-    if (run_pca) {
-        PCA_ANCESTRY (
+    if (run_projection) {
+        ANCESTRY_PROJECTION (
             MAKE_COMPATIBLE.out.geno,
             MAKE_COMPATIBLE.out.pheno,
             MAKE_COMPATIBLE.out.variants,
             ch_reference
         )
+        ch_versions = ch_versions.mix(ANCESTRY_PROJECTION.out.versions)
     }
 
     //
