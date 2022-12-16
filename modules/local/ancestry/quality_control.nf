@@ -43,6 +43,7 @@ process QUALITY_CONTROL {
         --autosome \
         --make-pgen vzs \
         --allow-extra-chr \
+        --chr 1-22 \
         --out ${meta.build}_reference
 
     cat <<-END_VERSIONS > versions.yml
