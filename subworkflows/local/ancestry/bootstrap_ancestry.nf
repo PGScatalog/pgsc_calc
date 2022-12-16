@@ -3,7 +3,7 @@
 //
 include { SETUP_RESOURCE } from '../../../modules/local/ancestry/setup_resource'
 include { PLINK2_RELABELPVAR } from '../../../modules/local/plink2_relabelpvar'
-include { QUALITY_CONTROL } from '../../../modules/local/ancestry/quality_control'
+include { FILTER_REFERENCE } from '../../../modules/local/ancestry/filter_reference'
 include { MAKE_DATABASE } from '../../../modules/local/ancestry/make_database'
 
 workflow BOOTSTRAP_ANCESTRY {
@@ -46,14 +46,14 @@ workflow BOOTSTRAP_ANCESTRY {
         .join( relabelled )
         .set { ch_raw_ref }
 
-    QUALITY_CONTROL(ch_raw_ref)
-    ch_versions = ch_versions.mix(QUALITY_CONTROL.out.versions.first())
+    FILTER_REFERENCE( ch_raw_ref )
+    ch_versions = ch_versions.mix(FILTER_REFERENCE.out.versions.first())
 
     // grab chain files
     hg19tohg38 = Channel.fromPath("https://hgdownload.cse.ucsc.edu/goldenpath/hg19/liftOver/hg19ToHg38.over.chain.gz")
     hg38tohg19 = Channel.fromPath("https://hgdownload.soe.ucsc.edu/goldenPath/hg38/liftOver/hg38ToHg19.over.chain.gz")
 
-    QUALITY_CONTROL.out.plink
+    FILTER_REFERENCE.out.plink
         .flatten()
         .filter(Path) // drop meta hashmaps
         .concat( hg19tohg38, hg38tohg19 )

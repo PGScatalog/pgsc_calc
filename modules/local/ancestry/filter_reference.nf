@@ -1,4 +1,4 @@
-process QUALITY_CONTROL {
+process FILTER_REFERENCE {
     tag "$meta.build $meta.id chromosome $meta.chrom"
     label 'process_low'
 
@@ -40,10 +40,8 @@ process QUALITY_CONTROL {
         --mind 0.1 \
         --maf 0.01 \
         --hwe 0.000001 \
-        --autosome \
         --make-pgen vzs \
-        --allow-extra-chr \
-        --chr 1-22 \
+        --allow-extra-chr --autosome \
         --out ${meta.build}_reference
 
     cat <<-END_VERSIONS > versions.yml
