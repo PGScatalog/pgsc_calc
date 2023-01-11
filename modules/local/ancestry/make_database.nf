@@ -18,8 +18,8 @@ process MAKE_DATABASE {
     script:
     """
     echo $workflow.start > meta.txt
-    echo $workflow.repository > meta.txt
     echo $workflow.manifest.version > meta.txt
+
     tar --dereference -czf pgsc_calc.tar.gz *
 
     cat <<-END_VERSIONS > versions.yml
