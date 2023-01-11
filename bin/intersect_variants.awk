@@ -37,6 +37,7 @@ FNR == NR && !/^#/ {
         # comparison operators work on strings in awk, e.g. 'A' < 'C' is true
         print_reference_join_id(a, ALT)
     }
+    next
 }
 
 # process target
@@ -44,18 +45,18 @@ FNR != NR && !/^#/ {
     # this field is shared by bim and pvar files
     split($5, ALT, ",")
 
-
     for (a in ALT) {
         # comparison operators work on strings in awk, e.g. 'A' < 'C' is true
         print_target_join_id(a, ALT)
     }
+    next
 }
 
 function print_reference_join_id(a, ALT) {
     if($4 < ALT[a])
-        print $1":"$2":"$4":"ALT[a], $3, $4, (length($4) > 1 || length(ALT[a]) > 1) > "refvariants.tmp"
+        print $1":"$2":"$4":"ALT[a], $3, $4, (length($4) > 1 || length(ALT[a]) > 1) | "sort > ref_variants.txt"
     else
-        print $1":"$2":"ALT[a]":"$4, $3, $4, (length($4) > 1 || length(ALT[a]) > 1) > "refvariants.tmp"
+        print $1":"$2":"ALT[a]":"$4, $3, $4, (length($4) > 1 || length(ALT[a]) > 1) | "sort > ref_variants.txt"
 }
 
 function print_target_join_id(a, ALT) {
@@ -75,22 +76,13 @@ function print_target_join_id(a, ALT) {
     }
 
     if(ref < ALT[a]) {
-        print chrom":"pos":"ref":"ALT[a], id, ref > "targetvariants.tmp"
+        print chrom":"pos":"ref":"ALT[a], id, ref | "sort > target_variants.txt"
     }
     else {
-        print chrom":"pos":"ALT[a]":"ref, id, ref > "targetvariants.tmp"
+        print chrom":"pos":"ALT[a]":"ref, id, ref | "sort > target_variants.txt"
     }
 }
 
-function sort_ref() {
-    print "CHR:POS:A0:A1", "ID_REF", "REF_REF", "IS_INDEL" > "ref_variants.txt"
-    system("sort refvariants.tmp >> ref_variants.txt")
-}
-
-function sort_target() {
-    print "CHR:POS:A0:A1", "ID_TARGET", "REF_TARGET" > "target_variants.txt"
-    system("sort targetvariants.tmp >> target_variants.txt")
-}
 
 function join_ref_target() {
     system("join ref_variants.txt target_variants.txt > joined.txt")
@@ -124,8 +116,6 @@ END {
         print "Target variants are in bim format"
     }
 
-    sort_ref()
-    sort_target()
     join_ref_target()
     match_report()
     cleanup()
