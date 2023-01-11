@@ -24,7 +24,8 @@ process PLINK2_VCF {
 
     script:
     def args = task.ext.args ?: ''
-    def prefix = task.ext.prefix ?: "${meta.id}"
+    def prefix = task.ext.prefix ?: "${meta.id}_"
+    def build = meta.build? meta.build + '_': ''  // important for making reference
     def mem_mb = task.memory.toMega()
     def dosage_options = meta.vcf_import_dosage ? 'dosage=DS' : ''
     // rewriting genotypes, so use --max-alleles instead of using generic ID
@@ -40,8 +41,8 @@ process PLINK2_VCF {
         $set_ma_missing \\
         $args \\
         --vcf $vcf $dosage_options \\
-        --make-pgen vzs\\
-        --out vcf_${prefix}_${meta.chrom} # 'vcf_' prefix is important
+        --make-pgen vzs \\
+        --out ${build}${prefix}${meta.chrom}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

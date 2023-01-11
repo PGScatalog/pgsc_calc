@@ -1,8 +1,8 @@
 // TODO: add build to meta
 process PLINK2_RELABELPVAR {
     tag "$meta.id chromosome $meta.chrom"
-    storeDir ( params.genotypes_cache ? "$params.genotypes_cache/${meta.build}/${meta.id}/${meta.chrom}" :
-              "$workDir/genomes/${meta.build}/${meta.id}/${meta.chrom}/")
+    storeDir ( params.genotypes_cache ? "$params.genotypes_cache/${meta.id}/${meta.chrom}" :
+              "$workDir/genomes/${meta.id}/${meta.chrom}/")
     label 'process_low'
     label "${ params.copy_genomes ? 'copy_genomes' : '' }"
 
@@ -31,11 +31,11 @@ process PLINK2_RELABELPVAR {
     script:
     def args = task.ext.args ?: ''
     def compressed = variants.getName().endsWith("zst") ? 'vzs' : ''
-    def prefix = task.ext.suffix ? "${meta.id}${task.ext.suffix}" : "${meta.id}"
+    def prefix = task.ext.suffix ? "${meta.id}_${task.ext.suffix}_" : "${meta.id}_"
+    def build = meta.build? meta.build + '_': ''  // important for making reference
     def mem_mb = task.memory.toMega() // plink is greedy
     // if dropping multiallelic variants, set a generic ID that won't match
     def set_ma_missing = params.keep_multiallelic ? '' : '--var-id-multi @:#'
-
 
     """
     plink2 \\
@@ -46,10 +46,10 @@ process PLINK2_RELABELPVAR {
         $set_ma_missing \\
         --pfile ${geno.baseName} $compressed \\
         --make-just-pvar zs \\
-        --out ${prefix}_${meta.chrom}
+        --out ${build}${prefix}${meta.chrom}
 
-    cp -RP $geno ${prefix}_${meta.chrom}.pgen
-    cp -RP $pheno ${prefix}_${meta.chrom}.psam
+    cp -RP $geno ${build}${prefix}${meta.chrom}.pgen
+    cp -RP $pheno ${build}${prefix}${meta.chrom}.psam
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
