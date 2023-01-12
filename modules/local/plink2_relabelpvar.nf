@@ -1,8 +1,8 @@
 // TODO: add build to meta
 process PLINK2_RELABELPVAR {
     tag "$meta.id chromosome $meta.chrom"
-    storeDir ( params.genotypes_cache ? "$params.genotypes_cache/${meta.id}/${meta.chrom}" :
-              "$workDir/genomes/${meta.id}/${meta.chrom}/")
+    storeDir ( params.genotypes_cache ? "$params.genotypes_cache/${meta.id}/${meta.build}/${meta.chrom}" :
+              "$workDir/genomes/${meta.id}/${meta.build}${meta.chrom}/")
     label 'process_low'
     label "${ params.copy_genomes ? 'copy_genomes' : '' }"
 
