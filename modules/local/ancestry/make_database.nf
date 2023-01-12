@@ -2,17 +2,17 @@ process MAKE_DATABASE {
     label 'process_low'
     storeDir "$workDir/reference"
 
-    conda (params.enable_conda ? "$projectDir/environments/pgscatalog_utils/environment.yml" : null)
-    def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/pgscatalog_utils:${params.platform}-0.3.0"
+    conda (params.enable_conda ? "$projectDir/environments/zstd/environment.yml" : null)
+    def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/zstd:${params.platform}-1.5.2"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/pgscatalog_utils:amd64-0.3.0' :
+        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/zstd:amd64-1.5.2' :
         dockerimg }"
 
     input:
     path '*'
 
     output:
-    path "pgsc_calc.tar.gz", emit: reference
+    path "pgsc_calc.tar.zst", emit: reference
     path "versions.yml"    , emit: versions
 
     script:
@@ -20,11 +20,11 @@ process MAKE_DATABASE {
     echo $workflow.start > meta.txt
     echo $workflow.manifest.version > meta.txt
 
-    tar --dereference -czf pgsc_calc.tar.gz *
+    tar --dereference -acf pgsc_calc.tar.zst *
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
-        pgscatalog_utils: \$(echo \$(python -c 'import pgscatalog_utils; print(pgscatalog_utils.__version__)'))
+        zstd: \$(zstd --version | cut -d ' ' -f 7 | sed 's/v// ; s/,//'))
     END_VERSIONS
     """
 }
