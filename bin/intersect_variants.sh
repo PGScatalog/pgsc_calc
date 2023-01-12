@@ -9,6 +9,8 @@
 # use process substition to pass decompressed data to sh, if needed
 # e.g. <(zstdcat compressed.pvar.zst)
 
+set -euxo pipefail
+
 # Inputs
 i_reference=$1
 i_target=$2
