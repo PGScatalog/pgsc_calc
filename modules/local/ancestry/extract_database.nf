@@ -11,7 +11,7 @@ process EXTRACT_DATABASE {
     path reference
 
     output:
-    tuple val(meta38), path("GRCh38_1000G_ALL.pgen"), path("GRCh37_1000G_ALL.psam"), path("GRCh37_1000G_ALL.pvar.zst"), emit: grch38
+    tuple val(meta38), path("GRCh38_1000G_ALL.pgen"), path("GRCh38_1000G_ALL.psam"), path("GRCh38_1000G_ALL.pvar.zst"), emit: grch38
     tuple val(meta38), path("deg2_hg38.king.cutoff.out.id"), emit: grch38_king
     tuple val(meta37), path("GRCh37_1000G_ALL.pgen"), path("GRCh37_1000G_ALL.psam"), path("GRCh37_1000G_ALL.pvar.zst"), emit: grch37
     tuple val(meta37), path("deg2_phase3.king.cutoff.out.id"), emit: grch37_king
