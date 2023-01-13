@@ -67,50 +67,62 @@ def String unique_pgp_id    = process_accessions(params.pgp_id)
 def String unique_pgs_id    = process_accessions(params.pgs_id)
 
 
-def run_bootstrap       = true
-def run_input_check     = true
+def run_ancestry_bootstrap = true
+def run_input_check = true
 def run_make_compatible = true
-def run_projection      = true
-def run_apply_score     = true
+def run_match = true
+def run_ancestry_assign = true
+def run_ancestry_adjust = true
+def run_apply_score = true
 
 if (params.only_bootstrap) {
-    run_bootstrap = true
+    run_ancestry_bootstrap = true
     run_input_check = false
     run_make_compatible = false
-    run_projection = false
+    run_match = false
+    run_ancestry_assign = false
+    run_ancestry_adjust = false
     run_apply_score = false
 }
 
 if (params.only_input) {
-    run_bootstrap = false
+    run_ancestry_bootstrap = false
     run_input_check = true
     run_make_compatible = false
-    run_projection = false
+    run_match = false
+    run_ancestry_assign = false
     run_apply_score = false
 }
 
 if (params.only_compatible) {
-    run_bootstrap = false
+    run_ancestry_bootstrap = false
     run_input_check = true
     run_make_compatible = true
-    run_projection = false
+    run_match = false
+    run_ancestry_assign = false
     run_apply_score = false
 }
 
 if (params.only_projection) {
-    run_bootstrap = true
+    run_ancestry_bootstrap = true
     run_input_check = true
     run_make_compatible = true
-    run_projection = true
+    run_match = true
+    run_ancestry_assign = true
     run_apply_score = false
 }
 
 if (params.only_score) {
-    run_bootstrap = true
+    run_ancestry_bootstrap = true
     run_input_check = true
     run_make_compatible = true
-    run_projection = false
+    run_match = true
+    run_ancestry_assign = false
     run_apply_score = true
+}
+
+if (!run_ancestry_assign && !run_ancestry_adjust) {
+    run_ancestry_bootstrap = false
 }
 
 /*
@@ -124,6 +136,7 @@ include { DOWNLOAD_SCOREFILES  } from '../modules/local/download_scorefiles'
 include { BOOTSTRAP_ANCESTRY   } from '../subworkflows/local/ancestry/bootstrap_ancestry'
 include { INPUT_CHECK          } from '../subworkflows/local/input_check'
 include { MAKE_COMPATIBLE      } from '../subworkflows/local/make_compatible'
+include { MATCH                } from '../subworkflows/local/match'
 include { ANCESTRY_PROJECTION  } from '../subworkflows/local/ancestry/ancestry_projection'
 include { APPLY_SCORE          } from '../subworkflows/local/apply_score'
 include { DUMPSOFTWAREVERSIONS } from '../modules/local/dumpsoftwareversions'
@@ -140,7 +153,7 @@ workflow PGSCALC {
     //
     // SUBWORKFLOW: Create reference database for ancestry inference
     //
-    if (run_bootstrap) {
+    if (run_ancestry_bootstrap) {
         if (params.ref) {
             log.info "Reference database provided: skipping bootstrap"
             ch_reference = Channel.fromPath(params.ref, checkIfExists: true)
@@ -192,15 +205,16 @@ workflow PGSCALC {
             INPUT_CHECK.out.pheno,
             INPUT_CHECK.out.variants,
             INPUT_CHECK.out.vcf,
-            INPUT_CHECK.out.scorefiles,
+
         )
         ch_versions = ch_versions.mix(MAKE_COMPATIBLE.out.versions)
     }
 
+
     //
     // SUBWORKFLOW: Run ancestry projection
     //
-    if (run_projection) {
+    if (run_ancestry_assign) {
         ANCESTRY_PROJECTION (
             MAKE_COMPATIBLE.out.geno,
             MAKE_COMPATIBLE.out.pheno,
@@ -209,6 +223,35 @@ workflow PGSCALC {
         )
         ch_versions = ch_versions.mix(ANCESTRY_PROJECTION.out.versions)
     }
+
+    //
+    // TODO: Set up optional input of intersected variants for MAKE_COMPATIBLE
+    //
+    if (run_ancestry_adjust) {
+        // TODO: set up optional input of intersected variants here for run_apply_score
+
+    }
+
+    //
+    // SUBWORKFLOW: Match scoring files against target genomes
+    //
+    if (run_match) {
+        if (run_ancestry_assign) {
+            // intersected variants ( across ref & target ) are an optional input
+            intersection = ANCESTRY_PROJECTION.out.intersection
+        } else {
+            intersection = file('NO_FILE') // don't check if file exists
+        }
+
+        MATCH (
+            MAKE_COMPATIBLE.out.geno,
+            MAKE_COMPATIBLE.out.pheno,
+            MAKE_COMPATIBLE.out.variants,
+            INPUT_CHECK.out.scorefiles,
+            intersection
+        )
+    }
+
 
     //
     // SUBWORKFLOW: Apply a scoring file to target genomic data

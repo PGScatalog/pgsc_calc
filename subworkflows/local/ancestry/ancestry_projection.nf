@@ -27,15 +27,8 @@ workflow ANCESTRY_PROJECTION {
 
     ch_versions = ch_versions.mix(EXTRACT_DATABASE.out.versions)
 
-    Channel.of(
-        [['build': 'GRCh37'], file("$projectDir/assets/ancestry/high-LD-regions-hg19-GRCh37.txt", checkIfExists: true)],
-        [['build': 'GRCh38'], file("$projectDir/assets/ancestry/high-LD-regions-hg38-GRCh38.txt", checkIfExists: true)]
-    )
-        .join(ch_db)
-        .set{ ch_ref }
-
     //
-    // STEP 1: Get shared variants across reference and target, then ld thin
+    // STEP 1: get overlapping variants across reference and target ------------
     //
 
     // sort order is _very important_
@@ -50,17 +43,16 @@ workflow ANCESTRY_PROJECTION {
     ch_genomes
         // copy build to first element, use as a key, and drop it
         .map { it -> [it.first().subMap(['build']), it] }
-        .combine ( ch_ref, by: 0 )
+        .combine ( ch_db, by: 0 )
         .map { it.tail() }
         .map { it.flatten() }
         .dump(tag: 'intersect_input')
         .set{ ch_ref_combined }
 
-    INTERSECT_REFERENCE ( ch_ref_combined )
-    ch_versions = ch_versions.mix(INTERSECT_REFERENCE.out.versions)
+    INTERSECT_VARIANTS ( ch_ref_combined )
+    ch_versions = ch_versions.mix(INTERSECT_VARIANTS.out.versions)
 
     //
-    // STEP 2: Derive PCA on reference population
     //
     ch_db
         .join( INTERSECT_REFERENCE.out.ref_intersect )
@@ -107,5 +99,6 @@ workflow ANCESTRY_PROJECTION {
     emit:
     projections = PLINK2_PROJECT.out.projections
     versions = ch_versions
+    intersection = INTERSECT_VARIANTS.out.intersection
 
 }
