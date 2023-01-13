@@ -219,7 +219,8 @@ workflow PGSCALC {
             MAKE_COMPATIBLE.out.geno,
             MAKE_COMPATIBLE.out.pheno,
             MAKE_COMPATIBLE.out.variants,
-            ch_reference
+            ch_reference,
+            params.target_build
         )
         ch_versions = ch_versions.mix(ANCESTRY_PROJECTION.out.versions)
     }
