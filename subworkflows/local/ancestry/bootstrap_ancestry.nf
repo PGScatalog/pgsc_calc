@@ -3,7 +3,6 @@
 //
 include { SETUP_RESOURCE } from '../../../modules/local/ancestry/setup_resource'
 include { PLINK2_RELABELPVAR } from '../../../modules/local/plink2_relabelpvar'
-include { FILTER_REFERENCE } from '../../../modules/local/ancestry/filter_reference'
 include { MAKE_DATABASE } from '../../../modules/local/ancestry/make_database'
 
 workflow BOOTSTRAP_ANCESTRY {
