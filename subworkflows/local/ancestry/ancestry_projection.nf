@@ -13,6 +13,7 @@ workflow ANCESTRY_PROJECTION {
     geno
     pheno
     variants
+    vmiss
     reference
     target_build
 
@@ -44,6 +45,7 @@ workflow ANCESTRY_PROJECTION {
         .set { ch_genomes }
 
     ch_genomes
+        .join(vmiss)
         // copy build to first element, use as a key, and drop it
         .map { it -> [it.first().subMap(['build']), it] }
         .combine ( ch_db, by: 0 )
@@ -67,33 +69,30 @@ workflow ANCESTRY_PROJECTION {
          [['build': 'GRCh38'], file("$projectDir/assets/ancestry/high-LD-regions-hg38-GRCh38.txt", checkIfExists: true)]
     )
         .join(ch_king)
-        .set{ ch_ref_data }
+        .set{ ch_king_and_ld }
 
     ch_db
+        // TODO: is intersection meta important? it's included but not used
+        .combine( INTERSECT_VARIANTS.out.intersection )
         .map { it -> [it.first().subMap(['build']), it] }
-        .combine ( ch_ref_data, by: 0 )
+        .combine ( ch_king_and_ld, by: 0 )
         .map { it.tail() }
         .map { it.flatten() }
-        .dump(tag: 'intersect_input')
-        .filter { it.first().build == target_build }
-        .set{ ch_ref_raw }
-
-    ch_genomes.join(INTERSECT_VARIANTS.out.intersection, by: 0)
-        .map { it -> [it.first().subMap(['build']), it] }
-        .combine ( ch_ref_raw, by: 0 )
-        .map { it.tail() }
-        .map { it.flatten() }
-        .set { ch_filter_input }
+        .set{ ch_filter_input }
 
     FILTER_VARIANTS ( ch_filter_input )
+
+    FILTER_VARIANTS.out.ref
+        .join(FILTER_VARIANTS.out.prune_in)
+        .set { ch_pca_input }
 
     //
     // STEP 2: Derive PCA on reference population ------------------------------
     //
 
-    PLINK2_PCA ( FILTER_VARIANTS.out.ref )
+    PLINK2_PCA ( ch_pca_input )
     ch_versions = ch_versions.mix(PLINK2_PCA.out.versions)
-
+    
     //
     // STEP 3: Project reference and target samples into PCA space -------------
     //

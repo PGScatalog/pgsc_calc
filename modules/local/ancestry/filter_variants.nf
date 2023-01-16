@@ -11,12 +11,12 @@ process FILTER_VARIANTS {
         dockerimg }"
 
     input:
-    tuple val(meta), path(geno), path(pheno), path(var), path(shared),
-        path(ref_geno), path(ref_pheno), path(ref_var),
-        path(ld), path(king)
+    tuple val(meta), path(ref_geno), path(ref_pheno), path(ref_var),
+        val(matchmeta), path(shared), path(ld), path(king)
 
     output:
-    tuple val(meta), path("*_reference.pgen"), path("*_reference.psam"), path("*_reference.pvar.zst"), path("*thinned.prune.in.gz"), emit: ref
+    tuple val(meta), path("*_reference.pgen"), path("*_reference.psam"), path("*_reference.pvar.zst"), emit: ref
+    tuple val(meta), path("*thinned.prune.in.gz"), emit: prune_in
     path "versions.yml", emit: versions
 
     script:
@@ -25,22 +25,13 @@ process FILTER_VARIANTS {
     // dynamic input option
     def input = (meta.is_pfile) ? '--pfile vzs' : '--bfile vzs'
     """
-    # 1. identify variants with high-missingness in the TARGET dataset ---------
-    plink2 \
-            --threads $task.cpus \
-            --memory $mem_mb \
-            $input ${geno.simpleName} \
-            --geno 0.5 \
-            --make-just-pvar zs \
-            --out low_missingness
-
-    # 2. Get QC'd variant set & unrelated samples from REFERENCE data for PCA --
+    # 1. Get QC'd variant set & unrelated samples from REFERENCE data for PCA --
 
     # (STRANDAMB == TRUE)
-    awk '\$5 == 1 { print \$2 }' $shared | gzip -c > 1000G_StrandAmb.txt.gz
+    awk '\$5 == 1 { print \$2 }' <(zcat $shared) | gzip -c > 1000G_StrandAmb.txt.gz
 
     # ((IS_INDEL == FALSE) && (STRANDAMB == FALSE) || ((IS_INDEL == TRUE)) && (SAME_REF == TRUE))
-    awk '((\$4 == 0) && (\$5 == 0)) || ((\$4 == 0) && (\$8 == 1)) {print \$2}' matched_variants.txt | gzip -c > shared.txt.gz
+    awk '((\$4 == 0) && (\$5 == 0)) || ((\$4 == 0) && (\$8 == 1)) {print \$2}' <(zcat $shared) | gzip -c > shared.txt.gz
 
     plink2 \
             --threads $task.cpus \

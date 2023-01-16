@@ -11,11 +11,11 @@ process INTERSECT_VARIANTS {
         dockerimg }"
 
     input:
-    tuple val(meta), path(geno), path(pheno), path(variants),
+    tuple val(meta), path(geno), path(pheno), path(variants), path(vmiss),
         path(ref_geno), path(ref_pheno), path(ref_variants)
 
     output:
-    tuple val(meta), path("matched_variants.txt"), emit: intersection
+    tuple val(meta), path("matched_variants.txt.gz"), emit: intersection
     path "versions.yml", emit: versions
 
     script:
@@ -26,6 +26,8 @@ process INTERSECT_VARIANTS {
     intersect_variants.sh <(plink2 --zst-decompress $ref_variants) \
         <(plink2 --zst-decompress $variants) \
         $file_format
+
+    gzip matched_variants.txt
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

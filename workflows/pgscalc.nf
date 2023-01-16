@@ -219,6 +219,7 @@ workflow PGSCALC {
             MAKE_COMPATIBLE.out.geno,
             MAKE_COMPATIBLE.out.pheno,
             MAKE_COMPATIBLE.out.variants,
+            MAKE_COMPATIBLE.out.vmiss,
             ch_reference,
             params.target_build
         )
