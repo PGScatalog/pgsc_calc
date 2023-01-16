@@ -17,10 +17,11 @@ i_target=$2
 target_format=$3
 
 # reference is always pvar
-echo -e "CHR:POS:A0:A1\tID_REF\tREF_REF\tIS_INDEL" > ref_variants.txt
+echo -e "CHR:POS:A0:A1\tID_REF\tREF_REF\tIS_INDEL\tSTRANDAMB" > ref_variants.txt
     awk '!/^#/ {split($5, ALT, ",");
           for (a in ALT){
-            if($4 < ALT[a]) print $1":"$2":"$4":"ALT[a], $3, $4, (length($4) > 1 || length(ALT[a]) > 1); else print $1":"$2":"ALT[a]":"$4, $3, $4, (length($4) > 1 || length(ALT[a]) > 1)
+            if($4 < ALT[a]) print $1":"$2":"$4":"ALT[a], $3, $4, (length($4) > 1 || length(ALT[a]) > 1), ($4 ALT[a] == "AT" || $4 ALT[a] == "TA" || $4 ALT[a] == "CG" || $4 ALT[a] == "GC");
+            else print $1":"$2":"ALT[a]":"$4, $3, $4, (length($4) > 1 || length(ALT[a]) > 1), ($4 ALT[a] == "AT" || $4 ALT[a] == "TA" || $4 ALT[a] == "CG" || $4 ALT[a] == "GC")
           }}' $i_reference | sort >> ref_variants.txt
 
 # handle target (in multiple formats)
@@ -39,7 +40,7 @@ fi
 
 # Merge & output matches w/ ref orientation
 join ref_variants.txt target_variants.txt |\
-    awk '{if (NR==1) print $0, "SAME_REF"; else print $0, ($3 == $6)}' > matched_variants.txt
+    awk '{if (NR==1) print $0, "SAME_REF"; else print $0, ($3 == $7)}' > matched_variants.txt
 
 # Cleanup intermediate files
 rm -f ref_variants.txt target_variants.txt
