@@ -27,6 +27,7 @@ workflow ANCESTRY_PROJECTION {
 
     EXTRACT_DATABASE.out.grch38
         .concat(EXTRACT_DATABASE.out.grch37)
+        .filter { it.first().build == target_build }
         .set { ch_db }
 
     ch_versions = ch_versions.mix(EXTRACT_DATABASE.out.versions)
