@@ -36,12 +36,7 @@ process FILTER_VARIANTS {
 
     # 2. Get QC'd variant set & unrelated samples from REFERENCE data for PCA --
 
-    # --zst-decompress can't be used with mem / threads flags
-    plink2 \
-            --zst-decompress $ref_var \
-            | grep -vE "^#" \
-            | awk '{if(\$4 \$5 == "AT" || \$4 \$5 == "TA" || \$4 \$5 == "CG" || \$4 \$5 == "GC") print \$3}' \
-        > 1000G_StrandAmb.txt
+    awk '\$5 == 1 { print \$2 }' $shared | gzip -c > 1000G_StrandAmb.txt.gz
 
     plink2 \
             --threads $task.cpus \
@@ -49,7 +44,7 @@ process FILTER_VARIANTS {
             --pfile ${ref_geno.simpleName} vzs \
             --remove $king \
             --extract $shared \
-            --exclude 1000G_StrandAmb.txt \
+            --exclude 1000G_StrandAmb.txt.gz \
             --max-alleles 2 \
             --snps-only just-acgt \
             --rm-dup exclude-all \
