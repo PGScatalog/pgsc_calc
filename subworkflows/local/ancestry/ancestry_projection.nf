@@ -103,33 +103,32 @@ workflow ANCESTRY_PROJECTION {
         .groupTuple()
         .set{ ch_pca_output }
 
-    // ch_genomes
-    // // copy build to first element, use as a key, and drop it
-    //     .map { it -> [it.first().subMap(['build']), it] }
-    //     .combine ( ch_pca_output, by: 0 )
-    //     .map { it.tail() }
-    //     .map { it.flatten() }
-    //     .dump(tag: 'target_project_input')
-    //     .set { ch_target_project_input }
+    ch_genomes
+        .map { it -> [it.first().subMap(['build']), it] }
+        .combine ( ch_pca_output, by: 0 )
+        .map { it.tail() }
+        .map { it.flatten() }
+        .dump(tag: 'target_project_input')
+        .set { ch_target_project_input }
 
-    // ch_db
-    //     .filter { it.first().get('build') == params.target_build }
-    //     .combine ( ch_pca_output, by: 0 )
-    // // add is_pfile to meta map, because PLINK2_PROJECT must handle bfile or pfile
-    //     .map { it -> [['build': params.target_build, 'chrom': 'ALL',
-    //                    'id': 'reference', 'is_pfile': true], it.tail()] }
-    //     .map { it.flatten() }
-    //     .concat ( ch_target_project_input )
-    //     .dump(tag: 'all_project_input')
-    //     .set { ch_all_project_input }
+    // TO DO: double check projection should use QC'd data or raw data?
+    ch_db
+        .filter { it.first().get('build') == params.target_build }
+        .combine ( ch_pca_output, by: 0 )
+    // add is_pfile to meta map, because PLINK2_PROJECT must handle bfile or pfile
+        .map { it -> [['build': params.target_build, 'chrom': 'ALL',
+                       'id': 'reference', 'is_pfile': true], it.tail()] }
+        .map { it.flatten() }
+        .concat ( ch_target_project_input )
+        .dump(tag: 'all_project_input')
+        .set { ch_all_project_input }
 
-
-    // PLINK2_PROJECT( ch_all_project_input )
-    // ch_versions = ch_versions.mix(PLINK2_PROJECT.out.versions.first())
+    PLINK2_PROJECT( ch_all_project_input )
+    ch_versions = ch_versions.mix(PLINK2_PROJECT.out.versions.first())
 
     emit:
     intersection = INTERSECT_VARIANTS.out.intersection
-    projections = Channel.empty() // PLINK2_PROJECT.out.projections
-    versions = Channel.empty() // ch_versions
+    projections = PLINK2_PROJECT.out.projections
+    versions = ch_versions
 
 }
