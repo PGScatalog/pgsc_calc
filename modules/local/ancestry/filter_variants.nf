@@ -16,8 +16,7 @@ process FILTER_VARIANTS {
         path(ld), path(king)
 
     output:
-    // TODO: double check output
-    //tuple val(meta), path("*.pgen"), path("*.psam"), path("*.pvar.zst"), emit: filtered
+    tuple val(meta), path("*_reference.pgen"), path("*_reference.psam"), path("*_reference.pvar.zst"), path("*thinned.prune.in.gz"), emit: ref
     path "versions.yml", emit: versions
 
     script:
@@ -71,6 +70,8 @@ process FILTER_VARIANTS {
             --indep-pairwise 1000 50 0.05 \
             --exclude range $ld \
             --out ${ref_geno.simpleName}_thinned
+
+    gzip *.prune.in *.prune.out
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

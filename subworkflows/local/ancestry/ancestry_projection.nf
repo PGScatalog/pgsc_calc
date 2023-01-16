@@ -56,7 +56,7 @@ workflow ANCESTRY_PROJECTION {
     ch_versions = ch_versions.mix(INTERSECT_VARIANTS.out.versions)
 
     //
-    // STEP 2: filter variants in reference and target datasets
+    // STEP 2: filter variants in reference and target datasets ----------------
     //
     EXTRACT_DATABASE.out.grch37_king
         .concat(EXTRACT_DATABASE.out.grch38_king)
@@ -88,26 +88,20 @@ workflow ANCESTRY_PROJECTION {
     FILTER_VARIANTS ( ch_filter_input )
 
     //
-    // STEP 2: Derive PCA on reference population
+    // STEP 2: Derive PCA on reference population ------------------------------
     //
 
-    // ch_db
-    //     .join( INTERSECT_REFERENCE.out.ref_intersect )
-    //     .map { it.flatten() }
-    //     .dump(tag: 'pca_input')
-    //     .set { ch_pca_input }
-
-
-    // PLINK2_PCA ( ch_pca_input )
-    // ch_versions = ch_versions.mix(PLINK2_PCA.out.versions)
+    PLINK2_PCA ( FILTER_VARIANTS.out.ref )
+    ch_versions = ch_versions.mix(PLINK2_PCA.out.versions)
 
     //
-    // STEP 3: Project reference and target samples into PCA space
+    // STEP 3: Project reference and target samples into PCA space -------------
     //
-    // PLINK2_PCA.out.afreq
-    //     .concat(PLINK2_PCA.out.eigenvec_var)
-    //     .groupTuple()
-    //     .set{ ch_pca_output }
+
+    PLINK2_PCA.out.afreq
+        .concat(PLINK2_PCA.out.eigenvec_var)
+        .groupTuple()
+        .set{ ch_pca_output }
 
     // ch_genomes
     // // copy build to first element, use as a key, and drop it
