@@ -22,6 +22,7 @@ process PLINK2_VCF {
     tuple val(newmeta), path("*.pgen"), emit: pgen
     tuple val(newmeta), path("*.psam"), emit: psam
     tuple val(newmeta), path("*.zst") , emit: pvar
+    tuple val(meta), path("*.vmiss.gz"), emit: vmiss
     path "versions.yml"            , emit: versions
 
     script:
@@ -41,10 +42,14 @@ process PLINK2_VCF {
         --memory $mem_mb \\
         --set-all-var-ids '@:#:\$r:\$a' \\
         $set_ma_missing \\
+        --missing \\
+        --missing vcols=fmissdosage,fmiss \\
         $args \\
         --vcf $vcf $dosage_options \\
         --make-pgen vzs \\
         --out ${build}${prefix}${meta.chrom}
+
+    gzip *.vmiss
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

@@ -24,6 +24,7 @@ process PLINK2_RELABELPVAR {
     tuple val(meta), path("*.pgen"), emit: geno
     tuple val(meta), path("*.zst") , emit: variants
     tuple val(meta), path("*.psam"), emit: pheno
+    tuple val(meta), path("*.vmiss.gz"), emit: vmiss
     path "versions.yml"            , emit: versions
 
     when:
@@ -43,6 +44,8 @@ process PLINK2_RELABELPVAR {
     plink2 \\
         --threads $task.cpus \\
         --memory $mem_mb \\
+        --missing \\
+        --missing vcols=fmissdosage,fmiss \\
         $args \\
         --set-all-var-ids '@:#:\$r:\$a' \\
         $set_ma_missing \\
@@ -52,6 +55,7 @@ process PLINK2_RELABELPVAR {
 
     cp -RP $geno ${build}${prefix}${meta.chrom}.pgen
     cp -RP $pheno ${build}${prefix}${meta.chrom}.psam
+    gzip *.vmiss
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

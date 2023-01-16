@@ -23,6 +23,7 @@ process PLINK2_RELABELBIM {
     tuple val(meta), path("*.bed"), emit: geno
     tuple val(meta), path("*.zst"), emit: variants
     tuple val(meta), path("*.fam"), emit: pheno
+    tuple val(meta), path("*.vmiss.gz"), emit: vmiss
     path "versions.yml"           , emit: versions
 
     when:
@@ -42,6 +43,7 @@ process PLINK2_RELABELBIM {
     plink2 \\
         --threads $task.cpus \\
         --memory $mem_mb \\
+        --missing vcols=fmissdosage,fmiss \\
         $args \\
         --set-all-var-ids '@:#:\$r:\$a' \\
         $set_ma_missing \\
@@ -51,6 +53,7 @@ process PLINK2_RELABELBIM {
 
     cp -RP $geno ${build}${prefix}${meta.chrom}.bed
     cp -RP $pheno ${build}${prefix}${meta.chrom}.fam
+    gzip *.vmiss
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

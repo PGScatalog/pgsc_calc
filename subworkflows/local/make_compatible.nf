@@ -44,9 +44,15 @@ workflow MAKE_COMPATIBLE {
         .mix(PLINK2_RELABELPVAR.out.variants, PLINK2_VCF.out.pvar)
         .set{ variants_all }
 
+    PLINK2_RELABELBIM.out.vmiss
+        .mix(PLINK2_RELABELPVAR.out.vmiss, PLINK2_VCF.out.vmiss)
+        .dump(tag: 'make_compatible')
+        .set { vmiss }
+
     emit:
     geno       = geno_all
     pheno      = pheno_all
     variants   = variants_all
+    vmiss      = vmiss
     versions   = ch_versions
 }
