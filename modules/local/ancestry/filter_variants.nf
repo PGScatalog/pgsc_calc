@@ -27,19 +27,15 @@ process FILTER_VARIANTS {
     """
     # 1. Get QC'd variant set & unrelated samples from REFERENCE data for PCA --
 
-    # (STRANDAMB == TRUE)
-    awk '\$5 == 1 { print \$2 }' <(zcat $shared) | gzip -c > 1000G_StrandAmb.txt.gz
-
     # ((IS_INDEL == FALSE) && (STRANDAMB == FALSE) || ((IS_INDEL == TRUE)) && (SAME_REF == TRUE))
-    awk '((\$4 == 0) && (\$5 == 0)) || ((\$4 == 0) && (\$8 == 1)) {print \$2}' <(zcat $shared) | gzip -c > shared.txt.gz
+    awk '((\$4 == 0) && (\$5 == 0)) || ((\$4 == 1) && (\$8 == 1)) {print \$2}' <(zcat $shared) | gzip -c > shared.txt.gz
 
     plink2 \
             --threads $task.cpus \
-            --memory $mem_mb \
+            --memory $mem_mb \c
             --pfile ${ref_geno.simpleName} vzs \
             --remove $king \
             --extract shared.txt.gz \
-            --exclude 1000G_StrandAmb.txt.gz \
             --max-alleles 2 \
             --snps-only just-acgt \
             --rm-dup exclude-all \
@@ -51,7 +47,7 @@ process FILTER_VARIANTS {
             --allow-extra-chr --autosome \
             --out ${meta.build}_reference
 
-    # 3. LD-thin variants in REFERENCE (filtered variants & samples) for input
+    # 2. LD-thin variants in REFERENCE (filtered variants & samples) for input
     # into PCA -----------------------------------------------------------------
     plink2 \
             --threads $task.cpus \
