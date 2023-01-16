@@ -36,14 +36,18 @@ process FILTER_VARIANTS {
 
     # 2. Get QC'd variant set & unrelated samples from REFERENCE data for PCA --
 
+    # (STRANDAMB == TRUE)
     awk '\$5 == 1 { print \$2 }' $shared | gzip -c > 1000G_StrandAmb.txt.gz
+
+    # ((IS_INDEL == FALSE) && (STRANDAMB == FALSE) || ((IS_INDEL == TRUE)) && (SAME_REF == TRUE))
+    awk '((\$4 == 0) && (\$5 == 0)) || ((\$4 == 0) && (\$8 == 1)) {print \$2}' matched_variants.txt | gzip -c > shared.txt.gz
 
     plink2 \
             --threads $task.cpus \
             --memory $mem_mb \
             --pfile ${ref_geno.simpleName} vzs \
             --remove $king \
-            --extract $shared \
+            --extract shared.txt.gz \
             --exclude 1000G_StrandAmb.txt.gz \
             --max-alleles 2 \
             --snps-only just-acgt \
