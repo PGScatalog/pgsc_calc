@@ -42,7 +42,6 @@ process PLINK2_VCF {
         --memory $mem_mb \\
         --set-all-var-ids '@:#:\$r:\$a' \\
         $set_ma_missing \\
-        --missing \\
         --missing vcols=fmissdosage,fmiss \\
         $args \\
         --vcf $vcf $dosage_options \\
