@@ -32,7 +32,7 @@ process FILTER_VARIANTS {
 
     plink2 \
             --threads $task.cpus \
-            --memory $mem_mb \c
+            --memory $mem_mb \
             --pfile ${ref_geno.simpleName} vzs \
             --remove $king \
             --extract shared.txt.gz \
