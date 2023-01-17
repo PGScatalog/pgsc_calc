@@ -264,9 +264,9 @@ workflow PGSCALC {
             MAKE_COMPATIBLE.out.geno,
             MAKE_COMPATIBLE.out.pheno,
             MAKE_COMPATIBLE.out.variants,
-            MAKE_COMPATIBLE.out.scorefiles,
+            MATCH.out.scorefiles,
             INPUT_CHECK.out.log_scorefiles,
-            MAKE_COMPATIBLE.out.db
+            MATCH.out.db
         )
         ch_versions = ch_versions.mix(APPLY_SCORE.out.versions)
     }
