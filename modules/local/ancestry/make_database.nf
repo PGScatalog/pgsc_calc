@@ -10,6 +10,7 @@ process MAKE_DATABASE {
 
     input:
     path '*'
+    path checksums
 
     output:
     path "pgsc_calc.tar.zst", emit: reference
@@ -17,7 +18,8 @@ process MAKE_DATABASE {
 
     script:
     """
-    echo $workflow.start > meta.txt
+    md5sum -c $checksums
+
     echo $workflow.manifest.version > meta.txt
 
     tar --dereference -acf pgsc_calc.tar.zst *

@@ -59,7 +59,10 @@ workflow BOOTSTRAP_ANCESTRY {
         .dump(tag: 'ancestry_ref')
         .set { ch_raw_ref }
 
-    MAKE_DATABASE( ch_raw_ref )
+    Channel.fromPath("$projectDir/assets/ancestry/checksums.txt")
+        .set { ch_checksums }
+
+    MAKE_DATABASE( ch_raw_ref, ch_checksums )
     ch_versions = ch_versions.mix(MAKE_DATABASE.out.versions)
 
     emit:

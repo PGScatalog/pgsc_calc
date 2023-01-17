@@ -1,7 +1,7 @@
 reference,build,type,url
-1000G,GRCh38,pgen,https://www.dropbox.com/s/e5n8yr4n7y91fyp/all_hg38.pgen.zst?dl=1
+1000G,GRCh38,pgen,https://www.dropbox.com/s/j72j6uciq5zuzii/all_hg38.pgen.zst?dl=1
 1000G,GRCh38,psam,https://www.dropbox.com/s/2e87z6nc4qexjjm/hg38_corrected.psam?dl=1
-1000G,GRCh38,pvar,https://www.dropbox.com/s/vx09262b4k1kszy/all_hg38_noannot.pvar.zst?dl=1
+1000G,GRCh38,pvar,https://www.dropbox.com/s/ngbo2xm5ojw9koy/all_hg38_noannot.pvar.zst?dl=1
 1000G,GRCh37,pgen,https://www.dropbox.com/s/y6ytfoybz48dc0u/all_phase3.pgen.zst?dl=1
 1000G,GRCh37,psam,https://www.dropbox.com/s/6ppo144ikdzery5/phase3_corrected.psam?dl=1
 1000G,GRCh37,pvar,https://www.dropbox.com/s/c95n8quqwqww4s0/all_phase3_noannot.pvar.zst?dl=1
