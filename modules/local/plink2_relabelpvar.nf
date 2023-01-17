@@ -44,7 +44,6 @@ process PLINK2_RELABELPVAR {
     plink2 \\
         --threads $task.cpus \\
         --memory $mem_mb \\
-        --missing \\
         --missing vcols=fmissdosage,fmiss \\
         $args \\
         --set-all-var-ids '@:#:\$r:\$a' \\
