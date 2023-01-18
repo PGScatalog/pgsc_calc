@@ -7,14 +7,13 @@ workflow MATCH {
     pheno
     variants
     scorefile
-    intersection
+    ch_intersection
 
     main:
     ch_versions = Channel.empty()
 
-    // TODO: add intersection
     variants
-        .combine( scorefile )
+        .combine(scorefile)
         .dump(tag: 'match_variants_input')
         .set { ch_variants }
 
@@ -25,6 +24,16 @@ workflow MATCH {
     // chromosomes. so if a groupKey size is not provided then nextflow must
     // wait for the entire process to finish before releasing the grouped
     // tuples. setting a groupKey size avoids lots of unnecessary waiting.
+
+    // TODO: this doesn't work with multiple input chromosomes! :|
+    // this is only needed to successfully join on the output of MATCH_VARIANTS.out.matches
+    ch_intersection.map {
+        tuple(it.first().subMap(['id', 'is_vcf', 'is_bfile', 'is_pfile']),
+              it.tail())
+    }
+        .map { it.flatten() }
+        .set { ch_intersection }
+
     MATCH_VARIANTS.out.matches.map{
         tuple(groupKey(it[0].subMap(['id', 'is_vcf', 'is_bfile', 'is_pfile']),
                        it[0].n_chrom),
@@ -33,10 +42,12 @@ workflow MATCH {
     }
         .groupTuple()
         .combine( scorefile )
+        .join( ch_intersection )
         .dump(tag: 'match_variants_output')
         .set { matches }
 
     MATCH_COMBINE ( matches )
+
     ch_versions = ch_versions.mix(MATCH_VARIANTS.out.versions)
 
     emit:
