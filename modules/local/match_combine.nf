@@ -11,7 +11,7 @@ process MATCH_COMBINE {
         dockerimg }"
 
     input:
-    tuple val(meta), val(chrom), path('???.ipc.zst'), path(scorefile)
+    tuple val(meta), val(chrom), path('???.ipc.zst'), path(scorefile), path(shared)
 
     output:
     tuple val(scoremeta), path("*.scorefile.gz"), emit: scorefile
@@ -24,6 +24,7 @@ process MATCH_COMBINE {
     def ambig = params.keep_ambiguous       ? '--keep_ambiguous'    : ''
     def multi = params.keep_multiallelic    ? '--keep_multiallelic' : ''
     def split = !chrom.contains("ALL") ? '--split' : ''
+    def filter_mode = shared.name != 'NO_FILE' ? "" : '' // "--filter_IDs $shared" : ''
     scoremeta = [:]
     scoremeta.id = "$meta.id"
 
@@ -39,6 +40,7 @@ process MATCH_COMBINE {
         --min_overlap $params.min_overlap \
         $ambig \
         $multi \
+        $filter_mode \
         --outdir \$PWD \
         $split \
         -v
