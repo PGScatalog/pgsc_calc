@@ -18,12 +18,14 @@ process PLINK2_PROJECT {
     path "versions.yml", emit: versions
 
     script:
+    def args = task.ext.args ?: ''
     def input = (meta.is_pfile) ? '--pfile vzs' : '--bfile vzs'
     def mem_mb = task.memory.toMega() // plink is greedy
     """
     plink2 $input ${geno.simpleName} \
         --threads $task.cpus \
         --memory $mem_mb \
+        $args \
         --read-freq $afreq \
         --score $eigenvec 2 4 header-read variance-standardize cols=-scoreavgs,+scoresums \
         --score-col-nums 5-14 \
