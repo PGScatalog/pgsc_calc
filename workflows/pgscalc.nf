@@ -121,6 +121,11 @@ if (params.only_score) {
     run_apply_score = true
 }
 
+if (params.skip_ancestry) {
+    run_ancestry_assign = false
+    run_ancestry_adjust = false
+}
+
 if (!run_ancestry_assign && !run_ancestry_adjust) {
     run_ancestry_bootstrap = false
 }
