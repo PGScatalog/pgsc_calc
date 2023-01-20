@@ -25,17 +25,6 @@ workflow MATCH {
     // chromosomes. so if a groupKey size is not provided then nextflow must
     // wait for the entire process to finish before releasing the grouped
     // tuples. setting a groupKey size avoids lots of unnecessary waiting.
-
-    // TODO: this doesn't work with multiple input chromosomes! :|
-    // this is only needed to successfully join on the output of MATCH_VARIANTS.out.matches
-    ch_intersection.map {
-        tuple(it.first().subMap(['id', 'is_vcf', 'is_bfile', 'is_pfile']),
-              it.tail())
-    }
-        .map { it.flatten() }
-        .dump(tag:'intersected')
-        .set { ch_flat_intersection }
-
     MATCH_VARIANTS.out.matches.map{
         tuple(groupKey(it[0].subMap(['id', 'is_vcf', 'is_bfile', 'is_pfile']),
                        it[0].n_chrom),
@@ -44,12 +33,16 @@ workflow MATCH {
     }
         .groupTuple()
         .combine( scorefile )
-        .dump(tag: 'tupled_variants_output')
-        .join( ch_flat_intersection )
-        .dump(tag: 'match_variants_output')
         .set { ch_matches }
 
-    MATCH_COMBINE ( ch_matches )
+    // MATCH_COMBINE input note:
+    // ch_intersection and ch_matches sampleset order should be the same
+    // e.g.: ch_matches: [[id: cineca], chrom, [ipc0, ...], scorefile]
+    // ch_intersection: [[id: cineca], matched.txt.gz]
+    // normally there'd be a join to enforce sampleset order but things get
+    // unpleasant with optional inputs. how can you join on file('NO_FILE')??
+    // there's no meta key! do we do a fake meta key too?
+    MATCH_COMBINE ( ch_matches, ch_intersection )
     ch_versions = ch_versions.mix(MATCH_COMBINE.out.versions)
 
     MATCH_COMBINE.out.scorefile.subscribe onNext: { combine_fail = false },

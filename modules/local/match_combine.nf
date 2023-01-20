@@ -5,13 +5,14 @@ process MATCH_COMBINE {
     errorStrategy 'finish'
 
     conda (params.enable_conda ? "$projectDir/environments/pgscatalog_utils/environment.yml" : null)
-    def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/pgscatalog_utils:${params.platform}-0.3.0"
+    def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/pgscatalog_utils:${params.platform}-0.4.0"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/pgscatalog_utils:amd64-0.3.0' :
+        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/pgscatalog_utils:amd64-0.4.0' :
         dockerimg }"
 
     input:
-    tuple val(meta), val(chrom), path('???.ipc.zst'), path(scorefile), path(shared)
+    tuple val(meta), val(chrom), path('???.ipc.zst'), path(scorefile)
+    path(shared)
 
     output:
     tuple val(scoremeta), path("*.scorefile.gz"), emit: scorefile

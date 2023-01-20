@@ -16,7 +16,7 @@ process INTERSECT_VARIANTS {
         path(ref_geno), path(ref_pheno), path(ref_variants)
 
     output:
-    tuple val(meta), path("matched_variants.txt.gz"), emit: intersection
+    path("matched_variants.txt.gz"), emit: intersection
     path "versions.yml", emit: versions
 
     script:

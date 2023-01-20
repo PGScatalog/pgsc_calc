@@ -242,7 +242,7 @@ workflow PGSCALC {
             // intersected variants ( across ref & target ) are an optional input
             intersection = ANCESTRY_PROJECTION.out.intersection
         } else {
-            intersection = file('NO_FILE') // dummy file with fake name
+            intersection = Channel.of(file('NO_FILE')) // dummy file with fake name
         }
 
         MATCH (
