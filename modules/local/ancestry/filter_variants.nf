@@ -1,5 +1,5 @@
 process FILTER_VARIANTS {
-    tag "$meta.id $meta.build"
+    tag "$meta.build"
     label 'process_low'
 
     conda (params.enable_conda ? "bioconda::plink2==2.00a3.3" : null)
