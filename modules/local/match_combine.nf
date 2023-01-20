@@ -24,7 +24,8 @@ process MATCH_COMBINE {
     def ambig = params.keep_ambiguous       ? '--keep_ambiguous'    : ''
     def multi = params.keep_multiallelic    ? '--keep_multiallelic' : ''
     def split = !chrom.contains("ALL") ? '--split' : ''
-    def filter_mode = shared.name != 'NO_FILE' ? "" : '' // "--filter_IDs $shared" : ''
+    // TODO: just read the text file instead of cutting
+    def filter_mode = shared.name != 'NO_FILE' ? "--filter_IDs <(zcat $shared | cut -f 2 -d ' ')" : ''
     scoremeta = [:]
     scoremeta.id = "$meta.id"
 
