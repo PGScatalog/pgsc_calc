@@ -1,6 +1,6 @@
 process MATCH_COMBINE {
     tag "$meta.id"
-    scratch true
+    scratch (workflow.containerEngine == 'singularity' ? true : false)
     label 'process_medium'
     errorStrategy 'finish'
 

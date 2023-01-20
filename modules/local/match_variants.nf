@@ -1,6 +1,6 @@
 process MATCH_VARIANTS {
     tag "$meta.id chromosome $meta.chrom"
-    scratch true
+    scratch (workflow.containerEngine == 'singularity' ? true : false)
     label 'process_medium'
     errorStrategy 'finish'
 
