@@ -20,6 +20,22 @@ workflow ANCESTRY_PROJECTION {
     main:
     ch_versions = Channel.empty()
 
+    // sort order is _very important_
+    // input order to modules must always be: geno, pheno, variants, e.g.:
+    // .pgen, .psam, .pvar.zst in plink2
+    // .bed, .fam, .bim.zst in plink1
+    // it's assumed variants are zstd compressed at the start of the workflow
+    geno.concat(pheno, variants)
+        .groupTuple(size: 3, sort: { it.toString().split("\\.")[-1] } )
+        .set { ch_genomes }
+
+    ch_genomes.map {
+        if (it.first().chrom != 'ALL') {
+            log.error "ERROR: Ancestry projection not supported with split (per-chromosome) input datasets, try --skip_ancestry"
+            System.exit(1)
+        }
+    }
+
     //
     // STEP 0: extract the reference data once (don't do it inside separate processes)
     //
@@ -35,15 +51,6 @@ workflow ANCESTRY_PROJECTION {
     //
     // STEP 1: get overlapping variants across reference and target ------------
     //
-
-    // sort order is _very important_
-    // input order to modules must always be: geno, pheno, variants, e.g.:
-    // .pgen, .psam, .pvar.zst in plink2
-    // .bed, .fam, .bim.zst in plink1
-    // it's assumed variants are zstd compressed at the start of the workflow
-    geno.concat(pheno, variants)
-        .groupTuple(size: 3, sort: { it.toString().split("\\.")[-1] } )
-        .set { ch_genomes }
 
     ch_genomes
         .join(vmiss)
