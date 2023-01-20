@@ -191,11 +191,16 @@ workflow PGSCALC {
     scorefiles.collect().set{ ch_scorefiles }
 
     if (run_input_check) {
+        Channel.fromPath(params.hg19_chain, checkIfExists: true)
+            .mix(Channel.fromPath(params.hg38_chain, checkIfExists: true))
+            .collect()
+            .set { chain_files }
+
         INPUT_CHECK (
             ch_input,
             params.format,
             ch_scorefiles,
-            ch_reference
+            chain_files
         )
         ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
     }

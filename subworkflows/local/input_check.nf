@@ -10,7 +10,7 @@ workflow INPUT_CHECK {
     input // file: /path/to/samplesheet.csv
     format // csv or JSON
     scorefile // flat list of paths
-    reference
+    chain_files
 
     main:
     /* all genomic data should be represented as a list of : [[meta], file]
@@ -68,7 +68,7 @@ workflow INPUT_CHECK {
     }
         .set { ch_pfiles }
 
-    COMBINE_SCOREFILES ( scorefile, reference )
+    COMBINE_SCOREFILES ( scorefile, chain_files )
 
     versions = ch_versions.mix(COMBINE_SCOREFILES.out.versions)
 
