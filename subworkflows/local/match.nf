@@ -18,6 +18,7 @@ workflow MATCH {
         .set { ch_variants }
 
     MATCH_VARIANTS ( ch_variants )
+    ch_versions = ch_versions.mix(MATCH_VARIANTS.out.versions)
 
     // create custom groupKey() to set a different group size for each
     // sampleset.  different samplesets may have different numbers of
@@ -32,7 +33,8 @@ workflow MATCH {
               it.tail())
     }
         .map { it.flatten() }
-        .set { ch_intersection }
+        .dump(tag:'intersected')
+        .set { ch_flat_intersection }
 
     MATCH_VARIANTS.out.matches.map{
         tuple(groupKey(it[0].subMap(['id', 'is_vcf', 'is_bfile', 'is_pfile']),
@@ -42,16 +44,26 @@ workflow MATCH {
     }
         .groupTuple()
         .combine( scorefile )
-        .join( ch_intersection )
+        .dump(tag: 'tupled_variants_output')
+        .join( ch_flat_intersection )
         .dump(tag: 'match_variants_output')
-        .set { matches }
+        .set { ch_matches }
 
-    MATCH_COMBINE ( matches )
+    MATCH_COMBINE ( ch_matches )
+    ch_versions = ch_versions.mix(MATCH_COMBINE.out.versions)
 
-    ch_versions = ch_versions.mix(MATCH_VARIANTS.out.versions)
+    MATCH_COMBINE.out.scorefile.subscribe onNext: { combine_fail = false },
+        onComplete: { combine_error(combine_fail) }
 
     emit:
     scorefiles = MATCH_COMBINE.out.scorefile
     db         = MATCH_COMBINE.out.summary
     versions   = ch_versions
+}
+
+def combine_error(boolean fail) {
+    if (fail) {
+        log.error "ERROR: Final scorefile wasn't produced!"
+        System.exit(1)
+    }
 }

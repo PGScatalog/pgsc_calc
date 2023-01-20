@@ -252,6 +252,7 @@ workflow PGSCALC {
             INPUT_CHECK.out.scorefiles,
             intersection
         )
+        ch_versions = ch_versions.mix(MATCH.out.versions)
     }
 
 
