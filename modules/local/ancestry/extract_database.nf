@@ -1,6 +1,7 @@
 process EXTRACT_DATABASE {
     label 'process_low'
 
+    storeDir "$workDir/ref_extracted/"
     conda (params.enable_conda ? "$projectDir/environments/zstd/environment.yml" : null)
     def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/zstd:${params.platform}-1.5.2"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?

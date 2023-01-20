@@ -1,6 +1,7 @@
 process INTERSECT_VARIANTS {
     tag "$meta.id chromosome $meta.chrom"
     label 'process_high_memory'
+    storeDir "$workDir/intersected/$meta.id/$meta.chrom"
 
     conda (params.enable_conda ? "bioconda::plink2==2.00a3.3" : null)
     def dockerimg = "${ params.platform == 'amd64' ?
