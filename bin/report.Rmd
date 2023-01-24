@@ -168,6 +168,12 @@ log %>%
 #### Summary
 
 ```{r match_table, echo = FALSE}
+if (!"n_unmatched" %in% colnames(compat)) {
+  # handle missing column if one PGS matches perfectly
+  compat <- compat %>%
+    mutate(n_unmatched = 0) 
+}
+
 compat %>%
   select(sampleset, accession, n_variants, score_pass, percent_matched,
          n_matched, n_unmatched) %>%
