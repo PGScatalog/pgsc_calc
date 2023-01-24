@@ -91,6 +91,7 @@ jobs:
           - "plink2 testrelabelpvar"
           - "plink2 vcf"          
           - "test apply score subworkflow"
+          - "test perfect apply score"
           - "test input check subworkflow"
           - "test input check subworkflow with PGS catalog API"
           - "test input check subworkflow with PGS catalog API and whitespace"
