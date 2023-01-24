@@ -8,6 +8,15 @@ will only occur in major versions with changes noted in this changelog.
 
 .. _`semantic versioning`: https://semver.org/
 
+pgsc_calc v1.3.1 (2022-01-24)
+-----------------------------
+
+This patch fixes a bug that breaks the workflow if all variants in one or more
+PGS scoring files match perfectly with the target genomes. Thanks to
+`@lemieuxl`_ for reporting the problem!
+
+.. _`@lemieuxl`: https://github.com/PGScatalog/pgsc_calc/issues/75
+
 pgsc_calc v1.3.0 (2022-11-21)
 -----------------------------
 
