@@ -169,7 +169,7 @@ log %>%
 
 ```{r match_table, echo = FALSE}
 if (!"n_unmatched" %in% colnames(compat)) {
-  # handle missing column if one PGS matches perfectly
+  # handle missing column if all PGS matches perfectly (e.g. no unmatched or excluded variants)
   compat <- compat %>%
     mutate(n_unmatched = 0) 
 }
