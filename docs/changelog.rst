@@ -8,6 +8,16 @@ will only occur in major versions with changes noted in this changelog.
 
 .. _`semantic versioning`: https://semver.org/
 
+pgsc_calc v1.3.2 (2022-01-27)
+-----------------------------
+
+This patch fixes a bug that made some PGS Catalog scoring files incompatible
+with the pipeline. Effect weights were sometimes set to utf-8 strings instead of
+floating point numbers, which caused an assertion error. Thanks to `@j0n-a`_ for
+reporting the problem.
+
+.. _`@j0n-a`: https://github.com/PGScatalog/pgsc_calc/issues/79
+
 pgsc_calc v1.3.1 (2022-01-24)
 -----------------------------
 
