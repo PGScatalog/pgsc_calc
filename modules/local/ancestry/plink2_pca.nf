@@ -27,7 +27,7 @@ process PLINK2_PCA {
         --pfile vzs ${geno.simpleName} \
         --extract $pruned \
         --freq \
-        --pca biallelic-var-wts \
+        --pca biallelic-var-wts 20 \
         --out ${geno.simpleName}_pcs_ref
 
     cat <<-END_VERSIONS > versions.yml

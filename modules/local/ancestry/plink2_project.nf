@@ -28,7 +28,7 @@ process PLINK2_PROJECT {
         $args \
         --read-freq $afreq \
         --score $eigenvec 2 4 header-read variance-standardize cols=-scoreavgs,+scoresums \
-        --score-col-nums 5-14 \
+        --score-col-nums 5-24 \
         --out ${geno.simpleName}_proj
 
     cat <<-END_VERSIONS > versions.yml
