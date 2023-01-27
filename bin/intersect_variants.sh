@@ -4,7 +4,7 @@
 # handles variants that have been ref / alt swapped but not flipped
 #
 # usage:
-# bash intersect_variants.sh <path/to/reference/pvar> </path/to/target> <pvar or bim>
+# bash intersect_variants.sh <path/to/reference/pvar> </path/to/target> <pvar or bim> <chrom or ALL>
 #
 # use process substition to pass decompressed data to sh, if needed
 # e.g. <(zstdcat compressed.pvar.zst)
@@ -15,14 +15,29 @@ set -euxo pipefail
 i_reference=$1
 i_target=$2
 target_format=$3
+chrom=$4
+
+validate_chrom() { echo "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y" | grep -F -q -w "$1"; }
 
 # reference is always pvar
 echo -e "CHR:POS:A0:A1\tID_REF\tREF_REF\tIS_INDEL\tSTRANDAMB\tIS_MA_REF" > ref_variants.txt
-    awk '!/^#/ {split($5, ALT, ",");
-          for (a in ALT){
-            if($4 < ALT[a]) print $1":"$2":"$4":"ALT[a], $3, $4, (length($4) > 1 || length(ALT[a]) > 1), ($4 ALT[a] == "AT" || $4 ALT[a] == "TA" || $4 ALT[a] == "CG" || $4 ALT[a] == "GC"), (length(ALT) > 1);
-            else print $1":"$2":"ALT[a]":"$4, $3, $4, (length($4) > 1 || length(ALT[a]) > 1), ($4 ALT[a] == "AT" || $4 ALT[a] == "TA" || $4 ALT[a] == "CG" || $4 ALT[a] == "GC"), (length(ALT) > 1)
-          }}' $i_reference | sort >> ref_variants.txt
+if [ "$chrom" == "ALL" ]; then
+  awk '!/^#/ {split($5, ALT, ",");
+    for (a in ALT){
+      if($4 < ALT[a]) print $1":"$2":"$4":"ALT[a], $3, $4, (length($4) > 1 || length(ALT[a]) > 1), ($4 ALT[a] == "AT" || $4 ALT[a] == "TA" || $4 ALT[a] == "CG" || $4 ALT[a] == "GC"), (length(ALT) > 1);
+      else print $1":"$2":"ALT[a]":"$4, $3, $4, (length($4) > 1 || length(ALT[a]) > 1), ($4 ALT[a] == "AT" || $4 ALT[a] == "TA" || $4 ALT[a] == "CG" || $4 ALT[a] == "GC"), (length(ALT) > 1)
+    }}' $i_reference | sort >> ref_variants.txt
+elif validate_chrom $chrom; then
+  echo $chrom
+  awk -v chrom="$chrom" '!/^#/ && ($1 == chrom) {split($5, ALT, ",");
+    for (a in ALT){
+      if($4 < ALT[a]) print $1":"$2":"$4":"ALT[a], $3, $4, (length($4) > 1 || length(ALT[a]) > 1), ($4 ALT[a] == "AT" || $4 ALT[a] == "TA" || $4 ALT[a] == "CG" || $4 ALT[a] == "GC"), (length(ALT) > 1);
+      else print $1":"$2":"ALT[a]":"$4, $3, $4, (length($4) > 1 || length(ALT[a]) > 1), ($4 ALT[a] == "AT" || $4 ALT[a] == "TA" || $4 ALT[a] == "CG" || $4 ALT[a] == "GC"), (length(ALT) > 1)
+    }}' $i_reference | sort >> ref_variants.txt
+else
+  echo "${chrom} is not a valid option, only {1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y} are currently accepted"
+  exit 1
+fi
 
 # handle target (in multiple formats)
 echo -e "CHR:POS:A0:A1\tID_TARGET\tREF_TARGET\tIS_MA_TARGET" > target_variants.txt

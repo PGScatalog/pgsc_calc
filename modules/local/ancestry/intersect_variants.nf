@@ -22,11 +22,12 @@ process INTERSECT_VARIANTS {
     script:
     def mem_mb = task.memory.toMega() // plink is greedy
     def file_format = meta.is_pfile ? 'pvar' : 'bim'
+    def chrom = "ALL" // ToDo: edit this to specify current chromosome
 
     """
     intersect_variants.sh <(plink2 --zst-decompress $ref_variants) \
         <(plink2 --zst-decompress $variants) \
-        $file_format
+        $file_format $chrom
 
     gzip matched_variants.txt
 
