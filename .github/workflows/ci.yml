@@ -21,7 +21,7 @@ jobs:
       fail-fast: false        
       matrix:
         test_profile: ["test", "test_json"]
-        profile: ["docker"]
+        profile: ["docker", "singularity"]
         include:
           # Test pipeline minimum Nextflow version
           - NXF_VER: '21.04.0'
