@@ -12,15 +12,17 @@
 set -euxo pipefail
 
 # Inputs
-i_reference=$1
-i_target=$2
-target_format=$3
-chrom=$4
+i_reference=$1 # path/to/REFERENCE/pvar (or decompressed stdin)
+i_target=$2 # path/to/TARGET/pvar (or decompressed stdin)
+target_format=$3 # format of target pvar
+chrom=$4 # whether to limit matches to specific chromosome of the reference
 
+chr_list="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y"
 validate_chrom() { echo "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y" | grep -F -q -w "$1"; }
 
 # reference is always pvar
 echo -e "CHR:POS:A0:A1\tID_REF\tREF_REF\tIS_INDEL\tSTRANDAMB\tIS_MA_REF" > ref_variants.txt
+## Decide how to handle chromosome
 if [ "$chrom" == "ALL" ]; then
   awk '!/^#/ {split($5, ALT, ",");
     for (a in ALT){
@@ -28,30 +30,29 @@ if [ "$chrom" == "ALL" ]; then
       else print $1":"$2":"ALT[a]":"$4, $3, $4, (length($4) > 1 || length(ALT[a]) > 1), ($4 ALT[a] == "AT" || $4 ALT[a] == "TA" || $4 ALT[a] == "CG" || $4 ALT[a] == "GC"), (length(ALT) > 1)
     }}' $i_reference | sort >> ref_variants.txt
 elif validate_chrom $chrom; then
-  echo $chrom
-  awk -v chrom="$chrom" '!/^#/ && ($1 == chrom) {split($5, ALT, ",");
+  awk -v filter_chrom=$chrom '!/^#/ && ($1 == filter_chrom) {split($5, ALT, ",");
     for (a in ALT){
       if($4 < ALT[a]) print $1":"$2":"$4":"ALT[a], $3, $4, (length($4) > 1 || length(ALT[a]) > 1), ($4 ALT[a] == "AT" || $4 ALT[a] == "TA" || $4 ALT[a] == "CG" || $4 ALT[a] == "GC"), (length(ALT) > 1);
       else print $1":"$2":"ALT[a]":"$4, $3, $4, (length($4) > 1 || length(ALT[a]) > 1), ($4 ALT[a] == "AT" || $4 ALT[a] == "TA" || $4 ALT[a] == "CG" || $4 ALT[a] == "GC"), (length(ALT) > 1)
     }}' $i_reference | sort >> ref_variants.txt
 else
-  echo "${chrom} is not a valid option, only {1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y} are currently accepted"
+  echo "${chrom} is not a valid option, only {$chr_list} are currently accepted"
   exit 1
 fi
 
 # handle target (in multiple formats)
 echo -e "CHR:POS:A0:A1\tID_TARGET\tREF_TARGET\tIS_MA_TARGET" > target_variants.txt
 if [ "$target_format" == "pvar" ]; then
-    awk '!/^#/ {split($5, ALT, ",");
-          for (a in ALT){
-            if($4 < ALT[a]) print $1":"$2":"$4":"ALT[a], $3, $4, (length(ALT) > 1);
-            else print $1":"$2":"ALT[a]":"$4, $3, $4, (length(ALT) > 1)
-          }}' $i_target | sort >> target_variants.txt
+  awk '!/^#/ {split($5, ALT, ",");
+    for (a in ALT){
+      if($4 < ALT[a]) print $1":"$2":"$4":"ALT[a], $3, $4, (length(ALT) > 1);
+      else print $1":"$2":"ALT[a]":"$4, $3, $4, (length(ALT) > 1)
+    }}' $i_target | sort >> target_variants.txt
 elif [ "$target_format" == "bim" ]; then
-    awk '!/^#/ {
+  awk '!/^#/ {
     if($5 < $6) print $1":"$4":"$5":"$6, $2, $6, 0;
     else print $1":"$4":"$6":"$5, $2, $6, 0
-    }' $i_target | sort >> target_variants.txt
+  }' $i_target | sort >> target_variants.txt
 else
   echo "${target_format} is not a valid option (only pvar and bim are currently accepted)"
   exit 1
