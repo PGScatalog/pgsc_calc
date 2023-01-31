@@ -81,25 +81,34 @@ if (params.only_bootstrap) {
     run_make_compatible = false
     run_match = false
     run_ancestry_assign = false
-    run_ancestry_adjust = false
+    run_ancestry_adjust = true
     run_apply_score = false
 }
 
 if (params.only_input) {
-    run_ancestry_bootstrap = false
+    run_ancestry_bootstrap = true
     run_input_check = true
     run_make_compatible = false
     run_match = false
-    run_ancestry_assign = false
+    run_ancestry_assign = true
     run_apply_score = false
 }
 
 if (params.only_compatible) {
-    run_ancestry_bootstrap = false
+    run_ancestry_bootstrap = true
     run_input_check = true
     run_make_compatible = true
     run_match = false
-    run_ancestry_assign = false
+    run_ancestry_assign = true
+    run_apply_score = false
+}
+
+if (params.only_match) {
+    run_ancestry_bootstrap = true
+    run_input_check = true
+    run_make_compatible = true
+    run_match = true
+    run_ancestry_assign = true
     run_apply_score = false
 }
 
@@ -117,7 +126,7 @@ if (params.only_score) {
     run_input_check = true
     run_make_compatible = true
     run_match = true
-    run_ancestry_assign = false
+    run_ancestry_assign = true
     run_apply_score = true
 }
 
