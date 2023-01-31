@@ -1,19 +1,19 @@
 process PLINK2_RELABELBIM {
-    tag "$meta.id chromosome $meta.chrom"
+    // labels are defined in conf/modules.config
+    label 'process_low'
+    label "${ params.copy_genomes ? 'copy_genomes' : '' }"
+    label "plink2" // controls conda, docker, + singularity options
 
+    tag "$meta.id chromosome $meta.chrom"
     storeDir ( params.genotypes_cache ? "$params.genotypes_cache/${meta.id}/${meta.build}/${meta.chrom}" :
               "$workDir/genomes/${meta.id}/${meta.build}/${meta.chrom}/")
 
-    label 'process_low'
-    label "${ params.copy_genomes ? 'copy_genomes' : '' }"
+    conda (params.enable_conda ? "${task.ext.conda}" : null)
 
-    conda (params.enable_conda ? "bioconda::plink2==2.00a3.3" : null)
-    def dockerimg = "${ params.platform == 'amd64' ?
-        'quay.io/biocontainers/plink2:2.00a3.3--hb2a7ceb_0' :
-        'dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/plink2:arm64-2.00a3.3' }"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/plink2:2.00a3.3--hb2a7ceb_0' :
-        dockerimg }"
+    container "${ workflow.containerEngine == 'singularity' &&
+        !task.ext.singularity_pull_docker_container ?
+        "${task.ext.singularity}${task.ext.singularity_version}" :
+        "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
     // input is sorted alphabetically -> bed, bim, fam or pgen, psam, pvar

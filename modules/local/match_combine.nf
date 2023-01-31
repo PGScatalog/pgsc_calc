@@ -1,14 +1,17 @@
 process MATCH_COMBINE {
-    tag "$meta.id"
-    scratch (workflow.containerEngine == 'singularity' ? true : false)
+    // labels are defined in conf/modules.config
     label 'process_medium'
-    errorStrategy 'finish'
+    label 'pgscatalog_utils' // controls conda, docker, + singularity options
 
-    conda (params.enable_conda ? "$projectDir/environments/pgscatalog_utils/environment.yml" : null)
-    def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/pgscatalog_utils:${params.platform}-0.4.0"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/pgscatalog_utils:amd64-0.4.0' :
-        dockerimg }"
+    tag "$meta.id"
+    scratch (workflow.containerEngine == 'singularity' || params.parallel ? true : false)
+
+    conda (params.enable_conda ? "${task.ext.conda}" : null)
+
+    container "${ workflow.containerEngine == 'singularity' &&
+        !task.ext.singularity_pull_docker_container ?
+        "${task.ext.singularity}${task.ext.version}" :
+        "${task.ext.docker}${task.ext.version}" }"
 
     input:
     tuple val(meta), val(chrom), path('???.ipc.zst'), path(scorefile)

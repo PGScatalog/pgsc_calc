@@ -1,12 +1,16 @@
 process MAKE_DATABASE {
+    // labels are defined in conf/modules.config
     label 'process_low'
+    label 'zstd' // controls conda, docker, + singularity options
+
     storeDir "$workDir/reference"
 
-    conda (params.enable_conda ? "$projectDir/environments/zstd/environment.yml" : null)
-    def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/zstd:${params.platform}-1.5.2"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/zstd:amd64-1.5.2' :
-        dockerimg }"
+    conda (params.enable_conda ? "${task.ext.conda}" : null)
+
+    container "${ workflow.containerEngine == 'singularity' &&
+        !task.ext.singularity_pull_docker_container ?
+        "${task.ext.singularity}${task.ext.version}" :
+        "${task.ext.docker}${task.ext.version}" }"
 
     input:
     path '*'

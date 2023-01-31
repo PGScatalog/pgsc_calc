@@ -1,11 +1,13 @@
 process SCORE_REPORT {
     label 'process_high_memory'
+    label 'report'
 
-    def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/report:${params.platform}-2.14"
-    conda (params.enable_conda ? "$projectDir/environments/report/environment.yml" : null)
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/report:2.14' :
-        dockerimg }"
+    conda (params.enable_conda ? "${task.ext.conda}" : null)
+
+    container "${ workflow.containerEngine == 'singularity' &&
+        !task.ext.singularity_pull_docker_container ?
+        "${task.ext.singularity}${task.ext.version}" :
+        "${task.ext.docker}${task.ext.version}" }"
 
     input:
     path scorefiles

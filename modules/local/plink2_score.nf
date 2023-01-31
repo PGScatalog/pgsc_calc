@@ -1,14 +1,16 @@
 process PLINK2_SCORE {
-    tag "$meta.id chromosome $meta.chrom effect type $scoremeta.effect_type"
+    // labels are defined in conf/modules.config
     label 'process_low'
+    label 'plink2' // controls conda, docker, + singularity options
 
-    conda (params.enable_conda ? "bioconda::plink2==2.00a3.3" : null)
-    def dockerimg = "${ params.platform == 'amd64' ?
-        'quay.io/biocontainers/plink2:2.00a3.3--hb2a7ceb_0' :
-        'dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/plink2:arm64-2.00a3.3' }"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/plink2:2.00a3.3--hb2a7ceb_0' :
-        dockerimg }"
+    tag "$meta.id chromosome $meta.chrom effect type $scoremeta.effect_type"
+
+    conda (params.enable_conda ? "${task.ext.conda}" : null)
+
+    container "${ workflow.containerEngine == 'singularity' &&
+        !task.ext.singularity_pull_docker_container ?
+        "${task.ext.singularity}${task.ext.singularity_version}" :
+        "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
     tuple val(meta), path(geno), path(pheno), path(variants), val(scoremeta), path(scorefile)

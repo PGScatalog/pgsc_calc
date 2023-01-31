@@ -1,14 +1,18 @@
 process MATCH_VARIANTS {
-    tag "$meta.id chromosome $meta.chrom"
-    scratch (workflow.containerEngine == 'singularity' ? true : false)
+    // labels are defined in conf/modules.config
     label 'process_medium'
+    label 'pgscatalog_utils' // controls conda, docker, + singularity options
+
+    tag "$meta.id chromosome $meta.chrom"
+    scratch (workflow.containerEngine == 'singularity' || params.parallel ? true : false)
     errorStrategy 'finish'
 
-    conda (params.enable_conda ? "$projectDir/environments/pgscatalog_utils/environment.yml" : null)
-    def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/pgscatalog_utils:${params.platform}-0.3.0"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/pgscatalog_utils:amd64-0.3.0' :
-        dockerimg }"
+    conda (params.enable_conda ? "${task.ext.conda}" : null)
+
+    container "${ workflow.containerEngine == 'singularity' &&
+        !task.ext.singularity_pull_docker_container ?
+        "${task.ext.singularity}${task.ext.version}" :
+        "${task.ext.docker}${task.ext.version}" }"
 
     input:
     tuple val(meta), path(pvar), path(scorefile)
