@@ -14,4 +14,11 @@
     - path: output/match/cineca-synthetic-subset_22_additive_0.scorefile.gz
     - path: output/match/cineca-synthetic-subset_log.csv.gz
     - path: output/score/report.html
-      
+
+# TODO: fix overlap -> 1 in pgscatalog_utils
+- name: test perfect apply score
+  command: nextflow run main.nf -profile test --only_score -c ./tests/config/nextflow.config --scorefile ./tests/subworkflows/perfect.txt 
+  tags:
+    - applyscore
+    - subworkflow
+    - fast    

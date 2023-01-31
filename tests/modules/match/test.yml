@@ -8,8 +8,8 @@
   files:
     - path: output/match/versions.yml
       contains:
-        - "pgscatalog_utils: 0.3.0"
-        
+        - "pgscatalog_utils: 0.3.1"
+
 - name: test match combine module
   command: nextflow run ./tests/modules/match -entry testmatchcombine -c ./tests/config/nextflow.config -profile test
   tags:
@@ -20,7 +20,7 @@
   files:
     - path: output/match/versions.yml
       contains:
-        - "pgscatalog_utils: 0.3.0"
+        - "pgscatalog_utils: 0.3.1"
     - path: output/match/test_ALL_additive_0.scorefile.gz
       contains:
         - "ID"
@@ -35,8 +35,3 @@
         - "other_allele"
         - "effect_weight"
         - "effect_type"
-          
-    
-    
-    
-    
