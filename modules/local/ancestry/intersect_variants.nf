@@ -18,20 +18,19 @@ process INTERSECT_VARIANTS {
         path(ref_geno), path(ref_pheno), path(ref_variants)
 
     output:
-    path("matched_variants.txt.gz"), emit: intersection
+    path("${meta.id}_${meta.chrom}_matched.txt.gz"), emit: intersection
     path "versions.yml", emit: versions
 
     script:
     def mem_mb = task.memory.toMega() // plink is greedy
     def file_format = meta.is_pfile ? 'pvar' : 'bim'
-    def chrom = "ALL" // ToDo: edit this to specify current chromosome
-
     """
     intersect_variants.sh <(plink2 --zst-decompress $ref_variants) \
         <(plink2 --zst-decompress $variants) \
-        $file_format $chrom
+        $file_format $meta.chrom
 
-    gzip matched_variants.txt
+    mv matched_variants.txt ${meta.id}_${meta.chrom}_matched.txt
+    gzip *.txt
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
