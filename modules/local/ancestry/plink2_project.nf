@@ -17,6 +17,7 @@ process PLINK2_PROJECT {
 
     output:
     tuple val(meta), path("*_proj.sscore"), emit: projections
+    path "*.{.sscore.vars}", emit: vars_projected
     path "versions.yml", emit: versions
 
     script:
@@ -29,7 +30,7 @@ process PLINK2_PROJECT {
         --memory $mem_mb \
         $args \
         --read-freq $afreq \
-        --score $eigenvec 2 4 header-read variance-standardize cols=-scoreavgs,+scoresums \
+        --score $eigenvec 2 4 header-read variance-standardize cols=-scoreavgs,+scoresums list-variants \
         --score-col-nums 5-24 \
         --out ${geno.simpleName}_proj
 

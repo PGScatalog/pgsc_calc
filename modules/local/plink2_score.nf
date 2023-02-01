@@ -17,6 +17,7 @@ process PLINK2_SCORE {
 
     output:
     path "*.{sscore,sscore.zst}", emit: scores  // optional compression
+    path "*.{.sscore.vars}", emit: vars_scored
     path "versions.yml", emit: versions
     path "*.log"       , emit: log
 
@@ -35,7 +36,7 @@ process PLINK2_SCORE {
     def recessive = (scoremeta.effect_type == 'recessive') ? ' recessive ' : ''
     def dominant = (scoremeta.effect_type == 'dominant') ? ' dominant ' : ''
 
-    args2 = [args2, cols, no_imputation, recessive, dominant].join(' ')
+    args2 = [args2, cols, 'list-variants', no_imputation, recessive, dominant].join(' ')
 
     if (scoremeta.n_scores == 1)
         """
