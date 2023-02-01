@@ -45,6 +45,7 @@ workflow MATCH {
     MATCH_COMBINE ( ch_matches, ch_intersection )
     ch_versions = ch_versions.mix(MATCH_COMBINE.out.versions)
 
+    def combine_fail = true
     MATCH_COMBINE.out.scorefile.subscribe onNext: { combine_fail = false },
         onComplete: { combine_error(combine_fail) }
 
