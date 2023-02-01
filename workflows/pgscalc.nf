@@ -90,7 +90,7 @@ if (params.only_input) {
     run_input_check = true
     run_make_compatible = false
     run_match = false
-    run_ancestry_assign = true
+    run_ancestry_assign = false
     run_apply_score = false
 }
 
