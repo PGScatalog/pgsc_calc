@@ -79,14 +79,23 @@ workflow ANCESTRY_PROJECTION {
         .join(ch_king)
         .set{ ch_king_and_ld }
 
-    ch_db
-        // TODO: is intersection meta important? it's included but not used
-        .combine( INTERSECT_VARIANTS.out.intersection )
-        .map { it -> [it.first().subMap(['build']), it] }
-        .combine ( ch_king_and_ld, by: 0 )
-        .map { it.tail() }
-        .map { it.flatten() }
-        .set{ ch_filter_input }
+    // groupTuple always needs a size, so outputs can be streamed to the next process when they're ready
+    // however, n_chrom may be different depending on sampleset
+    // so construct a special groupKey to handle the case of multiple samplesets
+    INTERSECT_VARIANTS.out.intersection
+        .map { tuple(groupKey(it.first().subMap('id', 'build'), it.first().n_chrom), it.last()) }
+        .groupTuple()
+        // temporarily set build as key for joining with reference data
+        .map { it -> tuple(it.first().subMap(['build']), it) }
+        .set { ch_intersected }
+
+    ch_intersected
+        .combine(ch_db, by: 0 )
+        .combine(ch_king_and_ld, by: 0 )
+        // this seems like an unpleasant way to do things. how to flatten one level of a groovy list?
+        // [meta.id, meta.build], list[intersected], ref_geno, ref_var, ref_pheno, ld, king
+        .map { tuple(it[1][0], it[1][1], it[2], it[3], it[4], it[5], it[6]) }
+        .set { ch_filter_input }
 
     FILTER_VARIANTS ( ch_filter_input )
 
