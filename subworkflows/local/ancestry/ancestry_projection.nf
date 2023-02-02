@@ -29,13 +29,6 @@ workflow ANCESTRY_PROJECTION {
         .groupTuple(size: 3, sort: { it.toString().split("\\.")[-1] } )
         .set { ch_genomes }
 
-    ch_genomes.map {
-        if (it.first().chrom != 'ALL') {
-            log.error "ERROR: Ancestry projection not supported with split (per-chromosome) input datasets, try --skip_ancestry"
-            System.exit(1)
-        }
-    }
-
     //
     // STEP 0: extract the reference data once (don't do it inside separate processes)
     //
