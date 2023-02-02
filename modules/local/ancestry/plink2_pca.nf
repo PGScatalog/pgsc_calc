@@ -14,8 +14,8 @@ process PLINK2_PCA {
     tuple val(meta), path(geno), path(pheno), path(variants), path(pruned)
 
     output:
-    tuple val(meta), path("*.afreq"), emit: afreq
-    tuple val(meta), path("*.eigenvec.var"), emit: eigenvec_var
+    path("*.afreq"), emit: afreq
+    path("*.eigenvec.var"), emit: eigenvec_var
     path "versions.yml", emit: versions
 
     script:
