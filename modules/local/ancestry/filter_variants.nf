@@ -17,15 +17,15 @@ process FILTER_VARIANTS {
         path(ld), path(king)
 
     output:
-    tuple val(meta), path("*_reference.pgen"), path("*_reference.psam"), path("*_reference.pvar.zst"), emit: ref
-    tuple val(meta), path("*thinned.prune.in.gz"), emit: prune_in
+    tuple val(build), path("*_reference.pgen"), path("*_reference.psam"), path("*_reference.pvar.zst"), emit: ref
+    tuple val(build), path("*thinned.prune.in.gz"), emit: prune_in
     path "versions.yml", emit: versions
 
     script:
     def mem_mb = task.memory.toMega() // plink is greedy
-
     // dynamic input option
     def input = (meta.is_pfile) ? '--pfile vzs' : '--bfile vzs'
+    build = meta.subMap('build')
     """
     # 1. Get QC'd variant set & unrelated samples from REFERENCE data for PCA --
 
