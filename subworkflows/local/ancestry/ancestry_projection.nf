@@ -6,6 +6,7 @@ include { EXTRACT_DATABASE } from '../../../modules/local/ancestry/extract_datab
 include { INTERSECT_VARIANTS } from '../../../modules/local/ancestry/intersect_variants'
 include { FILTER_VARIANTS } from '../../../modules/local/ancestry/filter_variants'
 include { PLINK2_PCA } from '../../../modules/local/ancestry/plink2_pca'
+include { RELABEL_IDS } from '../../../modules/local/ancestry/relabel_ids'
 include { PLINK2_PROJECT } from '../../../modules/local/ancestry/plink2_project'
 
 workflow ANCESTRY_PROJECTION {
@@ -102,15 +103,21 @@ workflow ANCESTRY_PROJECTION {
 
     PLINK2_PCA ( ch_pca_input )
     ch_versions = ch_versions.mix(PLINK2_PCA.out.versions)
-    
+
     //
-    // STEP 3: Project reference and target samples into PCA space -------------
+    // STEP 3: Rekey
     //
 
     PLINK2_PCA.out.afreq
         .concat(PLINK2_PCA.out.eigenvec_var)
-        .groupTuple()
-        .set{ ch_pca_output }
+        .set { ch_pca_output }
+
+    ch_intersected
+        .map { tuple(it[1][0], it[1][1]) }
+        .combine( ch_pca_output )
+        .set { ch_relabel_input }
+
+    RELABEL_IDS( ch_relabel_input )
 
     ch_genomes
         .map { it -> [it.first().subMap(['build']), it] }
