@@ -1,20 +1,20 @@
 process FILTER_VARIANTS {
     // labels are defined in conf/modules.config
     label 'process_low'
-    label 'pgscatalog_utils' // controls conda, docker, + singularity options
+    label 'plink2' // controls conda, docker, + singularity options
 
-    tag "$meta.build"
+    tag "$meta.id $meta.build"
 
     conda (params.enable_conda ? "${task.ext.conda}" : null)
 
     container "${ workflow.containerEngine == 'singularity' &&
         !task.ext.singularity_pull_docker_container ?
-        "${task.ext.singularity}${task.ext.version}" :
-        "${task.ext.docker}${task.ext.version}" }"
+        "${task.ext.singularity}${task.ext.singularity_version}" :
+        "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
-    tuple val(meta), path(ref_geno), path(ref_pheno), path(ref_var),
-        val(matchmeta), path(shared), path(ld), path(king)
+    tuple val(meta), path(shared), path(ref_geno), path(ref_pheno), path(ref_var),
+        path(ld), path(king)
 
     output:
     tuple val(meta), path("*_reference.pgen"), path("*_reference.psam"), path("*_reference.pvar.zst"), emit: ref
