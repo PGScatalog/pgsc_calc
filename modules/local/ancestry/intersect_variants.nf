@@ -18,12 +18,13 @@ process INTERSECT_VARIANTS {
         path(ref_geno), path(ref_pheno), path(ref_variants)
 
     output:
-    path("${meta.id}_${meta.chrom}_matched.txt.gz"), emit: intersection
+    tuple val(id), path("${meta.id}_${meta.chrom}_matched.txt.gz"), emit: intersection
     path "versions.yml", emit: versions
 
     script:
     def mem_mb = task.memory.toMega() // plink is greedy
     def file_format = meta.is_pfile ? 'pvar' : 'bim'
+    id = meta.subMap('id', 'build', 'n_chrom')
     """
     intersect_variants.sh <(plink2 --zst-decompress $ref_variants) \
         <(plink2 --zst-decompress $variants) \
