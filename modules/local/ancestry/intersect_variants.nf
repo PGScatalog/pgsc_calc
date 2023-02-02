@@ -24,7 +24,7 @@ process INTERSECT_VARIANTS {
     script:
     def mem_mb = task.memory.toMega() // plink is greedy
     def file_format = meta.is_pfile ? 'pvar' : 'bim'
-    id = meta.subMap('id', 'build', 'n_chrom')
+    id = meta.subMap('id', 'build', 'n_chrom', 'chrom')
     """
     intersect_variants.sh <(plink2 --zst-decompress $ref_variants) \
         <(plink2 --zst-decompress $variants) \
