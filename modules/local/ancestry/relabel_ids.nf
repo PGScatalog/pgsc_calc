@@ -3,6 +3,8 @@ process RELABEL_IDS {
     label 'process_low'
     label 'pgscatalog_utils' // controls conda, docker, + singularity options
 
+    tag "$meta.id $target_format"
+
     conda (params.enable_conda ? "${task.ext.conda}" : null)
 
     container "${ workflow.containerEngine == 'singularity' &&
@@ -14,19 +16,20 @@ process RELABEL_IDS {
     tuple val(meta), path(matched), path(target)
 
     output:
-    tuple val(meta), path("*.var")
+    tuple val(relabel_meta), path("${meta.id}*"), emit: relabelled
     path "versions.yml", emit: versions
 
     script:
+    relabel_meta = meta.subMap('id', 'build')  // workaround for .clone() failing on a groupKey
+    target_format = target.getExtension() == 'var' ? 'var' : 'afreq'
+    relabel_meta.target_format = target_format
     """
     relabel_ids.py --maps <(zcat $matched) \
         --col_from ID_REF \
         --col_to ID_TARGET \
         --target_file $target \
         --target_col ID \
-        --out ${meta.id}_${target.getExtension()}
-
-    # todo: compress output
+        --out ${meta.id}.${target.getExtension()}
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
