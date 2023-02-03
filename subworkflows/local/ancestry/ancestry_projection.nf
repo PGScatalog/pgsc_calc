@@ -77,7 +77,8 @@ workflow ANCESTRY_PROJECTION {
     // however, n_chrom may be different depending on sampleset
     // so construct a special groupKey to handle the case of multiple samplesets
     INTERSECT_VARIANTS.out.intersection
-        .map { tuple(groupKey(it.first().subMap('id', 'build'), it.first().n_chrom), it.last()) }
+        .map { tuple(groupKey(it.first().subMap('id', 'build'), it.first().n_chrom),
+                     it.last()) }
         .groupTuple()
         // temporarily set build as key for joining with reference data
         .map { it -> tuple(it.first().subMap(['build']), it) }
@@ -105,7 +106,7 @@ workflow ANCESTRY_PROJECTION {
     ch_versions = ch_versions.mix(PLINK2_PCA.out.versions)
 
     //
-    // STEP 3: Rekey
+    // STEP 3: Rekey PCA output for use on target datasets ---------------------
     //
 
     PLINK2_PCA.out.afreq
@@ -129,7 +130,7 @@ workflow ANCESTRY_PROJECTION {
         .set { ch_relabel_output }
 
     //
-    // STEP 3: Project reference and target samples into PCA space -------------
+    // STEP 4: Project reference and target samples into PCA space -------------
     //
 
     ch_genomes
@@ -146,19 +147,46 @@ workflow ANCESTRY_PROJECTION {
         // [meta, geno, pheno, var, eigenvec, afreq]
         .set { ch_target_project_input }
 
-    // TO DO: double check projection should use QC'd data or raw data?
-    ch_db
-        .filter { it.first().get('build') == params.target_build }
-        .combine ( ch_pca_output, by: 0 )
-    // add is_pfile to meta map, because PLINK2_PROJECT must handle bfile or pfile
-        .map { it -> [['build': params.target_build, 'chrom': 'ALL',
-                       'id': 'reference', 'is_pfile': true], it.tail()] }
-        .map { it.flatten() }
-        .concat ( ch_target_project_input )
-        .dump(tag: 'all_project_input')
-        .set { ch_all_project_input }
+    // associate the reference database with each unique sampleset
+    // so it's possible to join the reference channel with the rekeyed data
 
-    PLINK2_PROJECT( ch_all_project_input )
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // TODO: think about this again
+    //   - it's running the reference projection once per sampleset
+    //   - afreq and vars are taken from the associated sampleset
+    //   - should we project the reference data once and combine the results with
+    //   each sampleset?
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    ch_genomes.map { it.first().id }.unique().set { ch_samplesets }
+
+    ch_db
+        .combine( ch_samplesets )
+        .map {
+            // cloning because don't want to modify meta object in place
+            m = it.first().clone()
+            m.id = it.last()
+            it.removeLast()
+            return tuple(m, it.tail()).flatten()
+        }
+        .combine ( ch_relabel_output.var, by: 0 )
+        .combine ( ch_relabel_output.afreq, by: 0 )
+        .map { m = it.first().clone()
+              // add important information for PLINK2_PROJECT
+              // must happen after .combine() matches by key
+              m.chrom = 'ALL'
+              m.is_pfile = true
+              return tuple(m, it.tail()).flatten()
+        }
+        .map { it.findAll { !(it.getClass() == LinkedHashMap &&
+                              it.containsKey('target_format')) } }
+        .set { ch_ref_project_input }
+
+    ch_target_project_input
+        .concat ( ch_ref_project_input )
+        .set { ch_project_input }
+
+    PLINK2_PROJECT( ch_project_input )
     ch_versions = ch_versions.mix(PLINK2_PROJECT.out.versions.first())
 
     emit:

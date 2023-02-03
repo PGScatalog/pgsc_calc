@@ -13,11 +13,11 @@ process PLINK2_PROJECT {
         "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
-    tuple val(meta), path(geno), path(pheno), path(variants), path(afreq), path(eigenvec)
+    tuple val(meta), path(geno), path(pheno), path(variants), path(eigenvec), path(afreq)
 
     output:
     tuple val(meta), path("*_proj.sscore"), emit: projections
-    path "*.{.sscore.vars}", emit: vars_projected
+    path "*.sscore.vars", emit: vars_projected
     path "versions.yml", emit: versions
 
     script:
