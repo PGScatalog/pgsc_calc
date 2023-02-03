@@ -36,12 +36,12 @@ jobs:
 
       - name: Set up Singularity
         uses: eWaterCycle/setup-singularity@v7
-        if: steps.cache-singularity.outputs.cache-hit != 'true'
+        if: steps.cache-singularity.outputs.cache-hit != 'true' && matrix.profile == 'singularity'
         with:
           singularity-version: ${{ env.SINGULARITY_VERSION }}
 
       - name: Add singularity to path
-        if: steps.cache-singularity.outputs.cache-hit == 'true'
+        if: steps.cache-singularity.outputs.cache-hit == 'true' && matrix.profile == 'singularity'
         run: |
           echo "/opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64/bin" >> $GITHUB_PATH
         
