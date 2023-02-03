@@ -54,7 +54,7 @@ jobs:
         with:
           python-version: '3.10'
           cache: 'pip'
-      - run: pip install -r ${{ github_workspace }}/tests/requirements.txt
+      - run: pip install -r ${{ github.workspace }}/tests/requirements.txt
 
       - name: Cache nextflow
         uses: actions/cache@v2
