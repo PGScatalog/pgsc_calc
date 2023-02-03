@@ -127,12 +127,23 @@ workflow ANCESTRY_PROJECTION {
             afreq: it.last().first().target_format == 'afreq'
         }
         .set { ch_relabel_output }
+
+    //
+    // STEP 3: Project reference and target samples into PCA space -------------
+    //
+
     ch_genomes
-        .map { it -> [it.first().subMap(['build']), it] }
-        .combine ( ch_pca_output, by: 0 )
-        .map { it.tail() }
-        .map { it.flatten() }
+        // extract key from meta map as first element for combining
+        .map { it -> [it.first().subMap(['id', 'build']), it] }
+        .combine ( ch_relabel_output.var, by: 0 )
+        .combine ( ch_relabel_output.afreq, by: 0 )
+        .map { it.tail().flatten() } // now drop the key
+        // findAll() cleanly drops redundant hashmaps (keeps first one)
+        // TODO: replace horrible list slicing with findAll()
+        .map { it.findAll { !(it.getClass() == LinkedHashMap &&
+                              it.containsKey('target_format')) } }
         .dump(tag: 'target_project_input')
+        // [meta, geno, pheno, var, eigenvec, afreq]
         .set { ch_target_project_input }
 
     // TO DO: double check projection should use QC'd data or raw data?
