@@ -56,8 +56,9 @@ jobs:
           cache: 'pip'
       - run: pip install -r ${{ github.workspace }}/tests/requirements.txt
 
-      - name: Cache nextflow
-        uses: actions/cache@v2
+      - name: Cache singularity setup
+        id: cache-nextflow
+        uses: actions/cache@v3
         with:
           path: /usr/local/bin/nextflow
           key: ${{ runner.os }}-nextflow
@@ -69,10 +70,6 @@ jobs:
           wget -qO- get.nextflow.io | bash
           sudo mv nextflow /usr/local/bin/
 
-      - name: Install plink2
-        run: |
-          sudo apt install plink2
-          
       - name: Run unit tests
         run: TMPDIR=~ PROFILE=${{ matrix.profile }} pytest --kwdof --symlink --git-aware --wt 2 --tag "${{ matrix.tags }}" --ignore tests/bin
 
