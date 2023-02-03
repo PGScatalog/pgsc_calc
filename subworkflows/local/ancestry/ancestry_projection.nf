@@ -119,6 +119,14 @@ workflow ANCESTRY_PROJECTION {
 
     RELABEL_IDS( ch_relabel_input )
 
+    RELABEL_IDS.out.relabelled
+        // extract key from meta map as first element
+        .map { tuple(it.first().subMap('id', 'build'), it) }
+        .branch {
+            var: it.last().first().target_format == 'var'
+            afreq: it.last().first().target_format == 'afreq'
+        }
+        .set { ch_relabel_output }
     ch_genomes
         .map { it -> [it.first().subMap(['build']), it] }
         .combine ( ch_pca_output, by: 0 )
