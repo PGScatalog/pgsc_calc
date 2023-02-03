@@ -4,67 +4,15 @@ on:
     branches:
       - dev
       - main
+      - ci
   pull_request:
   release:
     types: [published]
 
+env:
+  SINGULARITY_VERSION: "3.8.3"
+    
 jobs:
-  test:
-    name: Run standard workflow test
-    if: ${{ github.event_name == 'push'}}
-    runs-on: ubuntu-latest
-    env:
-      NXF_VER: ${{ matrix.nxf_ver }}
-      NXF_ANSI_LOG: false
-      CAPSULE_LOG: none    
-    strategy:
-      fail-fast: false        
-      matrix:
-        test_profile: ["test", "test_json"]
-        profile: ["docker", "singularity"]
-        include:
-          # Test pipeline minimum Nextflow version
-          - NXF_VER: '21.04.0'
-    concurrency: ${{ matrix.profile }}  
-    steps:
-      - name: Check out pipeline code
-        uses: actions/checkout@v2
- 
-      - name: Set up Singularity
-        if: matrix.profile == 'singularity'
-        uses: eWaterCycle/setup-singularity@v5
-        with:
-          singularity-version: 3.7.1
-          
-      - name: Setup miniconda
-        if: matrix.profile == 'conda'
-        uses: conda-incubator/setup-miniconda@v2.1.1
-        with:
-          auto-update-conda: true
-          channels: conda-forge,bioconda,defaults
-          python-version: ${{ matrix.python-version }}          
-
-      - name: Conda clean
-        if: matrix.profile == 'conda'
-        run: conda clean -a
-
-      - name: Install Nextflow
-        run: |
-          wget -qO- get.nextflow.io | bash
-          sudo mv nextflow /usr/local/bin/
-        
-      - name: Run pipeline with test data (conda)
-        if: matrix.profile == 'conda'
-        continue-on-error: true
-        run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
-          
-      - name: Run pipeline with test data (docker, singularity)
-        if: matrix.profile != 'conda'
-        continue-on-error: false
-        run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile}},${{ matrix.profile }}          
-
   unit_test:
     name: ${{ matrix.profile }} ${{ matrix.tags }} 
     if: ${{ github.event_name == 'push'}}
@@ -75,45 +23,34 @@ jobs:
     strategy:
       fail-fast: false        
       matrix:
-        profile: ["docker"]
+        profile: ["docker", "singularity"]
         tags:
           - "pgscatalog test --pgs_id"
-          - "pgscatalog test --efo_trait --pgp_id and --pgs_id"
-          - "pgscatalog test bad accession"
-          - "pgscatalog test good and bad accessions GRCh38"
-          - "test match module"
-          - "test combine scorefiles module"
-          - "plink2 testscore"
-          - "plink2 testsmallscore"
-          - "plink2 testmultiscore"
-          - "plink2 testsmallmultiscore"
-          - "plink2 testmultiscorefail"
-          - "plink2 testrelabelbim"
-          - "plink2 testrelabelpvar"
-          - "plink2 vcf"          
-          - "test apply score subworkflow"
-          - "test perfect apply score"
-          - "test input check subworkflow"
-          - "test input check subworkflow with PGS catalog API"
-          - "test input check subworkflow with PGS catalog API and whitespace"
-          - "test input check subworkflow with liftover 38to37"
-          - "test input check subworkflow with liftover 37to38"
-          - "test make compatible subworkflow with bfile"
-          - "test make compatible subworkflow with vcf"
-          - "test make compatible subworkflow with pfile"
-          - "test input check subworkflow"
-          - "test input check subworkflow with PGS catalog API"
-          - "test input check subworkflow with PGS catalog API and whitespace"
     steps:
-      - name: Check out pipeline code
-        uses: actions/checkout@v2
+      - name: Cache singularity setup
+        id: cache-singularity
+        uses: actions/cache@v3
+        with:
+          path: /opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64
+          key: ${{ runner.os }}-singularity-${{ env.SINGULARITY_VERSION }}
 
+      - name: Set up Singularity
+        uses: eWaterCycle/setup-singularity@v7
+        if: steps.cache-singularity.outputs.cache-hit != 'true'
+        with:
+          singularity-version: ${{ env.SINGULARITY_VERSION }}
+
+      - name: Add singularity to path
+        if: steps.cache-singularity.outputs.cache-hit == 'true'
+        run: |
+          echo "/opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64/bin" >> $GITHUB_PATH
+        
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.x'
+          python-version: '3.10'
 
-      - name: Setup Pip Cache
+      - name: Set up Pip cache
         uses: actions/cache@v2
         with:
           path: ~/.cache/pip
@@ -126,12 +63,6 @@ jobs:
           python -m ensurepip --upgrade
           pip install -r tests/requirements.txt
           sudo apt install plink2
-
-      - name: Set up Singularity
-        if: matrix.profile == 'singularity'
-        uses: eWaterCycle/setup-singularity@v5
-        with:
-          singularity-version: 3.7.1
 
       - name: Restore Keys
         uses: actions/cache@v2
