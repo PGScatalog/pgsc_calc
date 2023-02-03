@@ -11,27 +11,28 @@ on:
 
 env:
   SINGULARITY_VERSION: "3.8.3"
-    
+
 jobs:
   unit_test:
-    name: ${{ matrix.profile }} ${{ matrix.tags }} 
+    name: ${{ matrix.profile }} ${{ matrix.tags }}
     if: ${{ github.event_name == 'push'}}
     runs-on: ubuntu-latest
     env:
       NXF_ANSI_LOG: false
       CAPSULE_LOG: none
     strategy:
-      fail-fast: false        
+      fail-fast: false
       matrix:
         profile: ["docker", "singularity"]
         tags:
           - "pgscatalog test --pgs_id"
     steps:
       - name: Check out pipeline code
-        uses: actions/checkout@v3      
-      
+        uses: actions/checkout@v3
+
       - name: Cache singularity setup
         id: cache-singularity
+        if: matrix.profile == 'singularity'
         uses: actions/cache@v3
         with:
           path: /opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64
@@ -47,39 +48,30 @@ jobs:
         if: steps.cache-singularity.outputs.cache-hit == 'true' && matrix.profile == 'singularity'
         run: |
           echo "/opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64/bin" >> $GITHUB_PATH
-        
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.10'
+      - run: pip install -r ${{ GITHUB_WORKSPACE }}/tests/requirements.txt
 
-      - name: Set up Pip cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-                      
-      - name: Install Python dependencies          
-        run: |
-          python -m ensurepip --upgrade
-          pip install -r tests/requirements.txt
-          sudo apt install plink2
-
-      - name: Restore Keys
+      - name: Cache nextflow
         uses: actions/cache@v2
         with:
           path: /usr/local/bin/nextflow
           key: ${{ runner.os }}-nextflow
           restore-keys: |
             ${{ runner.os }}-nextflow-
-            
+
       - name: Install Nextflow
         run: |
           wget -qO- get.nextflow.io | bash
           sudo mv nextflow /usr/local/bin/
 
+      - name: Install plink2
+        run: |
+          sudo apt install plink2
+          
       - name: Run unit tests
         run: TMPDIR=~ PROFILE=${{ matrix.profile }} pytest --kwdof --symlink --git-aware --wt 2 --tag "${{ matrix.tags }}" --ignore tests/bin
 
@@ -103,6 +95,4 @@ jobs:
             /home/runner/pytest_workflow_*/*/log.err
             /home/runner/pytest_workflow_*/*/work
             !/home/runner/pytest_workflow_*/*/work/conda
-            !/home/runner/pytest_workflow_*/*/work/singularity        
-        
-        
+            !/home/runner/pytest_workflow_*/*/work/singularity
