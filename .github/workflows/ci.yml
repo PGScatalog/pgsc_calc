@@ -13,6 +13,61 @@ env:
   SINGULARITY_VERSION: "3.8.3"
 
 jobs:
+  test:
+    name: Run standard workflow test
+    if: ${{ github.event_name == 'push'}}
+    runs-on: ubuntu-latest
+    env:
+      NXF_VER: ${{ matrix.nxf_ver }}
+      NXF_ANSI_LOG: false
+      CAPSULE_LOG: none
+    strategy:
+      fail-fast: false
+      matrix:
+        test_profile: ["test"]
+        profile: ["docker"]
+        include:
+          # Test pipeline minimum Nextflow version and current latest
+        nxf_ver: ['22.10.0', '']
+    concurrency: ${{ matrix.test_profile }}
+
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v2
+
+      - name: Install Nextflow
+        run: |
+          wget -qO- get.nextflow.io | bash
+          sudo mv nextflow /usr/local/bin/
+
+      - name: Load docker images from cache
+        if: matrix.profile == 'docker' && steps.cache-docker-pull.outputs.cache-hit == 'true'
+        run: |
+          find docker/ -name '*.tar.gz' -exec sh -c 'docker load < {}' \;
+
+      - name: Run pipeline with test data on docker
+        if: matrix.profile == 'docker'
+        continue-on-error: false
+        run: |
+          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
+
+      - name: Cache docker pull
+        id: cache-docker-pull
+        if: matrix.profile == 'docker'
+        uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/docker
+          key: ${{ runner.os }}--${{ hashFiles('conf/modules.config') }}
+
+      - name: Save docker images
+        if: matrix.profile == 'docker' && steps.cache-docker-pull.outputs.cache-hit == 'false'
+        run: |
+          mkdir -p ${GITHUB_WORKSPACE}/docker
+          # save and compress docker images
+          docker images | awk -v OFS=':' 'NR > 1 { print $1,$2 }' | xargs -I {} sh -c 'docker save "$1" | gzip > docker/$(basename "$1").tar.gz' - {}
+
+
+
   unit_test:
     name: ${{ matrix.profile }} ${{ matrix.tags }}
     if: ${{ github.event_name == 'push'}}
