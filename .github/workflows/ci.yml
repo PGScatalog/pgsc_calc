@@ -56,14 +56,12 @@ jobs:
           cache: 'pip'
       - run: pip install -r ${{ github.workspace }}/tests/requirements.txt
 
-      - name: Cache singularity setup
+      - name: Cache nextflow setup
         id: cache-nextflow
         uses: actions/cache@v3
         with:
           path: /usr/local/bin/nextflow
           key: ${{ runner.os }}-nextflow
-          restore-keys: |
-            ${{ runner.os }}-nextflow-
 
       - name: Install Nextflow
         run: |
