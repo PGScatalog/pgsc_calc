@@ -26,8 +26,6 @@ jobs:
       matrix:
         test_profile: ["test"]
         profile: ["docker"]
-        include:
-          # Test pipeline minimum Nextflow version and current latest
         nxf_ver: ['22.10.0', '']
     concurrency: ${{ matrix.test_profile }}
 
