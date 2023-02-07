@@ -40,12 +40,12 @@ jobs:
 
       - name: Make directory for docker images
         run: |
-          mkdir -p $HOME/docker/
+          mkdir -p ${{ runner.temp }}/docker/
 
       - name: Load docker images from cache
         if: matrix.profile == 'docker' && steps.cache-docker-pull.outputs.cache-hit == 'true'
         run: |
-          find $HOME/docker/ -name '*.tar.gz' -exec sh -c 'docker load < {}' \;
+          find ${{ runner.temp }}/docker/ -name '*.tar.gz' -exec sh -c 'docker load < {}' \;
 
       - name: Run pipeline with test data on docker
         if: matrix.profile == 'docker'
@@ -59,13 +59,13 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/docker
-          key: ${{ runner.os }}--${{ hashFiles("~/docker") }}
+          key: ${{ runner.os }}--${{ hashFiles('${{ runner.temp }}/docker') }}
 
       - name: Save docker images
         if: matrix.profile == 'docker' && steps.cache-docker-pull.outputs.cache-hit != 'true'
         run: |
           # save and compress docker images
-          docker images | awk -v OFS=':' 'NR > 1 { print $1,$2 }' | xargs -I {} sh -c 'docker save "$1" | gzip > $HOME/docker/$(basename "$1").tar.gz' - {}
+          docker images | awk -v OFS=':' 'NR > 1 { print $1,$2 }' | xargs -I {} sh -c 'docker save "$1" | gzip > ${{ runner.temp }}/docker/$(basename "$1").tar.gz' - {}
 
 
 
