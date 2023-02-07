@@ -48,7 +48,7 @@ jobs:
         uses: actions/cache/restore@v3
         with:
           path: ${{ runner.temp }}/docker/
-          key: ${{ runner.os }}--${{ hashFiles('${{ github.workspace }}/conf/modules.config') }}
+          key: ${{ runner.os }}--${{ hashFiles('conf/modules.config') }}
 
       - name: Load docker images from cache
         if: matrix.profile == 'docker' && steps.cache-docker-restore.outputs.cache-hit == 'true'
