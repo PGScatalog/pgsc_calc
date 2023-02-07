@@ -11,6 +11,7 @@ on:
 
 env:
   SINGULARITY_VERSION: "3.8.3"
+  NXF_SINGULARITY_CACHEDIR: "${{ runner.temp }}/singularity"
 
 jobs:
   preload_docker:
@@ -36,7 +37,17 @@ jobs:
           cat ${{ runner.temp }}/images.txt | xargs -I {} sh -c 'docker pull --platform linux/amd64 "$1"' - {}
           mkdir -p ${{ runner.temp }}/docker/
           cat ${{ runner.temp }}/images.txt | xargs -I {} sh -c 'docker save "$1" > ${{ runner.temp }}/docker/$(basename "$1").tar' - {}
-    
+
+  preload_singularity:
+    name: Preload singularity images
+    if: ${{ github.event_name == 'push'}}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: start
+        run: |
+          echo 'todo'
+
   test:
     needs: [preload_docker]
     name: Run standard workflow test
