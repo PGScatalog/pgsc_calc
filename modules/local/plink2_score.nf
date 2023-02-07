@@ -17,7 +17,7 @@ process PLINK2_SCORE {
 
     output:
     path "*.{sscore,sscore.zst}", emit: scores  // optional compression
-    path "*.{.sscore.vars}", emit: vars_scored
+    path "*.sscore.vars", emit: vars_scored
     path "versions.yml", emit: versions
     path "*.log"       , emit: log
 
