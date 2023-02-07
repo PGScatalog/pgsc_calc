@@ -38,10 +38,14 @@ jobs:
           wget -qO- get.nextflow.io | bash
           sudo mv nextflow /usr/local/bin/
 
+      - name: Make directory for docker images
+        run: |
+          mkdir -p $HOME/docker/
+
       - name: Load docker images from cache
         if: matrix.profile == 'docker' && steps.cache-docker-pull.outputs.cache-hit == 'true'
         run: |
-          find docker/ -name '*.tar.gz' -exec sh -c 'docker load < {}' \;
+          find $HOME/docker/ -name '*.tar.gz' -exec sh -c 'docker load < {}' \;
 
       - name: Run pipeline with test data on docker
         if: matrix.profile == 'docker'
@@ -54,15 +58,14 @@ jobs:
         if: matrix.profile == 'docker'
         uses: actions/cache@v3
         with:
-          path: ${{ github.workspace }}/docker
-          key: ${{ runner.os }}--${{ hashFiles('conf/modules.config') }}
+          path: ~/docker
+          key: ${{ runner.os }}--${{ hashFiles("$HOME/docker") }}
 
       - name: Save docker images
-        if: matrix.profile == 'docker' && steps.cache-docker-pull.outputs.cache-hit == 'false'
+        if: matrix.profile == 'docker' && steps.cache-docker-pull.outputs.cache-hit != 'true'
         run: |
-          mkdir -p ${GITHUB_WORKSPACE}/docker
           # save and compress docker images
-          docker images | awk -v OFS=':' 'NR > 1 { print $1,$2 }' | xargs -I {} sh -c 'docker save "$1" | gzip > docker/$(basename "$1").tar.gz' - {}
+          docker images | awk -v OFS=':' 'NR > 1 { print $1,$2 }' | xargs -I {} sh -c 'docker save "$1" | gzip > $HOME/docker/$(basename "$1").tar.gz' - {}
 
 
 
