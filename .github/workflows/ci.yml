@@ -42,17 +42,18 @@ jobs:
         run: |
           mkdir -p ${{ runner.temp }}/docker/
 
-      - name: Cache docker pull
-        id: cache-docker-pull
+      - name: Restore docker image cache
+        id: cache-docker-restore
         if: matrix.profile == 'docker'
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         with:
-          path: ${{ runner.temp }}/docker
+          path: ${{ runner.temp }}/docker/
           key: ${{ runner.os }}--${{ hashFiles('${{ runner.temp }}/docker') }}
 
       - name: Load docker images from cache
-        if: matrix.profile == 'docker' && steps.cache-docker-pull.outputs.cache-hit == 'true'
+        if: matrix.profile == 'docker' && steps.cache-docker-restore.outputs.cache-hit == 'true'
         run: |
+          find $HOME -name '*.tar'
           find ${{ runner.temp }}/docker/ -name '*.tar' -exec sh -c 'docker load < {}' \;
 
       - name: Run pipeline with test data on docker ${{ env.NXF_VER }} 
@@ -62,12 +63,17 @@ jobs:
           nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
 
       - name: Save docker images
-        if: matrix.profile == 'docker' && steps.cache-docker-pull.outputs.cache-hit != 'true'
+        if: matrix.profile == 'docker' && steps.cache-docker-restore.outputs.cache-hit != 'true'
         run: |
-          # save docker images
           # don't compress, because the cache action uses zstd
           docker images | awk -v OFS=':' 'NR > 1 { print $1,$2 }' | xargs -I {} sh -c 'docker save "$1" > ${{ runner.temp }}/docker/$(basename "$1").tar' - {}
 
+      - name: Cache saved docker images
+        id: cache-docker-pull
+        uses: actions/cache/save@v3
+        with:
+          path: ${{ runner.temp }}/docker
+          key: ${{ runner.os }}--${{ hashFiles('${{ runner.temp }}/docker') }}        
 
 
   unit_test:
