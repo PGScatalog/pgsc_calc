@@ -38,17 +38,13 @@ jobs:
           wget -qO- get.nextflow.io | bash
           sudo mv nextflow /usr/local/bin/
 
-      - name: Make directory for docker images
-        run: |
-          mkdir -p ${{ runner.temp }}/docker/
-
       - name: Restore docker image cache
         id: cache-docker-restore
         if: matrix.profile == 'docker'
         uses: actions/cache/restore@v3
         with:
           path: ${{ runner.temp }}/docker/
-          key: ${{ runner.os }}--${{ hashFiles('conf/modules.config') }}
+          key: ${{ runner.os }}--${{ github.sha }}
 
       - name: Load docker images from cache
         if: matrix.profile == 'docker' && steps.cache-docker-restore.outputs.cache-hit == 'true'
@@ -65,15 +61,15 @@ jobs:
       - name: Save docker images
         if: matrix.profile == 'docker' && steps.cache-docker-restore.outputs.cache-hit != 'true'
         run: |
-          # don't compress, because the cache action uses zstd
-          docker images | awk -v OFS=':' 'NR > 1 { print $1,$2 }' | xargs -I {} sh -c 'docker save "$1" > ${{ runner.temp }}/docker/$(basename "$1").tar' - {}
+          git grep 'ext.docker*' ${{ github.workspace }}/conf/modules.config | cut -f 2 -d '=' | xargs -L 2 echo | tr -d ' ' > ${{ runner.temp }}/images.txt
+          cat ${{ runner.temp }}/images.txt | xargs -I {} sh -c 'docker save "$1" > ${{ runner.temp }}/docker/$(basename "$1").tar' - {}
 
       - name: Cache saved docker images
         id: cache-docker-pull
         uses: actions/cache/save@v3
         with:
           path: ${{ runner.temp }}/docker
-          key: ${{ runner.os }}--${{ hashFiles('${{ runner.temp }}/docker') }}        
+          key: ${{ runner.os }}--${{ github.sha }}
 
 
   unit_test:
