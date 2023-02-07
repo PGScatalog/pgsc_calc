@@ -62,6 +62,7 @@ jobs:
         if: matrix.profile == 'docker' && steps.cache-docker-restore.outputs.cache-hit != 'true'
         run: |
           git grep 'ext.docker*' ${{ github.workspace }}/conf/modules.config | cut -f 2 -d '=' | xargs -L 2 echo | tr -d ' ' > ${{ runner.temp }}/images.txt
+          mkdir -p ${{ runner.temp }}/docker/
           cat ${{ runner.temp }}/images.txt | xargs -I {} sh -c 'docker save "$1" > ${{ runner.temp }}/docker/$(basename "$1").tar' - {}
 
       - name: Cache saved docker images
