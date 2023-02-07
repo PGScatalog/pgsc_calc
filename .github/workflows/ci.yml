@@ -11,7 +11,7 @@ on:
 
 env:
   SINGULARITY_VERSION: "3.8.3"
-  NXF_SINGULARITY_CACHEDIR: $RUNNER_TEMP/singularity
+  NXF_SINGULARITY_CACHEDIR: ${{ runner.temp }}/singularity
 
 jobs:
   preload_docker:
