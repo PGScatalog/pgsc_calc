@@ -11,7 +11,7 @@ on:
 
 env:
   SINGULARITY_VERSION: "3.8.3"
-  NXF_SINGULARITY_CACHEDIR: $RUNNER_TEMP
+  NXF_SINGULARITY_CACHEDIR: $RUNNER_TEMP/singularity
 
 jobs:
   preload_docker:
@@ -44,12 +44,47 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: start
+      - name: Check out pipeline code
+        uses: actions/checkout@v2
+        
+      - name: Install Nextflow
         run: |
-          echo 'todo'
+          wget -qO- get.nextflow.io | bash
+          sudo mv nextflow /usr/local/bin/
+
+      - name: Cache singularity setup
+        id: cache-singularity-setup
+        uses: actions/cache@v3
+        with:
+          path: /opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64
+          key: ${{ runner.os }}-singularity-${{ env.SINGULARITY_VERSION }}
+
+      - name: Set up Singularity
+        uses: eWaterCycle/setup-singularity@v7
+        if: ${{ steps.cache-singularity-setup.outputs.cache-hit != 'true' }}
+        with:
+          singularity-version: ${{ env.SINGULARITY_VERSION }}
+
+      - name: Add singularity to path
+        if: steps.cache-singularity-setup.outputs.cache-hit == 'true'
+        run: |
+          echo "/opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64/bin" >> $GITHUB_PATH
+          
+      - name: Cache singularity images
+        id: cache-singularity-pull
+        uses: actions/cache@v3
+        with:
+          path: $NXF_SINGULARITY_CACHEDIR
+          key: ${{ runner.os }}-${{ github.sha }}
+          
+      - name: Run nextflow to pull the images
+        if: ${{ steps.cache-singularity-pull.outputs.cache-hit != 'true' }}        
+        run: |
+          mkdir -p $NXF_SINGULARITY_CACHEDIR
+          nextflow run ${{ GITHUB_WORKSPACE }} -profile singularity,test
 
   test:
-    needs: [preload_docker]
+    needs: [preload_docker, preload_singularity]
     name: Run standard workflow test
     if: ${{ github.event_name == 'push'}}
     runs-on: ubuntu-latest
