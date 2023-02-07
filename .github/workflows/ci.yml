@@ -59,7 +59,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/docker
-          key: ${{ runner.os }}--${{ hashFiles("$HOME/docker") }}
+          key: ${{ runner.os }}--${{ hashFiles("~/docker") }}
 
       - name: Save docker images
         if: matrix.profile == 'docker' && steps.cache-docker-pull.outputs.cache-hit != 'true'
