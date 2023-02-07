@@ -81,7 +81,7 @@ jobs:
         if: ${{ steps.cache-singularity-pull.outputs.cache-hit != 'true' }}        
         run: |
           mkdir -p $NXF_SINGULARITY_CACHEDIR
-          nextflow run ${{ GITHUB_WORKSPACE }} -profile singularity,test
+          nextflow run ${ GITHUB_WORKSPACE } -profile singularity,test
 
   test:
     needs: [preload_docker, preload_singularity]
