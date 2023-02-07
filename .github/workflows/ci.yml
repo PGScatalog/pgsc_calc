@@ -13,7 +13,32 @@ env:
   SINGULARITY_VERSION: "3.8.3"
 
 jobs:
+  preload_docker:
+    name: Preload docker images
+    if: ${{ github.event_name == 'push'}}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v2
+
+      - name: Cache docker
+        id: cache-docker
+        uses: actions/cache@v3
+        with:
+          path: ${{ runner.temp }}/docker
+          key: ${{ runner.os }}-${{ github.sha }}
+
+      - name: Pull and save docker
+        if: matrix.profile == 'docker' && ${{ steps.cache-docker.outputs.cache-hit != 'true' }}
+        run: |
+          git grep 'ext.docker*' ${{ github.workspace }}/conf/modules.config | cut -f 2 -d '=' | xargs -L 2 echo | tr -d ' ' > ${{ runner.temp }}/images.txt
+          cat ${{ runner.temp }}/images.txt | xargs -I {} sh -c 'docker pull --platform linux/amd64 "$1"' - {}
+          mkdir -p ${{ runner.temp }}/docker/
+          cat ${{ runner.temp }}/images.txt | xargs -I {} sh -c 'docker save "$1" > ${{ runner.temp }}/docker/$(basename "$1").tar' - {}
+    
   test:
+    needs: [preload_docker]
     name: Run standard workflow test
     if: ${{ github.event_name == 'push'}}
     runs-on: ubuntu-latest
@@ -38,36 +63,20 @@ jobs:
           wget -qO- get.nextflow.io | bash
           sudo mv nextflow /usr/local/bin/
 
-      - name: Restore docker image cache
-        id: cache-docker-restore
-        if: matrix.profile == 'docker'
-        uses: actions/cache/restore@v3
+      - name: Restore docker cache
+        id: restore-docker
+        uses: actions/cache@v3
         with:
-          path: ${{ runner.temp }}/docker/
-          key: ${{ runner.os }}--${{ github.sha }}
+          path: ${{ runner.temp }}/docker
+          key: ${{ runner.os }}-${{ github.sha }}
 
       - name: Load docker images from cache
-        if: matrix.profile == 'docker' && steps.cache-docker-restore.outputs.cache-hit == 'true'
+        if: matrix.profile == 'docker' && ${{ steps.restore-docker.outputs.cache-hit == 'true' }}
         run: |
           find $HOME -name '*.tar'
           find ${{ runner.temp }}/docker/ -name '*.tar' -exec sh -c 'docker load < {}' \;
 
-      - name: Save docker images
-        if: matrix.profile == 'docker' && steps.cache-docker-restore.outputs.cache-hit != 'true'
-        run: |
-          git grep 'ext.docker*' ${{ github.workspace }}/conf/modules.config | cut -f 2 -d '=' | xargs -L 2 echo | tr -d ' ' > ${{ runner.temp }}/images.txt
-          cat ${{ runner.temp }}/images.txt | xargs -I {} sh -c 'docker pull --platform linux/amd64 "$1"' - {}
-          mkdir -p ${{ runner.temp }}/docker/
-          cat ${{ runner.temp }}/images.txt | xargs -I {} sh -c 'docker save "$1" > ${{ runner.temp }}/docker/$(basename "$1").tar' - {}
-
-      - name: Cache saved docker images
-        id: cache-docker-pull
-        uses: actions/cache/save@v3
-        with:
-          path: ${{ runner.temp }}/docker
-          key: ${{ runner.os }}--${{ github.sha }}
-
-      - name: Run pipeline with test data on docker ${{ env.NXF_VER }}
+      - name: Run pipeline with test data on docker
         if: matrix.profile == 'docker'
         continue-on-error: false
         run: |
