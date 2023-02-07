@@ -58,7 +58,7 @@ jobs:
         if: matrix.profile == 'docker'
         uses: actions/cache@v3
         with:
-          path: ~/docker
+          path: ${{ runner.temp }}/docker
           key: ${{ runner.os }}--${{ hashFiles('${{ runner.temp }}/docker') }}
 
       - name: Save docker images
