@@ -26,7 +26,7 @@ jobs:
       matrix:
         test_profile: ["test"]
         profile: ["docker"]
-        nxf_ver: ['22.10.0', '']
+        nxf_ver: ['22.10.0', ''] # minimum supported version, latest version
     concurrency: ${{ matrix.test_profile }}
 
     steps:
@@ -42,17 +42,6 @@ jobs:
         run: |
           mkdir -p ${{ runner.temp }}/docker/
 
-      - name: Load docker images from cache
-        if: matrix.profile == 'docker' && steps.cache-docker-pull.outputs.cache-hit == 'true'
-        run: |
-          find ${{ runner.temp }}/docker/ -name '*.tar.gz' -exec sh -c 'docker load < {}' \;
-
-      - name: Run pipeline with test data on docker
-        if: matrix.profile == 'docker'
-        continue-on-error: false
-        run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
-
       - name: Cache docker pull
         id: cache-docker-pull
         if: matrix.profile == 'docker'
@@ -61,11 +50,23 @@ jobs:
           path: ${{ runner.temp }}/docker
           key: ${{ runner.os }}--${{ hashFiles('${{ runner.temp }}/docker') }}
 
+      - name: Load docker images from cache
+        if: matrix.profile == 'docker' && steps.cache-docker-pull.outputs.cache-hit == 'true'
+        run: |
+          find ${{ runner.temp }}/docker/ -name '*.tar' -exec sh -c 'docker load < {}' \;
+
+      - name: Run pipeline with test data on docker ${{ env.NXF_VER }} 
+        if: matrix.profile == 'docker'
+        continue-on-error: false
+        run: |
+          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
+
       - name: Save docker images
         if: matrix.profile == 'docker' && steps.cache-docker-pull.outputs.cache-hit != 'true'
         run: |
-          # save and compress docker images
-          docker images | awk -v OFS=':' 'NR > 1 { print $1,$2 }' | xargs -I {} sh -c 'docker save "$1" | gzip > ${{ runner.temp }}/docker/$(basename "$1").tar.gz' - {}
+          # save docker images
+          # don't compress, because the cache action uses zstd
+          docker images | awk -v OFS=':' 'NR > 1 { print $1,$2 }' | xargs -I {} sh -c 'docker save "$1" > ${{ runner.temp }}/docker/$(basename "$1").tar' - {}
 
 
 
