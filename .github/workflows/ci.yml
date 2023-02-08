@@ -45,11 +45,6 @@ jobs:
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2
-        
-      - name: Install Nextflow
-        run: |
-          wget -qO- get.nextflow.io | bash
-          sudo mv nextflow /usr/local/bin/
 
       - name: Cache singularity setup
         id: cache-singularity-setup
@@ -68,21 +63,23 @@ jobs:
         if: steps.cache-singularity-setup.outputs.cache-hit == 'true'
         run: |
           echo "/opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64/bin" >> $GITHUB_PATH
-          
+
       - name: Cache singularity images
         id: cache-singularity-pull
         uses: actions/cache@v3
         with:
           path: $NXF_SINGULARITY_CACHEDIR
-          key: ${{ runner.os }}-${{ github.sha }}
-          
+          key: ${{ runner.os }}-${{ github.sha }}--singularity
+
       - name: Run nextflow to pull the images
-        if: ${{ steps.cache-singularity-pull.outputs.cache-hit != 'true' }}        
+        if: ${{ steps.cache-singularity-pull.outputs.cache-hit != 'true' }}
         run: |
           # runner context isn't available in env workflow key
           export NXF_SINGULARITY_CACHEDIR=${{ runner.temp }}/singularity
           mkdir -p $NXF_SINGULARITY_CACHEDIR
-          nextflow run ${GITHUB_WORKSPACE} -profile singularity,test
+          git grep 'ext.singularity*' conf/modules.config | cut -f 2 -d '=' | xargs -L 2 echo | tr -d ' ' > ${{ runner.temp }}/singularity_images.txt
+          cat singularity_images.txt | sed 's/oras:\/\///;s/https:\/\///;s/\//-/g;s/$/.img/;s/:/-/' > ${{ runnner.temp }}/singularity_image_paths.txt
+          paste -d '\n' ${{ runner.temp }}/singularity_images.txt ${{ runner.temp }}/singularity_image_paths.txt | xargs -L 2 sh -c 'singularity pull $0 $NXF_SINGULARITY_CACHEDIR/$1'
 
   test:
     needs: [preload_docker, preload_singularity]
