@@ -78,7 +78,7 @@ jobs:
           export NXF_SINGULARITY_CACHEDIR=${{ runner.temp }}/singularity
           mkdir -p $NXF_SINGULARITY_CACHEDIR
           git grep 'ext.singularity*' conf/modules.config | cut -f 2 -d '=' | xargs -L 2 echo | tr -d ' ' > ${{ runner.temp }}/singularity_images.txt
-          cat singularity_images.txt | sed 's/oras:\/\///;s/https:\/\///;s/\//-/g;s/$/.img/;s/:/-/' > ${{ runnner.temp }}/singularity_image_paths.txt
+          cat singularity_images.txt | sed 's/oras:\/\///;s/https:\/\///;s/\//-/g;s/$/.img/;s/:/-/' > ${{ runner.temp }}/singularity_image_paths.txt
           paste -d '\n' ${{ runner.temp }}/singularity_images.txt ${{ runner.temp }}/singularity_image_paths.txt | xargs -L 2 sh -c 'singularity pull $0 $NXF_SINGULARITY_CACHEDIR/$1'
 
   test:
