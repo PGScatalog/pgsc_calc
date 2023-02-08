@@ -79,7 +79,7 @@ jobs:
           mkdir -p $NXF_SINGULARITY_CACHEDIR
           git grep 'ext.singularity*' conf/modules.config | cut -f 2 -d '=' | xargs -L 2 echo | tr -d ' ' > ${{ runner.temp }}/singularity_images.txt
           cat ${{ runner.temp }}/singularity_images.txt | sed 's/oras:\/\///;s/https:\/\///;s/\//-/g;s/$/.img/;s/:/-/' > ${{ runner.temp }}/singularity_image_paths.txt
-          paste -d '\n' ${{ runner.temp }}/singularity_images.txt ${{ runner.temp }}/singularity_image_paths.txt | xargs -L 2 sh -c 'singularity pull $0 $NXF_SINGULARITY_CACHEDIR/$1'
+          paste -d '\n' ${{ runner.temp }}/singularity_image_paths.txt ${{ runner.temp }}/singularity_images.txt | xargs -L 2 sh -c 'singularity pull $NXF_SINGULARITY_CACHEDIR/$0 $1'
 
   test:
     needs: [preload_docker, preload_singularity]
