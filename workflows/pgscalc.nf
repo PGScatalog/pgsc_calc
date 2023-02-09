@@ -261,7 +261,18 @@ workflow PGSCALC {
             // intersected variants ( across ref & target ) are an optional input
             intersection = ANCESTRY_PROJECTION.out.intersection
         } else {
-            intersection = Channel.of(file('NO_FILE')) // dummy file with fake name
+            dummy_input = Channel.of(file('NO_FILE')) // dummy file that doesn't exist
+            // associate each sampleset with the dummy file
+            MAKE_COMPATIBLE.out.geno.map {
+                meta = it[0].clone()
+                meta = meta.subMap(['id'])
+                // one dummy file for groupTuple() size in match subworkflow
+                meta.n_chrom = 1
+                return meta
+            }
+                .unique()
+                .combine(dummy_input)
+                .set { intersection }
         }
 
         MATCH (
@@ -323,4 +334,3 @@ workflow.onComplete {
 -(((---(((--------
  ========================================================================================
 */
-

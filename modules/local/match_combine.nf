@@ -14,8 +14,7 @@ process MATCH_COMBINE {
         "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
-    tuple val(meta), val(chrom), path('???.ipc.zst'), path(scorefile)
-    path(shared)
+    tuple val(meta), val(chrom), path('???.ipc.zst'), path(scorefile), val(sharedmeta), path(shared)
 
     output:
     tuple val(scoremeta), path("*.scorefile.gz"), emit: scorefile

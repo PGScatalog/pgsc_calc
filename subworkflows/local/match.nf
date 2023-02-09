@@ -1,5 +1,5 @@
-include { MATCH_VARIANTS     } from '../../modules/local/match_variants'
-include { MATCH_COMBINE      } from '../../modules/local/match_combine'
+include { MATCH_VARIANTS } from '../../modules/local/match_variants'
+include { MATCH_COMBINE  } from '../../modules/local/match_combine'
 
 workflow MATCH {
     take:
@@ -35,16 +35,35 @@ workflow MATCH {
         .combine( scorefile )
         .set { ch_matches }
 
-    // MATCH_COMBINE input note:
-    // ch_intersection and ch_matches sampleset order should be the same
-    // e.g.: ch_matches: [[id: cineca], chrom, [ipc0, ...], scorefile]
-    // ch_intersection: [[id: cineca], matched.txt.gz]
-    // normally there'd be a join to enforce sampleset order but things get
-    // unpleasant with optional inputs. how can you join on file('NO_FILE')??
-    // there's no meta key! do we do a fake meta key too?
-    MATCH_COMBINE ( ch_matches, ch_intersection )
+    ch_intersection.map { tuple(groupKey(it[0].subMap(['id']),
+                                         it[0].n_chrom),
+                                it.last()) }
+        .groupTuple()
+        .set { ch_intersection_grouped }
+
+    // ch_matches id _must be unique_ for .cross() (this is guaranteed after
+    // groupTuple). this seems complicated but joining by key is the best way to
+    // make sure the correct intersections match the sample sets. ensuring sort
+    // order of two input channels would be more difficult.
+    ch_matches
+        // extract key
+        .map{ [it[0]['id'], it] }
+        .cross(ch_intersection_grouped.map{it -> [it[0]['id'], it]})
+        // drops key and combine list elements
+        .map { it[0].last() + it[1].last() }
+        .set { ch_match_combine_input }
+    // example channel structure is a list of:
+    // meta map: [id:hgdp, is_vcf:false, is_bfile:false, is_pfile:true]
+    // chrom list: [3, ..., 17],
+    // match list: [hgdp_match_0.ipc.zst, ...]
+    // scorefile path: scorefiles.txt.gz,
+    // intersection meta: [id:hgdp]
+    // optional intersection list of paths: [NO_FILE] / [matched_1.txt ... ]
+
+    MATCH_COMBINE ( ch_match_combine_input )
     ch_versions = ch_versions.mix(MATCH_COMBINE.out.versions)
 
+    // extra check to make sure subworkflow completed successfully
     def combine_fail = true
     MATCH_COMBINE.out.scorefile.subscribe onNext: { combine_fail = false },
         onComplete: { combine_error(combine_fail) }
