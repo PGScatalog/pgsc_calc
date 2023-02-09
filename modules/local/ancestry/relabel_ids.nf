@@ -24,7 +24,7 @@ process RELABEL_IDS {
     target_format = target.getExtension() == 'var' ? 'var' : 'afreq'
     relabel_meta.target_format = target_format
     """
-    relabel_ids.py --maps <(zcat $matched) \
+    relabel_ids --maps <(zcat $matched) \
         --col_from ID_REF \
         --col_to ID_TARGET \
         --target_file $target \
