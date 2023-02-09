@@ -5,6 +5,9 @@ on:
       - dev
       - main
   pull_request:
+    branches:
+      - dev
+      - main
   release:
     types: [published]
 
