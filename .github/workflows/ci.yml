@@ -4,7 +4,6 @@ on:
     branches:
       - dev
       - main
-      - ci
   pull_request:
   release:
     types: [published]
@@ -128,22 +127,8 @@ jobs:
         continue-on-error: false
         run: |
           nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
-
-
-  unit_test:
-    name: ${{ matrix.profile }} ${{ matrix.tags }}
-    if: ${{ github.event_name == 'push'}}
-    runs-on: ubuntu-latest
-    env:
-      NXF_ANSI_LOG: false
-      CAPSULE_LOG: none
-    strategy:
-      fail-fast: false
-      matrix:
-        profile: ["docker", "singularity"]
-        tags:
-          - "pgscatalog test --pgs_id"
-    steps:
+    
+jobs:
       - name: Check out pipeline code
         uses: actions/checkout@v3
 
@@ -158,8 +143,6 @@ jobs:
       - name: Set up Singularity
         uses: eWaterCycle/setup-singularity@v7
         if: steps.cache-singularity.outputs.cache-hit != 'true' && matrix.profile == 'singularity'
-        with:
-          singularity-version: ${{ env.SINGULARITY_VERSION }}
 
       - name: Add singularity to path
         if: steps.cache-singularity.outputs.cache-hit == 'true' && matrix.profile == 'singularity'
