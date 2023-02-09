@@ -4,31 +4,49 @@ on:
     branches:
       - dev
       - main
-      - ci
   pull_request:
   release:
     types: [published]
 
 env:
   SINGULARITY_VERSION: "3.8.3"
-    
+
 jobs:
-  unit_test:
-    name: ${{ matrix.profile }} ${{ matrix.tags }} 
+  preload_docker:
+    name: Preload docker images
     if: ${{ github.event_name == 'push'}}
     runs-on: ubuntu-latest
-    env:
-      NXF_ANSI_LOG: false
-      CAPSULE_LOG: none
-    strategy:
-      fail-fast: false        
-      matrix:
-        profile: ["docker", "singularity"]
-        tags:
-          - "pgscatalog test --pgs_id"
+
     steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v2
+
+      - name: Cache docker
+        id: cache-docker
+        uses: actions/cache@v3
+        with:
+          path: ${{ runner.temp }}/docker
+          key: ${{ runner.os }}-${{ github.sha }}
+
+      - name: Pull and save docker
+        if: matrix.profile == 'docker' && ${{ steps.cache-docker.outputs.cache-hit != 'true' }}
+        run: |
+          git grep 'ext.docker*' ${{ github.workspace }}/conf/modules.config | cut -f 2 -d '=' | xargs -L 2 echo | tr -d ' ' > ${{ runner.temp }}/images.txt
+          cat ${{ runner.temp }}/images.txt | xargs -I {} sh -c 'docker pull --platform linux/amd64 "$1"' - {}
+          mkdir -p ${{ runner.temp }}/docker/
+          cat ${{ runner.temp }}/images.txt | xargs -I {} sh -c 'docker save "$1" > ${{ runner.temp }}/docker/$(basename "$1").tar' - {}
+
+  preload_singularity:
+    name: Preload singularity images
+    if: ${{ github.event_name == 'push'}}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v2
+
       - name: Cache singularity setup
-        id: cache-singularity
+        id: cache-singularity-setup
         uses: actions/cache@v3
         with:
           path: /opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64
@@ -36,42 +54,115 @@ jobs:
 
       - name: Set up Singularity
         uses: eWaterCycle/setup-singularity@v7
-        if: steps.cache-singularity.outputs.cache-hit != 'true'
+        if: ${{ steps.cache-singularity-setup.outputs.cache-hit != 'true' }}
         with:
           singularity-version: ${{ env.SINGULARITY_VERSION }}
 
       - name: Add singularity to path
-        if: steps.cache-singularity.outputs.cache-hit == 'true'
+        if: steps.cache-singularity-setup.outputs.cache-hit == 'true'
         run: |
           echo "/opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64/bin" >> $GITHUB_PATH
-        
+
+      - name: Set up singularity cache dir environment variable
+        run: |
+          # runner context isn't available in env workflow key
+          export NXF_SINGULARITY_CACHEDIR=${{ runner.temp }}/singularity
+          mkdir -p $NXF_SINGULARITY_CACHEDIR
+
+      - name: Cache singularity images
+        id: cache-singularity-pull
+        uses: actions/cache@v3
+        with:
+          path: $NXF_SINGULARITY_CACHEDIR
+          key: ${{ runner.os }}-${{ github.sha }}--singularity
+
+      - name: Pull and save singularity
+        if: ${{ steps.cache-singularity-pull.outputs.cache-hit != 'true' }}
+        run: |
+          git grep 'ext.singularity*' conf/modules.config | cut -f 2 -d '=' | xargs -L 2 echo | tr -d ' ' > ${{ runner.temp }}/singularity_images.txt
+          cat ${{ runner.temp }}/singularity_images.txt | sed 's/oras:\/\///;s/https:\/\///;s/\//-/g;s/$/.img/;s/:/-/' > ${{ runner.temp }}/singularity_image_paths.txt
+          paste -d '\n' ${{ runner.temp }}/singularity_image_paths.txt ${{ runner.temp }}/singularity_images.txt | xargs -L 2 sh -c 'singularity pull $NXF_SINGULARITY_CACHEDIR/$0 $1'
+
+  test:
+    needs: [preload_docker, preload_singularity]
+    name: Run standard workflow test
+    if: ${{ github.event_name == 'push'}}
+    runs-on: ubuntu-latest
+    env:
+      NXF_VER: ${{ matrix.nxf_ver }}
+      NXF_ANSI_LOG: false
+      CAPSULE_LOG: none
+    strategy:
+      fail-fast: false
+      matrix:
+        test_profile: ["test"]
+        profile: ["docker"]
+        nxf_ver: ['22.10.0', ''] # minimum supported version, latest version
+    concurrency: ${{ matrix.test_profile }}
+
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v2
+
+      - name: Install Nextflow
+        run: |
+          wget -qO- get.nextflow.io | bash
+          sudo mv nextflow /usr/local/bin/
+
+      - name: Restore docker cache
+        id: restore-docker
+        uses: actions/cache@v3
+        with:
+          path: ${{ runner.temp }}/docker
+          key: ${{ runner.os }}-${{ github.sha }}
+
+      - name: Load docker images from cache
+        if: matrix.profile == 'docker' && ${{ steps.restore-docker.outputs.cache-hit == 'true' }}
+        run: |
+          find $HOME -name '*.tar'
+          find ${{ runner.temp }}/docker/ -name '*.tar' -exec sh -c 'docker load < {}' \;
+
+      - name: Run pipeline with test data on docker
+        if: matrix.profile == 'docker'
+        continue-on-error: false
+        run: |
+          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
+    
+jobs:
+      - name: Check out pipeline code
+        uses: actions/checkout@v3
+
+      - name: Cache singularity setup
+        id: cache-singularity
+        if: matrix.profile == 'singularity'
+        uses: actions/cache@v3
+        with:
+          path: /opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64
+          key: ${{ runner.os }}-singularity-${{ env.SINGULARITY_VERSION }}
+
+      - name: Set up Singularity
+        uses: eWaterCycle/setup-singularity@v7
+        if: steps.cache-singularity.outputs.cache-hit != 'true' && matrix.profile == 'singularity'
+
+      - name: Add singularity to path
+        if: steps.cache-singularity.outputs.cache-hit == 'true' && matrix.profile == 'singularity'
+        run: |
+          echo "/opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64/bin" >> $GITHUB_PATH
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.10'
+          cache: 'pip'
+      - run: pip install -r ${{ github.workspace }}/tests/requirements.txt
 
-      - name: Set up Pip cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-                      
-      - name: Install Python dependencies          
-        run: |
-          python -m ensurepip --upgrade
-          pip install -r tests/requirements.txt
-          sudo apt install plink2
-
-      - name: Restore Keys
-        uses: actions/cache@v2
+      - name: Cache nextflow setup
+        id: cache-nextflow
+        uses: actions/cache@v3
         with:
           path: /usr/local/bin/nextflow
           key: ${{ runner.os }}-nextflow
-          restore-keys: |
-            ${{ runner.os }}-nextflow-
-            
+
       - name: Install Nextflow
         run: |
           wget -qO- get.nextflow.io | bash
@@ -100,6 +191,4 @@ jobs:
             /home/runner/pytest_workflow_*/*/log.err
             /home/runner/pytest_workflow_*/*/work
             !/home/runner/pytest_workflow_*/*/work/conda
-            !/home/runner/pytest_workflow_*/*/work/singularity        
-        
-        
+            !/home/runner/pytest_workflow_*/*/work/singularity
