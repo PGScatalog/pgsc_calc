@@ -19,15 +19,28 @@ workflow APPLY_SCORE {
     main:
     ch_versions = Channel.empty()
 
+    geno
+        .mix(pheno, variants)
+        .groupTuple(size: 3, sort: true) // sorting is important for annotate_genomic
+        .branch {
+            ref: it.first().id == 'reference'
+            target: it.first().id != 'reference'
+        }
+        .set { ch_all_genomes }
+
+    ch_all_genomes.target.set { ch_genomes }
+
+    // TODO: relabel reference and then merge back for scoring
+    // think about split scoring files? probably easiest to match target behaviour
+    // ch_all_genomes.ref.view()
+
     scorefiles
         .flatMap { annotate_scorefiles(it) }
         .dump(tag: 'final_scorefiles')
         .set { annotated_scorefiles }
 
     // intersect genomic data with split scoring files -------------------------
-    geno
-        .mix(pheno, variants)
-        .groupTuple(size: 3, sort: true) // sorting is important for annotate_genomic
+    ch_genomes
         .map { annotate_genomic(it) }
         .dump( tag: 'final_genomes')
         .cross ( annotated_scorefiles ) { m, it -> [m.id, m.chrom] }

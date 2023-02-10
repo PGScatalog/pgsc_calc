@@ -291,10 +291,28 @@ workflow PGSCALC {
     //
 
     if (run_apply_score) {
+        if (run_ancestry_assign) {
+            MAKE_COMPATIBLE.out.geno
+                .mix(ANCESTRY_PROJECTION.out.ref_geno)
+                .set { ch_geno }
+
+            MAKE_COMPATIBLE.out.pheno
+                .mix(ANCESTRY_PROJECTION.out.ref_pheno)
+                .set { ch_pheno }
+
+            MAKE_COMPATIBLE.out.variants
+                .mix(ANCESTRY_PROJECTION.out.ref_var)
+                .set { ch_variants }
+        } else {
+            MAKE_COMPATIBLE.out.geno.set { ch_geno }
+            MAKE_COMPATIBLE.out.pheno.set { ch_geno }
+            MAKE_COMPATIBLE.out.variants.set { ch_variants }
+        }
+
         APPLY_SCORE (
-            MAKE_COMPATIBLE.out.geno,
-            MAKE_COMPATIBLE.out.pheno,
-            MAKE_COMPATIBLE.out.variants,
+            ch_geno,
+            ch_pheno,
+            ch_variants,
             MATCH.out.scorefiles,
             INPUT_CHECK.out.log_scorefiles,
             MATCH.out.db

@@ -200,7 +200,7 @@ workflow ANCESTRY_PROJECTION {
         .transpose()
         .branch {
             geno: it.last().getExtension() == 'pgen'
-            pheno: it.last().getExtension() == 'fam'
+            pheno: it.last().getExtension() == 'psam'
             var: it.last().getExtension() == 'zst'
         }
         .set{ ch_ref_branched }
