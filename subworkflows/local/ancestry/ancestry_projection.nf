@@ -189,9 +189,28 @@ workflow ANCESTRY_PROJECTION {
     PLINK2_PROJECT( ch_project_input )
     ch_versions = ch_versions.mix(PLINK2_PROJECT.out.versions.first())
 
+    // prepare reference data channels for emit to scoring subworkflow
+    ch_db.map {
+        meta = it.first().clone()
+        meta.is_pfile = true
+        meta.id = 'reference'
+        meta.chrom = 'ALL'
+        return tuple(meta, it.tail())
+    }
+        .transpose()
+        .branch {
+            geno: it.last().getExtension() == 'pgen'
+            pheno: it.last().getExtension() == 'fam'
+            var: it.last().getExtension() == 'zst'
+        }
+        .set{ ch_ref_branched }
+
     emit:
     intersection = INTERSECT_VARIANTS.out.intersection
     projections = PLINK2_PROJECT.out.projections
+    ref_geno = ch_ref_branched.geno
+    ref_pheno = ch_ref_branched.pheno
+    ref_var = ch_ref_branched.var
     versions = ch_versions
 
 }
