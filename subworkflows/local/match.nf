@@ -18,7 +18,7 @@ workflow MATCH {
         .set { ch_variants }
 
     MATCH_VARIANTS ( ch_variants )
-    ch_versions = ch_versions.mix(MATCH_VARIANTS.out.versions)
+    ch_versions = ch_versions.mix(MATCH_VARIANTS.out.versions.first())
 
     // create custom groupKey() to set a different group size for each
     // sampleset.  different samplesets may have different numbers of

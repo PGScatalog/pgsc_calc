@@ -57,7 +57,7 @@ workflow ANCESTRY_PROJECTION {
         .set{ ch_ref_combined }
 
     INTERSECT_VARIANTS ( ch_ref_combined )
-    ch_versions = ch_versions.mix(INTERSECT_VARIANTS.out.versions)
+    ch_versions = ch_versions.mix(INTERSECT_VARIANTS.out.versions.first())
 
     //
     // STEP 2: filter variants in reference and target datasets ----------------

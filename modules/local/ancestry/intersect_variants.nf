@@ -35,7 +35,7 @@ process INTERSECT_VARIANTS {
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
-        plink2: \$(plink2 --version 2>&1 | sed 's/^PLINK v//; s/ 64.*\$//' )
+        awk:  \$(awk -W version 2> /dev/null | head -n 1 | cut -f 3 -d ' ')
     END_VERSIONS
     """
 }

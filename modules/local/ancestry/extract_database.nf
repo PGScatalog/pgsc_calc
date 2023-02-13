@@ -32,7 +32,7 @@ process EXTRACT_DATABASE {
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
-        pgscatalog_utils: \$(echo \$(python -c 'import pgscatalog_utils; print(pgscatalog_utils.__version__)'))
+        zstd: \$(zstd --version | cut -f 7 -d ' ' | sed 's/v//;s/,//')
     END_VERSIONS
     """
 }
