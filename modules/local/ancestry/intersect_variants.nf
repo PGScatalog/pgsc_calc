@@ -1,7 +1,7 @@
 process INTERSECT_VARIANTS {
     // labels are defined in conf/modules.config
     label 'process_high_memory'
-    label 'plink2' // controls conda, docker, + singularity options
+    label 'zstd' // controls conda, docker, + singularity options
 
     tag "$meta.id chromosome $meta.chrom"
     storeDir "$workDir/intersected/$meta.id/$meta.chrom"
@@ -26,8 +26,8 @@ process INTERSECT_VARIANTS {
     def file_format = meta.is_pfile ? 'pvar' : 'bim'
     id = meta.subMap('id', 'build', 'n_chrom')
     """
-    intersect_variants.sh <(plink2 --zst-decompress $ref_variants) \
-        <(plink2 --zst-decompress $variants) \
+    intersect_variants.sh <(zstdcat $ref_variants) \
+        <(zstdcat $variants) \
         $file_format $meta.chrom
 
     mv matched_variants.txt ${meta.id}_${meta.chrom}_matched.txt
