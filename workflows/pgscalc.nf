@@ -305,7 +305,7 @@ workflow PGSCALC {
                 .set { ch_variants }
         } else {
             MAKE_COMPATIBLE.out.geno.set { ch_geno }
-            MAKE_COMPATIBLE.out.pheno.set { ch_geno }
+            MAKE_COMPATIBLE.out.pheno.set { ch_pheno }
             MAKE_COMPATIBLE.out.variants.set { ch_variants }
         }
 
