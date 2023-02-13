@@ -313,6 +313,7 @@ workflow PGSCALC {
             ch_geno,
             ch_pheno,
             ch_variants,
+            intersection,
             MATCH.out.scorefiles,
             INPUT_CHECK.out.log_scorefiles,
             MATCH.out.db

@@ -3,6 +3,7 @@
 //
 import java.util.zip.GZIPInputStream
 
+include { RELABEL_IDS } from '../../modules/local/ancestry/relabel_ids'
 include { PLINK2_SCORE }    from '../../modules/local/plink2_score'
 include { SCORE_AGGREGATE } from '../../modules/local/score_aggregate'
 include { SCORE_REPORT    } from '../../modules/local/score_report'
@@ -12,12 +13,18 @@ workflow APPLY_SCORE {
     geno
     pheno
     variants
+    intersection
     scorefiles
     log_scorefiles
     db
 
     main:
     ch_versions = Channel.empty()
+
+    scorefiles
+        .flatMap { annotate_scorefiles(it) }
+        .dump(tag: 'final_scorefiles')
+        .set { annotated_scorefiles }
 
     geno
         .mix(pheno, variants)
@@ -34,10 +41,21 @@ workflow APPLY_SCORE {
     // think about split scoring files? probably easiest to match target behaviour
     // ch_all_genomes.ref.view()
 
-    scorefiles
-        .flatMap { annotate_scorefiles(it) }
-        .dump(tag: 'final_scorefiles')
-        .set { annotated_scorefiles }
+
+    // join scorefiles to annotated scorefiles for _reference data_
+    intersection
+        .map { tuple( it.first().subMap('id', 'chrom'), it ) }
+        .join( annotated_scorefiles.map { tuple( it.first().subMap('id', 'chrom'), it ) } )
+        .map { it.tail().flatten() }
+    // only keep scorefile hashmap [meta, matched, meta, scorefile]
+        .map { it.findAll { !(it.getClass() == LinkedHashMap &&
+                              it.containsKey('build')) } }
+        .map { it.sort { it.getClass() } }
+    // sort order: [meta, matched, scorefile ]
+        .set { ch_ref_scorefiles }
+
+    // TODO: automatically handle
+    RELABEL_IDS ( ch_ref_scorefiles )
 
     // intersect genomic data with split scoring files -------------------------
     ch_genomes
