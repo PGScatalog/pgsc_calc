@@ -1,15 +1,3 @@
-FROM continuumio/miniconda3:22.11.1
+FROM debian:bullseye-slim
 
-ADD environment.yml .
-
-RUN conda env create -f environment.yml
-
-ENV PATH="${PATH}:/opt/conda/envs/zstd/bin/"
-
-RUN conda clean --all -y
-
-WORKDIR /opt/conda
-
-RUN find . -maxdepth 1 -not -name envs -type d -exec rm -r {} \; && rm $HOME/.bashrc
-
-WORKDIR /
+RUN apt-get update && apt-get -y install zstd=1.4.8+dfsg-2.1
