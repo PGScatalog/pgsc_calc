@@ -1,8 +1,3 @@
-FROM continuumio/miniconda3
+FROM python:3.10.9-slim-bullseye
 
-WORKDIR /opt/
-
-COPY environment.yml .
-RUN conda env create -f environment.yml && conda clean -ay
-RUN echo "conda activate pyyaml" >> ~/.bashrc
-ENV PATH /opt/conda/envs/pyyaml/bin:$PATH
+RUN pip install --no-cache-dir pyyaml==6.0
