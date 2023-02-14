@@ -24,7 +24,7 @@ process INTERSECT_VARIANTS {
     script:
     def mem_mb = task.memory.toMega() // plink is greedy
     def file_format = meta.is_pfile ? 'pvar' : 'bim'
-    id = meta.subMap('id', 'build', 'n_chrom', 'chrom')
+    id = meta.subMap('id', 'build', 'n_chrom')
     """
     intersect_variants.sh <(zstdcat $ref_variants) \
         <(zstdcat $variants) \
@@ -35,7 +35,7 @@ process INTERSECT_VARIANTS {
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
-        awk:  \$(awk -W version 2> /dev/null | head -n 1 | cut -f 3 -d ' ')
+        zstd: \$(zstd -V | grep -Eo 'v[0-9]\\.[0-9]\\.[0-9]+' )
     END_VERSIONS
     """
 }

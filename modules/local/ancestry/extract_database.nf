@@ -32,7 +32,7 @@ process EXTRACT_DATABASE {
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
-        zstd: \$(zstd --version | cut -f 7 -d ' ' | sed 's/v//;s/,//')
+        zstd: \$(zstd -V | grep -Eo 'v[0-9]\\.[0-9]\\.[0-9]+' )
     END_VERSIONS
     """
 }
