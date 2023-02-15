@@ -27,7 +27,7 @@ process MATCH_COMBINE {
     def ambig = params.keep_ambiguous       ? '--keep_ambiguous'    : ''
     def multi = params.keep_multiallelic    ? '--keep_multiallelic' : ''
     def split = !chrom.contains("ALL") ? '--split' : ''
-    def filter_mode = shared.name != 'NO_FILE' ? "--filter_IDs <(zcat $shared | cut -f 2 -d ' ' | tail -n +2)" : ''
+    def filter_mode = shared.name != 'NO_FILE' ? "--filter_IDs <(zcat $shared | cut -f 7 -d ' ' | tail -n +2)" : ''
     scoremeta = [:]
     scoremeta.id = "$meta.id"
 
