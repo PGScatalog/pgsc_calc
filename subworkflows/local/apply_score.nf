@@ -54,8 +54,24 @@ workflow APPLY_SCORE {
     // sort order: [meta, matched, scorefile ]
         .set { ch_ref_scorefiles }
 
-    // TODO: automatically handle
+    // re-key scoring files for reference dataset
     RELABEL_IDS ( ch_ref_scorefiles )
+
+    // reference data isn't split, but scoring files may be
+    // combine() means scores will be calculated for all scoring files
+    ch_all_genomes.ref
+        .map { annotate_genomic(it) }
+        .combine ( RELABEL_IDS.out.relabelled )
+        .map { it.flatten() }
+        .map {
+            // overwrite meta chrom ALL = scoremeta chrom
+            // this is an acceptable lie for PLINK2_SCORE process
+            // (don't want separate TARGET_SCORE / REF_SCORE processes)
+            meta = it[0].clone()
+            meta.chrom = it[4].chrom
+            return tuple(meta, it.tail()).flatten()
+        }
+        .set { ch_apply_ref }
 
     // intersect genomic data with split scoring files -------------------------
     ch_genomes
@@ -63,6 +79,7 @@ workflow APPLY_SCORE {
         .dump( tag: 'final_genomes')
         .cross ( annotated_scorefiles ) { m, it -> [m.id, m.chrom] }
         .map { it.flatten() }
+        .mix( ch_apply_ref ) // add reference genomes!
         .dump(tag: 'ready_to_score')
         .set { ch_apply }
 
@@ -178,4 +195,12 @@ def count_scores(Path f) {
         assert n_scores > 0 : "Counting scores failed, please check scoring file"
         return n_scores
     }
+}
+
+// TODO: turn this into a utility function
+def annotate_chrom(ArrayList it) {
+    // extract chrom from filename prefix and add to hashmap
+    meta = it.first().clone()
+    meta.chrom = it.last().getSimpleName().tokenize('_')[0]
+    return [meta, it.last()]
 }
