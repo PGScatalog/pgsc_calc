@@ -16,20 +16,21 @@ process RELABEL_IDS {
     tuple val(meta), path(matched), path(target)
 
     output:
-    tuple val(relabel_meta), path("${meta.id}*"), emit: relabelled
+    tuple val(relabel_meta), path("*_${meta.id}*"), emit: relabelled
     path "versions.yml", emit: versions
 
     script:
     relabel_meta = meta.subMap('id', 'build')  // workaround for .clone() failing on a groupKey
-    target_format = target.getExtension() == 'var' ? 'var' : 'afreq'
+    target_format = target.getExtension()
     relabel_meta.target_format = target_format
     """
-    relabel_ids --maps <(zcat $matched) \
+    relabel_ids --maps $matched \
         --col_from ID_REF \
         --col_to ID_TARGET \
         --target_file $target \
         --target_col ID \
-        --out ${meta.id}.${target.getExtension()}
+        --out ${meta.id}.${target.getExtension()} \
+        --verbose
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

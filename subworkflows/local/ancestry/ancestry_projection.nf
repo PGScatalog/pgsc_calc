@@ -121,8 +121,10 @@ workflow ANCESTRY_PROJECTION {
     RELABEL_IDS( ch_relabel_input )
 
     RELABEL_IDS.out.relabelled
+        .transpose()
+        .map { annotate_chrom(it) }
         // extract key from meta map as first element
-        .map { tuple(it.first().subMap('id', 'build'), it) }
+        .map { tuple(it.first().subMap('id', 'chrom'), it) }
         .branch {
             var: it.last().first().target_format == 'var'
             afreq: it.last().first().target_format == 'afreq'
@@ -135,7 +137,7 @@ workflow ANCESTRY_PROJECTION {
 
     ch_genomes
         // extract key from meta map as first element for combining
-        .map { it -> [it.first().subMap(['id', 'build']), it] }
+        .map { it -> [it.first().subMap(['id', 'chrom']), it] }
         .combine ( ch_relabel_output.var, by: 0 )
         .combine ( ch_relabel_output.afreq, by: 0 )
         .map { it.tail().flatten() } // now drop the key
@@ -213,4 +215,11 @@ workflow ANCESTRY_PROJECTION {
     ref_var = ch_ref_branched.var
     versions = ch_versions
 
+}
+
+def annotate_chrom(ArrayList it) {
+    // extract chrom from filename prefix and add to hashmap
+    meta = it.first().clone()
+    meta.chrom = it.last().getSimpleName().tokenize('_')[0]
+    return [meta, it.last()]
 }
