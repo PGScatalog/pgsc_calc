@@ -49,23 +49,10 @@ workflow MAKE_COMPATIBLE {
         .dump(tag: 'make_compatible')
         .set { vmiss }
 
-    // if this subworkflow runs, then the emitted data must exist
-    // only need to check one channel, because process output will check others
-    def geno_fail = true
-    geno_all.subscribe onNext: { geno_fail = false },
-        onComplete: { compatible_error(geno_fail) }
-
     emit:
     geno       = geno_all
     pheno      = pheno_all
     variants   = variants_all
     vmiss      = vmiss
     versions   = ch_versions
-}
-
-def compatible_error(boolean fail) {
-    if (fail) {
-        log.error "Make compatible subworkflow didn't produce expected output"
-        System.exit(1)
-    }
 }
