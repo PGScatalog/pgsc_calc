@@ -17,3 +17,4 @@ def test_correlation(workflow_dir):
     corr.to_csv("correlations.csv")
     for index, value in corr.items():
         assert value > 0.99, f'Score {index} fails correlation test with r {value}'
+        assert false
