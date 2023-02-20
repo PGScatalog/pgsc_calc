@@ -26,7 +26,11 @@ process MATCH_COMBINE {
     def args  = task.ext.args               ?: ''
     def ambig = params.keep_ambiguous       ? '--keep_ambiguous'    : ''
     def multi = params.keep_multiallelic    ? '--keep_multiallelic' : ''
-    def split = !chrom.contains("ALL") ? '--split' : ''
+    // output one (or more) scoring files per chromosome?
+    def split_output = !chrom.contains("ALL") ? '--split' : ''
+    // output one (or more) scoring file per sampleset?
+    def combined_output = (chrom.contains("ALL") || shared.name != 'NO_FILE') ? '--combined' : ''
+    // filter match candidates to intersect with reference?
     def filter_mode = shared.name != 'NO_FILE' ? "--filter_IDs <(zcat $shared | cut -f 7 -d ' ' | tail -n +2)" : ''
     scoremeta = [:]
     scoremeta.id = "$meta.id"
@@ -45,7 +49,8 @@ process MATCH_COMBINE {
         $multi \
         $filter_mode \
         --outdir \$PWD \
-        $split \
+        $split_output \
+        $combined_output \
         -v
 
     cat <<-END_VERSIONS > versions.yml

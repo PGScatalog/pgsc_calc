@@ -16,7 +16,7 @@ process RELABEL_IDS {
     tuple val(meta), path(matched), path(target)
 
     output:
-    tuple val(relabel_meta), path("*_${meta.id}*"), emit: relabelled
+    tuple val(relabel_meta), path("${meta.id}*"), emit: relabelled
     path "versions.yml", emit: versions
 
     script:
@@ -24,16 +24,24 @@ process RELABEL_IDS {
     relabel_meta = meta.plus(['target_format': target_format]) // .plus() returns a new map
     col_from = (target_format == 'scorefile') ? 'ID_TARGET' : 'ID_REF'
     col_to = (target_format == 'scorefile') ? 'ID_REF' : 'ID_TARGET'
-    def split =  meta.chrom ? '--split' : ''
+
+    if (meta.chrom != 'ALL') {
+        output_mode = '--split'
+    } else if (meta.chrom == 'ALL') {
+        output_mode = '--combined'
+    } else if (matched.size() > 1) {
+        output_mode = '--split'
+    }
+
     """
     relabel_ids --maps $matched \
         --col_from $col_from \
         --col_to $col_to \
         --target_file $target \
         --target_col ID \
-        --out ${meta.id}.${target.getExtension()} \
+        --dataset ${meta.id}.${target_format} \
         --verbose \
-        $split
+        $output_mode
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

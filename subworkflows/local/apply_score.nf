@@ -37,40 +37,32 @@ workflow APPLY_SCORE {
 
     ch_all_genomes.target.set { ch_genomes }
 
-    // TODO: relabel reference and then merge back for scoring
-    // think about split scoring files? probably easiest to match target behaviour
-    // ch_all_genomes.ref.view()
+    // prepare scorefiles for reference data -----------------------------------
+    //   1. extract the combined scoring file from the annotated scoring files
+    //   2. join with a list of variants that intersect
+    //   3. relabel scoring file IDs from ID_REF -> ID_TARGET
+    // assumptions:
+    //   - input reference genomes are always combined (i.e. chrom: ALL)
+    annotated_scorefiles
+        .filter{ it.first().chrom == 'ALL'}
+        .map { tuple(it.first().subMap('id'), it) }
+        .set { ch_ref_scorefile }
 
-
-    // join scorefiles to annotated scorefiles for _reference data_
     intersection
-        .map { tuple( it.first().subMap('id', 'chrom'), it ) }
-        .join( annotated_scorefiles.map { tuple( it.first().subMap('id', 'chrom'), it ) } )
-        .map { it.tail().flatten() }
-    // only keep scorefile hashmap [meta, matched, meta, scorefile]
-        .map { it.findAll { !(it.getClass() == LinkedHashMap &&
-                              it.containsKey('build')) } }
-        .map { it.sort { it.getClass() } }
-    // sort order: [meta, matched, scorefile ]
-        .set { ch_ref_scorefiles }
+        .map { tuple( it.first().subMap('id'), it.last() ) }
+        .groupTuple() // TODO: set size
+        .join ( ch_ref_scorefile ) // TODO: replace with combine (effect types?)
+        .map { tuple(it[2][0], it[1], it[2][1]) }
+    // ugly way to get a channel of [scoremeta, [matched], scorefile ]
+    // TODO ??? what if there's more than one scoring file ??? (effect types! duplicate ids!)
+        .set { ch_scorefile_relabel_input }
 
-    // re-key scoring files for reference dataset
-    RELABEL_IDS ( ch_ref_scorefiles )
+    // relabel scoring file ids to match reference format
+    RELABEL_IDS ( ch_scorefile_relabel_input )
 
-    // reference data isn't split, but scoring files may be
-    // combine() means scores will be calculated for all scoring files
     ch_all_genomes.ref
-        .map { annotate_genomic(it) }
-        .combine ( RELABEL_IDS.out.relabelled )
-        .map { it.flatten() }
-        .map {
-            // overwrite meta chrom ALL = scoremeta chrom
-            // this is an acceptable lie for PLINK2_SCORE process
-            // (don't want separate TARGET_SCORE / REF_SCORE processes)
-            meta = it[0].clone()
-            meta.chrom = it[4].chrom
-            return tuple(meta, it.tail()).flatten()
-        }
+        .map { annotate_genomic(it).flatten() }
+        .combine ( RELABEL_IDS.out.relabelled )  // to work with multiple samplesets
         .set { ch_apply_ref }
 
     // intersect genomic data with split scoring files -------------------------
