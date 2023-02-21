@@ -3,6 +3,8 @@ process PLINK2_PCA {
     label 'process_low'
     label 'plink2' // controls conda, docker, + singularity options
 
+    tag "reference" // pca only done on reference data
+
     conda (params.enable_conda ? "${task.ext.conda}" : null)
 
     container "${ workflow.containerEngine == 'singularity' &&
