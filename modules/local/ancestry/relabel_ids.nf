@@ -1,9 +1,10 @@
 process RELABEL_IDS {
     // labels are defined in conf/modules.config
-    label 'process_low'
+    label 'process_medium'
     label 'pgscatalog_utils' // controls conda, docker, + singularity options
 
-    tag "$meta.id $target_format $meta.chrom"
+    // TODO: fix ancestry projection input meta doesn't contain chrom key
+    tag "$meta.id $target_format chromosome ${ meta.containsKey('chrom') ? meta.chrom : 'ALL' }"
 
     conda (params.enable_conda ? "${task.ext.conda}" : null)
 
@@ -24,15 +25,7 @@ process RELABEL_IDS {
     relabel_meta = meta.plus(['target_format': target_format]) // .plus() returns a new map
     col_from = (target_format == 'scorefile') ? 'ID_TARGET' : 'ID_REF'
     col_to = (target_format == 'scorefile') ? 'ID_REF' : 'ID_TARGET'
-
-    if (meta.chrom != 'ALL') {
-        output_mode = '--split'
-    } else if (meta.chrom == 'ALL') {
-        output_mode = '--combined'
-    } else if (matched.size() > 1) {
-        output_mode = '--split'
-    }
-
+    output_mode = "--split --combined" // always output split and combined data to make life easier
     """
     relabel_ids --maps $matched \
         --col_from $col_from \
