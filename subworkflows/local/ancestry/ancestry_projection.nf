@@ -118,6 +118,7 @@ workflow ANCESTRY_PROJECTION {
         .combine( ch_pca_output )
         .set { ch_relabel_input }
 
+    // TODO: fix ancestry projection input meta doesn't contain chrom key
     RELABEL_IDS( ch_relabel_input )
 
     RELABEL_IDS.out.relabelled
@@ -126,7 +127,7 @@ workflow ANCESTRY_PROJECTION {
         // extract key from meta map as first element
         .map { tuple(it.first().subMap('id', 'chrom'), it) }
         .branch {
-            var: it.last().first().target_format == 'var'
+            var: it.last().first().target_format == 'eigenvec'
             afreq: it.last().first().target_format == 'afreq'
         }
         .set { ch_relabel_output }
@@ -165,24 +166,23 @@ workflow ANCESTRY_PROJECTION {
     ch_db
         .combine( ch_samplesets )
         .map {
-            // cloning because don't want to modify meta object in place
-            m = it.first().clone()
-            m.id = it.last()
+            m = [:]
+            m.id = it.last() // this is a white lie for .combine() key
+            m.chrom = 'ALL' // ref data always combined
             it.removeLast()
             return tuple(m, it.tail()).flatten()
         }
         .combine ( ch_relabel_output.var, by: 0 )
         .combine ( ch_relabel_output.afreq, by: 0 )
-        .map { m = it.first().clone()
-              // add important information for PLINK2_PROJECT
-              // must happen after .combine() matches by key
-              m.chrom = 'ALL'
-              m.is_pfile = true
-              return tuple(m, it.tail()).flatten()
+        .map {
+            // add important information for PLINK2_PROJECT
+            // must happen after .combine() matches by key
+            m = it.first().plus(['is_pfile': true])
+            m.id = 'reference' // correct the previous lies
+            return tuple(m, it.tail()).flatten()
         }
-        .map { it.findAll { !(it.getClass() == LinkedHashMap &&
-                              it.containsKey('target_format')) } }
-        .set { ch_ref_project_input }
+        .map { it.findAll { !(it.getClass() == LinkedHashMap && it.containsKey('target_format')) } }
+        .set{ ch_ref_project_input }
 
     ch_target_project_input
         .concat ( ch_ref_project_input )
@@ -207,6 +207,11 @@ workflow ANCESTRY_PROJECTION {
         }
         .set{ ch_ref_branched }
 
+    // make sure the workflow completes reference projection
+    def project_fail = true
+    PLINK2_PROJECT.out.projections.subscribe onNext: { project_fail = false },
+        onComplete: { projection_error(score_fail) }
+
     emit:
     intersection = INTERSECT_VARIANTS.out.intersection
     projections = PLINK2_PROJECT.out.projections
@@ -220,6 +225,13 @@ workflow ANCESTRY_PROJECTION {
 def annotate_chrom(ArrayList it) {
     // extract chrom from filename prefix and add to hashmap
     meta = it.first().clone()
-    meta.chrom = it.last().getSimpleName().tokenize('_')[0]
+    meta.chrom = it.last().getBaseName().tokenize('_')[1]
     return [meta, it.last()]
+}
+
+def projection_error(boolean fail) {
+    if (fail) {
+        log.error "ERROR: No projections calculated!"
+        System.exit(1)
+    }
 }
