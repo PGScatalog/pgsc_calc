@@ -62,9 +62,17 @@ workflow APPLY_SCORE {
     // relabel scoring file ids to match reference format
     RELABEL_IDS ( ch_scorefile_relabel_input )
 
+    RELABEL_IDS.out.relabelled
+        .transpose()
+        .map { annotate_chrom(it) }
+        .map { tuple(it.first().subMap('chrom'), it) }
+        .set { ch_target_scorefile }
+
     ch_all_genomes.ref
         .map { annotate_genomic(it).flatten() }
-        .combine ( RELABEL_IDS.out.relabelled )  // to work with multiple samplesets
+        .map { tuple(it.first().subMap('chrom'), it) }
+        .combine( ch_target_scorefile, by: 0 ) // to work with multiple samplesets
+        .map { it.tail().flatten() }
         .set { ch_apply_ref }
 
     // intersect genomic data with split scoring files -------------------------
@@ -195,6 +203,6 @@ def count_scores(Path f) {
 def annotate_chrom(ArrayList it) {
     // extract chrom from filename prefix and add to hashmap
     meta = it.first().clone()
-    meta.chrom = it.last().getSimpleName().tokenize('_')[0]
+    meta.chrom = it.last().getBaseName().tokenize('_')[1]
     return [meta, it.last()]
 }
