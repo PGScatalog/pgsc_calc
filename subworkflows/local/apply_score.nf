@@ -38,8 +38,10 @@ workflow APPLY_SCORE {
     ch_all_genomes.target.set { ch_genomes }
 
     // prepare scorefiles for reference data -----------------------------------
-    //   1. extract the combined scoring file from the annotated scoring files
+    //   1. extract the combined scoring files from the annotated scoring files
+    //      (more than one may be present to handle duplicates or effect types)
     //   2. join with a list of variants that intersect
+    //   3. combine reference genome with scoring files
     //   3. relabel scoring file IDs from ID_REF -> ID_TARGET
     // assumptions:
     //   - input reference genomes are always combined (i.e. chrom: ALL)
@@ -50,11 +52,11 @@ workflow APPLY_SCORE {
 
     intersection
         .map { tuple( it.first().subMap('id'), it.last() ) }
-        .groupTuple() // TODO: set size
-        .join ( ch_ref_scorefile ) // TODO: replace with combine (effect types?)
-        .map { tuple(it[2][0], it[1], it[2][1]) }
-    // ugly way to get a channel of [scoremeta, [matched], scorefile ]
-    // TODO ??? what if there's more than one scoring file ??? (effect types! duplicate ids!)
+        .groupTuple() // TODO: be polite and set size
+        // ref genome must be combined with _all_ scorefiles
+        .combine ( ch_ref_scorefile, by: 0 )
+        // re-order: [scoremeta, [variant match reports], scorefile]
+        .map { tuple(it.last().first(), it.tail().head(), it.last().last()) }
         .set { ch_scorefile_relabel_input }
 
     // relabel scoring file ids to match reference format
