@@ -4,7 +4,6 @@ about: Question about polygenic risk score calculation?
 title: ''
 labels: ''
 assignees: ''
-
 ---
 
 Hi! Thanks for using the PGS Catalog calculator (`pgsc_calc`). 
