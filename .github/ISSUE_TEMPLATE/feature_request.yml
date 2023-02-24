@@ -1,5 +1,5 @@
 name: Feature request
-description: Suggest an idea for the `pgsc_calc` pipeline
+description: Suggest an idea for the pgsc_calc pipeline
 labels: enhancement
 body:
   - type: textarea
