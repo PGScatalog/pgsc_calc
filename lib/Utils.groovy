@@ -3,6 +3,7 @@
 //
 
 import org.yaml.snakeyaml.Yaml
+import groovyx.gpars.dataflow.DataflowBroadcast
 
 class Utils {
 
@@ -37,4 +38,45 @@ class Utils {
                 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         }
     }
+
+    static DataflowBroadcast submapCombine(channel_a, channel_b, keys, flatten=true) {
+        channel_a
+            .mix(channel_b)
+            .map { keys.collect { key -> assert it.first().containsKey(key) } }
+
+        if (flatten) {
+            return channel_a.map { it -> [it.first().subMap(keys), it] }
+                .combine(channel_b.map { it -> [it.first().subMap(keys), it] }, by: 0)
+                .map{ it.tail().flatten() }
+        } else {
+            return channel_a.map { it -> [it.first().subMap(keys), it] }
+                .combine(channel_b.map { it -> [it.first().subMap(keys), it] }, by: 0)
+                .map{ it.tail() }
+        }
+    }
+
+    // extract chromosome from file path
+    static ArrayList annotateChrom(ArrayList channel) {
+        def meta = channel.first().clone()
+        meta.chrom = channel.last().getBaseName().tokenize('_')[1]
+        return [meta, channel.last()]
+    }
+
+    // [map, object, ..., map, object]
+    // if drop = false, keep maps with matching key, leave objects alone
+    // if drop = true, drop maps with matching key, leave objects alone
+    static LinkedList filterMapListByKey(LinkedList channel, String key, boolean drop = false) {
+        return channel.findAll {
+            if (it instanceof LinkedHashMap) {
+                if (drop) {
+                    return !it.containsKey(key)
+                } else {
+                    return it.containsKey(key)
+                }
+            } else {
+                return true
+            }
+        }
+    }
+
 }
