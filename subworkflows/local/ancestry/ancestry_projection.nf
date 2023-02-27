@@ -33,6 +33,7 @@ workflow ANCESTRY_PROJECTION {
     //
     // STEP 0: extract the reference data once (don't do it inside separate processes)
     //
+
     EXTRACT_DATABASE( reference )
 
     EXTRACT_DATABASE.out.grch38
@@ -46,13 +47,10 @@ workflow ANCESTRY_PROJECTION {
     // STEP 1: get overlapping variants across reference and target ------------
     //
 
-    ch_genomes
-        .join(vmiss)
-        // copy build to first element, use as a key, and drop it
-        .map { it -> [it.first().subMap(['build']), it] }
-        .combine ( ch_db, by: 0 )
-        .map { it.tail() }
-        .map { it.flatten() }
+    Utils.submapCombine(ch_genomes.join(vmiss),
+                        ch_db,
+                        keys=['build'])
+        .map { Utils.filterMapListByKey(it, key='id') } // (keep map at list head)
         .dump(tag: 'intersect_input')
         .set{ ch_ref_combined }
 
@@ -66,6 +64,7 @@ workflow ANCESTRY_PROJECTION {
         .concat(EXTRACT_DATABASE.out.grch38_king)
         .set { ch_king }
 
+    // TODO: this is hardcoded and prevents custom reference support
     Channel.of(
          [['build': 'GRCh37'], file("$projectDir/assets/ancestry/high-LD-regions-hg19-GRCh37.txt", checkIfExists: true)],
          [['build': 'GRCh38'], file("$projectDir/assets/ancestry/high-LD-regions-hg38-GRCh38.txt", checkIfExists: true)]
@@ -79,17 +78,24 @@ workflow ANCESTRY_PROJECTION {
     INTERSECT_VARIANTS.out.intersection
         .map { tuple(groupKey(it.first().subMap('id', 'build'), it.first().n_chrom),
                      it.last()) }
-        .groupTuple()
-        // temporarily set build as key for joining with reference data
-        .map { it -> tuple(it.first().subMap(['build']), it) }
+        .groupTuple() // groupKey has an implicit size
         .set { ch_intersected }
 
-    ch_intersected
-        .combine(ch_db, by: 0 )
-        .combine(ch_king_and_ld, by: 0 )
-        // this seems like an unpleasant way to do things. how to flatten one level of a groovy list?
-        // [meta.id, meta.build], list[intersected], ref_geno, ref_var, ref_pheno, ld, king
-        .map { tuple(it[1][0], it[1][1], it[2], it[3], it[4], it[5], it[6]) }
+    // 1) combine ch_intersected with ch_db by build key
+    //    (there may be multiple ch_intersected if multiple samplesets are in the run)
+    // 2) combine 1) with ch_king_and_ld by build key
+    // 3) filter extra hash maps from ch_db and ch_king_and_ld
+    // 4) convert long flat list of match reports into a nested list in the resulting
+    //     ch_filter_input channel
+    Utils.submapCombine(
+        Utils.submapCombine(
+            ch_intersected,
+            ch_db,
+            ['build']),
+        ch_king_and_ld,
+        ['build'])
+        .map { Utils.filterMapListByKey(it, 'id') }
+        .map { Utils.listifyMatchReports(it) }
         .set { ch_filter_input }
 
     FILTER_VARIANTS ( ch_filter_input )
@@ -114,7 +120,6 @@ workflow ANCESTRY_PROJECTION {
         .set { ch_pca_output }
 
     ch_intersected
-        .map { tuple(it[1][0], it[1][1]) }
         .combine( ch_pca_output )
         .set { ch_relabel_input }
 
@@ -123,12 +128,10 @@ workflow ANCESTRY_PROJECTION {
 
     RELABEL_IDS.out.relabelled
         .transpose()
-        .map { annotate_chrom(it) }
-        // extract key from meta map as first element
-        .map { tuple(it.first().subMap('id', 'chrom'), it) }
+        .map { Utils.annotateChrom(it) }
         .branch {
-            var: it.last().first().target_format == 'eigenvec'
-            afreq: it.last().first().target_format == 'afreq'
+            var: it.first().target_format == 'eigenvec'
+            afreq: it.first().target_format == 'afreq'
         }
         .set { ch_relabel_output }
 
@@ -136,59 +139,55 @@ workflow ANCESTRY_PROJECTION {
     // STEP 4: Project reference and target samples into PCA space -------------
     //
 
-    ch_genomes
-        // extract key from meta map as first element for combining
-        .map { it -> [it.first().subMap(['id', 'chrom']), it] }
-        .combine ( ch_relabel_output.var, by: 0 )
-        .combine ( ch_relabel_output.afreq, by: 0 )
-        .map { it.tail().flatten() } // now drop the key
-        // findAll() cleanly drops redundant hashmaps (keeps first one)
-        // TODO: replace horrible list slicing with findAll()
-        .map { it.findAll { !(it.getClass() == LinkedHashMap &&
-                              it.containsKey('target_format')) } }
+    def relabel_keys = ['id', 'chrom']
+    Utils.submapCombine(
+        Utils.submapCombine(ch_genomes,
+                            ch_relabel_output.var,
+                            relabel_keys),
+        ch_relabel_output.afreq,
+        relabel_keys
+    )
+        .map { Utils.filterMapListByKey(it, key='target_format', drop=true) } // keep head of list
         .dump(tag: 'target_project_input')
-        // [meta, geno, pheno, var, eigenvec, afreq]
         .set { ch_target_project_input }
 
     // associate the reference database with each unique sampleset
     // so it's possible to join the reference channel with the rekeyed data
-
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // TODO: think about this again
-    //   - it's running the reference projection once per sampleset
-    //   - afreq and vars are taken from the associated sampleset
-    //   - should we project the reference data once and combine the results with
-    //   each sampleset?
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
     ch_genomes.map { it.first().id }.unique().set { ch_samplesets }
 
     ch_db
         .combine( ch_samplesets )
         .map {
             m = [:]
-            m.id = it.last() // this is a white lie for .combine() key
+            m.id = it.last() // this is a white lie for Utils.submapCombine()
             m.chrom = 'ALL' // ref data always combined
             it.removeLast()
             return tuple(m, it.tail()).flatten()
         }
-        .combine ( ch_relabel_output.var, by: 0 )
-        .combine ( ch_relabel_output.afreq, by: 0 )
+        .set { ch_ref_genomes }
+
+    // 1) combine ref genomes with relabelled variant file by id and chrom keys
+    // 2) combine 1) with relabelled allele frequency file by id and chrom keys
+    // 3) update meta map with keys needed by plink processes
+    // 4) drop extra hashmaps (i.e., only keep first hashmap)
+    Utils.submapCombine(
+        Utils.submapCombine(ch_ref_genomes,
+                            ch_relabel_output.var,
+                            relabel_keys),
+        ch_relabel_output.afreq,
+        relabel_keys
+    )
         .map {
             // add important information for PLINK2_PROJECT
             // must happen after .combine() matches by key
             m = it.first().plus(['is_pfile': true])
-            m.id = 'reference' // correct the previous lies
+            m.id = 'reference' // correct the previous lie
             return tuple(m, it.tail()).flatten()
         }
-        .map { it.findAll { !(it.getClass() == LinkedHashMap && it.containsKey('target_format')) } }
+        .map{ Utils.filterMapListByKey(it, 'target_format', drop=true) }
         .set{ ch_ref_project_input }
 
-    ch_target_project_input
-        .concat ( ch_ref_project_input )
-        .set { ch_project_input }
-
-    PLINK2_PROJECT( ch_project_input )
+    PLINK2_PROJECT( ch_target_project_input.mix ( ch_ref_project_input ) )
     ch_versions = ch_versions.mix(PLINK2_PROJECT.out.versions.first())
 
     // prepare reference data channels for emit to scoring subworkflow
@@ -207,10 +206,10 @@ workflow ANCESTRY_PROJECTION {
         }
         .set{ ch_ref_branched }
 
-    // make sure the workflow completes reference projection
-    def project_fail = true
-    PLINK2_PROJECT.out.projections.subscribe onNext: { project_fail = false },
-        onComplete: { projection_error(score_fail) }
+    // make sure the workflow completes reference projection for ref + target
+    def project_count = 0
+    PLINK2_PROJECT.out.projections.subscribe onNext: { project_count++ },
+        onComplete: { projection_error(project_count) }
 
     emit:
     intersection = INTERSECT_VARIANTS.out.intersection
@@ -222,16 +221,11 @@ workflow ANCESTRY_PROJECTION {
 
 }
 
-def annotate_chrom(ArrayList it) {
-    // extract chrom from filename prefix and add to hashmap
-    meta = it.first().clone()
-    meta.chrom = it.last().getBaseName().tokenize('_')[1]
-    return [meta, it.last()]
-}
-
-def projection_error(boolean fail) {
-    if (fail) {
-        log.error "ERROR: No projections calculated!"
+def projection_error(int n) {
+    // basic check to see if projection succeeded.
+    // reference = 1, target = at least 1 (1 + 1 = 2)
+    if (n < 2) {
+        log.error "ERROR: Incomplete projections calculated!"
         System.exit(1)
     }
 }
