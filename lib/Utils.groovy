@@ -4,6 +4,7 @@
 
 import org.yaml.snakeyaml.Yaml
 import groovyx.gpars.dataflow.DataflowBroadcast
+import java.nio.file.Path
 
 class Utils {
 
@@ -39,6 +40,10 @@ class Utils {
         }
     }
 
+    // a convenience function for using nextflow's .combine() with hashmap keys
+    // the key must be a list of hashmap keys
+    // the hashmap must be at the head of a list
+    // the key can be a subset of hashmap keys
     static DataflowBroadcast submapCombine(channel_a, channel_b, keys, flatten=true) {
         channel_a
             .mix(channel_b)
@@ -56,7 +61,7 @@ class Utils {
     }
 
     // extract chromosome from file path
-    static ArrayList annotateChrom(ArrayList channel) {
+    static List annotateChrom(List channel) {
         def meta = channel.first().clone()
         meta.chrom = channel.last().getBaseName().tokenize('_')[1]
         return [meta, channel.last()]
@@ -65,7 +70,7 @@ class Utils {
     // [map, object, ..., map, object]
     // if drop = false, keep maps with matching key, leave objects alone
     // if drop = true, drop maps with matching key, leave objects alone
-    static LinkedList filterMapListByKey(LinkedList channel, String key, boolean drop = false) {
+    static List filterMapListByKey(List channel, String key, boolean drop = false) {
         return channel.findAll {
             if (it instanceof LinkedHashMap) {
                 if (drop) {
@@ -77,6 +82,29 @@ class Utils {
                 return true
             }
         }
+    }
+
+    // grab a long flat tuple with a structure like:
+    // [meta, 1_matched.txt.gz, ..., n_matched.txt.gz,
+    //     ref_geno, ref_var, ref_pheno, ld, king]
+    // and make the intersected match reports (1_matched.txt.gz...) into a list, like:
+    // [meta.id, meta.build], list[intersected], ref_geno, ref_var, ref_pheno, ld, king]
+    static List listifyMatchReports(List channel) {
+        def meta = channel.first()
+        def matches = []
+        def not_matches = []
+
+        for (item in channel){
+            // explicitly importing java.nio.file.Path fixes failed compilation
+            if (item instanceof Path) {
+                if (item.getName() ==~ '.*matched.txt.gz$') {
+                    matches.add(item)
+                } else {
+                    not_matches.add(item)
+                }
+            }
+        }
+        return [meta, matches, *not_matches]
     }
 
 }
