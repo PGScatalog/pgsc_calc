@@ -51,8 +51,9 @@ process PLINK2_RELABELBIM {
         --make-just-bim zs \\
         --out ${build}${prefix}${meta.chrom}
 
-    cp -RP $geno ${build}${prefix}${meta.chrom}.bed
-    cp -RP $pheno ${build}${prefix}${meta.chrom}.fam
+    # cross platform (mac, linux) method of preserving symlinks
+    cp -a $geno ${build}${prefix}${meta.chrom}.bed
+    cp -a $pheno ${build}${prefix}${meta.chrom}.fam
     gzip *.vmiss
 
     cat <<-END_VERSIONS > versions.yml

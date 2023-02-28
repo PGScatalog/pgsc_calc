@@ -52,8 +52,9 @@ process PLINK2_RELABELPVAR {
         --make-just-pvar zs \\
         --out ${build}${prefix}${meta.chrom}
 
-    cp -RP $geno ${build}${prefix}${meta.chrom}.pgen
-    cp -RP $pheno ${build}${prefix}${meta.chrom}.psam
+    # cross platform (mac, linux) method of preserving symlinks
+    cp -a $geno ${build}${prefix}${meta.chrom}.pgen
+    cp -a $pheno ${build}${prefix}${meta.chrom}.psam
     gzip *.vmiss
 
     cat <<-END_VERSIONS > versions.yml
