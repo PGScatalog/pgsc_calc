@@ -166,17 +166,12 @@ workflow ANCESTRY_PROJECTION {
         }
         .set { ch_ref_genomes }
 
-    // 1) combine ref genomes with relabelled variant file by id and chrom keys
-    // 2) combine 1) with relabelled allele frequency file by id and chrom keys
+    // 1) combine ref genomes with pca eigenvec var, no key needed
+    // 2) combine 1) with pca allele frequency file, no key needed
     // 3) update meta map with keys needed by plink processes
-    // 4) drop extra hashmaps (i.e., only keep first hashmap)
-    Utils.submapCombine(
-        Utils.submapCombine(ch_ref_genomes,
-                            ch_relabel_output.var,
-                            relabel_keys),
-        ch_relabel_output.afreq,
-        relabel_keys
-    )
+    ch_ref_genomes
+        .combine(PLINK2_PCA.out.eigenvec_var)
+        .combine(PLINK2_PCA.out.afreq)
         .map {
             // add important information for PLINK2_PROJECT
             // must happen after .combine() matches by key
@@ -184,7 +179,6 @@ workflow ANCESTRY_PROJECTION {
             m.id = 'reference' // correct the previous lie
             return tuple(m, it.tail()).flatten()
         }
-        .map{ Utils.filterMapListByKey(it, 'target_format', drop=true) }
         .set{ ch_ref_project_input }
 
     PLINK2_PROJECT( ch_target_project_input.mix ( ch_ref_project_input ) )
