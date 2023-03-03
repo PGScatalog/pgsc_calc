@@ -151,7 +151,7 @@ include { BOOTSTRAP_ANCESTRY   } from '../subworkflows/local/ancestry/bootstrap_
 include { INPUT_CHECK          } from '../subworkflows/local/input_check'
 include { MAKE_COMPATIBLE      } from '../subworkflows/local/make_compatible'
 include { MATCH                } from '../subworkflows/local/match'
-include { ANCESTRY_PROJECTION  } from '../subworkflows/local/ancestry/ancestry_projection'
+include { ANCESTRY_PROJECT  } from '../subworkflows/local/ancestry/ancestry_project'
 include { APPLY_SCORE          } from '../subworkflows/local/apply_score'
 include { DUMPSOFTWAREVERSIONS } from '../modules/local/dumpsoftwareversions'
 
@@ -234,7 +234,7 @@ workflow PGSCALC {
     // SUBWORKFLOW: Run ancestry projection
     //
     if (run_ancestry_assign) {
-        ANCESTRY_PROJECTION (
+        ANCESTRY_PROJECT (
             MAKE_COMPATIBLE.out.geno,
             MAKE_COMPATIBLE.out.pheno,
             MAKE_COMPATIBLE.out.variants,
@@ -242,7 +242,7 @@ workflow PGSCALC {
             ch_reference,
             params.target_build
         )
-        ch_versions = ch_versions.mix(ANCESTRY_PROJECTION.out.versions)
+        ch_versions = ch_versions.mix(ANCESTRY_PROJECT.out.versions)
     }
 
     //
@@ -259,7 +259,7 @@ workflow PGSCALC {
     if (run_match) {
         if (run_ancestry_assign) {
             // intersected variants ( across ref & target ) are an optional input
-            intersection = ANCESTRY_PROJECTION.out.intersection
+            intersection = ANCESTRY_PROJECT.out.intersection
         } else {
             dummy_input = Channel.of(file('NO_FILE')) // dummy file that doesn't exist
             // associate each sampleset with the dummy file
@@ -293,15 +293,15 @@ workflow PGSCALC {
     if (run_apply_score) {
         if (run_ancestry_assign) {
             MAKE_COMPATIBLE.out.geno
-                .mix(ANCESTRY_PROJECTION.out.ref_geno)
+                .mix(ANCESTRY_PROJECT.out.ref_geno)
                 .set { ch_geno }
 
             MAKE_COMPATIBLE.out.pheno
-                .mix(ANCESTRY_PROJECTION.out.ref_pheno)
+                .mix(ANCESTRY_PROJECT.out.ref_pheno)
                 .set { ch_pheno }
 
             MAKE_COMPATIBLE.out.variants
-                .mix(ANCESTRY_PROJECTION.out.ref_var)
+                .mix(ANCESTRY_PROJECT.out.ref_var)
                 .set { ch_variants }
         } else {
             MAKE_COMPATIBLE.out.geno.set { ch_geno }

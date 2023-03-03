@@ -1,5 +1,6 @@
 //
-//
+// Do a PCA on reference data and project target genomes into the PCA space
+// This subworkflow suffers from shrinkage, which ANCESTRY_OADP mitigates
 //
 
 include { EXTRACT_DATABASE } from '../../../modules/local/ancestry/extract_database'
@@ -9,7 +10,7 @@ include { PLINK2_PCA } from '../../../modules/local/ancestry/plink2_pca'
 include { RELABEL_IDS } from '../../../modules/local/ancestry/relabel_ids'
 include { PLINK2_PROJECT } from '../../../modules/local/ancestry/plink2_project'
 
-workflow ANCESTRY_PROJECTION {
+workflow ANCESTRY_PROJECT {
     take:
     geno
     pheno
