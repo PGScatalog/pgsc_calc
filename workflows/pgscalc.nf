@@ -152,6 +152,7 @@ include { INPUT_CHECK          } from '../subworkflows/local/input_check'
 include { MAKE_COMPATIBLE      } from '../subworkflows/local/make_compatible'
 include { MATCH                } from '../subworkflows/local/match'
 include { ANCESTRY_PROJECT  } from '../subworkflows/local/ancestry/ancestry_project'
+include { ANCESTRY_OADP  } from '../subworkflows/local/ancestry/ancestry_oadp'
 include { APPLY_SCORE          } from '../subworkflows/local/apply_score'
 include { DUMPSOFTWAREVERSIONS } from '../modules/local/dumpsoftwareversions'
 
@@ -234,15 +235,29 @@ workflow PGSCALC {
     // SUBWORKFLOW: Run ancestry projection
     //
     if (run_ancestry_assign) {
-        ANCESTRY_PROJECT (
-            MAKE_COMPATIBLE.out.geno,
-            MAKE_COMPATIBLE.out.pheno,
-            MAKE_COMPATIBLE.out.variants,
-            MAKE_COMPATIBLE.out.vmiss,
-            ch_reference,
-            params.target_build
-        )
-        ch_versions = ch_versions.mix(ANCESTRY_PROJECT.out.versions)
+        if (params.shrinkage) {
+            ANCESTRY_OADP (
+                MAKE_COMPATIBLE.out.geno,
+                MAKE_COMPATIBLE.out.pheno,
+                MAKE_COMPATIBLE.out.variants,
+                MAKE_COMPATIBLE.out.vmiss,
+                ch_reference,
+                params.target_build
+            )
+            ch_versions = ch_versions.mix(ANCESTRY_OADP.out.versions)
+            intersection = ANCESTRY_OADP.out.intersection
+        } else {
+            ANCESTRY_PROJECT (
+                MAKE_COMPATIBLE.out.geno,
+                MAKE_COMPATIBLE.out.pheno,
+                MAKE_COMPATIBLE.out.variants,
+                MAKE_COMPATIBLE.out.vmiss,
+                ch_reference,
+                params.target_build
+            )
+            ch_versions = ch_versions.mix(ANCESTRY_PROJECT.out.versions)
+            intersection = ANCESTRY_PROJECTION.out.intersection
+        }
     }
 
     //
@@ -259,7 +274,7 @@ workflow PGSCALC {
     if (run_match) {
         if (run_ancestry_assign) {
             // intersected variants ( across ref & target ) are an optional input
-            intersection = ANCESTRY_PROJECT.out.intersection
+            // intersection = ANCESTRY_PROJECT.out.intersection
         } else {
             dummy_input = Channel.of(file('NO_FILE')) // dummy file that doesn't exist
             // associate each sampleset with the dummy file
