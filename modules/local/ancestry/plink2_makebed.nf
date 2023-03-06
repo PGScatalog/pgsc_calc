@@ -17,8 +17,7 @@ process PLINK2_MAKEBED {
 
     input:
     // input is sorted alphabetically -> bed, fam, bim.zst or pgen, psam, pvar
-    tuple val(meta), path(geno), path(pheno), path(variants)
-    path pruned // optional list of variants to extract
+    tuple val(meta), path(geno), path(pheno), path(variants), path(pruned)
 
     output:
     tuple val(meta), path("*.bed"), emit: geno
@@ -35,7 +34,7 @@ process PLINK2_MAKEBED {
 
     // output options
     def extract = pruned.name != 'NO_FILE' ? "--extract $pruned" : ''
-    def thinned = pruned.name != 'NO_FILE' ? "_thinned" : ''
+    def extracted = pruned.name != 'NO_FILE' ? "_extracted" : ''
     def prefix = task.ext.suffix ? "${meta.id}${task.ext.suffix}_" : "${meta.id}_"
     def build = meta.build? meta.build + '_': ''
 
@@ -48,7 +47,7 @@ process PLINK2_MAKEBED {
         $input ${geno.baseName} \
         --make-bed vzs \
         $extract \
-        --out ${build}${prefix}${meta.chrom}${thinned}
+        --out ${build}${prefix}${meta.chrom}${extracted}
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
