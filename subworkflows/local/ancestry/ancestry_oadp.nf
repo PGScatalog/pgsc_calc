@@ -102,8 +102,20 @@ workflow ANCESTRY_OADP {
     FILTER_VARIANTS ( ch_filter_input )
 
     FILTER_VARIANTS.out.ref
-        .join(FILTER_VARIANTS.out.prune_in)
-        .set { ch_pca_input }
+        .map {
+            m = it.first().clone()
+            m.id = 'reference'
+            m.chrom = 'ALL'
+            m.is_pfile = true
+            return tuple(m, it.tail()).flatten()
+        }
+        .set { ch_makebed_ref }
+
+    FILTER_VARIANTS.out.prune_in
+        .map{ it.last() } // drop meta key, not needed
+        .set { ch_prune_in }
+
+    PLINK2_MAKEBED ( ch_makebed_ref, ch_prune_in )
 
 
     emit:

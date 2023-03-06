@@ -16,8 +16,9 @@ process PLINK2_MAKEBED {
         "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
-    // input is sorted alphabetically -> bed, bim, fam or pgen, psam, pvar
-    tuple val(meta), path(geno), path(variants), path(pheno)
+    // input is sorted alphabetically -> bed, fam, bim.zst or pgen, psam, pvar
+    tuple val(meta), path(geno), path(pheno), path(variants)
+    path pruned // optional list of variants to extract
 
     output:
     tuple val(meta), path("*.bed"), emit: geno
@@ -27,20 +28,27 @@ process PLINK2_MAKEBED {
 
     script:
     def args = task.ext.args ?: ''
-    def compressed = variants.getName().endsWith("zst") ? 'vzs' : ''
-    // dynamic input option
+    def mem_mb = task.memory.toMega() // plink is greedy
+
+    // input options
     def input = (meta.is_pfile) ? '--pfile vzs' : '--bfile vzs'
 
-    // TODO: optionally extract pruned variants for target (ref won't need this)
+    // output options
+    def extract = pruned.name != 'NO_FILE' ? "--extract $pruned" : ''
+    def thinned = pruned.name != 'NO_FILE' ? "_thinned" : ''
+    def prefix = task.ext.suffix ? "${meta.id}${task.ext.suffix}_" : "${meta.id}_"
+    def build = meta.build? meta.build + '_': ''
+
     """
     plink2 \
         --threads $task.cpus \
         --memory $mem_mb \
         --seed 31 \
         $args \
-        $input ${geno.baseName} $compressed \
+        $input ${geno.baseName} \
         --make-bed vzs \
-        --out ${build}${prefix}${meta.chrom}
+        $extract \
+        --out ${build}${prefix}${meta.chrom}${thinned}
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
