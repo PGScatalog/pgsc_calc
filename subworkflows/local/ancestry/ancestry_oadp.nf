@@ -6,9 +6,7 @@ include { EXTRACT_DATABASE } from '../../../modules/local/ancestry/extract_datab
 include { INTERSECT_VARIANTS } from '../../../modules/local/ancestry/intersect_variants'
 include { FILTER_VARIANTS } from '../../../modules/local/ancestry/filter_variants'
 include { PLINK2_MAKEBED } from '../../../modules/local/ancestry/plink2_makebed'
-include { PLINK2_PCA } from '../../../modules/local/ancestry/plink2_pca'
-include { RELABEL_IDS } from '../../../modules/local/ancestry/relabel_ids'
-include { PLINK2_PROJECT } from '../../../modules/local/ancestry/plink2_project'
+include { INTERSECT_THINNED } from '../../../modules/local/ancestry/oadp/intersect_thinned'
 
 workflow ANCESTRY_OADP {
     take:
@@ -101,7 +99,11 @@ workflow ANCESTRY_OADP {
 
     FILTER_VARIANTS ( ch_filter_input )
 
+    //
+    // ref -> thinned bfile for fraposa
+    //
     FILTER_VARIANTS.out.ref
+        .join( FILTER_VARIANTS.out.prune_in, by: 0 )
         .map {
             m = it.first().clone()
             m.id = 'reference'
@@ -111,12 +113,35 @@ workflow ANCESTRY_OADP {
         }
         .set { ch_makebed_ref }
 
-    FILTER_VARIANTS.out.prune_in
-        .map{ it.last() } // drop meta key, not needed
-        .set { ch_prune_in }
+    PLINK2_MAKEBED ( ch_makebed_ref )
 
-    PLINK2_MAKEBED ( ch_makebed_ref, ch_prune_in )
+    //
+    // targets -> intersect with thinned variants
+    //
+    Utils.submapCombine(
+        ch_intersected,
+        FILTER_VARIANTS.out.prune_in,
+        ['build']
+    )
+        .map { Utils.filterMapListByKey(it, 'id') }
+        .map { Utils.listifyMatchReports(it) }
+        .map { [ it.first().subMap('build', 'id'), it] }
+        .set { ch_intersect_thin_input }
 
+    //ch_intersect_thin_input.view()
+    ch_genomes.map { [groupKey(it.first().subMap('build', 'id', 'is_pfile', 'is_bfile'), it.first().n_chrom), it] }
+        .groupTuple()
+        .map{ Utils.filterMapListByKey(it.flatten(), 'chrom', drop=true) }
+        .map{ [ it.first().subMap('build', 'id'), it.head(), it.tail() ] }
+        .set{ ch_combined_genomes }
+
+    ch_intersect_thin_input.join(ch_combined_genomes, by: 0)
+        .map { it.tail().first() + it.tail().tail() }
+    // [meta, [matches], pruned, geno_meta, [gigantic list of pfiles]]
+        .set { ch_blah }
+
+    // extract merge and relabel!
+    INTERSECT_THINNED ( ch_blah )
 
     emit:
     intersection = INTERSECT_VARIANTS.out.intersection
