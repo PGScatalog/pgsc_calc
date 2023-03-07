@@ -5,8 +5,6 @@ process PLINK2_MAKEBED {
     label "plink2" // controls conda, docker, + singularity options
 
     tag "$meta.id chromosome $meta.chrom"
-    storeDir ( params.genotypes_cache ? "$params.genotypes_cache/${meta.id}/${meta.build}/${meta.chrom}" :
-              "$workDir/genomes/${meta.id}/${meta.build}/${meta.chrom}/")
 
     conda (params.enable_conda ? "${task.ext.conda}" : null)
 
@@ -21,16 +19,13 @@ process PLINK2_MAKEBED {
 
     output:
     tuple val(meta), path("*.bed"), emit: geno
-    tuple val(meta), path("*.zst"), emit: variants
+    tuple val(meta), path("*.bim"), emit: variants
     tuple val(meta), path("*.fam"), emit: pheno
     path "versions.yml"           , emit: versions
 
     script:
     def args = task.ext.args ?: ''
     def mem_mb = task.memory.toMega() // plink is greedy
-
-    // input options
-    def input = (meta.is_pfile) ? '--pfile vzs' : '--bfile vzs'
 
     // output options
     def extract = pruned.name != 'NO_FILE' ? "--extract $pruned" : ''
@@ -39,13 +34,15 @@ process PLINK2_MAKEBED {
     def build = meta.build? meta.build + '_': ''
 
     """
+    # use explicit flag because pfile prefix might be different
     plink2 \
         --threads $task.cpus \
         --memory $mem_mb \
         --seed 31 \
-        $args \
-        $input ${geno.baseName} \
-        --make-bed vzs \
+        --pgen $geno \
+        --psam $pheno \
+        --pvar $variants \
+        --make-bed \
         $extract \
         --out ${build}${prefix}${meta.chrom}${extracted}
 
