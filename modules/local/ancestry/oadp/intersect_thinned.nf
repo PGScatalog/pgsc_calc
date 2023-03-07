@@ -21,11 +21,11 @@ process INTERSECT_THINNED {
     tuple val(meta), path(matched), path(pruned), val(geno_meta), path(genomes)
 
     output:
-    tuple val(meta), path("*_thinned.txt.gz"), emit: match
+    tuple val(meta), path("*_thinned.txt.gz"), emit: match_thinned
     tuple val(geno_meta), path("*.pgen"), emit: geno
-    tuple val(geno_meta), path("*.zst"), emit: variants
+    tuple val(geno_meta), path("*.pvar.gz"), emit: variants
     tuple val(geno_meta), path("*.psam"), emit: pheno
-
+    path "versions.yml"           , emit: versions
 
     script:
     def args = task.ext.args ?: ''
@@ -50,9 +50,13 @@ process INTERSECT_THINNED {
     cut -f 7 -d ' ' ${meta.id}_ALL_matched_thinned.txt > ${meta.id}_shared.txt
 
     # 2) extract ld thinned variants and combine data if split -----------------
+    # don't compress these files, because of pyplink reading limitations
+    # in downstream fraposa process
+    # (it's OK because the thinned files are quite small)
+
     echo $genomes | tr -s ' ' '\n' | cut -f 1 -d '.' | uniq > ids.txt
 
-
+    # one file -> assume combined chrom data
     if [ \$(wc -l < ids.txt) -eq 1 ]
     then
         cp ids.txt autosomes.txt
@@ -68,11 +72,12 @@ process INTERSECT_THINNED {
             --seed 31 \
             $input \$f vzs \
             --extract ${meta.id}_shared.txt \
-            --make-pgen vzs \
+            --make-pgen \
             --sort-vars \
             --out extracted/\${f}_extracted
     done < autosomes.txt
 
+    # one file -> assume combined chrom data
     if [ \$(wc -l < ids.txt) -eq 1 ]
     then
         mv extracted/*.p* .
@@ -80,16 +85,21 @@ process INTERSECT_THINNED {
         plink2 --threads $task.cpus \
             --memory $mem_mb \
             --seed 31 \
-            --pmerge-list <(sed "s/\$/_extracted/g" autosomes.txt) pfile-vzs \
+            --pmerge-list <(sed "s/\$/_extracted/g" autosomes.txt) pfile \
             --pmerge-list-dir extracted \
             --delete-pmerge-result \
-            --make-pgen vzs \
+            --make-pgen \
             --sort-vars \
             --out ${meta.build}_${meta.id}_ALL_extracted
     fi
 
     # 3) clean up and compress -------------------------------------------------
     rm -r extracted autosomes.txt ids.txt
-    gzip *.txt
+    gzip *.txt *.pvar
+
+    cat <<-END_VERSIONS > versions.yml
+    ${task.process.tokenize(':').last()}:
+        plink2: \$(plink2 --version 2>&1 | sed 's/^PLINK v//; s/ 64.*\$//' )
+    END_VERSIONS
     """
 }
