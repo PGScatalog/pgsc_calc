@@ -5,9 +5,11 @@
 include { EXTRACT_DATABASE } from '../../../modules/local/ancestry/extract_database'
 include { INTERSECT_VARIANTS } from '../../../modules/local/ancestry/intersect_variants'
 include { FILTER_VARIANTS } from '../../../modules/local/ancestry/filter_variants'
-include { PLINK2_MAKEBED } from '../../../modules/local/ancestry/plink2_makebed'
+include { PLINK2_MAKEBED as PLINK2_MAKEBED_TARGET; PLINK2_MAKEBED as PLINK2_MAKEBED_REF } from '../../../modules/local/ancestry/plink2_makebed'
 include { INTERSECT_THINNED } from '../../../modules/local/ancestry/oadp/intersect_thinned'
-
+include { RELABEL_IDS } from '../../../modules/local/ancestry/relabel_ids'
+include { PLINK2_ORIENT } from '../../../modules/local/ancestry/oadp/plink2_orient'
+n
 workflow ANCESTRY_OADP {
     take:
     geno
@@ -78,6 +80,9 @@ workflow ANCESTRY_OADP {
         .map { tuple(groupKey(it.first().subMap('id', 'build'), it.first().n_chrom),
                      it.last()) }
         .groupTuple() // groupKey has an implicit size
+        .map { m = it.first().plus([:])
+              return [m, it.tail()]
+        }
         .set { ch_intersected }
 
     // 1) combine ch_intersected with ch_db by build key
@@ -98,8 +103,8 @@ workflow ANCESTRY_OADP {
         .set { ch_filter_input }
 
     FILTER_VARIANTS ( ch_filter_input )
-
-    //
+    ch_versions = ch_versions.mix(FILTER_VARIANTS.out.versions)
+    // -------------------------------------------------------------------------
     // ref -> thinned bfile for fraposa
     //
     FILTER_VARIANTS.out.ref
@@ -113,11 +118,14 @@ workflow ANCESTRY_OADP {
         }
         .set { ch_makebed_ref }
 
-    PLINK2_MAKEBED ( ch_makebed_ref )
+    PLINK2_MAKEBED_REF ( ch_makebed_ref )
+    ch_versions = ch_versions.mix(PLINK2_MAKEBED_REF.out.versions)
+    // -------------------------------------------------------------------------
+    // targets -> intersect with thinned reference variants
+    // combine split targets into one file
+    // relabel
+    // then convert to bim
 
-    //
-    // targets -> intersect with thinned variants
-    //
     Utils.submapCombine(
         ch_intersected,
         FILTER_VARIANTS.out.prune_in,
@@ -128,21 +136,66 @@ workflow ANCESTRY_OADP {
         .map { [ it.first().subMap('build', 'id'), it] }
         .set { ch_intersect_thin_input }
 
-    //ch_intersect_thin_input.view()
     ch_genomes.map { [groupKey(it.first().subMap('build', 'id', 'is_pfile', 'is_bfile'), it.first().n_chrom), it] }
         .groupTuple()
+        .map { m = it.first().plus([:])
+              return [m, it.tail()]
+        }
         .map{ Utils.filterMapListByKey(it.flatten(), 'chrom', drop=true) }
         .map{ [ it.first().subMap('build', 'id'), it.head(), it.tail() ] }
         .set{ ch_combined_genomes }
 
     ch_intersect_thin_input.join(ch_combined_genomes, by: 0)
         .map { it.tail().first() + it.tail().tail() }
-    // [meta, [matches], pruned, geno_meta, [gigantic list of pfiles]]
-        .set { ch_blah }
+        // [meta, [matches], pruned, geno_meta, [gigantic list of pfiles]]
+        .set { ch_intersect_thinned_input }
 
-    // extract merge and relabel!
-    INTERSECT_THINNED ( ch_blah )
+    // extract & merge split targets
+    INTERSECT_THINNED ( ch_intersect_thinned_input )
+    // TODO: why are versions bork?
+    // ch_versions = ch_versions.mix(INTERSECT_THINNED.out.versions)
 
+    Utils.submapCombine(
+        INTERSECT_THINNED.out.match_thinned,
+        INTERSECT_THINNED.out.variants,
+        ['build', 'id']
+    )
+        .map{ Utils.filterMapListByKey(it, 'is_pfile', drop=true) }
+        .set { ch_thinned_target }
+
+    RELABEL_IDS( ch_thinned_target )
+    ch_versions = ch_versions.mix(RELABEL_IDS.out.versions)
+
+    RELABEL_IDS.out.relabelled
+        .map { [it.first(), it.last().findAll { it.getName().contains("_ALL_") }].flatten() }
+        .set { ch_target_relabelled }
+
+    target_extract = Channel.of(file('NO_FILE')) // optional input for PLINK2_MAKEBED
+    Utils.submapCombine(
+        INTERSECT_THINNED.out.geno.join(INTERSECT_THINNED.out.pheno, by: 0),
+        ch_target_relabelled,
+        ['build', 'id']
+    )
+        .map { Utils.filterMapListByKey(it, 'target_format', drop=true) }
+        .combine(target_extract)
+        .set { ch_target_makebed_input }
+
+    PLINK2_MAKEBED_TARGET ( ch_target_makebed_input )
+
+    // make sure allele order matches across ref / target ----------------------
+    // (because plink1 format is very annoying about this sort of thing)
+
+    PLINK2_MAKEBED_TARGET.out.geno
+        .concat(PLINK2_MAKEBED_TARGET.out.pheno, PLINK2_MAKEBED_TARGET.out.variants)
+        .groupTuple(size: 3)
+        .combine(PLINK2_MAKEBED_REF.out.variants)
+        .map{ Utils.filterMapListByKey(it, 'chrom', drop=true).flatten() }
+        .set { ch_orient_input }
+
+    PLINK2_ORIENT( ch_orient_input )
+
+    // fraposa -----------------------------------------------------------------
+    // TODO
     emit:
     intersection = INTERSECT_VARIANTS.out.intersection
     projections = Channel.empty() // PLINK2_PROJECT.out.projections
