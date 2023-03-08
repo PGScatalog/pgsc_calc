@@ -5,7 +5,7 @@
 include { EXTRACT_DATABASE } from '../../../modules/local/ancestry/extract_database'
 include { INTERSECT_VARIANTS } from '../../../modules/local/ancestry/intersect_variants'
 include { FILTER_VARIANTS } from '../../../modules/local/ancestry/filter_variants'
-include { PLINK2_MAKEBED as PLINK2_MAKEBED_TARGET; PLINK2_MAKEBED as PLINK2_MAKEBED_REF } from '../../../modules/local/ancestry/plink2_makebed'
+include { PLINK2_MAKEBED as PLINK2_MAKEBED_TARGET; PLINK2_MAKEBED as PLINK2_MAKEBED_REF } from '../../../modules/local/ancestry/oadp/plink2_makebed'
 include { INTERSECT_THINNED } from '../../../modules/local/ancestry/oadp/intersect_thinned'
 include { RELABEL_IDS } from '../../../modules/local/ancestry/relabel_ids'
 include { PLINK2_ORIENT } from '../../../modules/local/ancestry/oadp/plink2_orient'

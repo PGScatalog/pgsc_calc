@@ -1,9 +1,9 @@
 //
 // Create a database containing reference data required for ancestry inference
 //
-include { SETUP_RESOURCE } from '../../../modules/local/ancestry/setup_resource'
+include { SETUP_RESOURCE } from '../../../modules/local/ancestry/bootstrap/setup_resource'
 include { PLINK2_RELABELPVAR } from '../../../modules/local/plink2_relabelpvar'
-include { MAKE_DATABASE } from '../../../modules/local/ancestry/make_database'
+include { MAKE_DATABASE } from '../../../modules/local/ancestry/bootstrap/make_database'
 
 workflow BOOTSTRAP_ANCESTRY {
     take:

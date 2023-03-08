@@ -6,9 +6,9 @@
 include { EXTRACT_DATABASE } from '../../../modules/local/ancestry/extract_database'
 include { INTERSECT_VARIANTS } from '../../../modules/local/ancestry/intersect_variants'
 include { FILTER_VARIANTS } from '../../../modules/local/ancestry/filter_variants'
-include { PLINK2_PCA } from '../../../modules/local/ancestry/plink2_pca'
+include { PLINK2_PCA } from '../../../modules/local/ancestry/project/plink2_pca'
 include { RELABEL_IDS } from '../../../modules/local/ancestry/relabel_ids'
-include { PLINK2_PROJECT } from '../../../modules/local/ancestry/plink2_project'
+include { PLINK2_PROJECT } from '../../../modules/local/ancestry/project/plink2_project'
 
 workflow ANCESTRY_PROJECT {
     take:
