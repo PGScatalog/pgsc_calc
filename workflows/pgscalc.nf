@@ -235,6 +235,11 @@ workflow PGSCALC {
     // SUBWORKFLOW: Run ancestry projection
     //
     if (run_ancestry_assign) {
+        intersection = Channel.empty()
+        ref_geno = Channel.empty()
+        ref_pheno = Channel.empty()
+        ref_var = Channel.empty()
+
         if (params.shrinkage) {
             ANCESTRY_OADP (
                 MAKE_COMPATIBLE.out.geno,
@@ -245,7 +250,10 @@ workflow PGSCALC {
                 params.target_build
             )
             ch_versions = ch_versions.mix(ANCESTRY_OADP.out.versions)
-            intersection = ANCESTRY_OADP.out.intersection
+            intersection = intersection.mix(ANCESTRY_OADP.out.intersection)
+            ref_geno = ref_geno.mix(ANCESTRY_OADP.out.ref_geno)
+            ref_pheno = ref_pheno.mix(ANCESTRY_OADP.out.ref_pheno)
+            ref_var = ref_var.mix(ANCESTRY_OADP.out.ref_var)
         } else {
             ANCESTRY_PROJECT (
                 MAKE_COMPATIBLE.out.geno,
@@ -256,7 +264,10 @@ workflow PGSCALC {
                 params.target_build
             )
             ch_versions = ch_versions.mix(ANCESTRY_PROJECT.out.versions)
-            intersection = ANCESTRY_PROJECTION.out.intersection
+            intersection = intersection.mix(ANCESTRY_PROJECTION.out.intersection)
+            ref_geno = ref_geno.mix(ANCESTRY_PROJECTION.out.ref_geno)
+            ref_pheno = ref_pheno.mix(ANCESTRY_PROJECTION.out.ref_pheno)
+            ref_var = ref_var.mix(ANCESTRY_PROJECTION.out.ref_var)
         }
     }
 
@@ -308,15 +319,15 @@ workflow PGSCALC {
     if (run_apply_score) {
         if (run_ancestry_assign) {
             MAKE_COMPATIBLE.out.geno
-                .mix(ANCESTRY_PROJECT.out.ref_geno)
+                .mix( ref_geno )
                 .set { ch_geno }
 
             MAKE_COMPATIBLE.out.pheno
-                .mix(ANCESTRY_PROJECT.out.ref_pheno)
+                .mix( ref_pheno )
                 .set { ch_pheno }
 
             MAKE_COMPATIBLE.out.variants
-                .mix(ANCESTRY_PROJECT.out.ref_var)
+                .mix( ref_var )
                 .set { ch_variants }
         } else {
             MAKE_COMPATIBLE.out.geno.set { ch_geno }
