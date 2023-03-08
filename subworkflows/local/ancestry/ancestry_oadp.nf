@@ -9,7 +9,8 @@ include { PLINK2_MAKEBED as PLINK2_MAKEBED_TARGET; PLINK2_MAKEBED as PLINK2_MAKE
 include { INTERSECT_THINNED } from '../../../modules/local/ancestry/oadp/intersect_thinned'
 include { RELABEL_IDS } from '../../../modules/local/ancestry/relabel_ids'
 include { PLINK2_ORIENT } from '../../../modules/local/ancestry/oadp/plink2_orient'
-n
+include { FRAPOSA_OADP } from '../../../modules/local/ancestry/oadp/fraposa_oadp'
+
 workflow ANCESTRY_OADP {
     take:
     geno
@@ -43,6 +44,22 @@ workflow ANCESTRY_OADP {
         .set { ch_db }
 
     ch_versions = ch_versions.mix(EXTRACT_DATABASE.out.versions)
+
+    // prepare reference data channels for emit to scoring subworkflow
+    ch_db.map {
+        meta = it.first().clone()
+        meta.is_pfile = true
+        meta.id = 'reference'
+        meta.chrom = 'ALL'
+        return tuple(meta, it.tail())
+    }
+        .transpose()
+        .branch {
+            geno: it.last().getExtension() == 'pgen'
+            pheno: it.last().getExtension() == 'psam'
+            var: it.last().getExtension() == 'zst'
+        }
+        .set{ ch_ref_branched }
 
     //
     // STEP 1: get overlapping variants across reference and target ------------
@@ -119,6 +136,7 @@ workflow ANCESTRY_OADP {
         .set { ch_makebed_ref }
 
     PLINK2_MAKEBED_REF ( ch_makebed_ref )
+
     ch_versions = ch_versions.mix(PLINK2_MAKEBED_REF.out.versions)
     // -------------------------------------------------------------------------
     // targets -> intersect with thinned reference variants
@@ -195,13 +213,33 @@ workflow ANCESTRY_OADP {
     PLINK2_ORIENT( ch_orient_input )
 
     // fraposa -----------------------------------------------------------------
-    // TODO
+
+    PLINK2_MAKEBED_REF.out.geno
+        .concat(PLINK2_MAKEBED_REF.out.pheno, PLINK2_MAKEBED_REF.out.variants)
+        .groupTuple(size: 3)
+        .set { ch_fraposa_ref }
+
+    PLINK2_ORIENT.out.geno
+        .concat(PLINK2_ORIENT.out.pheno, PLINK2_ORIENT.out.variants)
+        .groupTuple(size: 3)
+        .set { ch_fraposa_target }
+
+    // todo: update samplesheet, reference is a reserved sampleset name
+    ch_fraposa_ref
+        .combine( ch_fraposa_target )
+        .flatten()
+        .filter{ !(it instanceof LinkedHashMap) || it.id == 'reference' }
+        .buffer(size: 7)
+        .set { ch_fraposa_input }
+
+    FRAPOSA_OADP( ch_fraposa_input )
+
     emit:
     intersection = INTERSECT_VARIANTS.out.intersection
-    projections = Channel.empty() // PLINK2_PROJECT.out.projections
-    ref_geno = Channel.empty() // ch_ref_branched.geno
-    ref_pheno = Channel.empty() // ch_ref_branched.pheno
-    ref_var = Channel.empty() // ch_ref_branched.var
+    projections = FRAPOSA_OADP.out.pcs
+    ref_geno = ch_ref_branched.geno
+    ref_pheno = ch_ref_branched.pheno
+    ref_var = ch_ref_branched.var
     versions = ch_versions
 
 }
