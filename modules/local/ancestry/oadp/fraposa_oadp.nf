@@ -17,7 +17,7 @@ process FRAPOSA_OADP {
         path(target_geno), path(target_pheno), path(target_variants)
 
     output:
-    tuple path("*.pcs"), emit: pcs
+    path("*.pcs"), emit: pcs
     path "versions.yml", emit: versions
 
     script:
