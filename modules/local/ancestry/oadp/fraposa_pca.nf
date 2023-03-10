@@ -1,9 +1,9 @@
-process FRAPOSA_OADP {
+process FRAPOSA_PCA {
     // labels are defined in conf/modules.config
     label 'process_high_memory'
     label 'fraposa' // controls conda, docker, + singularity options
 
-    tag "${target_geno.baseName.tokenize('_')[1]}"
+    tag "$meta.id"
 
     conda (params.enable_conda ? "${task.ext.conda}" : null)
 
@@ -13,19 +13,17 @@ process FRAPOSA_OADP {
         "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
-    tuple val(meta), path(ref_geno), path(ref_pheno), path(ref_variants),
-        path(target_geno), path(target_pheno), path(target_variants), path(pca)
+    tuple val(meta), path(ref_geno), path(ref_pheno), path(ref_variants)
 
     output:
-    path "*.pcs", emit: pca
+    path "*.dat", emit: pca
     path "versions.yml", emit: versions
 
     script:
     """
     fraposa ${ref_geno.baseName} \
         --method oadp \
-        --dim_ref 10 \
-        --stu_filepref ${target_geno.baseName}
+        --dim_ref 10
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

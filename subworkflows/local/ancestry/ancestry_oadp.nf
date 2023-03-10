@@ -9,6 +9,7 @@ include { PLINK2_MAKEBED as PLINK2_MAKEBED_TARGET; PLINK2_MAKEBED as PLINK2_MAKE
 include { INTERSECT_THINNED } from '../../../modules/local/ancestry/oadp/intersect_thinned'
 include { RELABEL_IDS } from '../../../modules/local/ancestry/relabel_ids'
 include { PLINK2_ORIENT } from '../../../modules/local/ancestry/oadp/plink2_orient'
+include { FRAPOSA_PCA } from '../../../modules/local/ancestry/oadp/fraposa_pca'
 include { FRAPOSA_OADP } from '../../../modules/local/ancestry/oadp/fraposa_oadp'
 
 workflow ANCESTRY_OADP {
@@ -224,19 +225,24 @@ workflow ANCESTRY_OADP {
         .groupTuple(size: 3)
         .set { ch_fraposa_target }
 
-    // todo: update samplesheet, reference is a reserved sampleset name
+    // do PCA on reference genomes...
+    FRAPOSA_PCA( ch_fraposa_ref.map { it.flatten() } )
+
+    // TODO: update samplesheet, reference is a reserved sampleset name
+    // ... and project split target genomes
     ch_fraposa_ref
         .combine( ch_fraposa_target )
         .flatten()
         .filter{ !(it instanceof LinkedHashMap) || it.id == 'reference' }
         .buffer(size: 7)
+        .combine(FRAPOSA_PCA.out.pca.map{ [it] })
         .set { ch_fraposa_input }
 
     FRAPOSA_OADP( ch_fraposa_input )
 
     emit:
     intersection = INTERSECT_VARIANTS.out.intersection
-    projections = FRAPOSA_OADP.out.pcs
+    projections = FRAPOSA_OADP.out.pca
     ref_geno = ch_ref_branched.geno
     ref_pheno = ch_ref_branched.pheno
     ref_var = ch_ref_branched.var
