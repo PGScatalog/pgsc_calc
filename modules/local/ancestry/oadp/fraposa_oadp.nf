@@ -14,7 +14,8 @@ process FRAPOSA_OADP {
 
     input:
     tuple val(meta), path(ref_geno), path(ref_pheno), path(ref_variants),
-        path(target_geno), path(target_pheno), path(target_variants), path(pca)
+        path(target_geno), path(target_pheno), path(target_variants), path(split_fam),
+        path(pca)
 
     output:
     path "*.pcs", emit: pca
@@ -25,7 +26,8 @@ process FRAPOSA_OADP {
     fraposa ${ref_geno.baseName} \
         --method oadp \
         --dim_ref 10 \
-        --stu_filepref ${target_geno.baseName}
+        --stu_filepref ${target_geno.baseName} \
+        --stu_filt_iid <(cut -f1 $split_fam)
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

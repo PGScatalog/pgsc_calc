@@ -21,6 +21,7 @@ process PLINK2_MAKEBED {
     tuple val(meta), path("*.bed"), emit: geno
     tuple val(meta), path("*.bim"), emit: variants
     tuple val(meta), path("*.fam"), emit: pheno
+    tuple val(meta), path("splitfam*"), emit: splits, optional: true
     path "versions.yml"           , emit: versions
 
     script:
@@ -48,25 +49,7 @@ process PLINK2_MAKEBED {
 
     if [ $meta.id != 'reference' ]
     then
-        # split into 50,000 sample chunks
-        split -l 50000 -a 4 $pheno split_${prefix}
-        for x in split_${prefix}*
-        do
-            cut -f1,2 \$x > current_ids.txt
-            plink2 \
-                --threads $task.cpus \
-                --memory $mem_mb \
-                --seed 31 \
-                --bfile ${build}${prefix}${meta.chrom}${extracted} \
-                --keep current_ids.txt \
-                --keep-allele-order \
-                --make-bed \
-                --out \$x
-        done
-        # clean up extracted data
-        rm ${build}${prefix}${meta.chrom}${extracted}.bed
-        rm ${build}${prefix}${meta.chrom}${extracted}.bim
-        rm ${build}${prefix}${meta.chrom}${extracted}.fam
+        split -l 50000 <(grep -v '#' $pheno) splitfam
     fi
 
     cat <<-END_VERSIONS > versions.yml

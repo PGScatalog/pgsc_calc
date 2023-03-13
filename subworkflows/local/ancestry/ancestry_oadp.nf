@@ -220,9 +220,14 @@ workflow ANCESTRY_OADP {
         .groupTuple(size: 3)
         .set { ch_fraposa_ref }
 
+    PLINK2_MAKEBED_TARGET.out.splits
+        .transpose()
+        .set { ch_split_targets }
+
     PLINK2_ORIENT.out.geno
         .concat(PLINK2_ORIENT.out.pheno, PLINK2_ORIENT.out.variants)
         .groupTuple(size: 3)
+        .combine(ch_split_targets, by: 0)
         .set { ch_fraposa_target }
 
     // do PCA on reference genomes...
@@ -230,14 +235,16 @@ workflow ANCESTRY_OADP {
 
     // TODO: update samplesheet, reference is a reserved sampleset name
     // ... and project split target genomes
+
     ch_fraposa_ref
         .combine( ch_fraposa_target )
         .flatten()
         .filter{ !(it instanceof LinkedHashMap) || it.id == 'reference' }
-        .buffer(size: 7)
+        .buffer(size: 8)
         .combine(FRAPOSA_PCA.out.pca.map{ [it] })
         .set { ch_fraposa_input }
 
+    // project targets into reference PCA space
     FRAPOSA_OADP( ch_fraposa_input )
 
     emit:
