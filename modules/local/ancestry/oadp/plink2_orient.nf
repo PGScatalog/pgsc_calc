@@ -39,7 +39,7 @@ process PLINK2_ORIENT {
         --bed $geno \
         --fam $pheno \
         --bim $variants \
-        --a1-allele $ref_variants \
+        --a1-allele $ref_variants 5 2 \
         --make-bed \
         --out ${build}${prefix}${meta.chrom}_oriented
 
