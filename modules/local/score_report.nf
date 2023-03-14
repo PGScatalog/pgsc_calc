@@ -15,6 +15,7 @@ process SCORE_REPORT {
     path report
     path logo
     path '*' // list of summary csvs, staged with original names
+    path ancestry_results
 
     output:
     path "*.html"      , emit: report
@@ -22,6 +23,7 @@ process SCORE_REPORT {
 
     script:
     def args = task.ext.args ?: ''
+    def ancestry_results = ancestry_results.name == 'NO_FILE' ? '--skip_ancestry' : '--run_ancestry'
     """
     # R and symlinks don't get along
     cp -LR $report real_report.Rmd
