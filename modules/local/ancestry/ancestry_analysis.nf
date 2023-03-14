@@ -11,15 +11,16 @@ process ANCESTRY_ANALYSIS {
         "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
-    tuple path(projections), path(vars_projected), path(scores), path(vars_scored)
-    // ToDo: add reference samples psam and relatedness file (deg)
+    tuple path(scores), path(relatedness), path('???.pcs')
 
     output:
+    path "results.csv", emit: results
     path "versions.yml", emit: versions
-
 
     script:
     """
+    touch results.csv
+
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
         pgscatalog_utils: \$(echo \$(python -c 'import pgscatalog_utils; print(pgscatalog_utils.__version__)'))
