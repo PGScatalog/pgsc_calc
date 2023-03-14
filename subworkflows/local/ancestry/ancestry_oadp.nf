@@ -79,8 +79,13 @@ workflow ANCESTRY_OADP {
     //
     // STEP 2: filter variants in reference and target datasets ----------------
     //
+
+    // filtering isn't strictly necessary:
+    // one channel will be empty, EXTRACT_DATABASE only extracts the input build
+    // but it's worth keeping just in case anything untoward happens
     EXTRACT_DATABASE.out.grch37_king
         .concat(EXTRACT_DATABASE.out.grch38_king)
+        .filter { it.first().build == params.target_build }
         .set { ch_king }
 
     // TODO: this is hardcoded and prevents custom reference support
@@ -253,6 +258,7 @@ workflow ANCESTRY_OADP {
     ref_geno = ch_ref_branched.geno
     ref_pheno = ch_ref_branched.pheno
     ref_var = ch_ref_branched.var
+    relatedness = ch_king
     versions = ch_versions
 
 }
