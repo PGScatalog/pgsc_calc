@@ -84,6 +84,7 @@ if (params.only_bootstrap) {
     run_ancestry_assign = false
     run_ancestry_adjust = true
     run_apply_score = false
+    run_report = false
 }
 
 if (params.only_input) {
@@ -93,6 +94,7 @@ if (params.only_input) {
     run_match = false
     run_ancestry_assign = false
     run_apply_score = false
+    run_report = false
 }
 
 if (params.only_compatible) {
@@ -102,6 +104,7 @@ if (params.only_compatible) {
     run_match = false
     run_ancestry_assign = true
     run_apply_score = false
+    run_report = false
 }
 
 if (params.only_match) {
@@ -111,6 +114,7 @@ if (params.only_match) {
     run_match = true
     run_ancestry_assign = true
     run_apply_score = false
+    run_report = false
 }
 
 if (params.only_projection) {
@@ -120,6 +124,7 @@ if (params.only_projection) {
     run_match = false
     run_ancestry_assign = true
     run_apply_score = false
+    run_report = false
 }
 
 if (params.only_score) {
@@ -129,6 +134,7 @@ if (params.only_score) {
     run_match = true
     run_ancestry_assign = true
     run_apply_score = true
+    run_report = false
 }
 
 if (params.skip_ancestry) {
@@ -343,22 +349,11 @@ workflow PGSCALC {
         projections = Channel.empty()
         relatedness = Channel.empty()
         report_pheno = Channel.empty()
-        vars_projected = Channel.empty()
-        vars_scored = Channel.empty()
 
         if (run_ancestry_assign) {
-            // todo: grab the correct outputs from subworkflows
             projections = projections.mix(ANCESTRY_OADP.out.projections)
-            relatedness = relatedness.mix(Channel.of(file('NO_FILE')))
+            relatedness = relatedness.mix(ANCESTRY_OADP.out.relatedness)
             report_pheno = report_pheno.mix(ref_pheno)
-            vars_projected = vars_projected.mix(Channel.of(file('NO_FILE')))
-            vars_scored =  vars_projected.mix(Channel.of(file('NO_FILE')))
-        } else {
-            projections = projections.mix(Channel.of(file('NO_FILE')))
-            relatedness = relatedness.mix(Channel.of(file('NO_FILE')))
-            report_pheno = report_pheno.mix(Channel.of(file('NO_FILE')))
-            vars_projected = vars_projected.mix(Channel.of(file('NO_FILE')))
-            vars_scored =  vars_projected.mix(Channel.of(file('NO_FILE')))
         }
 
         REPORT (
@@ -368,8 +363,7 @@ workflow PGSCALC {
             projections,
             INPUT_CHECK.out.log_scorefiles,
             MATCH.out.db,
-            vars_projected,
-            vars_scored
+            run_ancestry_assign
         )
     }
 
