@@ -74,6 +74,7 @@ def run_match = true
 def run_ancestry_assign = true
 def run_ancestry_adjust = true
 def run_apply_score = true
+def run_report = true
 
 if (params.only_bootstrap) {
     run_ancestry_bootstrap = true
@@ -154,6 +155,7 @@ include { MATCH                } from '../subworkflows/local/match'
 include { ANCESTRY_PROJECT  } from '../subworkflows/local/ancestry/ancestry_project'
 include { ANCESTRY_OADP  } from '../subworkflows/local/ancestry/ancestry_oadp'
 include { APPLY_SCORE          } from '../subworkflows/local/apply_score'
+include { REPORT               } from '../subworkflows/local/report'
 include { DUMPSOFTWAREVERSIONS } from '../modules/local/dumpsoftwareversions'
 
 /*
@@ -272,14 +274,6 @@ workflow PGSCALC {
     }
 
     //
-    // TODO: Set up optional input of intersected variants for MAKE_COMPATIBLE
-    //
-    if (run_ancestry_adjust) {
-        // TODO: set up optional input of intersected variants here for run_apply_score
-
-    }
-
-    //
     // SUBWORKFLOW: Match scoring files against target genomes
     //
     if (run_match) {
@@ -340,13 +334,44 @@ workflow PGSCALC {
             ch_pheno,
             ch_variants,
             intersection,
-            MATCH.out.scorefiles,
-            INPUT_CHECK.out.log_scorefiles,
-            MATCH.out.db
+            MATCH.out.scorefiles
         )
         ch_versions = ch_versions.mix(APPLY_SCORE.out.versions)
     }
 
+    if (run_report) {
+        projections = Channel.empty()
+        relatedness = Channel.empty()
+        report_pheno = Channel.empty()
+        vars_projected = Channel.empty()
+        vars_scored = Channel.empty()
+
+        if (run_ancestry_assign) {
+            // todo: grab the correct outputs from subworkflows
+            projections = projections.mix(ANCESTRY_OADP.out.projections)
+            relatedness = relatedness.mix(Channel.of(file('NO_FILE')))
+            report_pheno = report_pheno.mix(ref_pheno)
+            vars_projected = vars_projected.mix(Channel.of(file('NO_FILE')))
+            vars_scored =  vars_projected.mix(Channel.of(file('NO_FILE')))
+        } else {
+            projections = projections.mix(Channel.of(file('NO_FILE')))
+            relatedness = relatedness.mix(Channel.of(file('NO_FILE')))
+            report_pheno = report_pheno.mix(Channel.of(file('NO_FILE')))
+            vars_projected = vars_projected.mix(Channel.of(file('NO_FILE')))
+            vars_scored =  vars_projected.mix(Channel.of(file('NO_FILE')))
+        }
+
+        REPORT (
+            report_pheno,
+            relatedness,
+            APPLY_SCORE.out.scores,
+            projections,
+            INPUT_CHECK.out.log_scorefiles,
+            MATCH.out.db,
+            vars_projected,
+            vars_scored
+        )
+    }
 
 
     // MODULE: Dump software versions for all tools used in the workflow

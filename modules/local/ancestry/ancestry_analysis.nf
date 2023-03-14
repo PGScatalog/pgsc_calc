@@ -11,10 +11,7 @@ process ANCESTRY_ANALYSIS {
         "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
-    path projections
-    path vars_projected
-    path scores
-    path vars_scored
+    tuple path(projections), path(vars_projected), path(scores), path(vars_scored)
     // ToDo: add reference samples psam and relatedness file (deg)
 
     output:
