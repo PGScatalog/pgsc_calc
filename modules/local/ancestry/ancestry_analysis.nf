@@ -11,15 +11,30 @@ process ANCESTRY_ANALYSIS {
         "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
-    tuple path(scores), path(relatedness), path('???.pcs')
+    tuple path(scores), path(relatedness), path(ref_psam), path(ref_pcs), path('target_pcs/???.pcs')
 
     output:
-    path "results.csv", emit: results
+    path "*adjusted.txt.gz", emit: results
     path "versions.yml", emit: versions
 
     script:
     """
-    touch results.csv
+    # TODO: dataset label will break.
+    # need to rework workflow to split input data by sampleset
+    ancestry_analysis -d hgdp \
+        -r reference \
+        --psam $ref_psam \
+        --ref_pcs $ref_pcs \
+        --target_pcs target_pcs/*.pcs \
+        -x $relatedness \
+        -p SuperPop \
+        -s $scores \
+        -a RandomForest \
+        --n_assignment 10 \
+        -n empirical mean mean+var \
+        --n_normalization 10 \
+        --outdir . \
+        -v
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

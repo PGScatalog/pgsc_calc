@@ -252,9 +252,22 @@ workflow ANCESTRY_OADP {
     // project targets into reference PCA space
     FRAPOSA_OADP( ch_fraposa_input )
 
+    FRAPOSA_OADP.out.pca
+        .flatten()
+        .filter{it.name =~ 'reference'}
+        .first()
+        .set{ ref_pcs }
+
+        FRAPOSA_OADP.out.pca
+        .flatten()
+        .filter{!(it.name =~ 'reference') }
+        .collect()
+        .set{ target_pcs }
+
     emit:
     intersection = INTERSECT_VARIANTS.out.intersection
-    projections = FRAPOSA_OADP.out.pca
+    ref_projections = ref_pcs
+    target_projections = target_pcs
     ref_geno = ch_ref_branched.geno
     ref_pheno = ch_ref_branched.pheno
     ref_var = ch_ref_branched.var
