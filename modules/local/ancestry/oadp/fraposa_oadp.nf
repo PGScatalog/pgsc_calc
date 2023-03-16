@@ -18,10 +18,12 @@ process FRAPOSA_OADP {
         path(pca)
 
     output:
-    path "*.pcs", emit: pca
+    tuple val(oadp_meta), path("GRCh3?_reference_*.pcs"), path("GRCh3?_${target_id}_*.pcs"), emit: pca
     path "versions.yml", emit: versions
 
     script:
+    target_id = target_geno.baseName.tokenize('_')[1]
+    oadp_meta = ['target_id':target_id]
     """
     fraposa ${ref_geno.baseName} \
         --method oadp \

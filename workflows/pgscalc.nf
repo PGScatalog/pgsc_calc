@@ -346,14 +346,12 @@ workflow PGSCALC {
     }
 
     if (run_report) {
-        ref_projections = Channel.empty()
-        target_projections = Channel.empty()
+        projections = Channel.empty()
         relatedness = Channel.empty()
         report_pheno = Channel.empty()
 
         if (run_ancestry_assign) {
-            ref_projections = ref_projections.mix(ANCESTRY_OADP.out.ref_projections)
-            target_projections = target_projections.mix(ANCESTRY_OADP.out.target_projections)
+            projections = projections.mix(ANCESTRY_OADP.out.projections)
             relatedness = relatedness.mix(ANCESTRY_OADP.out.relatedness)
             report_pheno = report_pheno.mix(ref_pheno)
         }
@@ -362,8 +360,7 @@ workflow PGSCALC {
             report_pheno,
             relatedness,
             APPLY_SCORE.out.scores,
-            ref_projections,
-            target_projections,
+            projections,
             INPUT_CHECK.out.log_scorefiles,
             MATCH.out.db,
             run_ancestry_assign

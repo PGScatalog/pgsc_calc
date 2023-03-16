@@ -11,7 +11,7 @@ process ANCESTRY_ANALYSIS {
         "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
-    tuple path(scores), path(relatedness), path(ref_psam), path(ref_pcs), path('target_pcs/???.pcs')
+    tuple val(meta), path('ref_pcs/?.pcs'), path('target_pcs/???.pcs'), path(scores), path(relatedness), path(ref_psam)
 
     output:
     path "*adjusted.txt.gz", emit: results
@@ -19,12 +19,11 @@ process ANCESTRY_ANALYSIS {
 
     script:
     """
-    # TODO: dataset label will break.
-    # need to rework workflow to split input data by sampleset
-    ancestry_analysis -d hgdp \
+    # TODO: --ref_pcs is a horrible hack to select the first duplicate
+    ancestry_analysis -d $meta.target_id \
         -r reference \
         --psam $ref_psam \
-        --ref_pcs $ref_pcs \
+        --ref_pcs ref_pcs/1.pcs \
         --target_pcs target_pcs/*.pcs \
         -x $relatedness \
         -p SuperPop \

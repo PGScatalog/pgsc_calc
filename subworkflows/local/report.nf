@@ -6,8 +6,7 @@ workflow REPORT {
     ref_pheno
     ref_relatedness
     scores
-    ref_projections
-    target_projections
+    projections
     log_scorefiles
     log_match
     run_ancestry_assign // bool
@@ -29,15 +28,18 @@ workflow REPORT {
        file input collisions
      */
     if (run_ancestry_assign) {
+
         scores
             .combine(ref_relatedness)
             .combine(ref_pheno)
-            .combine(ref_projections)
             .flatten()
-            .concat(target_projections)
             .filter{ !(it instanceof LinkedHashMap) }
-            .buffer(size: 5)
-            .set{ ch_ancestry_input }
+            .buffer(size: 3)
+            .set{ ch_scores_and_pop }
+
+        projections
+            .combine( ch_scores_and_pop )
+            .set { ch_ancestry_input }
 
         ANCESTRY_ANALYSIS ( ch_ancestry_input )
         ancestry_results = ANCESTRY_ANALYSIS.out.results
