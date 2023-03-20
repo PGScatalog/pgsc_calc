@@ -23,13 +23,11 @@ process RELABEL_IDS {
     script:
     target_format = target.getName().tokenize('.')[1] // test.tar.gz -> tar, test.var -> var
     relabel_meta = meta.plus(['target_format': target_format]) // .plus() returns a new map
-    col_from = (target_format == 'scorefile') ? 'ID_TARGET' : 'ID_REF'
-    col_to = (target_format == 'scorefile') ? 'ID_REF' : 'ID_TARGET'
     output_mode = "--split --combined" // always output split and combined data to make life easier
     """
     relabel_ids --maps $matched \
-        --col_from $col_from \
-        --col_to $col_to \
+        --col_from ID_TARGET \
+        --col_to ID_REF \
         --target_file $target \
         --target_col ID \
         --dataset ${meta.id}.${target_format} \
