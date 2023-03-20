@@ -1,4 +1,5 @@
 process PLINK2_SCORE {
+    errorStrategy 'finish'
     // labels are defined in conf/modules.config
     label 'process_low'
     label 'plink2' // controls conda, docker, + singularity options
