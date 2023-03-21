@@ -30,8 +30,10 @@ process MATCH_COMBINE {
     def split_output = !chrom.contains("ALL") ? '--split' : ''
     // output one (or more) scoring file per sampleset?
     def combined_output = (chrom.contains("ALL") || shared.name != 'NO_FILE') ? '--combined' : ''
-    // filter match candidates to intersect with reference?
-    def filter_mode = shared.name != 'NO_FILE' ? "--filter_IDs <(zcat $shared | cut -f 7 -d ' ' | tail -n +2)" : ''
+    // filter match candidates to intersect with reference:
+    // omit multi-allelic variants in reference because these will cause errors with relabelling!...
+    // ... unclear whether we should remove them from target with '&& ($9 == 0') as well?
+    def filter_mode = shared.name != 'NO_FILE' ? "--filter_IDs <(awk '(\$6 == 0) {print \$7}' <(zcat $shared))" : ''
     scoremeta = [:]
     scoremeta.id = "$meta.id"
 
