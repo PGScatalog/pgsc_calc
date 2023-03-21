@@ -49,7 +49,7 @@ process PLINK2_MAKEBED {
 
     if [ $meta.id != 'reference' ]
     then
-        split -l 500 <(grep -v '#' $pheno) splitfam
+        split -l 50000 <(grep -v '#' $pheno) splitfam
     fi
 
     cat <<-END_VERSIONS > versions.yml
