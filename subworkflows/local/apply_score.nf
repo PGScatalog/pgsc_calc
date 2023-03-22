@@ -99,16 +99,6 @@ workflow APPLY_SCORE {
 
     ch_versions = ch_versions.mix(SCORE_AGGREGATE.out.versions)
 
-    SCORE_REPORT(
-        SCORE_AGGREGATE.out.scores,
-        log_scorefiles,
-        Channel.fromPath("$projectDir/bin/report.Rmd", checkIfExists: true),
-        Channel.fromPath("$projectDir/assets/PGS_Logo.png", checkIfExists: true),
-        db.collect()
-    )
-
-    ch_versions = ch_versions.mix(SCORE_REPORT.out.versions)
-
     emit:
     versions = ch_versions
     scores = SCORE_AGGREGATE.out.scores

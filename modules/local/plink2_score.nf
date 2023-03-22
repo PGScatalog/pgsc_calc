@@ -4,7 +4,7 @@ process PLINK2_SCORE {
     label 'process_low'
     label 'plink2' // controls conda, docker, + singularity options
 
-    tag "$meta.id chromosome $meta.chrom effect type $scoremeta.effect_type"
+    tag "$meta.id chromosome $meta.chrom effect type $scoremeta.effect_type $scoremeta.n"
 
     conda (params.enable_conda ? "${task.ext.conda}" : null)
 
