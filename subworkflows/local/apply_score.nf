@@ -33,6 +33,8 @@ workflow APPLY_SCORE {
         }
         .set { ch_all_genomes }
 
+    ch_all_genomes.target.set { ch_genomes }
+
     // prepare scorefiles for reference data -----------------------------------
     //   1. extract the combined scoring files from the annotated scoring files
     //      (more than one may be present to handle duplicates or effect types)
@@ -44,13 +46,13 @@ workflow APPLY_SCORE {
     annotated_scorefiles
         .filter{ it.first().chrom == 'ALL'}
         .map { tuple(it.first().subMap('id'), it) }
-        .set { ch_ref_scorefile_raw }
+        .set { ch_ref_scorefile }
 
     intersection
         .map { tuple( it.first().subMap('id'), it.last() ) }
         .groupTuple() // TODO: be polite and set size
         // ref genome must be combined with _all_ scorefiles
-        .combine ( ch_ref_scorefile_raw, by: 0 )
+        .combine ( ch_ref_scorefile, by: 0 )
         // re-order: [scoremeta, [variant match reports], scorefile]
         .map { tuple(it.last().first(), it.tail().head(), it.last().last()) }
         .set { ch_scorefile_relabel_input }
@@ -61,27 +63,22 @@ workflow APPLY_SCORE {
     RELABEL_IDS.out.relabelled
         .transpose()
         .map { annotate_chrom(it) }
-        .filter{ it.first().chrom == 'ALL' }
-        .groupTuple()
-        .set { ch_ref_scorefiles }
+        .map { tuple(it.first().subMap('chrom'), it) }
+        .set { ch_target_scorefile }
 
     ch_all_genomes.ref
         .map { annotate_genomic(it).flatten() }
-        .combine( ch_ref_scorefiles ) // to work with multiple samplesets
-        .set { ch_apply_ref }// works now
+        .map { tuple(it.first().subMap('chrom'), it) }
+        .combine( ch_target_scorefile, by: 0 ) // to work with multiple samplesets
+        .map { it.tail().flatten() }
+        .set { ch_apply_ref }
 
     // intersect genomic data with split scoring files -------------------------
-    annotated_scorefiles
-        .groupTuple()
-        .map { [it.first().subMap(['id', 'chrom']), it] }
-        .set { ch_target_scorefiles }
-
-    ch_all_genomes.target
+    ch_genomes
         .map { annotate_genomic(it) }
         .dump( tag: 'final_genomes')
-        .map { [it.first().subMap(['id', 'chrom']), it] }
-        .join(ch_target_scorefiles)
-        .map{ [*it.tail().first(), *it.tail().last()] }
+        .cross ( annotated_scorefiles ) { m, it -> [m.id, m.chrom] }
+        .map { it.flatten() }
         .mix( ch_apply_ref ) // add reference genomes!
         .dump(tag: 'ready_to_score')
         .set { ch_apply }
@@ -91,14 +88,26 @@ workflow APPLY_SCORE {
     ch_apply.subscribe onNext: { score_fail = false }, onComplete: { score_error(score_fail) }
 
     PLINK2_SCORE ( ch_apply )
+
     ch_versions = ch_versions.mix(PLINK2_SCORE.out.versions.first())
 
     PLINK2_SCORE.out.scores
-         .collect()
-         .set { ch_scores }
+        .collect()
+        .set { ch_scores }
 
     SCORE_AGGREGATE ( ch_scores )
+
     ch_versions = ch_versions.mix(SCORE_AGGREGATE.out.versions)
+
+    SCORE_REPORT(
+        SCORE_AGGREGATE.out.scores,
+        log_scorefiles,
+        Channel.fromPath("$projectDir/bin/report.Rmd", checkIfExists: true),
+        Channel.fromPath("$projectDir/assets/PGS_Logo.png", checkIfExists: true),
+        db.collect()
+    )
+
+    ch_versions = ch_versions.mix(SCORE_REPORT.out.versions)
 
     emit:
     versions = ch_versions
@@ -139,7 +148,7 @@ def annotate_scorefiles(ArrayList scorefiles) {
             // dominant, 1 recessive). scorefile looks like:
             //     variant ID | effect allele | weight 1 | ... | weight_n
             // one weight is mandatory, extra weight columns are optional
-            // scoremeta.n_scores = count_scores(it.last())
+            scoremeta.n_scores = count_scores(it.last())
 
             // file name structure: {dataset}_{chr}_{effect}_{split}.scorefile -
             // {dataset} is only used to disambiguate files, not for scoremeta
@@ -149,7 +158,7 @@ def annotate_scorefiles(ArrayList scorefiles) {
             scoremeta.effect_type = it.last().getName().tokenize('_')[2]
 
             // get score number from file name of scorefile ---------------------
-            // scoremeta.n = it.last().getName().tokenize('_')[3].tokenize('.')[0]
+            scoremeta.n = it.last().getName().tokenize('_')[3].tokenize('.')[0]
 
             return [scoremeta, it.last()]
     }
@@ -175,7 +184,7 @@ def annotate_genomic(ArrayList target) {
     psam.eachLine { n++ }
     meta.n_samples = n
 
-    return [meta] + paths
+    return [meta, paths]
 }
 
 def count_scores(Path f) {
