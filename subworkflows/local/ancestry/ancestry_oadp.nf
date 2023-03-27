@@ -90,8 +90,8 @@ workflow ANCESTRY_OADP {
 
     // TODO: this is hardcoded and prevents custom reference support
     Channel.of(
-         [['build': 'GRCh37'], file("$projectDir/assets/ancestry/high-LD-regions-hg19-GRCh37.txt", checkIfExists: true)],
-         [['build': 'GRCh38'], file("$projectDir/assets/ancestry/high-LD-regions-hg38-GRCh38.txt", checkIfExists: true)]
+        [['build': 'GRCh37'], file(params.ld_grch37, checkIfExists: true)],
+        [['build': 'GRCh38'], file(params.ld_grch38, checkIfExists: true)]
     )
         .join(ch_king)
         .set{ ch_king_and_ld }

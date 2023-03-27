@@ -26,12 +26,12 @@ process ANCESTRY_ANALYSIS {
         --ref_pcs ref_pcs/1.pcs \
         --target_pcs target_pcs/*.pcs \
         -x $relatedness \
-        -p SuperPop \
+        -p $params.ref_label \
         -s $scores \
-        -a RandomForest \
-        --n_assignment 10 \
-        -n empirical mean mean+var \
-        --n_normalization 10 \
+        -a $params.assignment_algorithm \
+        --n_assignment $params.n_assignment \
+        -n $params.normalization_method \
+        --n_normalization $params.n_normalization \
         --outdir . \
         -v
 

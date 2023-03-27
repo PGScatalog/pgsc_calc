@@ -13,8 +13,8 @@
             "properties": {
                 "input": {
                     "type": "string",
-                    "default": "None",
-                    "description": "Path to input samplesheet"
+                    "description": "Path to input samplesheet",
+                    "format": "file-path"
                 },
                 "format": {
                     "type": "string",
@@ -29,39 +29,24 @@
                 "scorefile": {
                     "type": "string",
                     "description": "Path to a scoring file in PGS Catalog format. Multiple scorefiles can be specified using wildcards (e.g., ``--scorefile \"path/to/scores/*.txt\"``)",
-                    "fa_icon": "fas fa-file-alt"
+                    "fa_icon": "fas fa-file-alt",
+                    "format": "file-path"
                 },
                 "pgs_id": {
                     "type": "string",
-                    "default": "None",
                     "description": "A comma separated list of PGS score IDs, e.g. PGS000802"
                 },
                 "pgp_id": {
                     "type": "string",
-                    "default": "None",
                     "description": "A comma separated list of PGS Catalog publications, e.g. PGP000001"
                 },
                 "trait_efo": {
                     "type": "string",
-                    "default": "None",
                     "description": "A comma separated list of PGS Catalog EFO traits, e.g. EFO_0004214"
                 },
                 "efo_direct": {
                     "type": "boolean",
                     "description": "Return only PGS tagged with exact EFO term (e.g. no PGS for child/descendant terms in the ontology)"
-                },
-                "target_build": {
-                    "type": "string",
-                    "enum": [
-                        "GRCh37",
-                        "GRCh38"
-                    ],
-                    "description": "Genome build of input data"
-                },
-                "ref": {
-                    "type": "string",
-                    "default": "https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/reference_data/pgsc_calc_ref.sqlar",
-                    "description": "Path to reference database"
                 },
                 "vzs": {
                     "type": "boolean",
@@ -73,13 +58,16 @@
                 },
                 "genotypes_cache": {
                     "type": "string",
-                    "default": "None"
+                    "default": "None",
+                    "description": "A path to a directory that should contain relabelled genotypes",
+                    "format": "directory-path"
                 },
                 "outdir": {
                     "type": "string",
                     "description": "Path to the output directory where the results will be saved.",
                     "default": "./results",
-                    "fa_icon": "fas fa-folder-open"
+                    "fa_icon": "fas fa-folder-open",
+                    "format": "directory-path"
                 },
                 "email": {
                     "type": "string",
@@ -91,16 +79,173 @@
             },
             "required": [
                 "input",
-                "format",
-                "target_build"
+                "format"
             ]
         },
-        "variant_matching_qc_filtering": {
-            "title": "Variant Matching QC & Filtering",
+        "ancestry_options": {
+            "title": "Ancestry options",
             "type": "object",
             "description": "",
             "default": "",
             "properties": {
+                "ancestry_params_file": {
+                    "type": "string",
+                    "default": "None",
+                    "description": "A YAML or JSON file that contains parameters for handling ancestry options"
+                },
+                "shrinkage": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable shrinkage"
+                },
+                "assignment_algorithm": {
+                    "type": "string",
+                    "default": "RandomForest",
+                    "enum": [
+                        "Mahalanobis",
+                        "RandomForest"
+                    ],
+                    "description": "Method used for population/ancestry assignment"
+                },
+                "ref_label": {
+                    "type": "string",
+                    "default": "SuperPop",
+                    "description": "Population labels in reference psam to use for assignment"
+                },
+                "n_assignment": {
+                    "type": "integer",
+                    "default": 10,
+                    "description": "Number of PCs used for population assignment"
+                },
+                "normalization_method": {
+                    "type": "string",
+                    "default": "empirical mean mean+var",
+                    "description": "Method used for normalisation of genetic ancestry",
+                    "enum": [
+                        "empirical",
+                        "mean",
+                        "mean+var",
+                        "empirical mean mean+var"
+                    ]
+                },
+                "n_normalization": {
+                    "type": "integer",
+                    "default": 10,
+                    "description": "Number of PCs used for population normalisation"
+                }
+            }
+        },
+        "reference_options": {
+            "title": "Reference options",
+            "type": "object",
+            "description": "Define how reference genomes are defined and processed",
+            "default": "",
+            "properties": {
+                "ref_params_file": {
+                    "type": "string",
+                    "default": "None",
+                    "description": "A YAML or JSON file that contains parameters for handling reference data",
+                    "hidden": true
+                },
+                "ref": {
+                    "type": "string",
+                    "description": "Path to reference database. Must be set if --ref_samplesheet is not set.",
+                    "pattern": ".*tar.zst$",
+                    "format": "file-path"
+                },
+                "ref_samplesheet": {
+                    "type": "string",
+                    "description": "Path to a samplesheet that describes the structure of reference data. Must be set if --ref isn't set."
+                },
+                "hg19_chain": {
+                    "type": "string",
+                    "default": "https://hgdownload.cse.ucsc.edu/goldenpath/hg19/liftOver/hg19ToHg38.over.chain.gz",
+                    "description": "Path to a UCSC chain file for converting from hg19 to hg38",
+                    "pattern": ".*chain.gz$",
+                    "format": "file-path"
+                },
+                "hg38_chain": {
+                    "type": "string",
+                    "default": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/liftOver/hg38ToHg19.over.chain.gz",
+                    "description": "Path to a UCSC chain file for converting from hg38 to hg19"
+                },
+                "geno_ref": {
+                    "type": "number",
+                    "default": 0.1,
+                    "description": "Exclude variants with missing call frequencies greater than a threshold (in reference genomes)",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "mind_ref": {
+                    "type": "number",
+                    "default": 0.1,
+                    "description": "Exclude samples with missing call frequencies greater than a threshold (in reference genomes)",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "maf_ref": {
+                    "type": "number",
+                    "default": 0.01,
+                    "description": "Exclude variants with allele frequency lower than a threshold (in reference genomes)",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "hwe_ref": {
+                    "type": "number",
+                    "default": 0.000001,
+                    "description": "Exclude variants with Hardy-Weinberg equilibrium exact test p-values below  a threshold (in reference genomes)",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "indep_pairwise_ref": {
+                    "type": "string",
+                    "default": "1000 50 0.05",
+                    "description": "Used to generate a list of variants in approximate linkage equilibrium in reference genomes. Window size - step size - unphased hardcall r^2 threshold."
+                },
+                "ld_grch37": {
+                    "type": "string",
+                    "description": "Path to a file that contains areas of high linkage disequilibrium in the reference data (build GRCh37).",
+                    "format": "file-path",
+                    "mimetype": "text/plain"
+                },
+                "ld_grch38": {
+                    "type": "string",
+                    "description": "Path to a file that contains areas of high linkage disequilibrium in the reference data (build GRCh38).",
+                    "format": "file-path",
+                    "mimetype": "text/plain"
+                }
+            },
+            "required": [
+                "hg19_chain",
+                "hg38_chain",
+                "geno_ref",
+                "mind_ref",
+                "maf_ref",
+                "hwe_ref",
+                "indep_pairwise_ref",
+                "ld_grch37",
+                "ld_grch38"
+            ]
+        },
+        "compatibility_options": {
+            "title": "Compatibility options",
+            "type": "object",
+            "description": "Define parameters that control how scoring files and target genomes are made compatible with each other",
+            "default": "",
+            "properties": {
+                "compat_params_file": {
+                    "type": "string",
+                    "default": "None",
+                    "description": "A YAML or JSON file that contains parameters for handling compatibility options"
+                },
+                "target_build": {
+                    "type": "string",
+                    "enum": [
+                        "GRCh37",
+                        "GRCh38"
+                    ],
+                    "description": "Genome build of target genomes"
+                },
                 "liftover": {
                     "type": "boolean",
                     "description": "Lift scoring files to match your target genomes. Requires build information in the header of the scoring files."
@@ -111,7 +256,18 @@
                     "description": "Minimum proportion of variants required to successfully remap a scoring file to a different genome build",
                     "minimum": 0,
                     "maximum": 1
-                },
+                }
+            },
+            "required": [
+                "target_build"
+            ]
+        },
+        "matching_options": {
+            "title": "Matching options",
+            "type": "object",
+            "description": "Define how variants are matched across scoring files and target genomes",
+            "default": "",
+            "properties": {
                 "keep_multiallelic": {
                     "type": "boolean",
                     "description": "Allow matches of scoring file variants to multiallelic variants in the target dataset"
@@ -134,60 +290,6 @@
                 }
             },
             "fa_icon": "fas fa-user-cog"
-        },
-        "institutional_config_options": {
-            "title": "Institutional config options",
-            "type": "object",
-            "fa_icon": "fas fa-university",
-            "description": "Parameters used to describe centralised config profiles. These should not be edited.",
-            "help_text": "The centralised nf-core configuration profiles use a handful of pipeline parameters to describe themselves. This information is then printed to the Nextflow log when you run a pipeline. You should not need to change these values when you run a pipeline.",
-            "properties": {
-                "custom_config_version": {
-                    "type": "string",
-                    "description": "Git commit id for Institutional configs.",
-                    "default": "master",
-                    "hidden": true,
-                    "fa_icon": "fas fa-users-cog"
-                },
-                "custom_config_base": {
-                    "type": "string",
-                    "description": "Base directory for Institutional configs.",
-                    "default": "https://raw.githubusercontent.com/nf-core/configs/master",
-                    "hidden": true,
-                    "help_text": "If you're running offline, Nextflow will not be able to fetch the institutional config files from the internet. If you don't need them, then this is not a problem. If you do need them, you should download the files from the repo and tell Nextflow where to find them with this parameter.",
-                    "fa_icon": "fas fa-users-cog"
-                },
-                "hostnames": {
-                    "type": "string",
-                    "description": "Institutional configs hostname.",
-                    "hidden": true,
-                    "fa_icon": "fas fa-users-cog"
-                },
-                "config_profile_name": {
-                    "type": "string",
-                    "description": "Institutional config name.",
-                    "hidden": true,
-                    "fa_icon": "fas fa-users-cog"
-                },
-                "config_profile_description": {
-                    "type": "string",
-                    "description": "Institutional config description.",
-                    "hidden": true,
-                    "fa_icon": "fas fa-users-cog"
-                },
-                "config_profile_contact": {
-                    "type": "string",
-                    "description": "Institutional config contact information.",
-                    "hidden": true,
-                    "fa_icon": "fas fa-users-cog"
-                },
-                "config_profile_url": {
-                    "type": "string",
-                    "description": "Institutional config URL link.",
-                    "hidden": true,
-                    "fa_icon": "fas fa-users-cog"
-                }
-            }
         },
         "max_job_request_options": {
             "title": "Max job request options",
@@ -294,19 +396,6 @@
                     "hidden": true,
                     "help_text": "By default, parameters set as _hidden_ in the schema are not shown on the command line when a user runs with `--help`. Specifying this option will tell the pipeline to show all parameters."
                 },
-                "enable_conda": {
-                    "type": "boolean",
-                    "description": "Run this workflow with Conda. You can also use '-profile conda' instead of providing this parameter.",
-                    "hidden": true,
-                    "fa_icon": "fas fa-bacon"
-                },
-                "singularity_pull_docker_container": {
-                    "type": "boolean",
-                    "description": "Instead of directly downloading Singularity images for use with Singularity, force the workflow to pull and convert Docker containers instead.",
-                    "hidden": true,
-                    "fa_icon": "fas fa-toolbox",
-                    "help_text": "This may be useful for example if you are unable to directly pull Singularity containers to run the pipeline due to http/https proxy issues."
-                },
                 "platform": {
                     "type": "string",
                     "default": "amd64",
@@ -331,10 +420,16 @@
             "$ref": "#/definitions/input_output_options"
         },
         {
-            "$ref": "#/definitions/variant_matching_qc_filtering"
+            "$ref": "#/definitions/ancestry_options"
         },
         {
-            "$ref": "#/definitions/institutional_config_options"
+            "$ref": "#/definitions/reference_options"
+        },
+        {
+            "$ref": "#/definitions/compatibility_options"
+        },
+        {
+            "$ref": "#/definitions/matching_options"
         },
         {
             "$ref": "#/definitions/max_job_request_options"
