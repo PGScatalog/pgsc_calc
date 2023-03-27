@@ -14,7 +14,7 @@ process ANCESTRY_ANALYSIS {
     tuple val(meta), path('ref_pcs/?.pcs'), path('target_pcs/???.pcs'), path(scores), path(relatedness), path(ref_psam)
 
     output:
-    path "*adjusted.txt.gz", emit: results
+    path "*ancestry.txt.gz", emit: results
     path "versions.yml", emit: versions
 
     script:
