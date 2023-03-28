@@ -44,7 +44,7 @@ workflow ANCESTRY_PROJECT {
         .filter { it.first().build == target_build }
         .set { ch_db }
 
-    ch_versions = ch_versions.mix(EXTRACT_DATABASE.out.versions)
+    ch_versions = ch_versions.mix(EXTRACT_DATABASE.out.versions.first())
 
     // prepare reference data channels for emit to scoring subworkflow
     ch_db.map {
@@ -126,7 +126,8 @@ workflow ANCESTRY_PROJECT {
         .set { ch_filter_input }
 
     FILTER_VARIANTS ( ch_filter_input )
-    ch_versions = ch_versions.mix(FILTER_VARIANTS.out.versions)
+    ch_versions = ch_versions.mix(FILTER_VARIANTS.out.versions.first())
+
     // -------------------------------------------------------------------------
     // ref -> thinned bfile for fraposa
     //
@@ -142,8 +143,8 @@ workflow ANCESTRY_PROJECT {
         .set { ch_makebed_ref }
 
     PLINK2_MAKEBED_REF ( ch_makebed_ref )
+    ch_versions = ch_versions.mix(PLINK2_MAKEBED_REF.out.versions.first())
 
-    ch_versions = ch_versions.mix(PLINK2_MAKEBED_REF.out.versions)
     // -------------------------------------------------------------------------
     // targets -> intersect with thinned reference variants
     // combine split targets into one file
@@ -188,7 +189,7 @@ workflow ANCESTRY_PROJECT {
         .set { ch_thinned_target }
 
     RELABEL_IDS( ch_thinned_target )
-    ch_versions = ch_versions.mix(RELABEL_IDS.out.versions)
+    ch_versions = ch_versions.mix(RELABEL_IDS.out.versions.first())
 
     RELABEL_IDS.out.relabelled
         .map { [it.first(), it.last().findAll { it.getName().contains("_ALL_") }].flatten() }
@@ -205,6 +206,7 @@ workflow ANCESTRY_PROJECT {
         .set { ch_target_makebed_input }
 
     PLINK2_MAKEBED_TARGET ( ch_target_makebed_input )
+    ch_versions = ch_versions.mix(PLINK2_MAKEBED_TARGET.out.versions.first())
 
     // make sure allele order matches across ref / target ----------------------
     // (because plink1 format is very annoying about this sort of thing)
@@ -217,6 +219,7 @@ workflow ANCESTRY_PROJECT {
         .set { ch_orient_input }
 
     PLINK2_ORIENT( ch_orient_input )
+    ch_versions = ch_versions.mix(PLINK2_ORIENT.out.versions.first())
 
     // fraposa -----------------------------------------------------------------
 
@@ -237,6 +240,7 @@ workflow ANCESTRY_PROJECT {
 
     // do PCA on reference genomes...
     FRAPOSA_PCA( ch_fraposa_ref.map { it.flatten() } )
+    ch_versions = ch_versions.mix(FRAPOSA_PCA.out.versions.first())
 
     // TODO: update samplesheet, reference is a reserved sampleset name
     // ... and project split target genomes
@@ -251,6 +255,7 @@ workflow ANCESTRY_PROJECT {
 
     // project targets into reference PCA space
     FRAPOSA_PROJECT( ch_fraposa_input )
+    ch_versions = ch_versions.mix(FRAPOSA_PROJECT.out.versions.first())
 
     // group together ancestry projections for each sampleset
     // different samplesets will have different ancestry projections after intersection
