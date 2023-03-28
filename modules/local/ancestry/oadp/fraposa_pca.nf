@@ -22,7 +22,7 @@ process FRAPOSA_PCA {
     script:
     """
     fraposa ${ref_geno.baseName} \
-        --method oadp \
+        --method $params.projection_method \
         --dim_ref 10
 
     cat <<-END_VERSIONS > versions.yml

@@ -159,7 +159,6 @@ include { INPUT_CHECK          } from '../subworkflows/local/input_check'
 include { MAKE_COMPATIBLE      } from '../subworkflows/local/make_compatible'
 include { MATCH                } from '../subworkflows/local/match'
 include { ANCESTRY_PROJECT  } from '../subworkflows/local/ancestry/ancestry_project'
-include { ANCESTRY_OADP  } from '../subworkflows/local/ancestry/ancestry_oadp'
 include { APPLY_SCORE          } from '../subworkflows/local/apply_score'
 include { REPORT               } from '../subworkflows/local/report'
 include { DUMPSOFTWAREVERSIONS } from '../modules/local/dumpsoftwareversions'
@@ -248,35 +247,20 @@ workflow PGSCALC {
         ref_pheno = Channel.empty()
         ref_var = Channel.empty()
 
-        if (params.shrinkage) {
-            ANCESTRY_OADP (
-                MAKE_COMPATIBLE.out.geno,
-                MAKE_COMPATIBLE.out.pheno,
-                MAKE_COMPATIBLE.out.variants,
-                MAKE_COMPATIBLE.out.vmiss,
-                ch_reference,
-                params.target_build
-            )
-            ch_versions = ch_versions.mix(ANCESTRY_OADP.out.versions)
-            intersection = intersection.mix(ANCESTRY_OADP.out.intersection)
-            ref_geno = ref_geno.mix(ANCESTRY_OADP.out.ref_geno)
-            ref_pheno = ref_pheno.mix(ANCESTRY_OADP.out.ref_pheno)
-            ref_var = ref_var.mix(ANCESTRY_OADP.out.ref_var)
-        } else {
-            ANCESTRY_PROJECT (
-                MAKE_COMPATIBLE.out.geno,
-                MAKE_COMPATIBLE.out.pheno,
-                MAKE_COMPATIBLE.out.variants,
-                MAKE_COMPATIBLE.out.vmiss,
-                ch_reference,
-                params.target_build
-            )
-            ch_versions = ch_versions.mix(ANCESTRY_PROJECT.out.versions)
-            intersection = intersection.mix(ANCESTRY_PROJECTION.out.intersection)
-            ref_geno = ref_geno.mix(ANCESTRY_PROJECTION.out.ref_geno)
-            ref_pheno = ref_pheno.mix(ANCESTRY_PROJECTION.out.ref_pheno)
-            ref_var = ref_var.mix(ANCESTRY_PROJECTION.out.ref_var)
-        }
+        ANCESTRY_PROJECT (
+            MAKE_COMPATIBLE.out.geno,
+            MAKE_COMPATIBLE.out.pheno,
+            MAKE_COMPATIBLE.out.variants,
+            MAKE_COMPATIBLE.out.vmiss,
+            ch_reference,
+            params.target_build
+        )
+        ch_versions = ch_versions.mix(ANCESTRY_PROJECT.out.versions)
+        intersection = intersection.mix(ANCESTRY_PROJECT.out.intersection)
+        ref_geno = ref_geno.mix(ANCESTRY_PROJECT.out.ref_geno)
+        ref_pheno = ref_pheno.mix(ANCESTRY_PROJECT.out.ref_pheno)
+        ref_var = ref_var.mix(ANCESTRY_PROJECT.out.ref_var)
+
     }
 
     //
@@ -285,7 +269,7 @@ workflow PGSCALC {
     if (run_match) {
         if (run_ancestry_assign) {
             // intersected variants ( across ref & target ) are an optional input
-            // intersection = ANCESTRY_PROJECT.out.intersection
+            intersection = ANCESTRY_PROJECT.out.intersection
         } else {
             dummy_input = Channel.of(file('NO_FILE')) // dummy file that doesn't exist
             // associate each sampleset with the dummy file
@@ -351,8 +335,8 @@ workflow PGSCALC {
         report_pheno = Channel.empty()
 
         if (run_ancestry_assign) {
-            projections = projections.mix(ANCESTRY_OADP.out.projections)
-            relatedness = relatedness.mix(ANCESTRY_OADP.out.relatedness)
+            projections = projections.mix(ANCESTRY_PROJECT.out.projections)
+            relatedness = relatedness.mix(ANCESTRY_PROJECT.out.relatedness)
             report_pheno = report_pheno.mix(ref_pheno)
         }
 

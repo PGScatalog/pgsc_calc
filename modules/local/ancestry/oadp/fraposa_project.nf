@@ -1,9 +1,11 @@
-process FRAPOSA_OADP {
+process FRAPOSA_PROJECT {
     // labels are defined in conf/modules.config
     label 'process_high_memory'
     label 'fraposa' // controls conda, docker, + singularity options
 
     tag "${target_geno.baseName.tokenize('_')[1]}"
+
+    storeDir "$workDir/fraposa/${params.target_build}/${target_geno.baseName}"
 
     conda (params.enable_conda ? "${task.ext.conda}" : null)
 
@@ -26,7 +28,7 @@ process FRAPOSA_OADP {
     oadp_meta = ['target_id':target_id]
     """
     fraposa ${ref_geno.baseName} \
-        --method oadp \
+        --method $params.projection_method \
         --dim_ref 10 \
         --stu_filepref ${target_geno.baseName} \
         --stu_filt_iid <(cut -f1 $split_fam)

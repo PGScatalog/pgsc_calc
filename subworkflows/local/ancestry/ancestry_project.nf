@@ -1,14 +1,16 @@
 //
 // Do a PCA on reference data and project target genomes into the PCA space
-// This subworkflow suffers from shrinkage, which ANCESTRY_OADP mitigates
 //
 
 include { EXTRACT_DATABASE } from '../../../modules/local/ancestry/extract_database'
 include { INTERSECT_VARIANTS } from '../../../modules/local/ancestry/intersect_variants'
 include { FILTER_VARIANTS } from '../../../modules/local/ancestry/filter_variants'
-include { PLINK2_PCA } from '../../../modules/local/ancestry/project/plink2_pca'
+include { PLINK2_MAKEBED as PLINK2_MAKEBED_TARGET; PLINK2_MAKEBED as PLINK2_MAKEBED_REF } from '../../../modules/local/ancestry/oadp/plink2_makebed'
+include { INTERSECT_THINNED } from '../../../modules/local/ancestry/oadp/intersect_thinned'
 include { RELABEL_IDS } from '../../../modules/local/ancestry/relabel_ids'
-include { PLINK2_PROJECT } from '../../../modules/local/ancestry/project/plink2_project'
+include { PLINK2_ORIENT } from '../../../modules/local/ancestry/oadp/plink2_orient'
+include { FRAPOSA_PCA } from '../../../modules/local/ancestry/oadp/fraposa_pca'
+include { FRAPOSA_PROJECT } from '../../../modules/local/ancestry/oadp/fraposa_project'
 
 workflow ANCESTRY_PROJECT {
     take:
@@ -44,6 +46,22 @@ workflow ANCESTRY_PROJECT {
 
     ch_versions = ch_versions.mix(EXTRACT_DATABASE.out.versions)
 
+    // prepare reference data channels for emit to scoring subworkflow
+    ch_db.map {
+        meta = it.first().clone()
+        meta.is_pfile = true
+        meta.id = 'reference'
+        meta.chrom = 'ALL'
+        return tuple(meta, it.tail())
+    }
+        .transpose()
+        .branch {
+            geno: it.last().getExtension() == 'pgen'
+            pheno: it.last().getExtension() == 'psam'
+            var: it.last().getExtension() == 'zst'
+        }
+        .set{ ch_ref_branched }
+
     //
     // STEP 1: get overlapping variants across reference and target ------------
     //
@@ -61,14 +79,19 @@ workflow ANCESTRY_PROJECT {
     //
     // STEP 2: filter variants in reference and target datasets ----------------
     //
+
+    // filtering isn't strictly necessary:
+    // one channel will be empty, EXTRACT_DATABASE only extracts the input build
+    // but it's worth keeping just in case anything untoward happens
     EXTRACT_DATABASE.out.grch37_king
         .concat(EXTRACT_DATABASE.out.grch38_king)
+        .filter { it.first().build == params.target_build }
         .set { ch_king }
 
     // TODO: this is hardcoded and prevents custom reference support
     Channel.of(
-         [['build': 'GRCh37'], file("$projectDir/assets/ancestry/high-LD-regions-hg19-GRCh37.txt", checkIfExists: true)],
-         [['build': 'GRCh38'], file("$projectDir/assets/ancestry/high-LD-regions-hg38-GRCh38.txt", checkIfExists: true)]
+        [['build': 'GRCh37'], file(params.ld_grch37, checkIfExists: true)],
+        [['build': 'GRCh38'], file(params.ld_grch38, checkIfExists: true)]
     )
         .join(ch_king)
         .set{ ch_king_and_ld }
@@ -80,6 +103,9 @@ workflow ANCESTRY_PROJECT {
         .map { tuple(groupKey(it.first().subMap('id', 'build'), it.first().n_chrom),
                      it.last()) }
         .groupTuple() // groupKey has an implicit size
+        .map { m = it.first().plus([:])
+              return [m, it.tail()]
+        }
         .set { ch_intersected }
 
     // 1) combine ch_intersected with ch_db by build key
@@ -100,118 +126,145 @@ workflow ANCESTRY_PROJECT {
         .set { ch_filter_input }
 
     FILTER_VARIANTS ( ch_filter_input )
-
+    ch_versions = ch_versions.mix(FILTER_VARIANTS.out.versions)
+    // -------------------------------------------------------------------------
+    // ref -> thinned bfile for fraposa
+    //
     FILTER_VARIANTS.out.ref
-        .join(FILTER_VARIANTS.out.prune_in)
-        .set { ch_pca_input }
+        .join( FILTER_VARIANTS.out.prune_in, by: 0 )
+        .map {
+            m = it.first().clone()
+            m.id = 'reference'
+            m.chrom = 'ALL'
+            m.is_pfile = true
+            return tuple(m, it.tail()).flatten()
+        }
+        .set { ch_makebed_ref }
 
-    //
-    // STEP 2: Derive PCA on reference population ------------------------------
-    //
+    PLINK2_MAKEBED_REF ( ch_makebed_ref )
 
-    PLINK2_PCA ( ch_pca_input )
-    ch_versions = ch_versions.mix(PLINK2_PCA.out.versions)
+    ch_versions = ch_versions.mix(PLINK2_MAKEBED_REF.out.versions)
+    // -------------------------------------------------------------------------
+    // targets -> intersect with thinned reference variants
+    // combine split targets into one file
+    // relabel
+    // then convert to bim
 
-    //
-    // STEP 3: Rekey PCA output for use on target datasets ---------------------
-    //
+    Utils.submapCombine(
+        ch_intersected,
+        FILTER_VARIANTS.out.prune_in,
+        ['build']
+    )
+        .map { Utils.filterMapListByKey(it, 'id') }
+        .map { Utils.listifyMatchReports(it) }
+        .map { [ it.first().subMap('build', 'id'), it] }
+        .set { ch_intersect_thin_input }
 
-    PLINK2_PCA.out.afreq
-        .concat(PLINK2_PCA.out.eigenvec_var)
-        .set { ch_pca_output }
+    ch_genomes.map { [groupKey(it.first().subMap('build', 'id', 'is_pfile', 'is_bfile'), it.first().n_chrom), it] }
+        .groupTuple()
+        .map { m = it.first().plus([:])
+              return [m, it.tail()]
+        }
+        .map{ Utils.filterMapListByKey(it.flatten(), 'chrom', drop=true) }
+        .map{ [ it.first().subMap('build', 'id'), it.head(), it.tail() ] }
+        .set{ ch_combined_genomes }
 
-    ch_intersected
-        .combine( ch_pca_output )
-        .set { ch_relabel_input }
+    ch_intersect_thin_input.join(ch_combined_genomes, by: 0)
+        .map { it.tail().first() + it.tail().tail() }
+        // [meta, [matches], pruned, geno_meta, [gigantic list of pfiles]]
+        .set { ch_intersect_thinned_input }
 
-    // TODO: fix ancestry projection input meta doesn't contain chrom key
-    RELABEL_IDS( ch_relabel_input )
+    // extract & merge split targets
+    INTERSECT_THINNED ( ch_intersect_thinned_input )
+    // TODO: why are versions bork?
+    // ch_versions = ch_versions.mix(INTERSECT_THINNED.out.versions)
+
+    Utils.submapCombine(
+        INTERSECT_THINNED.out.match_thinned,
+        INTERSECT_THINNED.out.variants,
+        ['build', 'id']
+    )
+        .map{ Utils.filterMapListByKey(it, 'is_pfile', drop=true) }
+        .set { ch_thinned_target }
+
+    RELABEL_IDS( ch_thinned_target )
+    ch_versions = ch_versions.mix(RELABEL_IDS.out.versions)
 
     RELABEL_IDS.out.relabelled
-        .transpose()
-        .map { Utils.annotateChrom(it) }
-        .branch {
-            var: it.first().target_format == 'eigenvec'
-            afreq: it.first().target_format == 'afreq'
-        }
-        .set { ch_relabel_output }
+        .map { [it.first(), it.last().findAll { it.getName().contains("_ALL_") }].flatten() }
+        .set { ch_target_relabelled }
 
-    //
-    // STEP 4: Project reference and target samples into PCA space -------------
-    //
-
-    def relabel_keys = ['id', 'chrom']
+    target_extract = Channel.of(file('NO_FILE')) // optional input for PLINK2_MAKEBED
     Utils.submapCombine(
-        Utils.submapCombine(ch_genomes,
-                            ch_relabel_output.var,
-                            relabel_keys),
-        ch_relabel_output.afreq,
-        relabel_keys
+        INTERSECT_THINNED.out.geno.join(INTERSECT_THINNED.out.pheno, by: 0),
+        ch_target_relabelled,
+        ['build', 'id']
     )
-        .map { Utils.filterMapListByKey(it, key='target_format', drop=true) } // keep head of list
-        .dump(tag: 'target_project_input')
-        .set { ch_target_project_input }
+        .map { Utils.filterMapListByKey(it, 'target_format', drop=true) }
+        .combine(target_extract)
+        .set { ch_target_makebed_input }
 
-    // associate the reference database with each unique sampleset
-    // so it's possible to join the reference channel with the rekeyed data
-    ch_genomes.map { it.first().id }.unique().set { ch_samplesets }
+    PLINK2_MAKEBED_TARGET ( ch_target_makebed_input )
 
-    ch_db
-        .combine( ch_samplesets )
-        .map {
-            m = [:]
-            m.id = it.last() // this is a white lie for Utils.submapCombine()
-            m.chrom = 'ALL' // ref data always combined
-            it.removeLast()
-            return tuple(m, it.tail()).flatten()
-        }
-        .set { ch_ref_genomes }
+    // make sure allele order matches across ref / target ----------------------
+    // (because plink1 format is very annoying about this sort of thing)
 
-    // 1) combine ref genomes with pca eigenvec var, no key needed
-    // 2) combine 1) with pca allele frequency file, no key needed
-    // 3) update meta map with keys needed by plink processes
-    ch_ref_genomes
-        .combine(PLINK2_PCA.out.eigenvec_var)
-        .combine(PLINK2_PCA.out.afreq)
-        .map {
-            // add important information for PLINK2_PROJECT
-            // must happen after .combine() matches by key
-            m = it.first().plus(['is_pfile': true])
-            m.id = 'reference' // correct the previous lie
-            return tuple(m, it.tail()).flatten()
-        }
-        .set{ ch_ref_project_input }
+    PLINK2_MAKEBED_TARGET.out.geno
+        .concat(PLINK2_MAKEBED_TARGET.out.pheno, PLINK2_MAKEBED_TARGET.out.variants)
+        .groupTuple(size: 3)
+        .combine(PLINK2_MAKEBED_REF.out.variants)
+        .map{ Utils.filterMapListByKey(it, 'chrom', drop=true).flatten() }
+        .set { ch_orient_input }
 
-    PLINK2_PROJECT( ch_target_project_input.mix ( ch_ref_project_input ) )
-    ch_versions = ch_versions.mix(PLINK2_PROJECT.out.versions.first())
+    PLINK2_ORIENT( ch_orient_input )
 
-    // prepare reference data channels for emit to scoring subworkflow
-    ch_db.map {
-        meta = it.first().clone()
-        meta.is_pfile = true
-        meta.id = 'reference'
-        meta.chrom = 'ALL'
-        return tuple(meta, it.tail())
-    }
+    // fraposa -----------------------------------------------------------------
+
+    PLINK2_MAKEBED_REF.out.geno
+        .concat(PLINK2_MAKEBED_REF.out.pheno, PLINK2_MAKEBED_REF.out.variants)
+        .groupTuple(size: 3)
+        .set { ch_fraposa_ref }
+
+    PLINK2_MAKEBED_TARGET.out.splits
         .transpose()
-        .branch {
-            geno: it.last().getExtension() == 'pgen'
-            pheno: it.last().getExtension() == 'psam'
-            var: it.last().getExtension() == 'zst'
-        }
-        .set{ ch_ref_branched }
+        .set { ch_split_targets }
 
-    // make sure the workflow completes reference projection for ref + target
-    def project_count = 0
-    PLINK2_PROJECT.out.projections.subscribe onNext: { project_count++ },
-        onComplete: { projection_error(project_count) }
+    PLINK2_ORIENT.out.geno
+        .concat(PLINK2_ORIENT.out.pheno, PLINK2_ORIENT.out.variants)
+        .groupTuple(size: 3)
+        .combine(ch_split_targets, by: 0)
+        .set { ch_fraposa_target }
+
+    // do PCA on reference genomes...
+    FRAPOSA_PCA( ch_fraposa_ref.map { it.flatten() } )
+
+    // TODO: update samplesheet, reference is a reserved sampleset name
+    // ... and project split target genomes
+
+    ch_fraposa_ref
+        .combine( ch_fraposa_target )
+        .flatten()
+        .filter{ !(it instanceof LinkedHashMap) || it.id == 'reference' }
+        .buffer(size: 8)
+        .combine(FRAPOSA_PCA.out.pca.map{ [it] })
+        .set { ch_fraposa_input }
+
+    // project targets into reference PCA space
+    FRAPOSA_PROJECT( ch_fraposa_input )
+
+    // group together ancestry projections for each sampleset
+    // different samplesets will have different ancestry projections after intersection
+    FRAPOSA_PROJECT.out.pca
+        .groupTuple() // todo: set size
+        .set { ch_projections }
 
     emit:
     intersection = INTERSECT_VARIANTS.out.intersection
-    projections = PLINK2_PROJECT.out.projections
+    projections = ch_projections
     ref_geno = ch_ref_branched.geno
     ref_pheno = ch_ref_branched.pheno
     ref_var = ch_ref_branched.var
+    relatedness = ch_king
     versions = ch_versions
 
 }
