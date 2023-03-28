@@ -73,6 +73,3 @@ join ref_variants.txt target_variants.txt |\
 #8 : REF_TARGET
 #9 : IS_MA_TARGET
 #10 : SAME_REF
-
-# Cleanup intermediate files
-rm -f ref_variants.txt target_variants.txt

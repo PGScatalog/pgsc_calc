@@ -30,8 +30,14 @@ process INTERSECT_VARIANTS {
         <(zstdcat $variants) \
         $file_format $meta.chrom
 
-    mv matched_variants.txt ${meta.id}_${meta.chrom}_matched.txt
-    gzip *.txt
+    if [ \$(wc -l < matched_variants.txt) -eq 1 ]
+    then
+        echo "ERROR: No variants in intersection"
+        exit 1
+    else
+        mv matched_variants.txt ${meta.id}_${meta.chrom}_matched.txt
+        gzip *.txt
+    fi
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
