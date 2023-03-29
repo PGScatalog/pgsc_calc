@@ -1,17 +1,21 @@
+.. _containers:
+
 Reference: container images
 ===========================
 
 The recommended way of running ``pgsc_calc`` requires downloading and running
 container images that we have built and hosted in publicly available container
 registries. The container images contain software that we need to calculate
-scores. Below is a list of container images for reference, which might be
+scores. The workflow normally automatically downloads and runs the required
+containers. Below is a list of container images for reference, which might be
 helpful if you'd like to download and inspect them manually.
 
 Software
 --------
 
-.. note:: Up to 6 containers are currently required to run ``pgsc_calc``.
-   4 containers are required if you choose not to run ancestry assignment.
+.. note::
+   - Up to 6 containers are currently required to run ``pgsc_calc``
+   - Only 4 containers are required if you choose not to run ancestry assignment
 
 Minimum required software:
 
@@ -22,7 +26,7 @@ Minimum required software:
 * `pgscatalog_utils`_
     * A collection of useful tools for working with PGS Catalog data
 * report
-    * Contains R, RMarkdown, and the tidyverse to produce the summary report
+    * Contains publishing tools to produce the summary report
 
 Ancestry assignment software:
 
@@ -39,17 +43,29 @@ Ancestry assignment software:
 .. _`fraposa_pgsc`: https://github.com/PGScatalog/fraposa_pgsc
 .. _`zstd`: https://github.com/facebook/zstd
 
-Downloading and inspecting containers
--------------------------------------
+Downloading containers
+----------------------
 
-Production versions of docker and singularity containers are hosted on the PGS
-Catalog Github `package registry`_.
+Production versions of docker and singularity containers can be downloaded from
+the PGS Catalog Github `package registry`_.
 
 Singularity images have ``-singularity`` appended to container tags.
 
 Docker images support ``linux/amd64`` and ``linux/arm64`` platforms.
 
-Information about the specific container versions that ``pgsc_calc`` is using is
-stored in the ``conf/modules.config`` file.
-
 .. _`package registry`: https://github.com/orgs/PGScatalog/packages
+
+Versions
+--------
+
+Information about the specific versions that ``pgsc_calc`` is using is stored in
+the :download:`conf/modules.config <../../conf/modules.config>` file:
+
+.. include:: ../../conf/modules.config
+   :start-after: container configuration
+   :end-before: // output configuration
+   :literal:
+
+Software versions will change across different releases of ``pgsc_calc``. This
+information is also included in the output path
+``results/pipeline_info/versions.yml`` by default.
