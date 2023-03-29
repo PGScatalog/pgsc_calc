@@ -3,27 +3,35 @@
 How-to guides
 =============
 
-Calculating polygenic scores 
+Setting up reference database
+-----------------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   database
+
+Calculating polygenic scores
 ----------------------------
 
 .. toctree::
    :maxdepth: 1
 
-   prepare            
+   prepare
    samplesheet
    calculate_pgscatalog
-   multiple   
-   
+   multiple
+
 Making genomic data and scorefiles compatible
 ---------------------------------------------
 
 .. toctree::
    :maxdepth: 1
-              
-   calculate_custom   
+
+   calculate_custom
    liftover
    effecttype
-   
+
 
 Working in different environments
 ----------------------------------
@@ -39,7 +47,6 @@ Working with complex datasets
 
 .. toctree::
    :maxdepth: 1
-              
+
    copygenomes
    yaml
-
