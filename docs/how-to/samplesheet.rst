@@ -13,52 +13,57 @@ Samplesheet
 A samplesheet can be set up in a spreadsheet program, using the following
 structure:
 
-.. list-table:: Example samplesheet
-   :widths: 20 20 20 20 20
+.. csv-table:: Example samplesheet
+   :file: ../../assets/examples/samplesheet.csv
    :header-rows: 1
+                 
+The file should be in :term:`CSV` format. A template is :download:`available to
+download here <../../assets/examples/samplesheet.csv>`.
 
-   * - sampleset
-     - vcf_path
-     - bfile_path
-     - pfile_path
-     - chrom
-   * - cineca_synthetic_subset
-     -
-     - path/to/bfile_prefix
-     -
-     - 22
-   * - cineca_synthetic_subset_vcf
-     - path/to/vcf.gz
-     -
-     -
-     - 22
+There are four mandatory columns:
 
-The file should be in :term:`CSV` format. A template is `available here`_ (right
-click the link and "save as" to download).
+- **sampleset**: A text string referring to the name of a :term:`target dataset`
+  of genotyping data containing at least one sample/individual (however cohort
+  datasets will often contain many individuals with combined genotyped/imputed
+  data). Data from a sampleset may be input as a single file, or split across
+  chromosomes into multiple files.  Scores generated from files with the same
+  sampleset name are combined in later stages of the analysis.
 
-There are five mandatory columns:
+  .. danger::
+     - ``pgsc_calc`` works best with cohort data
+     - Scores calculated for low sample sizes will generate warnings in the
+       output report
+     - You should merge your genomes if they are split per individual before
+       using ``pgsc_calc``
+  
+- **path_prefix** should be set to the path of the target genomes excluding all
+  file extensions
 
-- **sampleset**: A text string referring to the name of a :term:`target dataset` of
-  genotyping data containing at least one sample/individual (however cohort datasets
-  will often contain many individuals with combined genotyped/imputed data). Data from a
-  sampleset may be input as a single file, or split across chromosomes into multiple files.
-  Scores generated from files with the same sampleset name are combined in later stages of the
-  analysis.
-- Columns that specify genomic data paths (**vcf_path**, **bfile_path**, and **pfile_path**)
-  are mutually exclusive and must contain only one non-NULL entry:
-    - **vcf_path**: A text string of a file path pointing to a multi-sample
-      :term:`VCF` file. File names must be unique. It's best to use full file paths,
-      not relative file paths.
-    - **bfile_path**: A text string of a file path pointing to the prefix of a plink
-      binary fileset. For example, if a binary fileset consists of plink.bed,
-      plink.bim, and plink.fam then the prefix would be "plink". Must be
-      unique. It's best to use full file paths, not relative file paths.
-    - **pfile_path**: Like **bfile_path**, but for a PLINK2 format fileset (pgen /
-      psam / pvar)
-- **chrom**: An integer (range 1-22) or string (X, Y). If the target genomic data file contains
-  multiple chromosomes, leave empty. Don't use a mix of empty and integer
-  chromosomes in the same sample.
+  - Example path prefix: ``/home/stuff/data.vcf.gz`` -> ``/home/stuff/data``
 
+  .. danger:: Always use absolute paths that begin with ``/``, e.g. ``/home/stuff/...``
+
+  .. note:: One plink file set (``bed / bim / fam`` or ``pgen / pvar / psam``) only
+       needs a single path prefix and row in the samplesheet
+     
+- **chrom**: An integer (range 1-22) or string (X, Y). If the target genomic
+  data file contains multiple chromosomes, leave empty. Don't use a mix of empty
+  and integer chromosomes in the same sample.
+
+- **format**: The file format of the target genomes. Currently supports
+  ``pfile``, ``bfile``, or ``vcf``.
+
+.. note:: Multiple samplesheet rows are typically only needed if:
+          
+          - The target genomes are split to have a one file per chromosome
+          - You're working with multiple cohorts simultaneously 
+          
+Setting genotype field
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. note:: This is an optional process that is only applicable for some types of
+          VCF data
+          
 There is one optional column:
 
 - **vcf_genotype_field**: Genotypes present in :term:`VCF` files are extracted from the
@@ -70,28 +75,24 @@ There is one optional column:
 An example of a samplesheet with two VCF datasets where you'd like to import
 different genotypes from each is below:
 
-.. list-table:: Example samplesheet
-   :widths: 15 15 15 15 15 15
+.. list-table:: Example samplesheet with genotype field set
    :header-rows: 1
 
    * - sampleset
-     - vcf_path
-     - vcf_genotype_field
-     - bfile_path
-     - pfile_path
+     - path_prefix
      - chrom
+     - format 
+     - vcf_genotype_field       
    * - cineca_sequenced
-     - path/to/vcf.gz
+     - path/to/vcf
+     - 22
+     - vcf
      - ``GT``
-     -
-     -
-     - 22
    * - cineca_imputed
-     - path/to/vcf_imputed.gz
-     - ``DS``
-     -
-     -
+     - path/to/vcf_imputed
      - 22
+     - vcf
+     - ``DS``
 
 .. _`available here`: https://raw.githubusercontent.com/PGScatalog/pgsc_calc/dev/assets/examples/samplesheet.csv
 
