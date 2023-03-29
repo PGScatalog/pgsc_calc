@@ -21,7 +21,7 @@ process SAMPLESHEET_JSON {
 
     script:
     """
-    samplesheet_to_json.py $samplesheet out.json
+    samplesheet_to_json $samplesheet out.json
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
