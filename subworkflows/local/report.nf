@@ -45,7 +45,7 @@ workflow REPORT {
         ancestry_results = ANCESTRY_ANALYSIS.out.results
         ch_versions = ch_versions.mix(ANCESTRY_ANALYSIS.out.versions)
     } else {
-        ancestry_results = ancestry_results.mix(Channel.of('NO_FILE'))
+        ancestry_results = ancestry_results.mix(Channel.fromPath('NO_FILE'))
     }
 
     SCORE_REPORT(
