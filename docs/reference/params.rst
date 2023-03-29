@@ -43,6 +43,8 @@ page. You can view the entire list by running:
 
 Or by :download:`downloading the schema <../../nextflow_schema.json>` and opening it in a text editor
 
+.. _schema:
+
 Schema
 ------
      

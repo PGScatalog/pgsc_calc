@@ -23,7 +23,7 @@ genomes.
 
 Once the reference database is included, remember you must include the ``--ref``
 parameter, which is a path to the reference database (see
-:ref:`reference/params:schema`).
+:ref:`schema`).
 
 (Optional) Create reference database
 ------------------------------------
@@ -51,7 +51,7 @@ reference database uses genomes from the 1000 Genomes project.
 
 
 3. Run the workflow with the ``--ref_samplesheet`` parameter, which is mutually
-   exclusive with the ``--ref`` parameter (see :ref:`reference/params:schema`).
+   exclusive with the ``--ref`` parameter (see :ref:`schema`).
 
 .. note:: This approach could be used to create a custom reference
           database. For example, including genomes from the Human Genome
