@@ -53,11 +53,20 @@ There are four mandatory columns:
 - **format**: The file format of the target genomes. Currently supports
   ``pfile``, ``bfile``, or ``vcf``.
 
+Notes
+~~~~~
+
 .. note:: Multiple samplesheet rows are typically only needed if:
           
           - The target genomes are split to have a one file per chromosome
           - You're working with multiple cohorts simultaneously 
-          
+
+.. danger:: All samplesets have to be in the same genome build (either GRCh37 or
+    GRCh38) which is specified using the ``--target_build [GRCh3#]``
+    command. All scoring files are downloaded or mapped to match the specified
+    genome build, no liftover/re-mapping of the genotyping data is performed
+    within the pipeline.
+
 Setting genotype field
 ~~~~~~~~~~~~~~~~~~~~~~
 

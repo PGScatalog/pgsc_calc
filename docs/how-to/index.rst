@@ -3,8 +3,8 @@
 How-to guides
 =============
 
-Setting up reference database
------------------------------
+Reference database
+------------------
 
 .. toctree::
    :maxdepth: 1
