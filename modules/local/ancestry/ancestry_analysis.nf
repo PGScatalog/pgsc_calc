@@ -28,8 +28,8 @@ process ANCESTRY_ANALYSIS {
         -x $relatedness \
         -p $params.ref_label \
         -s $scores \
-        -a $params.assignment_algorithm \
-        --n_assignment $params.n_assignment \
+        -a $params.ancestry_method \
+        --n_popcomp $params.n_popcomp \
         -n $params.normalization_method \
         --n_normalization $params.n_normalization \
         --outdir . \

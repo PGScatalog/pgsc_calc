@@ -93,18 +93,18 @@
           "enum": ["oadp", "sp", "adp"],
           "description": "The method for PCA prediction. oadp: most accurate. adp: accurate but slow. sp: fast but inaccurate."
         },
-        "assignment_algorithm": {
+        "ancestry_method": {
           "type": "string",
           "default": "RandomForest",
-          "enum": ["Mahalanobis", "RandomForest"],
-          "description": "Method used for population/ancestry assignment"
+          "description": "Method used for population/ancestry assignment",
+          "enum": ["Mahalanobis", "RandomForest"]
         },
         "ref_label": {
           "type": "string",
           "default": "SuperPop",
           "description": "Population labels in reference psam to use for assignment"
         },
-        "n_assignment": {
+        "n_popcomp": {
           "type": "integer",
           "default": 10,
           "description": "Number of PCs used for population assignment"
@@ -123,11 +123,11 @@
       },
       "required": [
         "projection_method",
-        "assignment_algorithm",
+        "ancestry_method",
         "ref_label",
-        "n_assignment",
         "normalization_method",
-        "n_normalization"
+        "n_normalization",
+        "n_popcomp"
       ]
     },
     "reference_options": {
