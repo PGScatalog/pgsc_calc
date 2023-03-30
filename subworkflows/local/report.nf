@@ -42,7 +42,11 @@ workflow REPORT {
             .set { ch_ancestry_input }
 
         ANCESTRY_ANALYSIS ( ch_ancestry_input )
-        ancestry_results = ANCESTRY_ANALYSIS.out.results
+        ancestry_results = ancestry_results.mix(
+            ANCESTRY_ANALYSIS.out.info,
+            ANCESTRY_ANALYSIS.out.popsimilarity,
+            ANCESTRY_ANALYSIS.out.pgs)
+
         ch_versions = ch_versions.mix(ANCESTRY_ANALYSIS.out.versions)
     } else {
         ancestry_results = ancestry_results.mix(Channel.fromPath('NO_FILE'))
