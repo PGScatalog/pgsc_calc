@@ -6,6 +6,7 @@ process FRAPOSA_PROJECT {
     tag "${target_geno.baseName.tokenize('_')[1]}"
 
     storeDir "$workDir/fraposa/${params.target_build}/${target_geno.baseName}"
+    cache 'deep'
 
     conda (params.enable_conda ? "${task.ext.conda}" : null)
 

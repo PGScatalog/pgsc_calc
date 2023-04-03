@@ -4,6 +4,7 @@ process FRAPOSA_PCA {
     label 'fraposa' // controls conda, docker, + singularity options
 
     tag "$meta.id"
+    cache 'deep'
 
     conda (params.enable_conda ? "${task.ext.conda}" : null)
 
