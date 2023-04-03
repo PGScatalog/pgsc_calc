@@ -4,14 +4,14 @@
 //
 
 process INTERSECT_THINNED {
-	scratch true
-	
+    scratch true
     // labels are defined in conf/modules.config
     label 'process_high_memory'
     label 'process_long'
     label 'plink2' // controls conda, docker, + singularity options
 
     tag "$meta.id"
+    storeDir "$workDir/thinned_intersection/${params.target_build}/${meta.id}"
 
     conda (params.enable_conda ? "${task.ext.conda}" : null)
 
