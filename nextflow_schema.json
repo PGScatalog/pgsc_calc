@@ -45,10 +45,6 @@
           "type": "boolean",
           "description": "Return only PGS tagged with exact EFO term (e.g. no PGS for child/descendant terms in the ontology)"
         },
-        "vzs": {
-          "type": "boolean",
-          "description": "Assume plink inputs (.bim / .pvar) are compressed with zstd"
-        },
         "copy_genomes": {
           "type": "boolean",
           "description": "Copy harmonised genomes (plink2 pgen/pvar/psam files) to outdir"
