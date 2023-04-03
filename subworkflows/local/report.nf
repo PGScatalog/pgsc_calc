@@ -28,7 +28,6 @@ workflow REPORT {
        file input collisions
      */
     if (run_ancestry_assign) {
-
         scores
             .combine(ref_relatedness)
             .combine(ref_pheno)
@@ -46,6 +45,7 @@ workflow REPORT {
             ANCESTRY_ANALYSIS.out.info,
             ANCESTRY_ANALYSIS.out.popsimilarity,
             ANCESTRY_ANALYSIS.out.pgs)
+            .collect()
 
         ch_versions = ch_versions.mix(ANCESTRY_ANALYSIS.out.versions)
     } else {
@@ -55,8 +55,6 @@ workflow REPORT {
     SCORE_REPORT(
         scores,
         log_scorefiles,
-        Channel.fromPath("$projectDir/bin/report.Rmd", checkIfExists: true),
-        Channel.fromPath("$projectDir/assets/PGS_Logo.png", checkIfExists: true),
         log_match.collect(),
         ancestry_results
     )
