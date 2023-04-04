@@ -1,0 +1,43 @@
+---
+title: PGS Catalog Calculator pipeline report
+author: PGS Catalog team
+date: today
+title-block-banner: true
+toc: true
+format:
+  html:
+    code-fold: true
+    anchor-sections: true
+notebook-view:
+  - notebook: report.ipynb
+    title: "Computations and Plots"
+---
+
+# Pipeline command
+
+{{< embed report.ipynb#pipeline-command >}}
+
+# Scoring file metadata
+
+::: {.callout-tip}
+Additional [documentation](https://pgsc-calc.readthedocs.io/en/latest/output.html#report) is available that explains some of the terms used this report in more detail
+:::
+
+## Scoring file summary
+
+{{< embed report.ipynb#scoring-file-summary >}}
+
+# Variant matching 
+
+## Parameters
+
+{{< embed report.ipynb#variant-matching-parameters >}}
+
+## Summary
+
+{{< embed report.ipynb#variant-matching-summary >}}
+
+## Detailed log
+
+{{< embed report.ipynb#variant-matching-detailed >}}
+

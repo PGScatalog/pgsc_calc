@@ -3,8 +3,8 @@ process FRAPOSA_PCA {
     label 'process_high_memory'
     label 'fraposa' // controls conda, docker, + singularity options
 
-    tag "${target_geno.baseName.tokenize('_')[1]}"
-    storeDir "$workDir/fraposa/${params.target_build}/${ref_geno.baseName}"
+    tag "reference"
+    cache "deep"
 
     conda (params.enable_conda ? "${task.ext.conda}" : null)
 

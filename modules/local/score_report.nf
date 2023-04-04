@@ -28,11 +28,11 @@ process SCORE_REPORT {
     echo "keep_ambiguous   : $params.keep_ambiguous"    >> params.txt
     echo "min_overlap      : $params.min_overlap"       >> params.txt
 
-    quarto render $projectDir/assets/report/report.ipynb \
-        --to html \
-        --execute \
-        --execute-dir \$PWD \
-        -o report.html
+    cp $projectDir/assets/report/report.ipynb .
+    jupyter nbconvert --to notebook --execute report.ipynb --inplace
+
+    cp $projectDir/assets/report/report.qmd .
+    quarto render report.qmd -M "self-contained:true"
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
