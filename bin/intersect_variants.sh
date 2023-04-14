@@ -40,6 +40,13 @@ else
   exit 1
 fi
 
+
+if [ $(wc -l < ref_variants.txt) -eq 1 ]
+then
+    echo "ERROR: No variants in reference report"
+    exit 1
+fi
+
 # handle target (in multiple formats)
 echo -e "CHR:POS:A0:A1\tID_TARGET\tREF_TARGET\tIS_MA_TARGET" > target_variants.txt
 if [ "$target_format" == "pvar" ]; then
@@ -56,6 +63,12 @@ elif [ "$target_format" == "bim" ]; then
 else
   echo "${target_format} is not a valid option (only pvar and bim are currently accepted)"
   exit 1
+fi
+
+if [ $(wc -l < target_variants.txt) -eq 1 ]
+then
+    echo "ERROR: No variants in target report"
+    exit 1
 fi
 
 # Merge & output matches w/ ref orientation
