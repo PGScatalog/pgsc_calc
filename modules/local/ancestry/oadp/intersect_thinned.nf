@@ -25,9 +25,9 @@ process INTERSECT_THINNED {
 
     output:
     tuple val(meta), path("*_thinned.txt.gz"), emit: match_thinned
-    tuple val(geno_meta), path("*.pgen"), emit: geno
-    tuple val(geno_meta), path("*.pvar.gz"), emit: variants
-    tuple val(geno_meta), path("*.psam"), emit: pheno
+    tuple val(geno_meta), path("*_extracted.pgen"), emit: geno
+    tuple val(geno_meta), path("*_extracted.pvar.gz"), emit: variants
+    tuple val(geno_meta), path("*_extracted.psam"), emit: pheno
     path "versions.yml"           , emit: versions
 
     script:
