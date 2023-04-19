@@ -17,7 +17,7 @@ process FRAPOSA_PCA {
     tuple val(meta), path(ref_geno), path(ref_pheno), path(ref_variants)
 
     output:
-    path "*.dat", emit: pca
+    path "*.{dat,pcs}", emit: pca
     path "versions.yml", emit: versions
 
     script:
