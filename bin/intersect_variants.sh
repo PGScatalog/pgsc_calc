@@ -17,6 +17,8 @@ i_target=$2 # path/to/TARGET/pvar (or decompressed stdin)
 target_format=$3 # format of target pvar
 chrom=$4 # whether to limit matches to specific chromosome of the reference
 
+mkdir tmp # temporary working directory
+
 chr_list="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y"
 validate_chrom() { echo "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y" | grep -F -q -w "$1"; }
 
