@@ -28,13 +28,13 @@ if [ "$chrom" == "ALL" ]; then
     for (a in ALT){
       if($4 < ALT[a]) print $1":"$2":"$4":"ALT[a], $3, $4, (length($4) > 1 || length(ALT[a]) > 1), ($4 ALT[a] == "AT" || $4 ALT[a] == "TA" || $4 ALT[a] == "CG" || $4 ALT[a] == "GC"), (length(ALT) > 1);
       else print $1":"$2":"ALT[a]":"$4, $3, $4, (length($4) > 1 || length(ALT[a]) > 1), ($4 ALT[a] == "AT" || $4 ALT[a] == "TA" || $4 ALT[a] == "CG" || $4 ALT[a] == "GC"), (length(ALT) > 1)
-    }}' $i_reference | sort >> ref_variants.txt
+    }}' $i_reference | sort -T ./tmp/ >> ref_variants.txt
 elif validate_chrom $chrom; then
   awk -v filter_chrom=$chrom '!/^#/ && ($1 == filter_chrom) {split($5, ALT, ",");
     for (a in ALT){
       if($4 < ALT[a]) print $1":"$2":"$4":"ALT[a], $3, $4, (length($4) > 1 || length(ALT[a]) > 1), ($4 ALT[a] == "AT" || $4 ALT[a] == "TA" || $4 ALT[a] == "CG" || $4 ALT[a] == "GC"), (length(ALT) > 1);
       else print $1":"$2":"ALT[a]":"$4, $3, $4, (length($4) > 1 || length(ALT[a]) > 1), ($4 ALT[a] == "AT" || $4 ALT[a] == "TA" || $4 ALT[a] == "CG" || $4 ALT[a] == "GC"), (length(ALT) > 1)
-    }}' $i_reference | sort >> ref_variants.txt
+    }}' $i_reference | sort -T ./tmp/ >> ref_variants.txt
 else
   echo "${chrom} is not a valid option, only {$chr_list} are currently accepted"
   exit 1
@@ -54,12 +54,12 @@ if [ "$target_format" == "pvar" ]; then
     for (a in ALT){
       if($4 < ALT[a]) print $1":"$2":"$4":"ALT[a], $3, $4, (length(ALT) > 1);
       else print $1":"$2":"ALT[a]":"$4, $3, $4, (length(ALT) > 1)
-    }}' $i_target | sort >> target_variants.txt
+    }}' $i_target | sort -T ./tmp/ >> target_variants.txt
 elif [ "$target_format" == "bim" ]; then
   awk '!/^#/ {
     if($5 < $6) print $1":"$4":"$5":"$6, $2, $6, 0;
     else print $1":"$4":"$6":"$5, $2, $6, 0
-  }' $i_target | sort >> target_variants.txt
+  }' $i_target | sort ./tmp/ >> target_variants.txt
 else
   echo "${target_format} is not a valid option (only pvar and bim are currently accepted)"
   exit 1
