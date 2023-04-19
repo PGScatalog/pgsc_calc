@@ -19,7 +19,7 @@ process FRAPOSA_PROJECT {
         path(pca)
 
     output:
-    tuple val(oadp_meta), path("GRCh3?_reference_*.pcs"), path("GRCh3?_${target_id}_*.pcs"), emit: pca
+    tuple val(oadp_meta), path("GRCh3?_${target_id}_*.pcs"), emit: pca
     path "versions.yml", emit: versions
 
     script:
