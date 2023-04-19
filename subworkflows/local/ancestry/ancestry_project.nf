@@ -259,13 +259,19 @@ workflow ANCESTRY_PROJECT {
 
     // group together ancestry projections for each sampleset
     // different samplesets will have different ancestry projections after intersection
+    FRAPOSA_PCA.out.pca
+        .flatten()
+        .filter { it.getExtension() == 'pcs' }
+        .map { [it] }
+        .set { ch_ref_projections }
+
     FRAPOSA_PROJECT.out.pca
         .groupTuple() // todo: set size
         .set { ch_projections }
 
     emit:
     intersection = INTERSECT_VARIANTS.out.intersection
-    projections = ch_projections
+    projections = ch_projections.combine(ch_ref_projections)
     ref_geno = ch_ref_branched.geno
     ref_pheno = ch_ref_branched.pheno
     ref_var = ch_ref_branched.var

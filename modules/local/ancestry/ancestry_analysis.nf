@@ -11,7 +11,7 @@ process ANCESTRY_ANALYSIS {
         "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
-    tuple val(meta), path('ref_pcs/?.pcs'), path('target_pcs/???.pcs'), path(scores), path(relatedness), path(ref_psam)
+    tuple val(meta), path('target_pcs/???.pcs'), path('ref_pcs/?.pcs'), path(scores), path(relatedness), path(ref_psam)
 
     output:
     path "*_info.json.gz", emit: info
