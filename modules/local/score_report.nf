@@ -32,6 +32,8 @@ process SCORE_REPORT {
     jupyter nbconvert --to notebook --execute report.ipynb --inplace
 
     cp $projectDir/assets/report/report.qmd .
+    # workaround for unhelpful filenotfound quarto errors in some HPCs
+    mkdir temp && TMPDIR=temp
     quarto render report.qmd -M "self-contained:true"
 
     cat <<-END_VERSIONS > versions.yml
