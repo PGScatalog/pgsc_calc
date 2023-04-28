@@ -3,6 +3,11 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - jupyterlab
-  - pandas
-  - quarto
+  - r-dplyr
+  - r-dt
+  - r-tidyr
+  - r-ggplot2
+  - r-forcats
+  - r-readr
+  - r-purrr
+  - r-jsonlite
