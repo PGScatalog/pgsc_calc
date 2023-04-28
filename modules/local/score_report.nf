@@ -21,17 +21,13 @@ process SCORE_REPORT {
 
     script:
     def args = task.ext.args ?: ''
-    def ancestry_results = ancestry_results.name == 'NO_FILE' ? '--skip_ancestry' : '--run_ancestry'
     """
     echo $workflow.commandLine > command.txt
     echo "keep_multiallelic: $params.keep_multiallelic" > params.txt
     echo "keep_ambiguous   : $params.keep_ambiguous"    >> params.txt
     echo "min_overlap      : $params.min_overlap"       >> params.txt
 
-    cp $projectDir/assets/report/report.ipynb .
-    jupyter nbconvert --to notebook --execute report.ipynb --inplace
-
-    cp $projectDir/assets/report/report.qmd .
+    cp -r $projectDir/assets/report/* .
     # workaround for unhelpful filenotfound quarto errors in some HPCs
     mkdir temp && TMPDIR=temp
     quarto render report.qmd -M "self-contained:true"
