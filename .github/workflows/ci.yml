@@ -4,6 +4,7 @@ on:
     branches:
       - dev
       - main
+      - ci
   pull_request:
     branches:
       - dev
@@ -71,7 +72,7 @@ jobs:
       - name: Set up singularity cache dir environment variable
         run: |
           # runner context isn't available in env workflow key
-          export NXF_SINGULARITY_CACHEDIR=${{ runner.temp }}/singularity
+          export NXF_SINGULARITY_CACHEDIR=${{ github.workspace }}/singularity
           mkdir -p $NXF_SINGULARITY_CACHEDIR
 
       - name: Cache singularity images
