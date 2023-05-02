@@ -9,8 +9,8 @@ process MAKE_DATABASE {
 
     container "${ workflow.containerEngine == 'singularity' &&
         !task.ext.singularity_pull_docker_container ?
-        "${task.ext.singularity}${task.ext.version}" :
-        "${task.ext.docker}${task.ext.version}" }"
+        "${task.ext.singularity}${task.ext.singularity_version}" :
+        "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
     path '*'

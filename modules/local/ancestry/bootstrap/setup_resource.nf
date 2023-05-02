@@ -9,8 +9,8 @@ process SETUP_RESOURCE {
 
     container "${ workflow.containerEngine == 'singularity' &&
         !task.ext.singularity_pull_docker_container ?
-        "${task.ext.singularity}${task.ext.version}" :
-        "${task.ext.docker}${task.ext.version}" }"
+        "${task.ext.singularity}${task.ext.singularity_version}" :
+        "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
     tuple val(meta), path(pgen), path(psam), path(pvar)

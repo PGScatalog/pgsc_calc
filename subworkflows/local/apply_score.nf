@@ -15,8 +15,6 @@ workflow APPLY_SCORE {
     variants
     intersection
     scorefiles
-    log_scorefiles
-    db
 
     main:
     ch_versions = Channel.empty()
@@ -37,43 +35,46 @@ workflow APPLY_SCORE {
 
     ch_all_genomes.target.set { ch_genomes }
 
-    // prepare scorefiles for reference data -----------------------------------
-    //   1. extract the combined scoring files from the annotated scoring files
-    //      (more than one may be present to handle duplicates or effect types)
-    //   2. join with a list of variants that intersect
-    //   3. combine reference genome with scoring files
-    //   3. relabel scoring file IDs from ID_REF -> ID_TARGET
-    // assumptions:
-    //   - input reference genomes are always combined (i.e. chrom: ALL)
-    annotated_scorefiles
-        .filter{ it.first().chrom == 'ALL'}
-        .map { tuple(it.first().subMap('id'), it) }
-        .set { ch_ref_scorefile }
+    ch_apply_ref = Channel.empty()
+    if (!params.skip_ancestry) {
+        // prepare scorefiles for reference data -----------------------------------
+        //   1. extract the combined scoring files from the annotated scoring files
+        //      (more than one may be present to handle duplicates or effect types)
+        //   2. join with a list of variants that intersect
+        //   3. combine reference genome with scoring files
+        //   3. relabel scoring file IDs from ID_REF -> ID_TARGET
+        // assumptions:
+        //   - input reference genomes are always combined (i.e. chrom: ALL)
+        annotated_scorefiles
+            .filter{ it.first().chrom == 'ALL'}
+            .map { tuple(it.first().subMap('id'), it) }
+            .set { ch_ref_scorefile }
 
-    intersection
-        .map { tuple( it.first().subMap('id'), it.last() ) }
-        .groupTuple() // TODO: be polite and set size
-        // ref genome must be combined with _all_ scorefiles
-        .combine ( ch_ref_scorefile, by: 0 )
-        // re-order: [scoremeta, [variant match reports], scorefile]
-        .map { tuple(it.last().first(), it.tail().head(), it.last().last()) }
-        .set { ch_scorefile_relabel_input }
+        intersection
+            .map { tuple( it.first().subMap('id'), it.last() ) }
+            .groupTuple() // TODO: be polite and set size
+            // ref genome must be combined with _all_ scorefiles
+            .combine ( ch_ref_scorefile, by: 0 )
+            // re-order: [scoremeta, [variant match reports], scorefile]
+            .map { tuple(it.last().first(), it.tail().head(), it.last().last()) }
+            .set { ch_scorefile_relabel_input }
 
-    // relabel scoring file ids to match reference format
-    RELABEL_IDS ( ch_scorefile_relabel_input )
+        // relabel scoring file ids to match reference format
+        RELABEL_IDS ( ch_scorefile_relabel_input )
 
-    RELABEL_IDS.out.relabelled
-        .transpose()
-        .map { annotate_chrom(it) }
-        .map { tuple(it.first().subMap('chrom'), it) }
-        .set { ch_target_scorefile }
+        RELABEL_IDS.out.relabelled
+            .transpose()
+            .map { annotate_chrom(it) }
+            .map { tuple(it.first().subMap('chrom'), it) }
+            .set { ch_target_scorefile }
 
-    ch_all_genomes.ref
-        .map { annotate_genomic(it).flatten() }
-        .map { tuple(it.first().subMap('chrom'), it) }
-        .combine( ch_target_scorefile, by: 0 ) // to work with multiple samplesets
-        .map { it.tail().flatten() }
-        .set { ch_apply_ref }
+        ch_all_genomes.ref
+            .map { annotate_genomic(it).flatten() }
+            .map { tuple(it.first().subMap('chrom'), it) }
+            .combine( ch_target_scorefile, by: 0 ) // to work with multiple samplesets
+            .map { it.tail().flatten() }
+            .set { ch_apply_ref }
+    }
 
     // intersect genomic data with split scoring files -------------------------
     ch_genomes
@@ -101,18 +102,9 @@ workflow APPLY_SCORE {
 
     ch_versions = ch_versions.mix(SCORE_AGGREGATE.out.versions)
 
-    SCORE_REPORT(
-        SCORE_AGGREGATE.out.scores,
-        log_scorefiles,
-        Channel.fromPath("$projectDir/bin/report.Rmd", checkIfExists: true),
-        Channel.fromPath("$projectDir/assets/PGS_Logo.png", checkIfExists: true),
-        db.collect()
-    )
-
-    ch_versions = ch_versions.mix(SCORE_REPORT.out.versions)
-
     emit:
     versions = ch_versions
+    scores = SCORE_AGGREGATE.out.scores
 }
 
 def score_error(boolean fail) {

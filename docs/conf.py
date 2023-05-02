@@ -35,7 +35,7 @@ extensions = [
     'sphinx.ext.autosectionlabel',
     'sphinx.ext.autodoc',
     'sphinx-jsonschema',
-    'sphinxemoji.sphinxemoji'
+    'sphinxemoji.sphinxemoji',
 ]
 
 nitpicky = True
@@ -75,38 +75,3 @@ html_theme_options = {
     "use_issues_button": False,
     "extra_navbar": ""
 }
-
-def write_containers():
-    base_singularity = get_unique_containers("singularity", "depot")  # biocontainers
-    custom_singularity = get_unique_containers("singularity", "oras")  # private containers
-    base_docker = get_unique_containers("docker", "quay")
-    custom_docker = get_unique_containers("docker", "\"dockerhub")
-    if not os.path.exists("_build"):
-        os.mkdir("_build")
-
-    with open('_build/singularity_containers.txt', 'w') as f:
-        f.write('\n'.join(base_singularity + custom_singularity))
-
-    with open('_build/docker_containers.txt', 'w') as f:
-        f.write('\n'.join(base_docker + custom_docker))
-
-
-def get_unique_containers(engine: str, grep_string: str) -> list[str]:
-    git: subprocess.CompletedProcess = subprocess.run(["git", "grep", "-h", grep_string, "../*.nf"],
-                                                      capture_output=True)
-    messy_containers: str = git.stdout.decode("utf-8").strip()
-    match engine:
-        case "docker":
-            # custom containers use double quotes for closures
-            containers = list(set(re.findall(r'"([^"]*)"', messy_containers)))
-            if not containers:
-                # biocontainers use single quotes
-                containers = list(set(re.findall('\'([^\']*)\'', messy_containers)))
-        case "singularity":
-            # all singularity images use single quotes
-            containers = list(set(re.findall('\'([^\']*)\'', messy_containers)))
-
-    return containers
-
-
-write_containers()

@@ -1,17 +1,18 @@
-:orphan:
-
 .. _interpret:
 
 ``pgsc_calc`` Outputs & results
 ===============================
 
 
-The pipeline outputs are written to a results directory
-(``--outdir`` default is ``./results/``) that contains three subdirectories:
+The pipeline outputs are written to a results directory (``--outdir`` default is
+``./results/``) with the following structure:
 
-- ``score/``: calculated PGS with summary report
-- ``match/`` : scoring files and variant match metadata
-- ``pipeline_info/`` : nextflow pipeline execution (memory, runtime, etc.)
+.. code-block:: console
+                
+    results
+    ├── match (scoring files and variant match metadata)
+    ├── pipeline_info (nextflow pipeline execution data)
+    └── score (calculated PGS with summary report)
 
 ``score/``
 ----------

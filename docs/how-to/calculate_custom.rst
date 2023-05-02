@@ -13,27 +13,7 @@ using a custom scoring file is described below.
 1. Samplesheet setup
 ~~~~~~~~~~~~~~~~~~~~
 
-First, you need to describe the structure of your genomic data in a standardised
-way. To do this, set up a spreadsheet that looks like:
-
-.. list-table:: Example samplesheet
-   :widths: 25 25 25 25
-   :header-rows: 1
-
-   * - sampleset
-     - vcf_path
-     - bfile_path
-     - chrom
-   * - cineca_synthetic_subset
-     -
-     - path/to/bfile_prefix
-     - 22
-   * - cineca_synthetic_subset_vcf
-     - path/to/vcf.gz
-     - 
-     - 22
-
-Save the file as ``samplesheet.csv``. See :ref:`setup samplesheet` for more details.
+Set up a samplesheet as described in: :ref:`setup samplesheet`.
 
 .. _custom scorefile setup:
 
@@ -114,7 +94,7 @@ Set the path of the custom scoring file with the ``--scorefile`` parameter:
 Congratulations, you've now calculated some scores using your custom scoring file! |:partying_face:|
 
 After the workflow executes successfully, the calculated scores and a summary
-report should be available in the ``results/make/`` directory by default. If
+report should be available in the ``results/`` directory by default. If
 you're interested in more information, see :ref:`interpret`.
 
 If the workflow didn't execute successfully, have a look at the

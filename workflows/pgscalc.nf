@@ -74,6 +74,7 @@ def run_match = true
 def run_ancestry_assign = true
 def run_ancestry_adjust = true
 def run_apply_score = true
+def run_report = true
 
 if (params.only_bootstrap) {
     run_ancestry_bootstrap = true
@@ -83,6 +84,7 @@ if (params.only_bootstrap) {
     run_ancestry_assign = false
     run_ancestry_adjust = true
     run_apply_score = false
+    run_report = false
 }
 
 if (params.only_input) {
@@ -92,6 +94,7 @@ if (params.only_input) {
     run_match = false
     run_ancestry_assign = false
     run_apply_score = false
+    run_report = false
 }
 
 if (params.only_compatible) {
@@ -101,6 +104,7 @@ if (params.only_compatible) {
     run_match = false
     run_ancestry_assign = true
     run_apply_score = false
+    run_report = false
 }
 
 if (params.only_match) {
@@ -110,15 +114,17 @@ if (params.only_match) {
     run_match = true
     run_ancestry_assign = true
     run_apply_score = false
+    run_report = false
 }
 
 if (params.only_projection) {
     run_ancestry_bootstrap = true
     run_input_check = true
     run_make_compatible = true
-    run_match = true
+    run_match = false
     run_ancestry_assign = true
     run_apply_score = false
+    run_report = false
 }
 
 if (params.only_score) {
@@ -128,6 +134,7 @@ if (params.only_score) {
     run_match = true
     run_ancestry_assign = true
     run_apply_score = true
+    run_report = false
 }
 
 if (params.skip_ancestry) {
@@ -151,8 +158,9 @@ include { BOOTSTRAP_ANCESTRY   } from '../subworkflows/local/ancestry/bootstrap_
 include { INPUT_CHECK          } from '../subworkflows/local/input_check'
 include { MAKE_COMPATIBLE      } from '../subworkflows/local/make_compatible'
 include { MATCH                } from '../subworkflows/local/match'
-include { ANCESTRY_PROJECTION  } from '../subworkflows/local/ancestry/ancestry_projection'
+include { ANCESTRY_PROJECT  } from '../subworkflows/local/ancestry/ancestry_project'
 include { APPLY_SCORE          } from '../subworkflows/local/apply_score'
+include { REPORT               } from '../subworkflows/local/report'
 include { DUMPSOFTWAREVERSIONS } from '../modules/local/dumpsoftwareversions'
 
 /*
@@ -234,7 +242,12 @@ workflow PGSCALC {
     // SUBWORKFLOW: Run ancestry projection
     //
     if (run_ancestry_assign) {
-        ANCESTRY_PROJECTION (
+        intersection = Channel.empty()
+        ref_geno = Channel.empty()
+        ref_pheno = Channel.empty()
+        ref_var = Channel.empty()
+
+        ANCESTRY_PROJECT (
             MAKE_COMPATIBLE.out.geno,
             MAKE_COMPATIBLE.out.pheno,
             MAKE_COMPATIBLE.out.variants,
@@ -242,14 +255,11 @@ workflow PGSCALC {
             ch_reference,
             params.target_build
         )
-        ch_versions = ch_versions.mix(ANCESTRY_PROJECTION.out.versions)
-    }
-
-    //
-    // TODO: Set up optional input of intersected variants for MAKE_COMPATIBLE
-    //
-    if (run_ancestry_adjust) {
-        // TODO: set up optional input of intersected variants here for run_apply_score
+        ch_versions = ch_versions.mix(ANCESTRY_PROJECT.out.versions)
+        intersection = intersection.mix(ANCESTRY_PROJECT.out.intersection)
+        ref_geno = ref_geno.mix(ANCESTRY_PROJECT.out.ref_geno)
+        ref_pheno = ref_pheno.mix(ANCESTRY_PROJECT.out.ref_pheno)
+        ref_var = ref_var.mix(ANCESTRY_PROJECT.out.ref_var)
 
     }
 
@@ -259,7 +269,7 @@ workflow PGSCALC {
     if (run_match) {
         if (run_ancestry_assign) {
             // intersected variants ( across ref & target ) are an optional input
-            intersection = ANCESTRY_PROJECTION.out.intersection
+            intersection = ANCESTRY_PROJECT.out.intersection
         } else {
             dummy_input = Channel.of(file('NO_FILE')) // dummy file that doesn't exist
             // associate each sampleset with the dummy file
@@ -293,15 +303,15 @@ workflow PGSCALC {
     if (run_apply_score) {
         if (run_ancestry_assign) {
             MAKE_COMPATIBLE.out.geno
-                .mix(ANCESTRY_PROJECTION.out.ref_geno)
+                .mix( ref_geno )
                 .set { ch_geno }
 
             MAKE_COMPATIBLE.out.pheno
-                .mix(ANCESTRY_PROJECTION.out.ref_pheno)
+                .mix( ref_pheno )
                 .set { ch_pheno }
 
             MAKE_COMPATIBLE.out.variants
-                .mix(ANCESTRY_PROJECTION.out.ref_var)
+                .mix( ref_var )
                 .set { ch_variants }
         } else {
             MAKE_COMPATIBLE.out.geno.set { ch_geno }
@@ -314,13 +324,32 @@ workflow PGSCALC {
             ch_pheno,
             ch_variants,
             intersection,
-            MATCH.out.scorefiles,
-            INPUT_CHECK.out.log_scorefiles,
-            MATCH.out.db
+            MATCH.out.scorefiles
         )
         ch_versions = ch_versions.mix(APPLY_SCORE.out.versions)
     }
 
+    if (run_report) {
+        projections = Channel.empty()
+        relatedness = Channel.empty()
+        report_pheno = Channel.empty()
+
+        if (run_ancestry_assign) {
+            projections = projections.mix(ANCESTRY_PROJECT.out.projections)
+            relatedness = relatedness.mix(ANCESTRY_PROJECT.out.relatedness)
+            report_pheno = report_pheno.mix(ref_pheno)
+        }
+
+        REPORT (
+            report_pheno,
+            relatedness,
+            APPLY_SCORE.out.scores,
+            projections,
+            INPUT_CHECK.out.log_scorefiles,
+            MATCH.out.db,
+            run_ancestry_assign
+        )
+    }
 
 
     // MODULE: Dump software versions for all tools used in the workflow

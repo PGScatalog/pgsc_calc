@@ -3,20 +3,39 @@
 How do I prepare my input genomes?
 ==================================
 
-The pipeline checks target genomic data to make sure it's consistent with the
-data that's described in the samplesheet (see :ref:`setup samplesheet`).
+Target genome data requirements
+-------------------------------
 
-Only human chromosomes 1 -- 22, X, Y, and XY are supported by the pipeline,
-although sex chromosomes are rarely used in scoring files. If input data contain
-other chromosomes (e.g. pseudoautosomal regions) then the pipeline will probably
-complain loudly and stop calculating.
+.. note:: This workflow will work best with the output of an imputation server
+          like `Michigan`_ or `TopMed`_
 
-The simplest way to prepare your input data is to use the `plink2`_ ``--chr``
-flag to create a new dataset that only contains compatible chromosomes. The
-process is slightly different depending on the format of your target genomes.
+.. danger:: If you'd like to input WGS genomes, some extra preprocessing steps
+            are required          
 
-VCF
----
+.. _`Michigan`: https://imputationserver.sph.umich.edu/index.html           
+.. _`TopMed`: https://imputation.biodatacatalyst.nhlbi.nih.gov/
+
+- Only human chromosomes 1 -- 22, X, Y, and XY are supported by the pipeline,
+  although sex chromosomes are rarely used in scoring files.
+- If input data contain other chromosomes (e.g. pseudoautosomal regions) then
+  the pipeline will probably complain loudly and stop calculating.
+
+
+Supported file formats
+~~~~~~~~~~~~~~~~~~~~~~
+
+The following file formats are currently supported:
+
+- VCF
+- Plink 1 file set (``.bed / .bim / .fam``)
+- Plink 2 file set (``.pgen / .pvar / .psam``)
+
+Compressed input is supported and automatically detected. For example, bgzip
+compression of VCF files, or zstd compression of plink2 variant information
+files (``.pvar``).
+
+VCF from an imputation server
+-----------------------------
 
 .. code-block:: console
 
@@ -24,6 +43,9 @@ VCF
         --allow-extra-chr \
         --chr 1-22, X, Y, XY \
         -make-pgen --out <1000G>_axy
+
+VCF from WGS
+------------
 
 
 ``plink`` binary fileset (bfile)

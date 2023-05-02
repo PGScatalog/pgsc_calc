@@ -41,10 +41,10 @@ process FILTER_VARIANTS {
             --max-alleles 2 \
             --snps-only just-acgt \
             --rm-dup exclude-all \
-            --geno 0.1 \
-            --mind 0.1 \
-            --maf 0.01 \
-            --hwe 0.000001 \
+            --geno $params.geno_ref \
+            --mind $params.mind_ref \
+            --maf $params.maf_ref \
+            --hwe $params.hwe_ref \
             --make-pgen vzs \
             --allow-extra-chr --autosome \
             --out ${meta.build}_reference
@@ -55,7 +55,7 @@ process FILTER_VARIANTS {
             --threads $task.cpus \
             --memory $mem_mb \
             --pfile vzs ${meta.build}_reference \
-            --indep-pairwise 1000 50 0.05 \
+            --indep-pairwise $params.indep_pairwise_ref \
             --exclude range $ld \
             --out ${ref_geno.simpleName}_thinned
 

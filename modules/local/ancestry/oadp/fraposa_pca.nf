@@ -1,9 +1,10 @@
-process SAMPLESHEET_JSON {
+process FRAPOSA_PCA {
     // labels are defined in conf/modules.config
-    label 'process_low'
-    label 'pgscatalog_utils' // controls conda, docker, + singularity options
+    label 'process_high_memory'
+    label 'fraposa' // controls conda, docker, + singularity options
 
-    tag "$samplesheet"
+    tag "reference"
+    cache "deep"
 
     conda (params.enable_conda ? "${task.ext.conda}" : null)
 
@@ -13,19 +14,21 @@ process SAMPLESHEET_JSON {
         "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
-    path samplesheet
+    tuple val(meta), path(ref_geno), path(ref_pheno), path(ref_variants)
 
     output:
-    path "out.json"    , emit: json
+    path "*.{dat,pcs}", emit: pca
     path "versions.yml", emit: versions
 
     script:
     """
-    samplesheet_to_json $samplesheet out.json
+    fraposa ${ref_geno.baseName} \
+        --method $params.projection_method \
+        --dim_ref 10
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
-        python: \$(echo \$(python --version 2>&1) | cut -f 2 -d ' ')
+        fraposa: TODO
     END_VERSIONS
     """
 }

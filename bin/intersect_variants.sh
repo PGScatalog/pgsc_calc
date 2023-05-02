@@ -17,6 +17,8 @@ i_target=$2 # path/to/TARGET/pvar (or decompressed stdin)
 target_format=$3 # format of target pvar
 chrom=$4 # whether to limit matches to specific chromosome of the reference
 
+mkdir tmp # temporary working directory
+
 chr_list="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y"
 validate_chrom() { echo "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y" | grep -F -q -w "$1"; }
 
@@ -28,16 +30,23 @@ if [ "$chrom" == "ALL" ]; then
     for (a in ALT){
       if($4 < ALT[a]) print $1":"$2":"$4":"ALT[a], $3, $4, (length($4) > 1 || length(ALT[a]) > 1), ($4 ALT[a] == "AT" || $4 ALT[a] == "TA" || $4 ALT[a] == "CG" || $4 ALT[a] == "GC"), (length(ALT) > 1);
       else print $1":"$2":"ALT[a]":"$4, $3, $4, (length($4) > 1 || length(ALT[a]) > 1), ($4 ALT[a] == "AT" || $4 ALT[a] == "TA" || $4 ALT[a] == "CG" || $4 ALT[a] == "GC"), (length(ALT) > 1)
-    }}' $i_reference | sort >> ref_variants.txt
+    }}' $i_reference | sort -T ./tmp/ >> ref_variants.txt
 elif validate_chrom $chrom; then
   awk -v filter_chrom=$chrom '!/^#/ && ($1 == filter_chrom) {split($5, ALT, ",");
     for (a in ALT){
       if($4 < ALT[a]) print $1":"$2":"$4":"ALT[a], $3, $4, (length($4) > 1 || length(ALT[a]) > 1), ($4 ALT[a] == "AT" || $4 ALT[a] == "TA" || $4 ALT[a] == "CG" || $4 ALT[a] == "GC"), (length(ALT) > 1);
       else print $1":"$2":"ALT[a]":"$4, $3, $4, (length($4) > 1 || length(ALT[a]) > 1), ($4 ALT[a] == "AT" || $4 ALT[a] == "TA" || $4 ALT[a] == "CG" || $4 ALT[a] == "GC"), (length(ALT) > 1)
-    }}' $i_reference | sort >> ref_variants.txt
+    }}' $i_reference | sort -T ./tmp/ >> ref_variants.txt
 else
   echo "${chrom} is not a valid option, only {$chr_list} are currently accepted"
   exit 1
+fi
+
+
+if [ $(wc -l < ref_variants.txt) -eq 1 ]
+then
+    echo "ERROR: No variants in reference report"
+    exit 1
 fi
 
 # handle target (in multiple formats)
@@ -47,15 +56,21 @@ if [ "$target_format" == "pvar" ]; then
     for (a in ALT){
       if($4 < ALT[a]) print $1":"$2":"$4":"ALT[a], $3, $4, (length(ALT) > 1);
       else print $1":"$2":"ALT[a]":"$4, $3, $4, (length(ALT) > 1)
-    }}' $i_target | sort >> target_variants.txt
+    }}' $i_target | sort -T ./tmp/ >> target_variants.txt
 elif [ "$target_format" == "bim" ]; then
   awk '!/^#/ {
     if($5 < $6) print $1":"$4":"$5":"$6, $2, $6, 0;
     else print $1":"$4":"$6":"$5, $2, $6, 0
-  }' $i_target | sort >> target_variants.txt
+  }' $i_target | sort ./tmp/ >> target_variants.txt
 else
   echo "${target_format} is not a valid option (only pvar and bim are currently accepted)"
   exit 1
+fi
+
+if [ $(wc -l < target_variants.txt) -eq 1 ]
+then
+    echo "ERROR: No variants in target report"
+    exit 1
 fi
 
 # Merge & output matches w/ ref orientation
@@ -73,6 +88,3 @@ join ref_variants.txt target_variants.txt |\
 #8 : REF_TARGET
 #9 : IS_MA_TARGET
 #10 : SAME_REF
-
-# Cleanup intermediate files
-rm -f ref_variants.txt target_variants.txt

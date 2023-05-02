@@ -3,12 +3,11 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - r-rmarkdown=2.14
-  - r-mime
   - r-dplyr
-  - r-httr
   - r-dt
   - r-tidyr
   - r-ggplot2
   - r-forcats
   - r-readr
+  - r-purrr
+  - r-jsonlite

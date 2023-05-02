@@ -11,18 +11,32 @@ process ANCESTRY_ANALYSIS {
         "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
-    path projections
-    path vars_projected
-    path scores
-    path vars_scored
-    // ToDo: add reference samples psam and relatedness file (deg)
+    tuple val(meta), path('target_pcs/???.pcs'), path('ref_pcs/?.pcs'), path(scores), path(relatedness), path(ref_psam)
 
     output:
+    path "*_info.json.gz", emit: info
+    path "*_popsimilarity.txt.gz", emit: popsimilarity
+    path "*_pgs.txt.gz", emit: pgs
     path "versions.yml", emit: versions
-
 
     script:
     """
+    # TODO: --ref_pcs is a horrible hack to select the first duplicate
+    ancestry_analysis -d $meta.target_id \
+        -r reference \
+        --psam $ref_psam \
+        --ref_pcs ref_pcs/1.pcs \
+        --target_pcs target_pcs/*.pcs \
+        -x $relatedness \
+        -p $params.ref_label \
+        -s $scores \
+        -a $params.ancestry_method \
+        --n_popcomp $params.n_popcomp \
+        -n $params.normalization_method \
+        --n_normalization $params.n_normalization \
+        --outdir . \
+        -v
+
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
         pgscatalog_utils: \$(echo \$(python -c 'import pgscatalog_utils; print(pgscatalog_utils.__version__)'))

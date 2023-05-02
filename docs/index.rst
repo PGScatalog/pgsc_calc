@@ -3,13 +3,14 @@
 ``pgsc_calc``: a reproducible workflow to calculate polygenic scores
 ====================================================================
 
-The ``pgsc_calc`` workflow makes it easy to calculate a :term:`polygenic score` (PGS) using
-scoring files published in the `Polygenic Score (PGS) Catalog`_ |:dna:|
-and/or custom scoring files.
+The ``pgsc_calc`` workflow makes it easy to calculate a :term:`polygenic score`
+(PGS) using scoring files published in the `Polygenic Score (PGS) Catalog`_
+|:dna:| and/or custom scoring files.
 
-The calculator workflow automates PGS downloads from the Catalog,
-variant matching between scoring files and target genotyping samplesets,
-and the parallel calculation of multiple PGS.
+The calculator workflow automates PGS downloads from the Catalog, variant
+matching between scoring files and target genotyping samplesets, and the
+parallel calculation of multiple PGS. Genetic ancestry assignment and PGS
+normalisation methods are also supported.
 
 .. _`Polygenic Score (PGS) Catalog`: https://www.pgscatalog.org/
 
@@ -20,24 +21,35 @@ Workflow summary
     :width: 600
     :alt: `pgsc_calc` workflow diagram
 
-Currently the pipeline (implemented in `nextflow`_) works by:
+|
+
+The workflow does the following steps:
 
 - Downloading scoring files using the PGS Catalog API in a specified genome build (GRCh37 and GRCh38).
 - Reading custom scoring files (and performing a liftover if genotyping data is in a different build).
-- Automatically combines and creates scoring files for efficient parallel computation of multiple PGS
-    - Matching variants in the scoring files against variants in the target dataset (in plink bfile/pfile or VCF format)
+- Automatically combines and creates scoring files for efficient parallel
+  computation of multiple PGS
+- Matching variants in the scoring files against variants in the target dataset (in plink bfile/pfile or VCF format)
 - Calculates PGS for all samples (linear sum of weights and dosages)
 - Creates a summary report to visualize score distributions and pipeline metadata (variant matching QC)
 
-The pipeline is build on top of `PLINK 2`_ and the `PGS Catalog Utilities`_ python package (for interacting
-with the Catalog API, processing scorefiles, and variant matching).
+And optionally:
 
-See `Features Under Development <Features Under Development_>`_ section for information
-about planned updates.
+- Using reference genomes to automatically assign the genetic ancestry of target
+  genomes
+- Normalising calculated PGS to account for genetic ancestry
 
-.. _nextflow: https://www.nextflow.io
+The workflow relies on open source scientific software, including:
+
+- `PLINK 2`_
+- `PGS Catalog Utilities`_
+- `FRAPOSA`_
+
+A full description of included software is described in :ref:`containers`.
+
 .. _PLINK 2: https://www.cog-genomics.org/plink/2.0/
 .. _PGS Catalog Utilities: https://github.com/PGScatalog/pgscatalog_utils
+.. _FRAPOSA: https://github.com/PGScatalog/fraposa_pgsc
 
 Quick example
 -------------

@@ -41,15 +41,14 @@ page. You can view the entire list by running:
 
     $ nextflow run pgscatalog/pgsc_calc --help
 
-Or by `downloading the schema`_ and opening it in a text editor
+Or by :download:`downloading the schema <../../nextflow_schema.json>` and opening it in a text editor
 
-.. _downloading the schema: https://github.com/PGScatalog/pgsc_calc/blob/master/nextflow_schema.json
-
-Parameter schema
-----------------
-
-.. jsonschema:: ../../nextflow_schema.json 
-    :lift_description:
+Schema
+------
+     
+.. jsonschema:: ../../nextflow_schema.json
+    :lift_title: 
+    :lift_description: 
     :lift_definitions:
     :auto_target:
     :auto_reference:

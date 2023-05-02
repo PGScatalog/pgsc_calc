@@ -14,81 +14,15 @@
         "pattern": "^\\S+$",
         "description": "Sampleset name must be provided and cannot contain spaces"
       },
-      "vcf_path": {
-        "type": [
-          "string",
-          "null"
-        ],
-        "pattern": "^\\S+\\.vcf\\.gz$",
-        "description": "VCF path must end with .vcf.gz, mutually exclusive with other formats",
-        "type": [
-          "null",
-          "string"
-        ],
-        "pattern": "^\\S+\\.vcf\\.gz$",
-        "minLength": 5
-      },
-      "vcf_genotype_field": {
-        "description": "Specify whether to import genotypes (default: GT), or imputed dosages (DS) from the VCF file.",
-        "type": [
-          "string",
-          "null"
-        ],
-        "pattern": "/^(GT|DS)$/"
-      },
-      "bed": {
-        "description": "Plink 1 binary genotype file",
-        "type": [
-          "string",
-          "null"
-        ],
-        "pattern": "^.*bed$",
-        "minLength": 5
-      },
-      "bim": {
-        "description": "Plink 1 variant information file",
-        "type": [
-          "string",
-          "null"
-        ],
-        "pattern": "^.*bim$",
-        "minLength": 5
-      },
-      "fam": {
-        "description": "Plink 1 sample information file",
-        "type": [
-          "string",
-          "null"
-        ],
-        "pattern": "^.*fam$",
-        "minLength": 5
-      },
-      "pgen": {
-        "description": "Plink 2 binary genotype file",
-        "type": [
-          "string",
-          "null"
-        ],
-        "pattern": "^.*pgen$",
-        "minLength": 6
-      },
-      "psam": {
-        "description": "Plink 2 sample information file",
-        "type": [
-          "string",
-          "null"
-        ],
-        "pattern": "^.*psam$",
-        "minLength": 6
-      },
-      "pvar": {
-        "description": "Plink 2 variant information file",
-        "type": [
-          "string",
-          "null"
-        ],
-        "pattern": "^.*pvar$",
-        "minLength": 6
+      "path": {
+        "description": "A list of resolved target genome file paths",
+        "type": "array",
+        "uniqueItems": true,
+        "minItems": 1,
+        "maxItems": 3,
+        "items": {
+          "type": "string"
+        }
       },
       "chrom": {
         "description": "Specify the chromosome of associated genotyping data (must be in {1-22, X, XY, Y}). If all chromosomes are in the associated file (e.g. your data is not split by chromosome), set to null.",
@@ -97,33 +31,26 @@
           "string"
         ],
         "minLength": 1
+      },
+      "format": {
+        "description": "Target genome data format.",
+        "type": "string",
+        "enum": [
+          "pfile",
+          "bfile",
+          "vcf"
+        ]
+      },
+      "vcf_genotype_field": {
+        "description": "Specify whether to import genotypes (default: GT), or imputed dosages (DS) from the VCF file.",
+        "type": "boolean"
       }
     },
     "required": [
       "sampleset",
+      "path",
+      "format",
       "chrom"
-    ],
-    "dependentRequired": {
-      "pgen": [
-        "pvar",
-        "psam"
-      ],
-      "pvar": [
-        "pgen",
-        "psam"
-      ],
-      "psam": [
-        "pvar",
-        "pgen"
-      ],
-      "bed": [
-        "bim",
-        "fam"
-      ],
-      "bim": [
-        "fam",
-        "bed"
-      ]
-    }
+    ]
   }
 }

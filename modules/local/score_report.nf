@@ -12,9 +12,8 @@ process SCORE_REPORT {
     input:
     path scorefiles
     path log_scorefiles
-    path report
-    path logo
     path '*' // list of summary csvs, staged with original names
+    path ancestry_results
 
     output:
     path "*.html"      , emit: report
@@ -23,19 +22,15 @@ process SCORE_REPORT {
     script:
     def args = task.ext.args ?: ''
     """
-    # R and symlinks don't get along
-    cp -LR $report real_report.Rmd
-    mv real_report.Rmd report.Rmd
-    cp -LR $log_scorefiles log_combined.json
-
-
     echo $workflow.commandLine > command.txt
     echo "keep_multiallelic: $params.keep_multiallelic" > params.txt
     echo "keep_ambiguous   : $params.keep_ambiguous"    >> params.txt
     echo "min_overlap      : $params.min_overlap"       >> params.txt
 
-    R -e 'rmarkdown::render("report.Rmd", \
-        output_options = list(self_contained=TRUE))'
+    cp -r $projectDir/assets/report/* .
+    # workaround for unhelpful filenotfound quarto errors in some HPCs
+    mkdir temp && TMPDIR=temp
+    quarto render report.qmd -M "self-contained:true"
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
