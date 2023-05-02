@@ -1,4 +1,7 @@
 process SCORE_REPORT {
+    // first elemenet of tag must be sampleset
+    tag "$meta.id" 
+
     label 'process_high_memory'
     label 'report'
 
@@ -10,13 +13,15 @@ process SCORE_REPORT {
         "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
-    path scorefiles
-    path log_scorefiles
-    path '*' // list of summary csvs, staged with original names
-    path ancestry_results
+    tuple val(meta), path(scorefile), path(score_log), path(match_summary), path(ancestry)
 
     output:
-    path "*.html"      , emit: report
+    // includeInputs to correctly use $meta.id in publishDir path
+    // ancestry results are optional also
+    path "*.txt.gz", includeInputs: true
+    path "*.json.gz", includeInputs: true, optional: true
+    // normal outputs
+    path "*.html", emit: report
     path "versions.yml", emit: versions
 
     script:
@@ -30,7 +35,8 @@ process SCORE_REPORT {
     cp -r $projectDir/assets/report/* .
     # workaround for unhelpful filenotfound quarto errors in some HPCs
     mkdir temp && TMPDIR=temp
-    quarto render report.qmd -M "self-contained:true"
+    quarto render report.qmd -M "self-contained:true" \
+        -P score_path:$scorefile
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

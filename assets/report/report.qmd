@@ -12,6 +12,7 @@ engine: knitr
 params:
   log_pattern: "*_summary.csv"
   log_scorefiles: "log_scorefiles.json"
+  score_path: ""
 css: logo.css
 ---
 
@@ -233,7 +234,7 @@ log_df %>%
 ## Scores 
 
 ```{r, echo = FALSE, message = FALSE}
-scores <- readr::read_tsv("aggregated_scores.txt.gz") 
+scores <- readr::read_tsv(params$score_path) 
 n_scores <- sum(grepl("*_SUM$", colnames(scores)))
 n_samples <- nrow(scores)
 ```

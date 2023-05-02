@@ -14,12 +14,13 @@ process SCORE_AGGREGATE {
     path scorefiles
 
     output:
-    path "aggregated_scores.txt.gz", emit: scores
-    path "versions.yml"            , emit: versions
+    path "*.txt.gz", emit: scores
+    path "versions.yml", emit: versions
 
     script:
+    def split_scores = params.skip_ancestry ? '--split' : ''
     """
-    aggregate_scores -s $scorefiles -o . -v
+    aggregate_scores -s $scorefiles -o . -v $split_scores
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

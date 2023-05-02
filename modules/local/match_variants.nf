@@ -3,6 +3,7 @@ process MATCH_VARIANTS {
     label 'process_medium'
     label 'pgscatalog_utils' // controls conda, docker, + singularity options
 
+    // first element of tag must be sampleset
     tag "$meta.id chromosome $meta.chrom"
     scratch (workflow.containerEngine == 'singularity' || params.parallel ? true : false)
     errorStrategy 'finish'

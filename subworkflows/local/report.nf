@@ -27,6 +27,9 @@ workflow REPORT {
      - lists of paths get staged to processes with generated names to prevent
        file input collisions
      */
+
+    // ch_scores keeps calculated score file names consistent with --skip_ancestry
+    ch_scores = Channel.empty()
     if (run_ancestry_assign) {
         scores
             .combine(ref_relatedness)
@@ -43,23 +46,41 @@ workflow REPORT {
         ANCESTRY_ANALYSIS ( ch_ancestry_input )
         ancestry_results = ancestry_results.mix(
             ANCESTRY_ANALYSIS.out.info,
-            ANCESTRY_ANALYSIS.out.popsimilarity,
-            ANCESTRY_ANALYSIS.out.pgs)
-            .collect()
+            ANCESTRY_ANALYSIS.out.popsimilarity)
+            .map { annotate_sampleset(it) }
+            .groupTuple(size: 2)
 
+        // ancestry_analysis: aggregated_scores.txt.gz -> {sampleset}_pgs.txt.gz
+        ch_scores = ch_scores.mix(ANCESTRY_ANALYSIS.out.pgs)
         ch_versions = ch_versions.mix(ANCESTRY_ANALYSIS.out.versions)
     } else {
-        ancestry_results = ancestry_results.mix(Channel.fromPath('NO_FILE'))
+        // aggregate_scores --split: aggregated_scores.txt.gz -> {sampleset}_pgs.txt.gz
+        ch_scores = ch_scores.mix(scores.map { annotate_sampleset(it) })
+        // make NO_FILE for each sampleset to join correctly later
+        ancestry_results = ancestry_results.mix(
+            ch_scores.map {it[0]} // unique samplesets
+                .combine(Channel.fromPath('NO_FILE'))
+        )
     }
 
-    SCORE_REPORT(
-        scores,
-        log_scorefiles,
-        log_match.collect(),
-        ancestry_results
-    )
+    // prepare report input channels -------------------------------------------
+
+    log_match.map { annotate_sampleset(it) }
+        .set { ch_annotated_log }
+
+    ch_scores
+        .join(ch_annotated_log, by: 0)
+        .join(ancestry_results, by: 0)
+        .combine(log_scorefiles) // all samplesets have the same scorefile metadata
+        .set { ch_report_input }
+
+    SCORE_REPORT( ch_report_input )
     ch_versions = ch_versions.mix(SCORE_REPORT.out.versions)
 
     emit:
     versions = ch_versions
+}
+
+def annotate_sampleset(it) {
+    [['id': it.getName().tokenize('_')[0]], it]
 }
