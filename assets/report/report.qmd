@@ -13,6 +13,7 @@ params:
   log_pattern: "*_summary.csv"
   log_scorefiles: "log_scorefiles.json"
   score_path: ""
+  sampleset: ""
 css: logo.css
 ---
 
@@ -317,7 +318,7 @@ long_scores %>%
 
 ### Get all scores
 
-All scores can be found in "aggregated_scores.txt.gz", in the results folder output by the pipeline.
+All scores can be found in ` `r stringr::str_glue("{params$sampleset}/score/{params$sampleset}_pgs.txt.gz")` `, in the results folder output by the pipeline.
 
 ## Citations
 
