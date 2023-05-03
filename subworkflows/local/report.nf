@@ -55,7 +55,10 @@ workflow REPORT {
         ch_versions = ch_versions.mix(ANCESTRY_ANALYSIS.out.versions)
     } else {
         // aggregate_scores --split: aggregated_scores.txt.gz -> {sampleset}_pgs.txt.gz
-        ch_scores = ch_scores.mix(scores.map { annotate_sampleset(it) })
+        scores.flatten()
+            .map { annotate_sampleset(it) }
+            .set { ch_scores }
+
         // make NO_FILE for each sampleset to join correctly later
         ancestry_results = ancestry_results.mix(
             ch_scores.map {it[0]} // unique samplesets

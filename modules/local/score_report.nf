@@ -36,7 +36,8 @@ process SCORE_REPORT {
     # workaround for unhelpful filenotfound quarto errors in some HPCs
     mkdir temp && TMPDIR=temp
     quarto render report.qmd -M "self-contained:true" \
-        -P score_path:$scorefile
+        -P score_path:$scorefile \
+        -P sampleset:$meta.id
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
