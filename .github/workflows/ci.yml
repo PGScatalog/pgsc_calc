@@ -107,7 +107,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: /usr/local/bin/nextflow
-          key: ${{ runner.os }}-${{ nxf_ver }}
+          key: ${{ runner.os }}-${{ env.nxf_ver }}
         
       - name: Install Nextflow
         if: steps.cache-nextflow-install.outputs.cache-hit != 'true'
