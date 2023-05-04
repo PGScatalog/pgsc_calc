@@ -95,7 +95,7 @@ jobs:
       fail-fast: false
       matrix:
         test_profile: ["test"]
-        profile: ["docker"]
+        profile: ["docker", "singularity"]
         nxf_ver: ['22.10.0', ''] # minimum supported version, latest version
     concurrency: ${{ matrix.test_profile }}
 
