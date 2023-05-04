@@ -47,7 +47,7 @@ jobs:
     if: ${{ github.event_name == 'push'}}
     runs-on: ubuntu-latest
     env:
-      NXF_SINGULARITY_CACHEDIR: "${{ github.workspace }}/singularity"
+      NXF_SINGULARITY_CACHEDIR: "${{ runner.temp }}/singularity"
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2
@@ -74,7 +74,7 @@ jobs:
         id: cache-singularity-pull
         uses: actions/cache@v3
         with:
-          path: $NXF_SINGULARITY_CACHEDIR
+          path: ${{ env.NXF_SINGULARITY_CACHEDIR }}
           key: ${{ runner.os }}-${{ github.sha }}--singularity
 
       - name: Pull and save singularity
