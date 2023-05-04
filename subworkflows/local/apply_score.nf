@@ -15,6 +15,7 @@ workflow APPLY_SCORE {
     variants
     intersection
     scorefiles
+    ref_afreq
 
     main:
     ch_versions = Channel.empty()
@@ -83,6 +84,7 @@ workflow APPLY_SCORE {
         .cross ( annotated_scorefiles ) { m, it -> [m.id, m.chrom] }
         .map { it.flatten() }
         .mix( ch_apply_ref ) // add reference genomes!
+        .combine( ref_afreq.map { it.last() } ) // add allelic frequencies
         .dump(tag: 'ready_to_score')
         .set { ch_apply }
 

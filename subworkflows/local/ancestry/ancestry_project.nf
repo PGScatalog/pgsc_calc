@@ -276,6 +276,7 @@ workflow ANCESTRY_PROJECT {
     ref_pheno = ch_ref_branched.pheno
     ref_var = ch_ref_branched.var
     relatedness = ch_king
+    ref_afreq = FILTER_VARIANTS.out.afreq
     versions = ch_versions
 
 }

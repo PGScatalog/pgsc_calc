@@ -15,7 +15,7 @@ process PLINK2_SCORE {
         "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
-    tuple val(meta), path(geno), path(pheno), path(variants), val(scoremeta), path(scorefile)
+    tuple val(meta), path(geno), path(pheno), path(variants), val(scoremeta), path(scorefile), path(ref_afreq)
 
     output:
     path "*.{sscore,sscore.zst}", emit: scores  // optional compression
@@ -31,24 +31,27 @@ process PLINK2_SCORE {
     // dynamic input option
     def input = (meta.is_pfile) ? '--pfile vzs' : '--bfile vzs'
 
+    // load allelic frequencies
+    def load_afreq = (ref_afreq.name != 'NO_FILE') ? "--read-freq $ref_afreq" : ""
+
     // custom args2
     def maxcol = (scoremeta.n_scores + 2) // id + effect allele = 2 cols
     def no_imputation = 'no-mean-imputation'
     def cols = (meta.n_samples < 50) ? 'header-read cols=+scoresums,+denom,-fid' : 'header-read cols=+scoresums,+denom,-fid'
     def recessive = (scoremeta.effect_type == 'recessive') ? ' recessive ' : ''
     def dominant = (scoremeta.effect_type == 'dominant') ? ' dominant ' : ''
-
     args2 = [args2, cols, 'list-variants', no_imputation, recessive, dominant].join(' ')
 
     if (scoremeta.n_scores == 1)
         """
-        plink2 \\
-            --threads $task.cpus \\
-            --memory $mem_mb \\
-            --seed 31 \\
-            $args \\
-            --score $scorefile $args2 \\
-            $input ${geno.baseName} \\
+        plink2 \
+            --threads $task.cpus \
+            --memory $mem_mb \
+            --seed 31 \
+            $load_afreq \
+            $args \
+            --score $scorefile $args2 \
+            $input ${geno.baseName} \
             --out ${meta.id}_${meta.chrom}_${scoremeta.effect_type}_${scoremeta.n}
 
         cat <<-END_VERSIONS > versions.yml
@@ -58,14 +61,15 @@ process PLINK2_SCORE {
         """
     else if (scoremeta.n_scores > 1)
         """
-        plink2 \\
-            --threads $task.cpus \\
-            --memory $mem_mb \\
-            --seed 31 \\
-            $args \\
-            --score $scorefile $args2 \\
-            --score-col-nums 3-$maxcol \\
-            $input ${geno.baseName} \\
+        plink2 \
+            --threads $task.cpus \
+            --memory $mem_mb \
+            --seed 31 \
+            $load_afreq \
+            $args \
+            --score $scorefile $args2 \
+            --score-col-nums 3-$maxcol \
+            $input ${geno.baseName} \
             --out ${meta.id}_${meta.chrom}_${scoremeta.effect_type}_${scoremeta.n}
 
         cat <<-END_VERSIONS > versions.yml
