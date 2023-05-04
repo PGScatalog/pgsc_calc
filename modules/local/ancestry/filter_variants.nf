@@ -19,6 +19,7 @@ process FILTER_VARIANTS {
     output:
     tuple val(build), path("*_reference.pgen"), path("*_reference.psam"), path("*_reference.pvar.zst"), emit: ref
     tuple val(build), path("*thinned.prune.in.gz"), emit: prune_in
+    tuple val(build), path("*.afreq.zst"), emit: afreq
     path "versions.yml", emit: versions
 
     script:
@@ -47,6 +48,7 @@ process FILTER_VARIANTS {
             --hwe $params.hwe_ref \
             --make-pgen vzs \
             --allow-extra-chr --autosome \
+            --freq zs \
             --out ${meta.build}_reference
 
     # 2. LD-thin variants in REFERENCE (filtered variants & samples) for input
