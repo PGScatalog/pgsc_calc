@@ -46,7 +46,8 @@ jobs:
     name: Preload singularity images
     if: ${{ github.event_name == 'push'}}
     runs-on: ubuntu-latest
-
+    env:
+      NXF_SINGULARITY_CACHEDIR: "${{ github.workspace }}/singularity"
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2
@@ -69,12 +70,6 @@ jobs:
         run: |
           echo "/opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64/bin" >> $GITHUB_PATH
 
-      - name: Set up singularity cache dir environment variable
-        run: |
-          # runner context isn't available in env workflow key
-          export NXF_SINGULARITY_CACHEDIR=${{ github.workspace }}/singularity
-          mkdir -p $NXF_SINGULARITY_CACHEDIR
-
       - name: Cache singularity images
         id: cache-singularity-pull
         uses: actions/cache@v3
@@ -85,9 +80,10 @@ jobs:
       - name: Pull and save singularity
         if: ${{ steps.cache-singularity-pull.outputs.cache-hit != 'true' }}
         run: |
+          mkdir -p $NXF_SINGULARITY_CACHEDIR          
           git grep 'ext.singularity*' conf/modules.config | cut -f 2 -d '=' | xargs -L 2 echo | tr -d ' ' > ${{ runner.temp }}/singularity_images.txt
           cat ${{ runner.temp }}/singularity_images.txt | sed 's/oras:\/\///;s/https:\/\///;s/\//-/g;s/$/.img/;s/:/-/' > ${{ runner.temp }}/singularity_image_paths.txt
-          paste -d '\n' ${{ runner.temp }}/singularity_image_paths.txt ${{ runner.temp }}/singularity_images.txt | xargs -L 2 sh -c 'singularity pull --disable-cache $NXF_SINGULARITY_CACHEDIR/$0 $1'
+          paste -d '\n' ${{ runner.temp }}/singularity_image_paths.txt ${{ runner.temp }}/singularity_images.txt | xargs -L 2 sh -c 'singularity pull --disable-cache --dir $NXF_SINGULARITY_CACHEDIR $0 $1'
 
   test:
     needs: [preload_docker, preload_singularity]
