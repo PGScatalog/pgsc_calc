@@ -116,7 +116,7 @@ jobs:
           key: ${{ runner.os }}-${{ github.sha }}
 
       - name: Load docker images from cache
-        if: matrix.profile == 'docker' && ${{ steps.restore-docker.outputs.cache-hit == 'true' }}
+        if: steps.restore-docker.outputs.cache-hit == 'true'
         run: |
           find $HOME -name '*.tar'
           find ${{ runner.temp }}/docker/ -name '*.tar' -exec sh -c 'docker load < {}' \;
