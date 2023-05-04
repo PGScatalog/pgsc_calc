@@ -47,7 +47,7 @@ jobs:
     if: ${{ github.event_name == 'push'}}
     runs-on: ubuntu-latest
     env:
-      NXF_SINGULARITY_CACHEDIR: "${{ runner.temp }}/singularity"
+      NXF_SINGULARITY_CACHEDIR: "${{ github.workspace }}/singularity"
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2
