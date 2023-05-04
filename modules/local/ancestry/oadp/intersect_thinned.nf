@@ -75,6 +75,8 @@ process INTERSECT_THINNED {
             --seed 31 \
             $input \$f vzs \
             --extract ${meta.id}_shared.txt \
+            --chr 1-22 \
+            --allow-extra-chr \
             --make-pgen \
             --sort-vars \
             --out extracted/\${f}_extracted
