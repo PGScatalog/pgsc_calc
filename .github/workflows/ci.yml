@@ -102,19 +102,11 @@ jobs:
       - name: Check out pipeline code
         uses: actions/checkout@v2
 
-      - name: Cache nextflow install
-        id: cache-nextflow-install
-        uses: actions/cache@v3
-        with:
-          path: /usr/local/bin/nextflow
-          key: ${{ runner.os }}-${{ nxf_ver }}
-        
       - name: Install Nextflow
-        if: steps.cache-nextflow-install.outputs.cache-hit != 'true'
         run: |
           wget -qO- get.nextflow.io | bash
           sudo mv nextflow /usr/local/bin/
-          
+
       - name: Restore docker cache
         id: restore-docker
         uses: actions/cache@v3
