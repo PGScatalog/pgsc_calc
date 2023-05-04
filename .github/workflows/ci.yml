@@ -16,7 +16,8 @@ env:
   SINGULARITY_VERSION: "3.8.3"
   NXF_ANSI_LOG: false
   CAPSULE_LOG: none  
-
+  NXF_SINGULARITY_CACHEDIR: "${{ github.workspace }}/singularity"
+  
 jobs:
   preload_docker:
     name: Preload docker images
@@ -46,8 +47,6 @@ jobs:
     name: Preload singularity images
     if: ${{ github.event_name == 'push'}}
     runs-on: ubuntu-latest
-    env:
-      NXF_SINGULARITY_CACHEDIR: "${{ github.workspace }}/singularity"
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2
