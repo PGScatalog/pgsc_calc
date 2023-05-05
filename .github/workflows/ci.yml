@@ -155,13 +155,27 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        profile: ["docker"]
+        profile: ["docker", "singularity"]
         tags:
           - "pgscatalog test --pgs_id"
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v3
 
+      - name: Restore docker cache
+        id: restore-docker
+        uses: actions/cache@v3
+        if: matrix.profile == 'docker'
+        with:
+          path: ${{ runner.temp }}/docker
+          key: ${{ runner.os }}-${{ github.sha }}
+
+      - name: Load docker images from cache
+        if: steps.restore-docker.outputs.cache-hit == 'true'
+        run: |
+          find $HOME -name '*.tar'
+          find ${{ runner.temp }}/docker/ -name '*.tar' -exec sh -c 'docker load < {}' \;
+        
       - name: Cache singularity setup
         id: cache-singularity
         if: matrix.profile == 'singularity'
@@ -185,13 +199,6 @@ jobs:
           python-version: '3.10'
           cache: 'pip'
       - run: pip install -r ${{ github.workspace }}/tests/requirements.txt
-
-      - name: Cache nextflow setup
-        id: cache-nextflow
-        uses: actions/cache@v3
-        with:
-          path: /usr/local/bin/nextflow
-          key: ${{ runner.os }}-nextflow
 
       - name: Install Nextflow
         run: |
