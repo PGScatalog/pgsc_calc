@@ -175,7 +175,7 @@ jobs:
         run: |
           find $HOME -name '*.tar'
           find ${{ runner.temp }}/docker/ -name '*.tar' -exec sh -c 'docker load < {}' \;
-        
+
       - name: Cache singularity setup
         id: cache-singularity
         if: matrix.profile == 'singularity'
@@ -192,6 +192,14 @@ jobs:
         if: steps.cache-singularity.outputs.cache-hit == 'true' && matrix.profile == 'singularity'
         run: |
           echo "/opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64/bin" >> $GITHUB_PATH
+
+      - name: Restore singularity cache
+        id: restore-singularity
+        uses: actions/cache@v3
+        if: matrix.profile == 'singularity'
+        with:
+          path: ${{ env.NXF_SINGULARITY_CACHEDIR }}
+          key: ${{ runner.os }}-${{ github.sha }}--singularity
 
       - name: Set up Python
         uses: actions/setup-python@v3
