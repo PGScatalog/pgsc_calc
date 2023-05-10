@@ -8,12 +8,11 @@
   files:
     - path: output/samplesheet/out.json
     - path: output/combine/scorefiles.txt.gz
-    - path: output/plink2/cineca_synthetic_subset_22.bed
-    - path: output/plink2/cineca_synthetic_subset_22.bim.zst
-    - path: output/plink2/cineca_synthetic_subset_22.fam
-    - path: output/match/cineca-synthetic-subset_22_additive_0.scorefile.gz
-    - path: output/match/cineca-synthetic-subset_log.csv.gz
-    - path: output/score/report.html
+    - path: output/plink2/GRCh37_cineca_22.pgen
+    - path: output/plink2/GRCh37_cineca_22.pvar.zst
+    - path: output/plink2/GRCh37_cineca_22.psam
+    - path: output/plink2/cineca_22_additive_0.sscore.vars
+    - path: output/score/cineca_pgs.txt.gz
 
 # TODO: fix overlap -> 1 in pgscatalog_utils
 - name: test perfect apply score

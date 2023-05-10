@@ -14,10 +14,12 @@ workflow testmatch {
     fam = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.fam')
     scorefile = Channel.fromPath('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/PGS001229_22.txt')
 
-    Channel.fromPath(params.ref, checkIfExists: true)
-        .set { ch_reference }
+    Channel.fromPath(params.hg19_chain, checkIfExists: true)
+        .mix(Channel.fromPath(params.hg38_chain, checkIfExists: true))
+        .collect()
+        .set { chain_files }
 
-    COMBINE_SCOREFILES ( scorefile, ch_reference )
+    COMBINE_SCOREFILES ( scorefile, chain_files )
 
     ch_scorefiles = COMBINE_SCOREFILES.out.scorefiles
 
@@ -31,7 +33,6 @@ workflow testmatch {
     ch_variants.combine( ch_scorefiles )
         .set { ch_match_input }
 
-    ch_match_input.view()
     MATCH_VARIANTS( ch_match_input )
 
     emit:
@@ -41,7 +42,18 @@ workflow testmatch {
 }
 
 workflow testmatchcombine {
+    // match combine can be optionally constrained by a list of variants in a
+    // reference panel (don't test this here)
+    ref_intersection = Channel.of(tuple([:], file('NO_FILE')))
+
     testmatch()
-    ch_combine = testmatch.out.matches.combine(testmatch.out.scorefile)
-    MATCH_COMBINE(ch_combine)
+
+    testmatch.out.matches
+        .map{ [ it[0], it[0].chrom, it.tail().flatten() ] }
+        .combine( testmatch.out.scorefile )
+        .combine( ref_intersection )
+        .set { ch_combine }
+
+    ch_combine.view()
+    MATCH_COMBINE( ch_combine.combine(ref_intersection) )
 }

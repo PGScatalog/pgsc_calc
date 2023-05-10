@@ -6,9 +6,9 @@
     - match
     - fast
   files:
-    - path: output/match/versions.yml
+    - path: output/test/match/versions.yml
       contains:
-        - "pgscatalog_utils: 0.3.1"
+        - "pgscatalog_utils: 0.4.0"
 
 - name: test match combine module
   command: nextflow run ./tests/modules/match -entry testmatchcombine -c ./tests/config/nextflow.config -profile test
@@ -18,16 +18,14 @@
     - combine
     - fast
   files:
-    - path: output/match/versions.yml
+    - path: output/combine/versions.yml
       contains:
-        - "pgscatalog_utils: 0.3.1"
-    - path: output/match/test_ALL_additive_0.scorefile.gz
+        - "pgscatalog_utils: 0.4.0"
+    - path: output/combine/scorefiles.txt.gz
       contains:
-        - "ID"
         - "effect_allele"
         - "PGS001229"
-    - path: output/match/test_summary.csv
-    - path: output/match/test_log.csv.gz
+    - path: output/combine/log_scorefiles.json
       contains:
         - "chr_name"
         - "chr_position"

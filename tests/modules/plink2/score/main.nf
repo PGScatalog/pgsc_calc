@@ -11,6 +11,7 @@ workflow testscore {
     bed = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.bed')
     fam = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.fam')
     scorefile = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/test.scorefile')
+    afreq = file('NO_FILE')
 
     def meta = [id: 'test', is_bfile: true, n_samples: 100]
     def scoremeta = [n_scores: 1]
@@ -21,7 +22,7 @@ workflow testscore {
         .concat(PLINK2_RELABELBIM.out.pheno, PLINK2_RELABELBIM.out.variants)
         .groupTuple(size: 3)
         .map{ it.flatten() }
-        .concat(Channel.of(scoremeta, scorefile))
+        .concat(Channel.of(scoremeta, scorefile, afreq))
         .collect()
         .set { genomes }
 
@@ -34,6 +35,7 @@ workflow testsmallscore {
     bed = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.bed')
     fam = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.fam')
     scorefile = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/test.scorefile')
+    afreq = file('NO_FILE')
 
     def meta = [id: 'test', is_bfile: true, n_samples: 1]
     def scoremeta = [n_scores: 1]
@@ -44,7 +46,7 @@ workflow testsmallscore {
         .concat(PLINK2_RELABELBIM.out.pheno, PLINK2_RELABELBIM.out.variants)
         .groupTuple(size: 3)
         .map{ it.flatten() }
-        .concat(Channel.of(scoremeta, scorefile))
+        .concat(Channel.of(scoremeta, scorefile, afreq))
         .collect()
         .set { genomes }
 
@@ -57,6 +59,7 @@ workflow testmultiscore {
     bim = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.bim')
     bed = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.bed')
     fam = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.fam')
+    afreq = file('NO_FILE')
 
     def meta = [id: 'test', is_bfile: true, n_samples: 100]
     def scoremeta = [n_scores: 2]
@@ -67,7 +70,7 @@ workflow testmultiscore {
         .concat(PLINK2_RELABELBIM.out.pheno, PLINK2_RELABELBIM.out.variants)
         .groupTuple(size: 3)
         .map{ it.flatten() }
-        .concat(Channel.of(scoremeta, scorefile))
+        .concat(Channel.of(scoremeta, scorefile, afreq))
         .collect()
         .set { genomes }
 
@@ -81,6 +84,7 @@ workflow testsmallmultiscore {
     bim = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.bim')
     bed = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.bed')
     fam = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.fam')
+    afreq = file('NO_FILE')
 
     def meta = [id: 'test', is_bfile: true, n_samples: 1]
     def scoremeta = [n_scores: 2]
@@ -91,7 +95,7 @@ workflow testsmallmultiscore {
         .concat(PLINK2_RELABELBIM.out.pheno, PLINK2_RELABELBIM.out.variants)
         .groupTuple(size: 3)
         .map{ it.flatten() }
-        .concat(Channel.of(scoremeta, scorefile))
+        .concat(Channel.of(scoremeta, scorefile, afreq))
         .collect()
         .set { genomes }
 
