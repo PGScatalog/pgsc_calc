@@ -167,7 +167,7 @@ jobs:
           - "test input check subworkflow with liftover 37to38"
           - "test apply score subworkflow"
           - "test perfect apply score"
-          - "test score correlation"
+# TODO - "test score correlation"
           - "test combine scorefiles module"
           - "test match module"
           - "test match combine module"

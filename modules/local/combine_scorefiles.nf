@@ -24,9 +24,6 @@ process COMBINE_SCOREFILES {
 
     if (params.liftover)
         """
-        # extract chain files from database
-        sqlite3 pgsc_calc_ref.sqlar -Ax hg19ToHg38.over.chain.gz hg38ToHg19.over.chain.gz
-
         combine_scorefiles -s $raw_scores \
             --liftover \
             -t $params.target_build \
