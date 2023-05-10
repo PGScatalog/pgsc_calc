@@ -24,10 +24,18 @@ process RELABEL_IDS {
     target_format = target.getName().tokenize('.')[1] // test.tar.gz -> tar, test.var -> var
     relabel_meta = meta.plus(['target_format': target_format]) // .plus() returns a new map
     output_mode = "--split --combined" // always output split and combined data to make life easier
+    col_from = "ID_TARGET"
+    col_to = "ID_REF"
+
+    if (target_format == "afreq") {
+        col_from = "ID_REF"
+        col_to = "ID_TARGET"
+        output_mode = "--combined"
+    }
     """
     relabel_ids --maps $matched \
-        --col_from ID_TARGET \
-        --col_to ID_REF \
+        --col_from $col_from \
+        --col_to $col_to \
         --target_file $target \
         --target_col ID \
         --dataset ${meta.id}.${target_format} \
@@ -40,4 +48,3 @@ process RELABEL_IDS {
     END_VERSIONS
     """
 }
-
