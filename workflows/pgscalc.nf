@@ -137,7 +137,12 @@ if (params.only_score) {
     run_report = false
 }
 
-if (params.skip_ancestry) {
+// always run ancestry if the reference database path is set
+// (even if --skip_ancestry is true)
+if (params.run_ancestry) {
+    run_ancestry_assign = true
+    run_ancestry_adjust = true
+} else if (params.skip_ancestry) {
     run_ancestry_assign = false
     run_ancestry_adjust = false
 }
@@ -176,9 +181,9 @@ workflow PGSCALC {
     // SUBWORKFLOW: Create reference database for ancestry inference
     //
     if (run_ancestry_bootstrap) {
-        if (params.ref) {
+        if (params.run_ancestry) {
             log.info "Reference database provided: skipping bootstrap"
-            ch_reference = Channel.fromPath(params.ref, checkIfExists: true)
+            ch_reference = Channel.fromPath(params.run_ancestry, checkIfExists: true)
         } else {
             log.info "Creating ancestry database from source data"
             reference_samplesheet = Channel.fromPath(params.ref_samplesheet)

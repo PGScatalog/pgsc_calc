@@ -37,7 +37,7 @@ workflow APPLY_SCORE {
     ch_all_genomes.target.set { ch_genomes }
 
     ch_apply_ref = Channel.empty()
-    if (!params.skip_ancestry) {
+    if (params.run_ancestry) {
         // prepare scorefiles for reference data -----------------------------------
         //   1. extract the combined scoring files from the annotated scoring files
         //      (more than one may be present to handle duplicates or effect types)

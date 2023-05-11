@@ -115,15 +115,21 @@
           "type": "integer",
           "default": 4,
           "description": "Number of PCs used for population normalisation"
+        },
+        "load_afreq": {
+          "type": "boolean",
+          "default": true,
+          "description": "Load allelic frequencies from reference panel when scoring target genomes"
         }
       },
       "required": [
         "projection_method",
         "ancestry_method",
         "ref_label",
+        "n_popcomp",
         "normalization_method",
         "n_normalization",
-        "n_popcomp"
+        "load_afreq"
       ]
     },
     "reference_options": {
@@ -132,17 +138,11 @@
       "description": "Define how reference genomes are defined and processed",
       "default": "",
       "properties": {
-        "ref_params_file": {
+        "run_ancestry": {
           "type": "string",
           "default": "None",
-          "description": "A YAML or JSON file that contains parameters for handling reference data",
-          "hidden": true
-        },
-        "ref": {
-          "type": "string",
-          "description": "Path to reference database. Must be set if --ref_samplesheet is not set.",
-          "pattern": ".*tar.zst$",
-          "format": "file-path"
+          "format": "file-path",
+          "description": "Path to reference database. Must be set if --ref_samplesheet is not set."
         },
         "ref_samplesheet": {
           "type": "string",
