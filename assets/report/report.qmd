@@ -14,6 +14,7 @@ params:
   log_scorefiles: "log_scorefiles.json"
   score_path: ""
   sampleset: ""
+  run_ancestry: false
 css: logo.css
 ---
 
@@ -234,11 +235,19 @@ log_df %>%
 
 ## Scores 
 
-```{r, echo = FALSE, message = FALSE}
+```{r, echo = FALSE, message = FALSE, eval=!params$run_ancestry}
 scores <- readr::read_tsv(params$score_path) 
 n_scores <- sum(grepl("*_SUM$", colnames(scores)))
 n_samples <- nrow(scores)
 ```
+
+```{r, echo = FALSE, message = FALSE, eval=params$run_ancestry}
+scores <- readr::read_tsv(params$score_path) 
+n_scores <- length(unique(scores$PGS))
+n_samples <- length(unique(scores$IID))
+print(n_samples)
+```
+
 
 ```{asis, echo = any(table(scores$sampleset) < 50)}
 
@@ -318,7 +327,15 @@ long_scores %>%
 
 ### Get all scores
 
-All scores can be found in ` `r stringr::str_glue("{params$sampleset}/score/{params$sampleset}_pgs.txt.gz")` `, in the results folder output by the pipeline.
+All scores can be found in the results directory, at:
+
+```{r, eval=params$run_ancestry, echo=FALSE}
+stringr::str_glue("{params$sampleset}/score/{params$sampleset}_pgs.txt.gz")
+```
+
+```{r, eval=!params$run_ancestry, echo=FALSE}
+stringr::str_glue("{params$sampleset}/score/aggregated_scores.txt.gz")
+```
 
 ## Citations
 

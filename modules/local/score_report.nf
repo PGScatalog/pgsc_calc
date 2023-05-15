@@ -26,6 +26,7 @@ process SCORE_REPORT {
 
     script:
     def args = task.ext.args ?: ''
+    run_ancestry = params.run_ancestry ? true : false
     """
     echo $workflow.commandLine > command.txt
     echo "keep_multiallelic: $params.keep_multiallelic" > params.txt
@@ -37,7 +38,8 @@ process SCORE_REPORT {
     mkdir temp && TMPDIR=temp
     quarto render report.qmd -M "self-contained:true" \
         -P score_path:$scorefile \
-        -P sampleset:$meta.id
+        -P sampleset:$meta.id \
+        -P run_ancestry:$run_ancestry
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
