@@ -12,7 +12,7 @@
     - path: output/plink2/GRCh37_cineca_22.pvar.zst
     - path: output/plink2/GRCh37_cineca_22.psam
     - path: output/plink2/cineca_22_additive_0.sscore.vars
-    - path: output/score/cineca_pgs.txt.gz
+    - path: output/score/aggregated_scores.txt.gz
 
 # TODO: fix overlap -> 1 in pgscatalog_utils
 - name: test perfect apply score
