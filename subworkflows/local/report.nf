@@ -51,13 +51,11 @@ workflow REPORT {
             .groupTuple(size: 2)
 
         // ancestry_analysis: aggregated_scores.txt.gz -> {sampleset}_pgs.txt.gz
-        ch_scores = ch_scores.mix(ANCESTRY_ANALYSIS.out.pgs)
+        ch_scores = ch_scores.mix(ANCESTRY_ANALYSIS.out.pgs.map{annotate_sampleset(it)})
         ch_versions = ch_versions.mix(ANCESTRY_ANALYSIS.out.versions)
     } else {
-        // aggregate_scores --split: aggregated_scores.txt.gz -> {sampleset}_pgs.txt.gz
-        scores.flatten()
-            .map { annotate_sampleset(it) }
-            .set { ch_scores }
+        // score_aggregate (no ancestry) -> aggregated_scores.txt.gz
+        ch_scores = ch_scores.mix(scores)
 
         // make NO_FILE for each sampleset to join correctly later
         ancestry_results = ancestry_results.mix(
@@ -67,7 +65,6 @@ workflow REPORT {
     }
 
     // prepare report input channels -------------------------------------------
-
     log_match.map { annotate_sampleset(it) }
         .set { ch_annotated_log }
 

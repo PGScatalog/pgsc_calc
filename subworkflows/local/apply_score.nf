@@ -107,8 +107,10 @@ workflow APPLY_SCORE {
 
     ch_versions = ch_versions.mix(PLINK2_SCORE.out.versions.first())
 
+    // [ [meta], [list, of, score, paths] ]
     PLINK2_SCORE.out.scores
         .collect()
+        .map { [ it.first(), it.tail().findAll { !(it instanceof LinkedHashMap) }]}
         .set { ch_scores }
 
     SCORE_AGGREGATE ( ch_scores )

@@ -2,6 +2,7 @@ process SCORE_AGGREGATE {
     // labels are defined in conf/modules.config
     label 'process_high_memory'
     label 'pgscatalog_utils' // controls conda, docker, + singularity options
+    tag "$meta.id"
 
     conda (params.enable_conda ? "${task.ext.conda}" : null)
 
@@ -11,16 +12,16 @@ process SCORE_AGGREGATE {
         "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
-    path scorefiles
+    tuple val(meta), path(scorefiles)
 
     output:
-    path "*.txt.gz", emit: scores
+    tuple val(scoremeta), path("*.txt.gz"), emit: scores
     path "versions.yml", emit: versions
 
     script:
-    def split_scores = params.skip_ancestry ? '--split' : ''
+    scoremeta = meta.subMap('id')
     """
-    aggregate_scores -s $scorefiles -o . -v $split_scores
+    aggregate_scores -s $scorefiles -o . -v
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

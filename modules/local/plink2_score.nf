@@ -18,7 +18,7 @@ process PLINK2_SCORE {
     tuple val(meta), path(geno), path(pheno), path(variants), val(scoremeta), path(scorefile), path(ref_afreq)
 
     output:
-    path "*.{sscore,sscore.zst}", emit: scores  // optional compression
+    tuple val(meta), path("*.{sscore,sscore.zst}"), emit: scores  // optional compression
     path "*.sscore.vars", emit: vars_scored
     path "versions.yml", emit: versions
     path "*.log"       , emit: log
