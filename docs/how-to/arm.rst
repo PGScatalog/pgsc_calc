@@ -28,3 +28,17 @@ Macs, you'll probably get a segmentation fault during variant matching:
 The pipeline has been tested using Docker desktop on an M1 Macbook. Some simpler
 parts of the pipeline run using qemu ``amd64`` emulation, but CPU intensive
 processes will run natively on arm64 docker images.
+
+``pgsc_calc`` seems slow on a Mac
+---------------------------------
+
+Running ``pgsc_calc`` on a mac will generally be slower than running on
+Linux. This is because the workflow is running in a Linux virtual machine on top
+of macOS. Some things to consider:
+
+* Enable `VirtIO`_ to improve I/O performance
+* `Allocate more`_ CPU / RAM to the Docker Desktop virtual machine
+* Run big jobs on Linux
+
+.. _VirtIO: https://www.docker.com/blog/speed-boost-achievement-unlocked-on-docker-desktop-4-6-for-mac/
+.. _Allocate more: https://docs.docker.com/desktop/settings/mac/#advanced-1
