@@ -6,8 +6,8 @@ process PLINK2_RELABELPVAR {
 
     tag "$meta.id chromosome $meta.chrom"
 
-    storeDir ( params.genotypes_cache ? "$params.genotypes_cache/${meta.id}/${meta.build}/${meta.chrom}" :
-              "$workDir/genomes/${meta.id}/${meta.build}/${meta.chrom}/")
+    storeDir ( params.genotypes_cache ? "$params.genotypes_cache/${meta.id}/${params.target_build}/${meta.chrom}" :
+              "$workDir/genomes/${meta.id}/${params.target_build}/${meta.chrom}/")
 
     conda (params.enable_conda ? "${task.ext.conda}" : null)
 
@@ -35,7 +35,6 @@ process PLINK2_RELABELPVAR {
     def args = task.ext.args ?: ''
     def compressed = variants.getName().endsWith("zst") ? 'vzs' : ''
     def prefix = task.ext.suffix ? "${meta.id}_${task.ext.suffix}_" : "${meta.id}_"
-    def build = meta.build? meta.build + '_': ''  // important for making reference
     def mem_mb = task.memory.toMega() // plink is greedy
     // if dropping multiallelic variants, set a generic ID that won't match
     def set_ma_missing = params.keep_multiallelic ? '' : '--var-id-multi @:#'
@@ -50,11 +49,11 @@ process PLINK2_RELABELPVAR {
         $set_ma_missing \\
         --pfile ${geno.baseName} $compressed \\
         --make-just-pvar zs \\
-        --out ${build}${prefix}${meta.chrom}
+        --out ${params.target_build}_${prefix}${meta.chrom}
 
     # cross platform (mac, linux) method of preserving symlinks
-    cp -a $geno ${build}${prefix}${meta.chrom}.pgen
-    cp -a $pheno ${build}${prefix}${meta.chrom}.psam
+    cp -a $geno ${params.target_build}_${prefix}${meta.chrom}.pgen
+    cp -a $pheno ${params.target_build}_${prefix}${meta.chrom}.psam
     gzip *.vmiss
 
     cat <<-END_VERSIONS > versions.yml

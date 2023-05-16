@@ -3,7 +3,7 @@ process FILTER_VARIANTS {
     label 'process_low'
     label 'plink2' // controls conda, docker, + singularity options
 
-    tag "$meta.id $meta.build"
+    tag "$meta.id $params.target_build"
 
     conda (params.enable_conda ? "${task.ext.conda}" : null)
 
@@ -18,15 +18,15 @@ process FILTER_VARIANTS {
 
     output:
     tuple val(build), path("*_reference.pgen"), path("*_reference.psam"), path("*_reference.pvar.zst"), emit: ref
-    tuple val(build), path("*thinned.prune.in.gz"), emit: prune_in
-    tuple val(build), path("*.afreq.zst"), emit: afreq
+    path("*thinned.prune.in.gz"), emit: prune_in
+    path("*.afreq.zst"), emit: afreq
     path "versions.yml", emit: versions
 
     script:
     def mem_mb = task.memory.toMega() // plink is greedy
     // dynamic input option
     def input = (meta.is_pfile) ? '--pfile vzs' : '--bfile vzs'
-    build = meta.subMap('build')
+    build = ['build': params.target_build]
     """
     # 1. Get QC'd variant set & unrelated samples from REFERENCE data for PCA --
 
@@ -49,19 +49,19 @@ process FILTER_VARIANTS {
             --make-pgen vzs \
             --allow-extra-chr --autosome \
             --freq zs \
-            --out ${meta.build}_reference
+            --out ${params.target_build}_reference
 
     # 2. LD-thin variants in REFERENCE (filtered variants & samples) for input
     # into PCA -----------------------------------------------------------------
     plink2 \
             --threads $task.cpus \
             --memory $mem_mb \
-            --pfile vzs ${meta.build}_reference \
+            --pfile vzs ${params.target_build}_reference \
             --indep-pairwise $params.indep_pairwise_ref \
             --exclude range $ld \
             --out ${ref_geno.simpleName}_thinned
 
-    gzip *.prune.in *.prune.out
+    gzip -f *.prune.in *.prune.out
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

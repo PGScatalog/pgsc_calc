@@ -24,7 +24,7 @@ process INTERSECT_THINNED {
     tuple val(meta), path(matched), path(pruned), val(geno_meta), path(genomes)
 
     output:
-    tuple val(meta), path("*_thinned.txt.gz"), emit: match_thinned
+    path("*_thinned.txt.gz"), emit: match_thinned
     tuple val(geno_meta), path("*_extracted.pgen"), emit: geno
     tuple val(geno_meta), path("*_extracted.pvar.gz"), emit: variants
     tuple val(geno_meta), path("*_extracted.psam"), emit: pheno
@@ -95,7 +95,7 @@ process INTERSECT_THINNED {
             --delete-pmerge-result \
             --make-pgen \
             --sort-vars \
-            --out ${meta.build}_${meta.id}_ALL_extracted
+            --out ${params.target_build}_${meta.id}_ALL_extracted
     fi
 
     # 3) clean up and compress -------------------------------------------------

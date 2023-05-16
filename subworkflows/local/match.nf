@@ -14,56 +14,48 @@ workflow MATCH {
 
     variants
         .combine(scorefile)
-        .dump(tag: 'match_variants_input')
+        .dump(tag: 'match_variants_input', pretty: true)
         .set { ch_variants }
 
     MATCH_VARIANTS ( ch_variants )
     ch_versions = ch_versions.mix(MATCH_VARIANTS.out.versions.first())
 
-    // create custom groupKey() to set a different group size for each
-    // sampleset.  different samplesets may have different numbers of
-    // chromosomes. so if a groupKey size is not provided then nextflow must
-    // wait for the entire process to finish before releasing the grouped
-    // tuples. setting a groupKey size avoids lots of unnecessary waiting.
-    MATCH_VARIANTS.out.matches.map{
-        tuple(groupKey(it[0].subMap(['id', 'is_vcf', 'is_bfile', 'is_pfile']),
-                       it[0].n_chrom),
-              it[0].chrom,
-              it[1])
-    }
-        .groupTuple()
-        .combine( scorefile )
+    // groupTuple() notes:
+    // removed custom groupKeys because only one group will ever be processed
+    // (1 sampleset limitation added for v2 release)
+    // so groupTuple's size parameter isn't needed in this subworkflow
+
+    // use multiMaps + concat to preserve lists of files after concatenating
+    // joining or combining can create nested lists (annoying to handle)
+    MATCH_VARIANTS.out.matches
+        .multiMap {
+            meta: it.first()
+            matches: it.last()
+        }
         .set { ch_matches }
 
-    ch_intersection.map { tuple(groupKey(it[0].subMap(['id']),
-                                         it[0].n_chrom),
-                                it.last()) }
+    ch_intersection
         .groupTuple()
+        .multiMap {
+            meta: it.first()
+            intersections: it.last()
+        }
         .set { ch_intersection_grouped }
 
-    // ch_matches id _must be unique_ for .cross() (this is guaranteed after
-    // groupTuple). this seems complicated but joining by key is the best way to
-    // make sure the correct intersections match the sample sets. ensuring sort
-    // order of two input channels would be more difficult.
-    ch_matches
-        // extract key
-        .map{ [it[0]['id'], it] }
-        .cross(ch_intersection_grouped.map{it -> [it[0]['id'], it]})
-        // drops key and combine list elements
-        .map { it[0].last() + it[1].last() }
+    // grab first() meta object for MATCH_COMBINE
+    // only meta.chrom is checked to see if it's set to 'ALL' or not
+    ch_matches.meta.first()
+        .concat( ch_matches.matches.collect() )
+        .concat( scorefile )
+        .concat( ch_intersection_grouped.intersections.collect() )
+        .buffer( size: 4 )
+        .dump ( tag: 'match_combine_input', pretty: true )
         .set { ch_match_combine_input }
-    // example channel structure is a list of:
-    // meta map: [id:hgdp, is_vcf:false, is_bfile:false, is_pfile:true]
-    // chrom list: [3, ..., 17],
-    // match list: [hgdp_match_0.ipc.zst, ...]
-    // scorefile path: scorefiles.txt.gz,
-    // intersection meta: [id:hgdp]
-    // optional intersection list of paths: [NO_FILE] / [matched_1.txt ... ]
 
-    MATCH_COMBINE ( ch_match_combine_input )
-    ch_versions = ch_versions.mix(MATCH_COMBINE.out.versions)
+     MATCH_COMBINE ( ch_match_combine_input )
+     ch_versions = ch_versions.mix(MATCH_COMBINE.out.versions)
 
-    // extra check to make sure subworkflow completed successfully
+    // mandatory output of match subworkflow
     def combine_fail = true
     MATCH_COMBINE.out.scorefile.subscribe onNext: { combine_fail = false },
         onComplete: { combine_error(combine_fail) }
@@ -76,7 +68,7 @@ workflow MATCH {
 
 def combine_error(boolean fail) {
     if (fail) {
-        log.error "ERROR: Final scorefile wasn't produced!"
+        log.error "ERROR: Matching subworkflow failed"
         System.exit(1)
     }
 }

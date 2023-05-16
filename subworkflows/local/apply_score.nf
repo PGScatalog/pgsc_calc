@@ -22,7 +22,7 @@ workflow APPLY_SCORE {
 
     scorefiles
         .flatMap { annotate_scorefiles(it) }
-        .dump(tag: 'final_scorefiles')
+        .dump(tag: 'final_scorefiles', pretty: true)
         .set { annotated_scorefiles }
 
     geno
@@ -32,9 +32,7 @@ workflow APPLY_SCORE {
             ref: it.first().id == 'reference'
             target: it.first().id != 'reference'
         }
-        .set { ch_all_genomes }
-
-    ch_all_genomes.target.set { ch_genomes }
+        .set { ch_genomes }
 
     ch_apply_ref = Channel.empty()
     if (params.run_ancestry) {
@@ -49,18 +47,19 @@ workflow APPLY_SCORE {
         annotated_scorefiles
             .filter{ it.first().chrom == 'ALL'}
             .map { tuple(it.first().subMap('id'), it) }
+            .dump( tag: 'reference_scorefiles', pretty: true)
             .set { ch_ref_scorefile }
 
         intersection
             .map { tuple( it.first().subMap('id'), it.last() ) }
-            .groupTuple() // TODO: be polite and set size
+            .groupTuple()
             .set { ch_grouped_intersections }
 
         ch_grouped_intersections
             // ref genome must be combined with _all_ scorefiles
             .combine ( ch_ref_scorefile, by: 0 )
-            // re-order: [scoremeta, [variant match reports], scorefile]
-            .map { tuple(it.last().first(), it.tail().head(), it.last().last()) }
+        // re-order: [scoremeta, scorefile, [variant match reports]]
+            .map { tuple(it.last().first(), it.last().last(), it.tail().head()) }
             .set { ch_scorefile_relabel_input }
 
         // relabel scoring file ids to match reference format
@@ -72,15 +71,17 @@ workflow APPLY_SCORE {
             .map { tuple(it.first().subMap('chrom'), it) }
             .set { ch_target_scorefile }
 
-        ch_all_genomes.ref
+        ch_genomes.ref
             .map { annotate_genomic(it).flatten() }
             .map { tuple(it.first().subMap('chrom'), it) }
-            .combine( ch_target_scorefile, by: 0 ) // to work with multiple samplesets
+            .combine( ch_target_scorefile, by: 0 )
             .map { it.tail().flatten() }
             .set { ch_apply_ref }
 
+        // [meta, file, [matches]]
         ch_grouped_intersections
-            .combine( ref_afreq.map{ it.last() } )
+            .combine( ref_afreq )
+            .map{ [it.first(), it.last(), it[1]] }
             .set { ch_afreq }
 
         // map afreq IDs from reference -> target
@@ -89,22 +90,17 @@ workflow APPLY_SCORE {
     }
 
     // intersect genomic data with split scoring files -------------------------
-    ch_genomes
-        .map { annotate_genomic(it) }
-        .dump( tag: 'final_genomes')
+    ch_genomes.target
+        .map { annotate_genomic(it) } // add n_samples
+        .dump( tag: 'final_genomes', pretty: true)
         .cross ( annotated_scorefiles ) { m, it -> [m.id, m.chrom] }
         .map { it.flatten() }
         .mix( ch_apply_ref ) // add reference genomes!
         .combine( ref_afreq.map { it.last() } ) // add allelic frequencies
-        .dump(tag: 'ready_to_score')
+        .dump(tag: 'ready_to_score', pretty: true)
         .set { ch_apply }
 
-    // make sure the workflow tries to process at least one score, or explode
-    def score_fail = true
-    ch_apply.subscribe onNext: { score_fail = false }, onComplete: { score_error(score_fail) }
-
     PLINK2_SCORE ( ch_apply )
-
     ch_versions = ch_versions.mix(PLINK2_SCORE.out.versions.first())
 
     // [ [meta], [list, of, score, paths] ]
@@ -114,20 +110,22 @@ workflow APPLY_SCORE {
         .set { ch_scores }
 
     SCORE_AGGREGATE ( ch_scores )
-
     ch_versions = ch_versions.mix(SCORE_AGGREGATE.out.versions)
+
+    // aggregated score output from this subworkflow is mandatory
+    def aggregate_fail = true
+    SCORE_AGGREGATE.out.scores.subscribe onNext: { aggregate_fail = false },
+      onComplete: { aggregate_error(aggregate_fail) }
 
     emit:
     versions = ch_versions
     scores = SCORE_AGGREGATE.out.scores
 }
 
-def score_error(boolean fail) {
+def aggregate_error(boolean fail) {
     if (fail) {
         log.error "ERROR: No scores calculated!"
         System.exit(1)
-    } else {
-        log.info "INFO: Scores ready for calculation"
     }
 }
 

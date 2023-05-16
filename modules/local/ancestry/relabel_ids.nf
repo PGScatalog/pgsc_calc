@@ -3,8 +3,7 @@ process RELABEL_IDS {
     label 'process_medium'
     label 'pgscatalog_utils' // controls conda, docker, + singularity options
 
-    // TODO: fix ancestry projection input meta doesn't contain chrom key
-    tag "$meta.id $target_format chromosome ${ meta.containsKey('chrom') ? meta.chrom : 'ALL' }"
+    tag "$meta.id $target_format"
 
     conda (params.enable_conda ? "${task.ext.conda}" : null)
 
@@ -14,7 +13,7 @@ process RELABEL_IDS {
         "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
-    tuple val(meta), path(matched), path(target)
+    tuple val(meta), path(target), path(matched)
 
     output:
     tuple val(relabel_meta), path("${meta.id}*"), emit: relabelled

@@ -44,12 +44,12 @@ workflow testmatch {
 workflow testmatchcombine {
     // match combine can be optionally constrained by a list of variants in a
     // reference panel (don't test this here)
-    ref_intersection = Channel.of(tuple([:], file('NO_FILE')))
+    ref_intersection = Channel.of(file('NO_FILE'))
 
     testmatch()
 
     testmatch.out.matches
-        .map{ [ it[0], it[0].chrom, it.tail().flatten() ] }
+        .map{ [ it[0], it.tail().flatten() ] }
         .combine( testmatch.out.scorefile )
         .combine( ref_intersection )
         .set { ch_combine }

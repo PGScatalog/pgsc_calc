@@ -15,7 +15,7 @@ process MATCH_COMBINE {
         "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
-    tuple val(meta), val(chrom), path('???.ipc.zst'), path(scorefile), val(sharedmeta), path(shared)
+    tuple val(meta), path('???.ipc.zst'), path(scorefile), path(shared)
 
     output:
     tuple val(scoremeta), path("*.scorefile.gz"), emit: scorefile
@@ -28,9 +28,9 @@ process MATCH_COMBINE {
     def ambig = params.keep_ambiguous       ? '--keep_ambiguous'    : ''
     def multi = params.keep_multiallelic    ? '--keep_multiallelic' : ''
     // output one (or more) scoring files per chromosome?
-    def split_output = !chrom.contains("ALL") ? '--split' : ''
+    def split_output = !meta.chrom.contains("ALL") ? '--split' : ''
     // output one (or more) scoring file per sampleset?
-    def combined_output = (chrom.contains("ALL") || shared.name != 'NO_FILE') ? '--combined' : ''
+    def combined_output = (meta.chrom.contains("ALL") || shared.name != 'NO_FILE') ? '--combined' : ''
     // filter match candidates to intersect with reference:
     // omit multi-allelic variants in reference because these will cause errors with relabelling!...
     // ... unclear whether we should remove them from target with '&& ($9 == 0') as well?

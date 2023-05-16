@@ -4,7 +4,7 @@ process PLINK2_MAKEBED {
     label "${ params.copy_genomes ? 'copy_genomes' : '' }"
     label "plink2" // controls conda, docker, + singularity options
 
-    tag "$meta.id chromosome $meta.chrom"
+    tag "$meta.id chromosome"
 
     conda (params.enable_conda ? "${task.ext.conda}" : null)
 
@@ -32,7 +32,6 @@ process PLINK2_MAKEBED {
     def extract = pruned.name != 'NO_FILE' ? "--extract $pruned" : ''
     def extracted = pruned.name != 'NO_FILE' ? "_extracted" : ''
     def prefix = task.ext.suffix ? "${meta.id}${task.ext.suffix}_" : "${meta.id}_"
-    def build = meta.build? meta.build + '_': ''
 
     """
     # use explicit flag because pfile prefix might be different
@@ -45,7 +44,7 @@ process PLINK2_MAKEBED {
         --pvar $variants \
         --make-bed \
         $extract \
-        --out ${build}${prefix}${meta.chrom}${extracted}
+        --out ${params.target_build}_${prefix}${meta.chrom}${extracted}
 
     if [ $meta.id != 'reference' ]
     then

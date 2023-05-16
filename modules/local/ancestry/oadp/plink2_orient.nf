@@ -29,7 +29,6 @@ process PLINK2_ORIENT {
 
     // output options
     def prefix = task.ext.suffix ? "${meta.id}${task.ext.suffix}_" : "${meta.id}_"
-    def build = meta.build? meta.build + '_': ''
 
     """
     plink2 \
@@ -41,7 +40,7 @@ process PLINK2_ORIENT {
         --bim $variants \
         --a1-allele $ref_variants 5 2 \
         --make-bed \
-        --out ${build}${prefix}${meta.chrom}_oriented
+        --out ${params.target_build}_${prefix}${meta.chrom}_oriented
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

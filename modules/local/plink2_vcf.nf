@@ -6,8 +6,8 @@ process PLINK2_VCF {
 
     tag "$meta.id chromosome $meta.chrom"
 
-    storeDir ( params.genotypes_cache ? "$params.genotypes_cache/${meta.id}/${meta.build}/${meta.chrom}" :
-              "$workDir/genomes/${meta.id}/${meta.build}/${meta.chrom}/")
+    storeDir ( params.genotypes_cache ? "$params.genotypes_cache/${meta.id}/${params.target_build}/${meta.chrom}" :
+              "$workDir/genomes/${meta.id}/${params.target_build}/${meta.chrom}/")
 
     conda (params.enable_conda ? "${task.ext.conda}" : null)
 
@@ -29,7 +29,6 @@ process PLINK2_VCF {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}_"
-    def build = meta.build? meta.build + '_': ''  // important for making reference
     def mem_mb = task.memory.toMega()
     def dosage_options = meta.vcf_import_dosage ? 'dosage=DS' : ''
     // rewriting genotypes, so use --max-alleles instead of using generic ID
@@ -47,7 +46,7 @@ process PLINK2_VCF {
         $args \\
         --vcf $vcf $dosage_options \\
         --make-pgen vzs \\
-        --out ${build}${prefix}${meta.chrom}
+        --out ${params.target_build}_${prefix}${meta.chrom}
 
     gzip *.vmiss
 

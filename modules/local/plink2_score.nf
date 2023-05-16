@@ -34,15 +34,18 @@ process PLINK2_SCORE {
     // load allelic frequencies
     def load_afreq = (ref_afreq.name != 'NO_FILE') ? "--read-freq $ref_afreq" : ""
 
+    // be explicit when comparing ints (use .toInteger()) because:
+    //   https://github.com/nextflow-io/nextflow/issues/3952
+
     // custom args2
-    def maxcol = (scoremeta.n_scores + 2) // id + effect allele = 2 cols
+    def maxcol = (scoremeta.n_scores.toInteger() + 2) // id + effect allele = 2 cols
     def no_imputation = 'no-mean-imputation'
-    def cols = (meta.n_samples < 50) ? 'header-read cols=+scoresums,+denom,-fid' : 'header-read cols=+scoresums,+denom,-fid'
+    def cols = (meta.n_samples.toInteger() < 50) ? 'header-read cols=+scoresums,+denom,-fid' : 'header-read cols=+scoresums,+denom,-fid'
     def recessive = (scoremeta.effect_type == 'recessive') ? ' recessive ' : ''
     def dominant = (scoremeta.effect_type == 'dominant') ? ' dominant ' : ''
     args2 = [args2, cols, 'list-variants', no_imputation, recessive, dominant].join(' ')
 
-    if (scoremeta.n_scores == 1)
+    if (scoremeta.n_scores.toInteger() == 1)
         """
         plink2 \
             --threads $task.cpus \
@@ -59,7 +62,7 @@ process PLINK2_SCORE {
             plink2: \$(plink2 --version 2>&1 | sed 's/^PLINK v//; s/ 64.*\$//' )
         END_VERSIONS
         """
-    else if (scoremeta.n_scores > 1)
+    else if (scoremeta.n_scores.toInteger() > 1)
         """
         plink2 \
             --threads $task.cpus \
