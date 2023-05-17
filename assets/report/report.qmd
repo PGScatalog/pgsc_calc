@@ -233,6 +233,20 @@ log_df %>%
 
 :::
 
+
+# Genetic Ancestry
+
+```{r, echo = FALSE, message = FALSE, eval=params$run_ancestry}
+popsim <- readr::read_tsv(gsub("_pgs.", "_popsimilarity.", params$score_path))
+head(popsim)
+
+# Placeholder figure: needs better legend labelling
+p_pca <- ggplot(popsim[popsim$REFERENCE == TRUE,], aes(x=PC2, y=PC1)) + geom_point(aes(colour=SuperPop), alpha=0.25)
+p_pca <- p_pca + geom_point(data=popsim[popsim$REFERENCE != TRUE,], aes(color=MostSimilarPop), shape=1)
+p_pca + theme_bw()
+```
+
+
 # Scores
 
 ```{r, echo = FALSE, message = FALSE, eval=!params$run_ancestry}
