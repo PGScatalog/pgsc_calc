@@ -233,7 +233,7 @@ log_df %>%
 
 :::
 
-## Scores 
+# Scores
 
 ```{r, echo = FALSE, message = FALSE, eval=!params$run_ancestry}
 scores <- readr::read_tsv(params$score_path) 
@@ -337,7 +337,7 @@ stringr::str_glue("{params$sampleset}/score/{params$sampleset}_pgs.txt.gz")
 stringr::str_glue("{params$sampleset}/score/aggregated_scores.txt.gz")
 ```
 
-## Citations
+# Citations
 
 ::: {.callout-important}
 For scores from the PGS Catalog, please remember to cite the original publications from which they came (these are listed in the metadata table.) 
