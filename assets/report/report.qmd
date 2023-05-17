@@ -245,7 +245,7 @@ for(pc in seq.int(1,5,2)){
   pcY = paste('PC', pc, sep='')
   pcX = paste('PC', pc+1, sep='')
   if (pcX %in% colnames(popsim)){
-    p_pca <- ggplot(popsim[popsim$REFERENCE == TRUE,], aes(x=!!sym(pcY), y=!!sym(pcX))) + geom_point(aes(colour=SuperPop), alpha=0.25)
+    p_pca <- ggplot(popsim[popsim$REFERENCE == TRUE,], aes(x=!!sym(pcX), y=!!sym(pcY))) + geom_point(aes(colour=SuperPop), alpha=0.25)
     p_pca <- p_pca + geom_point(data=popsim[popsim$REFERENCE != TRUE,], aes(color=MostSimilarPop), shape=1)
     p_pca <- p_pca + theme_bw()
     print(p_pca)
