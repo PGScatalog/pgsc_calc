@@ -264,6 +264,26 @@ for(pc in seq.int(1,5,2)){
 }
 ```
 
+## Population similarity summary
+
+```{r, echo = FALSE, message = FALSE, eval=params$run_ancestry}
+popsim %>% 
+  filter(sampleset == "reference") %>%
+  group_by(sampleset) %>%
+  count(`Most similar population` = SuperPop ) %>%
+  mutate(percent = round(n / sum(n) * 100, 2)) -> ref_count
+
+popsim %>%
+  filter(sampleset != "reference") %>%
+  group_by(sampleset) %>%
+  count(`Most similar population` = MostSimilarPop) %>%
+  mutate(percent = round(n / sum(n) * 100, 2)) %>%
+  bind_rows(ref_count) %>%
+  mutate(count = stringr::str_glue("{n} ({percent}%)")) %>%
+  select(-n, -percent) %>%
+  tidyr::pivot_wider(names_from = sampleset, values_from = count) %>%
+  DT::datatable()
+```
 
 # Scores
 
