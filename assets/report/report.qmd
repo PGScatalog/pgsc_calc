@@ -236,6 +236,17 @@ log_df %>%
 
 # Genetic Ancestry
 
+```{r colour_palette, echo = FALSE, eval=params$run_ancestry}
+# source: https://github.com/PGScatalog/PGS_Catalog/blob/master/catalog/static/catalog/pgs.scss#L2493-L2520
+# $ancestry_colours
+thousand_genomes_colours <- c("#FFD900", "#E41A1C", "#B15928", "#4DAF4A", 
+                              "#377EB8", "#00CED1", "#984EA3", "#A6CEE3", 
+                              "#FF7F00", "#BBB", "#999")
+names(thousand_genomes_colours) <- c("AFR", "AMR", "ASN", "EAS", "EUR", "GME",
+                                     "SAS", "MAE", "MAO", "NR", "OTH")
+thousand_genomes_palette <- scale_colour_manual(name = "Most Similar Population", values = thousand_genomes_colours)
+```
+
 ```{r, echo = FALSE, message = FALSE, eval=params$run_ancestry}
 popsim <- readr::read_tsv(gsub("_pgs.", "_popsimilarity.", params$score_path))
 head(popsim)
@@ -247,7 +258,7 @@ for(pc in seq.int(1,5,2)){
   if (pcX %in% colnames(popsim)){
     p_pca <- ggplot(popsim[popsim$REFERENCE == TRUE,], aes(x=!!sym(pcX), y=!!sym(pcY))) + geom_point(aes(colour=SuperPop), alpha=0.25)
     p_pca <- p_pca + geom_point(data=popsim[popsim$REFERENCE != TRUE,], aes(color=MostSimilarPop), shape=1)
-    p_pca <- p_pca + theme_bw()
+    p_pca <- p_pca + theme_bw() + thousand_genomes_palette
     print(p_pca)
   }
 }
