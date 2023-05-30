@@ -59,7 +59,7 @@ workflow BOOTSTRAP_ANCESTRY {
         .dump(tag: 'ancestry_ref')
         .set { ch_raw_ref }
 
-    Channel.fromPath("$projectDir/assets/ancestry/checksums.txt")
+    Channel.fromPath(params.ancestry_checksums, checkIfExists: true)
         .set { ch_checksums }
 
     MAKE_DATABASE( ch_raw_ref, ch_checksums )
@@ -94,7 +94,7 @@ def create_ref_input_channel(LinkedHashMap row) {
         meta.is_pfile = true
     }
 
-    return [meta, file(row.url)]
+    return [meta, file(row.url, checkIfExists: true)]
 }
 
 def check_relabelled_size(ArrayList it) {

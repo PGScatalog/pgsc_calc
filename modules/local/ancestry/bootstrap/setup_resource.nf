@@ -16,16 +16,19 @@ process SETUP_RESOURCE {
     tuple val(meta), path(pgen), path(psam), path(pvar)
 
     output:
-    tuple val(meta), path("*.pgen"), path("*.psam"), path("*.pvar.zst"), emit: plink
+    tuple val(meta), path("*.pgen"), path("*.psam", includeInputs: true), path("*.pvar.zst", includeInputs: true), emit: plink
     path "versions.yml", emit: versions
 
     script:
     """
-    # standardise plink prefix on pgen
-    mv $psam ${pgen.simpleName}.psam
     # --zst-decompress can't be used with mem / threads flags
     plink2 --zst-decompress $pgen ${pgen.simpleName}.pgen
-    mv $pvar ${pgen.simpleName}.pvar.zst
+
+    # standardise plink prefix on pgen if different
+    if [ ! -f ${pgen.simpleName}.pvar.zst ]; then
+        mv $psam ${pgen.simpleName}.psam
+        mv $pvar ${pgen.simpleName}.pvar.zst
+    fi
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
