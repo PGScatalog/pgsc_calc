@@ -61,7 +61,7 @@ elif [ "$target_format" == "bim" ]; then
   awk '!/^#/ {
     if($5 < $6) print $1":"$4":"$5":"$6, $2, $6, 0;
     else print $1":"$4":"$6":"$5, $2, $6, 0
-  }' $i_target | sort ./tmp/ >> target_variants.txt
+  }' $i_target | sort -T ./tmp/ >> target_variants.txt
 else
   echo "${target_format} is not a valid option (only pvar and bim are currently accepted)"
   exit 1
