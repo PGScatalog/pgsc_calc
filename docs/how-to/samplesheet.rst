@@ -7,6 +7,9 @@ A samplesheet describes the structure of your input genotyping datasets. It's ne
 because the structure of input data can be very different across use cases (e.g.
 different file formats, directories, and split vs. unsplit by chromosome).
 
+.. warning:: The format of samplesheets changed in v2.0.0 to better accommodate
+             additional file formats in the future
+             
 Samplesheet
 -----------
 

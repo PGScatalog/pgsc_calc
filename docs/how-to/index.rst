@@ -3,14 +3,6 @@
 How-to guides
 =============
 
-Reference database
-------------------
-
-.. toctree::
-   :maxdepth: 1
-
-   database
-
 Calculating polygenic scores
 ----------------------------
 
@@ -21,6 +13,7 @@ Calculating polygenic scores
    samplesheet
    calculate_pgscatalog
    multiple
+   ancestry
 
 Making genomic data and scorefiles compatible
 ---------------------------------------------
@@ -32,15 +25,23 @@ Making genomic data and scorefiles compatible
    liftover
    effecttype
 
+Reference database
+------------------
 
+.. toctree::
+   :maxdepth: 1
+
+   database
+   
 Working in different environments
-----------------------------------
+---------------------------------
 
 .. toctree::
    :maxdepth: 1
 
    bigjob
    arm
+   offline
 
 Working with complex datasets
 -----------------------------

@@ -1,7 +1,7 @@
 .. _param ref:
 
-Reference: Input Parameters/Flags
-=================================
+Reference: Workflow parameters
+==============================
 
 The documentation below is automatically generated from the input schema and
 contains additional technical detail. **Parameters in bold** are required and

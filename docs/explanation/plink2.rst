@@ -21,16 +21,22 @@ use ``plink2`` internally to calculate all scores but offer some extra features:
   by effect type and across duplicate variant IDs with different effect alleles,
   then the split scores are aggregated.
 
-- We also take care of automatically intersecting the target genomes matches
-  with the reference panel to calculate ancestry-normalised scores
+- We also take care of calculating genetic ancestry similarity to a reference
+  panel using robust PCA methods
+
+- Scores can be optionally normalised across different ancestry groups with a
+  range of methods
 
 Summary
 -------
 
-.. note:: For a seasoned human genetics bioinformatician the workflow mostly
+- For a seasoned human genetics bioinformatician the workflow mostly
   offers convenient integration with the PGS Catalog and simplifies large scale
-  analysis on HPCs. Automatic ancestry normalisation may also be helpful.
+  analysis on HPCs.
 
-.. note:: For a data scientist or somebody not familiar with PGS calculation,
-          ``pgsc_calc`` will be more useful.
+- Genetic ancestry similarity calculations and automatic ancestry normalisation
+  may also be helpful
+
+- For a data scientist or somebody less familiar with the intricacies of PGS
+  calculation, ``pgsc_calc`` will be more useful
 

@@ -39,6 +39,8 @@ And optionally:
   genomes
 - Normalising calculated PGS to account for genetic ancestry
 
+.. tip:: To enable these optional steps, see :ref:`ancestry`
+         
 The workflow relies on open source scientific software, including:
 
 - `PLINK 2`_
@@ -115,20 +117,6 @@ Changelog
 
 The :doc:`Changelog page<changelog>` describes fixes and enhancements for each version.
 
-Features Under Development
---------------------------
-
-In the future, the calculator will include new features for PGS interpretation:
-
-- *Genetic Ancestry*: calculate similarity of target samples to populations in a
-  reference dataset (e.g. `1000 Genomes (1000G)`_, `Human Genome Diversity Project (HGDP)`_)
-  using principal components analysis (PCA).
-- *PGS Normalization*: Using reference population data and/or PCA projections to report
-  individual-level PGS predictions (e.g. percentiles, z-scores) that account for genetic ancestry.
-
-.. _1000 Genomes (1000G): http://www.nature.com/nature/journal/v526/n7571/full/nature15393.html
-.. _Human Genome Diversity Project (HGDP): https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7115999/
-
 
 Credits
 -------
@@ -155,7 +143,7 @@ Citations
 
 If you use ``pgscatalog/pgsc_calc`` in your analysis, please cite:
 
-    PGS Catalog Calculator `(in development)`. PGS Catalog
+    PGS Catalog Calculator (in development) [0]_. PGS Catalog
     Team. https://github.com/PGScatalog/pgsc_calc
 
     Lambert `et al.` (2021) The Polygenic Score Catalog as an open database for
@@ -167,6 +155,8 @@ you use in your analyses, and the underlying data/software tools described in th
 
 .. _citations file: https://github.com/PGScatalog/pgsc_calc/blob/master/CITATIONS.md
 .. _10.1038/s41588-021-00783-5: https://doi.org/10.1038/s41588-021-00783-5
+.. [0] A manuscript is in development but the calculated scores have been
+       validated against UK Biobank since v1.1.0
 
 
 License Information

@@ -8,7 +8,21 @@ will only occur in major versions with changes noted in this changelog.
 
 .. _`semantic versioning`: https://semver.org/
 
-pgsc_calc v1.3.2 (2022-01-27)
+pgsc_calc v2.0.0 (2023-XX-XX)
+-----------------------------
+
+This major release features breaking changes to samplesheet structure to provide
+more flexible support for extra genomic file types in the future. Two major new
+features were implemented in this release:
+
+- Genetic ancestry group similarity measures are calculated using 1000 Genomes
+  reference panel for all input genomes
+- Calculated PGS are normalised for each ancestry group label using a range of
+  methods
+
+These new features are optional and don't run in the default workflow.  
+
+pgsc_calc v1.3.2 (2023-01-27)
 -----------------------------
 
 This patch fixes a bug that made some PGS Catalog scoring files incompatible
@@ -18,7 +32,7 @@ reporting the problem.
 
 .. _`@j0n-a`: https://github.com/PGScatalog/pgsc_calc/issues/79
 
-pgsc_calc v1.3.1 (2022-01-24)
+pgsc_calc v1.3.1 (2023-01-24)
 -----------------------------
 
 This patch fixes a bug that breaks the workflow if all variants in one or more
