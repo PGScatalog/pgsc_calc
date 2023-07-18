@@ -36,6 +36,7 @@ process SCORE_REPORT {
     cp -r $projectDir/assets/report/* .
     # workaround for unhelpful filenotfound quarto errors in some HPCs
     mkdir temp && TMPDIR=temp
+
     quarto render report.qmd -M "self-contained:true" \
         -P score_path:$scorefile \
         -P sampleset:$meta.id \

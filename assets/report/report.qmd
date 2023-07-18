@@ -281,7 +281,11 @@ popsim %>%
   bind_rows(ref_count) %>%
   mutate(count = stringr::str_glue("{n} ({percent}%)")) %>%
   select(-n, -percent) %>%
-  tidyr::pivot_wider(names_from = sampleset, values_from = count) %>%
+  tidyr::pivot_wider(names_from = sampleset, values_from = count) -> pop_summary
+
+write.csv(pop_summary, "pop_summary.csv", quote=FALSE, row.names = FALSE)
+
+pop_summary %>%
   DT::datatable()
 ```
 

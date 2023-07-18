@@ -1,0 +1,2 @@
+sampleset,path_prefix,chrom,format
+hapnest,ANCESTRY_TARGET_DIR/GRCh38_HAPNEST_TARGET_ALL,,pfile
