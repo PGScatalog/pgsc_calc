@@ -11,6 +11,8 @@ Getting started
 * Docker, Singularity, or Anaconda
 * Linux or macOS
 
+Without these dependencies installed you won't be able to run ``pgsc_calc``.
+
 Step by step setup
 ------------------
 
@@ -63,7 +65,7 @@ people. Exciting!
            polygenic scores, see :ref:`prepare`
 
 1. Set up samplesheet
----------------------
+~~~~~~~~~~~~~~~~~~~~~
 
 First, you need to describe the structure of your genomic data in a standardised
 way. To do this, set up a spreadsheet that looks like:
@@ -84,7 +86,7 @@ See :ref:`setup samplesheet` for more details.
 
 
 2. Select scoring files
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
 
 pgsc_calc makes it simple to work with polygenic scores that have been published
 in the PGS Catalog. You can specify one or more scores using the ``--pgs_id``
@@ -124,7 +126,7 @@ for more information). An example would look like:
 .. _harmonized (remapped rsIDs and/or lifted positions): https://www.pgscatalog.org/downloads/#dl_ftp_scoring_hm_pos
 
 3. Putting it all together
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For this example, we'll assume that the input genomes are in build GRCh37 and that
 they match the scoring file genome build.
@@ -150,7 +152,7 @@ If the workflow didn't execute successfully, have a look at the
 with the software you have installed on your computer.
 
 4. Next steps & advanced usage
-------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The pipeline distributes with settings that easily allow for it to be run on a
 personal computer on smaller datasets (e.g. 1000 Genomes, HGDP). The minimum
