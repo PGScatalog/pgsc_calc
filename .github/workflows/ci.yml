@@ -147,7 +147,7 @@ jobs:
         run: |
           nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
 
-  # run ancestry separately because it needs reference data      
+  # run ancestry separately because it needs reference data
   ancestry_test:
     needs: [preload_docker, preload_singularity]
     name: ${{ matrix.profile }} ${{ matrix.tags }}
@@ -159,11 +159,13 @@ jobs:
         profile: ["docker", "singularity"]
         tags:
           - "ancestry"
-    env:
-      ANCESTRY_REF_DIR: {{ env.runner_temp }}
-      ANCESTRY_TARGET_DIR: {{ env.runner_temp }}
-          
+
     steps:
+      - name: Set Environment Variable
+        run: |
+          echo "ANCESTRY_REF_DIR=$RUNNER_TEMP" >> $GITHUB_ENV
+          echo "ANCESTRY_TARGET_DIR=$RUNNER_TEMP" >> $GITHUB_ENV
+
       - name: Cache reference data
         id: cache-ref
         uses: actions/cache@v3
@@ -171,16 +173,18 @@ jobs:
           path: |
             $ANCESTRY_TARGET_DIR/GRCh38_HAPNEST_TARGET_ALL.pgen
             $ANCESTRY_TARGET_DIR/GRCh38_HAPNEST_TARGET_ALL.psam
-            $ANCESTRY_TARGET_DIR/GRCh38_HAPNEST_TARGET_ALL.pvar.zst            
-            $ANCESTRY_REF_DIR/GRCh38_HAPNEST_reference.tar.zst          
+            $ANCESTRY_TARGET_DIR/GRCh38_HAPNEST_TARGET_ALL.pvar.zst
+            $ANCESTRY_REF_DIR/GRCh38_HAPNEST_reference.tar.zst
+          key: ${{ runner.os }}-ancestry
 
       - name: Download reference data
-        if: steps.cache-ref.outputs.cache-hit != 'true'        
+        if: steps.cache-ref.outputs.cache-hit != 'true'
         run: |
-          wget -nc -P $ANCESTRY_REF_DIR https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/GRCh38_HAPNEST_reference.tar.zst
-          wget -nc -O $TMPDIR/temp.zstd https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/GRCh38_HAPNEST_target.tar.zst
-          tar -xf $TMPDIR/temp.zstd -C $ANCESTRY_TARGET_DIR
-            
+          wget -qnc -P $ANCESTRY_REF_DIR https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/GRCh38_HAPNEST_reference.tar.zst
+          wget -qnc -P $ANCESTRY_TARGET_DIR https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/GRCh38_HAPNEST_target.tar.zst
+          tar -xf $ANCESTRY_TARGET_DIR/GRCh38_HAPNEST_target.tar.zst -C $ANCESTRY_TARGET_DIR
+
+
       - name: Check out pipeline code
         uses: actions/checkout@v3
 
@@ -250,8 +254,8 @@ jobs:
             /home/runner/pytest_workflow_*/*/work
             !/home/runner/pytest_workflow_*/*/work/conda
             !/home/runner/pytest_workflow_*/*/work/singularity
-        
-    
+
+
   unit_test:
     needs: [preload_docker, preload_singularity]
     name: ${{ matrix.profile }} ${{ matrix.tags }}
