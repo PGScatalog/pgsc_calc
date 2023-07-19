@@ -11,8 +11,6 @@ on:
 jobs:
   docker:
     runs-on: ubuntu-latest
-    name: Save docker images
-
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v3
