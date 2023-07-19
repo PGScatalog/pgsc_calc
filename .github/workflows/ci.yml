@@ -13,11 +13,11 @@ on:
     types: [published]
 
 jobs:
-  preload_docker:
-    uses: ./.github/workflows/preload-docker.yml
+  preload_containers:
+    uses: ./.github/workflows/preload-containers.yml
     
   test:
-    needs: preload_docker
+    needs: preload_containers
     name: Run standard workflow test
     runs-on: ubuntu-latest
     env:
