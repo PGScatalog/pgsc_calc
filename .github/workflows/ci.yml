@@ -18,9 +18,6 @@ jobs:
 
   preload_singularity:
     uses: ./.github/workflows/preload-singularity.yml
-    with:
-      singularity_version: 3.8.3
-      nxf_singularity_cachedir: ${{ github.workspace }}/singularity
 
   standard_test_docker:        
     needs: preload_docker
@@ -35,6 +32,4 @@ jobs:
     with:
       cache-key: ${{ needs.preload_singularity.outputs.cache-key }}
       singularity: true
-      singularity_version: 3.8.3
-      nxf_singularity_cachedir: ${{ github.workspace }}/singularity
 

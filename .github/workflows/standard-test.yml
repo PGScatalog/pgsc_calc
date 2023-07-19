@@ -9,11 +9,11 @@ on:
         type: boolean
       singularity:
         type: boolean
-      singularity_version:
-        type: string
-      nxf_singularity_cachedir:
-        type: string
-        
+
+env:
+  NXF_SINGULARITY_CACHEDIR: ${{ github.workspace }}/singularity
+  SINGULARITY_VERSION: 3.8.3
+  
 jobs:
   docker:
     if: ${{ inputs.docker }}
@@ -73,19 +73,19 @@ jobs:
         id: restore-singularity-setup
         uses: actions/cache@v3
         with:
-          path: /opt/hostedtoolcache/singularity/${{ inputs.singularity_version }}/x64
-          key: ${{ runner.os }}-singularity-${{ inputs.singularity_version }}
+          path: /opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64
+          key: ${{ runner.os }}-singularity-${{ env.SINGULARITY_VERSION }}
           fail-on-cache-miss: true
 
       - name: Add singularity to path
         run: |
-          echo "/opt/hostedtoolcache/singularity/${{ inputs.singularity_version }}/x64/bin" >> $GITHUB_PATH
+          echo "/opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64/bin" >> $GITHUB_PATH
 
       - name: Restore singularity container images
         id: restore-singularity
         uses: actions/cache@v3
         with:
-          path: ${{ inputs.nxf_singularity_cachedir }}
+          path: ${{ env.NXF_SINGULARITY_CACHEDIR }}
           key: ${{ inputs.cache_key }}
 
       - name: Run pipeline with test data
