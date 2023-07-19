@@ -2,18 +2,25 @@ name: Preload singularity containers
 
 on:
   workflow_call:
+    inputs:
+      singularity_version:
+        required: true
+        type: string
+      nxf_singularity_cachedir:
+        required: true
+        type: string
     outputs:
       cache-key:
         value: singularity-${{ github.sha }}
 
 env:
-  NXF_SINGULARITY_CACHEDIR: "${{ github.workspace }}/singularity"
-  SINGULARITY_VERSION: "3.8.3"
+  NXF_SINGULARITY_CACHEDIR: ${{ inputs.nxf_singularity_cachedir }}
+  SINGULARITY_VERSION: ${{ inputs.singularity_version }}
 
 jobs:
   singularity:
     runs-on: ubuntu-latest
-    steps:          
+    steps:
       - name: Check out pipeline code
         uses: actions/checkout@v3
 
@@ -48,5 +55,3 @@ jobs:
         with:
           path: ${{ env.NXF_SINGULARITY_CACHEDIR }}
           key: singularity-${{ github.sha }}
-          
-    
