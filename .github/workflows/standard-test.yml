@@ -9,7 +9,7 @@ on:
         type: boolean
       singularity:
         type: boolean
-      singularty_version:
+      singularity_version:
         type: string
       nxf_singularity_cachedir:
         type: string
