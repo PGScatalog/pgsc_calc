@@ -14,22 +14,22 @@ on:
 
 jobs:
   preload_docker:
-    uses: ./.github/workflows/preload-containers.yml
-    with:
-      docker: true
+    uses: ./.github/workflows/preload-docker.yml
 
   preload_singularity:
-    uses: ./.github/workflows/preload-containers.yml
-    with:
-      singularity: true   
+    uses: ./.github/workflows/preload-singularity.yml
 
-  standard_test:
+  standard_test_docker:        
     needs: preload_docker
     uses: ./.github/workflows/standard-test.yml
     with:
-      cache-key: ${{ needs.preload_docker.outputs.docker-cache-key }}
+      cache-key: ${{ needs.preload_docker.outputs.cache-key }}
       docker: true
-      singularity: false
-      
-    
+
+  standard_test_singularity:      
+    needs: preload_singularity
+    uses: ./.github/workflows/standard-test.yml
+    with:
+      cache-key: ${{ needs.preload_singularity.outputs.cache-key }}
+      singularity: true
 

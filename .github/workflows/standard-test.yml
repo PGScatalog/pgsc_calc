@@ -4,14 +4,11 @@ on:
   workflow_call:
     inputs:
       cache-key:
-        required: false
         type: string
       docker:
         type: boolean
-        required: true
       singularity:
         type: boolean
-        required: true
 
 jobs:
   docker:

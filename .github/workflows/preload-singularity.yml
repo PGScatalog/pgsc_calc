@@ -1,16 +1,9 @@
-name: Preload docker containers
+name: Preload singularity containers
 
 on:
   workflow_call:
-    inputs:
-      singularity:
-        type: boolean
-      docker:
-        type: boolean
     outputs:
-      docker-cache-key:
-        value: docker-${{ github.sha }}
-      singularity-cache-key:
+      cache-key:
         value: singularity-${{ github.sha }}
 
 env:
@@ -18,29 +11,7 @@ env:
   SINGULARITY_VERSION: "3.8.3"
 
 jobs:
-  docker:
-    if: ${{ inputs.docker }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out pipeline code
-        uses: actions/checkout@v3
-
-      - name: Pull and save docker
-        run: |
-          git grep 'ext.docker*' ${{ github.workspace }}/conf/modules.config | cut -f 2 -d '=' | xargs -L 2 echo | tr -d ' ' > ${{ runner.temp }}/images.txt
-          cat ${{ runner.temp }}/images.txt | xargs -I {} sh -c 'docker pull --platform linux/amd64 "$1"' - {}
-          mkdir -p ${{ runner.temp }}/docker/
-          cat ${{ runner.temp }}/images.txt | xargs -I {} sh -c 'docker save "$1" > ${{ runner.temp }}/docker/$(basename "$1").tar' - {}
-
-      - name: Save docker
-        id: cache-docker
-        uses: actions/cache@v3
-        with:
-          path: ${{ runner.temp }}/docker
-          key: docker-${{ github.sha }}
-
   singularity:
-    if: ${{ inputs.singularity }}    
     runs-on: ubuntu-latest
     steps:          
       - name: Check out pipeline code
@@ -78,4 +49,4 @@ jobs:
           path: ${{ env.NXF_SINGULARITY_CACHEDIR }}
           key: singularity-${{ github.sha }}
           
-          
+    
