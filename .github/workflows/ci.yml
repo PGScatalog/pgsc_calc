@@ -147,7 +147,7 @@ jobs:
         run: |
           nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
 
-  # run ancestry separately because it needs reference data
+  # run ancestry separately because it needs large reference data (~500MB)
   ancestry_test:
     needs: [preload_docker, preload_singularity]
     name: ${{ matrix.profile }} ${{ matrix.tags }}
@@ -171,10 +171,10 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            $ANCESTRY_TARGET_DIR/GRCh38_HAPNEST_TARGET_ALL.pgen
-            $ANCESTRY_TARGET_DIR/GRCh38_HAPNEST_TARGET_ALL.psam
-            $ANCESTRY_TARGET_DIR/GRCh38_HAPNEST_TARGET_ALL.pvar.zst
-            $ANCESTRY_REF_DIR/GRCh38_HAPNEST_reference.tar.zst
+            ${{ env.ANCESTRY_TARGET_DIR }}/GRCh38_HAPNEST_TARGET_ALL.pgen
+            ${{ env.ANCESTRY_TARGET_DIR }}/GRCh38_HAPNEST_TARGET_ALL.psam
+            ${{ env.ANCESTRY_TARGET_DIR }}/GRCh38_HAPNEST_TARGET_ALL.pvar.zst
+            ${{ env.ANCESTRY_REF_DIR }}/GRCh38_HAPNEST_reference.tar.zst
           key: ${{ runner.os }}-ancestry
 
       - name: Download reference data
