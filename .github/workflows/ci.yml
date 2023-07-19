@@ -19,17 +19,10 @@ jobs:
   preload_singularity:
     uses: ./.github/workflows/preload-singularity.yml
 
-  standard_test_docker:        
-    needs: preload_docker
+  standard_test:        
+    needs: [preload_docker, preload_singularity]
     uses: ./.github/workflows/standard-test.yml
     with:
-      cache-key: ${{ needs.preload_docker.outputs.cache-key }}
-      docker: true
-
-  standard_test_singularity:      
-    needs: preload_singularity
-    uses: ./.github/workflows/standard-test.yml
-    with:
-      cache-key: ${{ needs.preload_singularity.outputs.cache-key }}
-      singularity: true
+      docker-cache-key: ${{ needs.preload_docker.outputs.cache-key }}
+      singularity-cache-key: ${{ needs.preload_singularity.outputs.cache-key }}      
 
