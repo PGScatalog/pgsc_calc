@@ -1,12 +1,11 @@
 name: Preload singularity and docker containers
-description: Pulls and caches containers
 
 on:
-  workflow-call:
+  workflow_call:
     outputs:
       docker-cache-key:
         description: "Docker cache key"
-        value: ${{ runner.os }}-${{ github.sha }}
+        value: ${{ github.sha }}
         
 jobs:
   docker:
@@ -27,7 +26,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ runner.temp }}/docker
-          key: ${{ runner.os }}-${{ github.sha }}
+          key: ${{ github.sha }}
           
           
   
