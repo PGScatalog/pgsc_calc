@@ -1,0 +1,49 @@
+name: Run standard test with singularity and docker profiles
+
+on:
+  workflow_call:
+    inputs:
+      docker-cache-key:
+        required: true
+        type: string
+      singularity-cache-key:
+        required: true
+        type: string
+
+jobs:
+  standard_test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        test_profile: ["test"]
+        profile: ["docker"]
+        nxf_ver: ['22.10.0', 'latest']
+
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v3
+
+      - uses: nf-core/setup-nextflow@v1
+        with:
+          version: ${{ matrix.nxf_ver }}
+
+      - name: Restore docker images
+        if: matrix.profile == 'docker'
+        id: restore-docker
+        uses: actions/cache/restore@v3
+        with:
+          path: ${{ runner.temp }}/docker
+          key: ${{ inputs.docker-cache-key }}
+
+      - name: Load docker images from cache
+        if: steps.restore-docker.outputs.cache-hit == 'true'
+        run: |
+          find $HOME -name '*.tar'
+          find ${{ runner.temp }}/docker/ -name '*.tar' -exec sh -c 'docker load < {}' \;
+
+      - name: Run pipeline with test data
+        run: |
+          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
+    
+  

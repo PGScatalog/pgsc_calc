@@ -15,44 +15,12 @@ on:
 jobs:
   preload_containers:
     uses: ./.github/workflows/preload-containers.yml
-    
-  test:
+
+  standard_test:
     needs: preload_containers
-    name: Run standard workflow test
-    runs-on: ubuntu-latest
-    env:
-      NXF_VER: ${{ matrix.nxf_ver }}
-    strategy:
-      fail-fast: false
-      matrix:
-        test_profile: ["test"]
-        profile: ["docker"]
-        nxf_ver: ['22.10.0', ''] # minimum supported version, latest version
-
-    steps:
-      - name: Check out pipeline code
-        uses: actions/checkout@v3
-
-      - uses: nf-core/setup-nextflow@v1
-        with:
-          version: ${{ matrix.nxf_ver }}
-
-      - name: Restore docker cache
-        id: restore-docker
-        uses: actions/cache@v3
-        if: matrix.profile == 'docker'
-        with:
-          path: ${{ runner.temp }}/docker
-          key: ${{ needs.preload_docker.outputs.docker-cache-key }}
-
-      - name: Load docker images from cache
-        if: steps.restore-docker.outputs.cache-hit == 'true'
-        run: |
-          find $HOME -name '*.tar'
-          find ${{ runner.temp }}/docker/ -name '*.tar' -exec sh -c 'docker load < {}' \;
-
-      - name: Run pipeline with test data
-        continue-on-error: false
-        run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
+    uses: ./.github/workflows/standard-test.yml
+    with:
+      docker-cache-key: ${{ jobs.preload_containers.output.docker-cache-key }}
+      singularity-cache-key: ${{ jobs.preload_containers.output.singularity-cache-key }}
+    
 
