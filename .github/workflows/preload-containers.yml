@@ -2,6 +2,11 @@ name: Preload docker containers
 
 on:
   workflow_call:
+    inputs:
+      singularity:
+        type: boolean
+      docker:
+        type: boolean
     outputs:
       docker-cache-key:
         value: docker-${{ github.sha }}
@@ -14,6 +19,7 @@ env:
 
 jobs:
   docker:
+    if: ${{ inputs.docker }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out pipeline code
@@ -34,6 +40,7 @@ jobs:
           key: docker-${{ github.sha }}
 
   singularity:
+    if: ${{ inputs.singularity }}    
     runs-on: ubuntu-latest
     steps:          
       - name: Check out pipeline code
