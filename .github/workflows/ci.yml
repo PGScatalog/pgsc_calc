@@ -20,7 +20,7 @@ jobs:
     needs: preload_containers
     uses: ./.github/workflows/standard-test.yml
     with:
-      docker-cache-key: ${{ jobs.preload_containers.output.docker-cache-key }}
-      singularity-cache-key: ${{ jobs.preload_containers.output.singularity-cache-key }}
+      docker-cache-key: ${{ needs.preload_containers.outputs.docker-cache-key }}
+      singularity-cache-key: ${{ needs.preload_containers.outputs.singularity-cache-key }}
     
 
