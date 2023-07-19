@@ -5,6 +5,7 @@ on:
     inputs:
       cache-key:
         type: string
+        required: true
       docker:
         type: boolean
       singularity:
@@ -86,7 +87,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ env.NXF_SINGULARITY_CACHEDIR }}
-          key: ${{ inputs.cache_key }}
+          key: ${{ inputs.cache-key }}
 
       - name: Run pipeline with test data
         run: |
