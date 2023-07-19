@@ -14,7 +14,7 @@ on:
 
 jobs:
   preload_docker:
-    uses: ./github/workflows/preload-docker.yml
+    uses: ./.github/workflows/preload-docker.yml
     
   test:
     needs: preload_docker
