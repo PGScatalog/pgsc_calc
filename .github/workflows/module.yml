@@ -17,7 +17,7 @@ on:
 env:
   NXF_SINGULARITY_CACHEDIR: ${{ github.workspace }}/singularity
   SINGULARITY_VERSION: 3.8.3
-  
+
 jobs:
   docker:
     if: ${{ inputs.docker }}
@@ -49,7 +49,7 @@ jobs:
         with:
           python-version: '3.10'
           cache: 'pip'
-      - run: pip install -r ${{ github.workspace }}/tests/requirements.txt          
+      - run: pip install -r ${{ github.workspace }}/tests/requirements.txt
 
       - name: Run unit tests
         run: TMPDIR=~ PROFILE=docker pytest --kwdof --symlink --git-aware --wt 2 --tag "${{ inputs.tag }}" --ignore tests/bin
@@ -66,7 +66,7 @@ jobs:
             /home/runner/pytest_workflow_*/*/work
             !/home/runner/pytest_workflow_*/*/work/conda
             !/home/runner/pytest_workflow_*/*/work/singularity
-        
+
   singularity:
     if: ${{ inputs.singularity }}
     runs-on: ubuntu-latest
@@ -84,7 +84,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: /opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64
-          key: ${{ inputs.cache-key }} 
+          key: ${{ runner.os }}-singularity-${{ env.SINGULARITY_VERSION }}
           fail-on-cache-miss: true
 
       - name: Add singularity to path
@@ -103,7 +103,7 @@ jobs:
         with:
           python-version: '3.10'
           cache: 'pip'
-      - run: pip install -r ${{ github.workspace }}/tests/requirements.txt          
+      - run: pip install -r ${{ github.workspace }}/tests/requirements.txt
 
       - name: Run unit tests
         run: TMPDIR=~ PROFILE=singularity pytest --kwdof --symlink --git-aware --wt 2 --tag "${{ inputs.tag }}" --ignore tests/bin
@@ -120,5 +120,3 @@ jobs:
             /home/runner/pytest_workflow_*/*/work
             !/home/runner/pytest_workflow_*/*/work/conda
             !/home/runner/pytest_workflow_*/*/work/singularity
-
-        

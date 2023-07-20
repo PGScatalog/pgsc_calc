@@ -100,9 +100,9 @@ jobs:
           - "pgscatalog test --efo_trait --pgp_id and --pgs_id"
           - "pgscatalog test bad accession"
           - "pgscatalog test good and bad accessions GRCh38"
-    with:
+    with:      
       cache-key: ${{ needs.preload_singularity.outputs.cache-key }}
-      docker: true
+      singularity: true
       tag: ${{ matrix.tags }}
       
   
