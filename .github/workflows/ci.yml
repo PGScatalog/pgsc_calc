@@ -15,21 +15,21 @@ on:
 jobs:
   preload_ancestry:
     uses: ./.github/workflows/preload-reference.yml
-    
+
   preload_docker:
     uses: ./.github/workflows/preload-docker.yml
 
   preload_singularity:
     uses: ./.github/workflows/preload-singularity.yml
 
-  standard_test_docker:        
+  standard_test_docker:
     needs: preload_docker
     uses: ./.github/workflows/standard-test.yml
     with:
       cache-key: ${{ needs.preload_docker.outputs.cache-key }}
       docker: true
 
-  standard_test_singularity:      
+  standard_test_singularity:
     needs: preload_singularity
     uses: ./.github/workflows/standard-test.yml
     with:
@@ -103,11 +103,11 @@ jobs:
           - "pgscatalog test --efo_trait --pgp_id and --pgs_id"
           - "pgscatalog test bad accession"
           - "pgscatalog test good and bad accessions GRCh38"
-    with:      
+    with:
       cache-key: ${{ needs.preload_singularity.outputs.cache-key }}
       singularity: true
       tag: ${{ matrix.tags }}
-        
+
   ancestry_docker:
     needs: [preload_ancestry, preload_docker]
     uses: ./.github/workflows/ancestry.yml
@@ -115,6 +115,11 @@ jobs:
       container-cache-key: ${{ needs.preload_docker.outputs.cache-key }}
       ancestry-cache-key: ${{ needs.preload_ancestry.outputs.cache-key }}
       docker: true
-          
-    
-    
+
+  ancestry_singularity:
+    needs: [preload_ancestry, preload_singularity]
+    uses: ./.github/workflows/ancestry.yml
+    with:
+      container-cache-key: ${{ needs.preload_singularity.outputs.cache-key }}
+      ancestry-cache-key: ${{ needs.preload_ancestry.outputs.cache-key }}
+      singularity: true
