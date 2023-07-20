@@ -17,15 +17,18 @@ on:
 env:
   NXF_SINGULARITY_CACHEDIR: ${{ github.workspace }}/singularity
   SINGULARITY_VERSION: 3.8.3
-  ANCESTRY_REF_DIR: ${{ env.runner_temp }}
-  ANCESTRY_TARGET_DIR: ${{ env.runner_temp }}
   
 jobs:
   docker:
     if: ${{ inputs.docker }}
     runs-on: ubuntu-latest
 
-    steps:      
+    steps:
+      - name: Set environment variables
+        run: |
+          echo "ANCESTRY_REF_DIR=$RUNNER_TEMP" >> $GITHUB_ENV
+          echo "ANCESTRY_TARGET_DIR=$RUNNER_TEMP" >> $GITHUB_ENV
+      
       - name: Check out pipeline code
         uses: actions/checkout@v3
 
@@ -37,7 +40,7 @@ jobs:
         uses: actions/cache/restore@v3
         with:
           path: ${{ runner.temp }}/docker
-          key: ${{ inputs.cache-key }}
+          key: ${{ inputs.container-cache-key }}
           fail-on-cache-miss: true
 
       - name: Load docker images from cache

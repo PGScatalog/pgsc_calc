@@ -5,24 +5,19 @@ on:
     outputs:
       cache-key:
         value: ancestry
-
-env:
-  ANCESTRY_REF_DIR: ${{ env.RUNNER_TEMP }}
-  ANCESTRY_TARGET_DIR: ${{ env.RUNNER_TEMP }}  
   
 jobs:
   preload_reference:
     runs-on: ubuntu-latest
     steps:
-      - name: Download reference data
+      - name: Set environment variables
         run: |
-          wget -qnc -P $ANCESTRY_REF_DIR https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/GRCh38_HAPNEST_reference.tar.zst
-          wget -qnc -P $ANCESTRY_TARGET_DIR https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/GRCh38_HAPNEST_target.tar.zst
-          tar -xf $ANCESTRY_TARGET_DIR/GRCh38_HAPNEST_target.tar.zst -C $ANCESTRY_TARGET_DIR
-          
+          echo "ANCESTRY_REF_DIR=$RUNNER_TEMP" >> $GITHUB_ENV
+          echo "ANCESTRY_TARGET_DIR=$RUNNER_TEMP" >> $GITHUB_ENV
+
       - name: Cache reference data
         id: cache-ref
-        uses: actions/cache/save@v3
+        uses: actions/cache@v3
         with:
           path: |
             ${{ env.ANCESTRY_TARGET_DIR }}/GRCh38_HAPNEST_TARGET_ALL.pgen
@@ -30,3 +25,11 @@ jobs:
             ${{ env.ANCESTRY_TARGET_DIR }}/GRCh38_HAPNEST_TARGET_ALL.pvar.zst
             ${{ env.ANCESTRY_REF_DIR }}/GRCh38_HAPNEST_reference.tar.zst
           key: ancestry
+          
+      - name: Download reference data
+        if: steps.cache-ref.outputs.cache-hit != 'true'        
+        run: |
+          wget -qnc -P $ANCESTRY_REF_DIR https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/GRCh38_HAPNEST_reference.tar.zst
+          wget -qnc -P $ANCESTRY_TARGET_DIR https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/GRCh38_HAPNEST_target.tar.zst
+          tar -xf $ANCESTRY_TARGET_DIR/GRCh38_HAPNEST_target.tar.zst -C $ANCESTRY_TARGET_DIR
+          
