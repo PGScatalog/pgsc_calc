@@ -5,9 +5,9 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7577371.svg)](https://doi.org/10.5281/zenodo.7577371)
 
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-≥22.10.0-23aa62.svg?labelColor=000000)](https://www.nextflow.io/)
-[![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
 [![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)
 [![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/docs/)
+[![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
 
 ## Introduction
 
@@ -29,13 +29,12 @@ and/or user-defined PGS/PRS.
 * Calculates PGS for all samples (linear sum of weights and dosages)
 * Creates a summary report to visualize score distributions and pipeline metadata (variant matching QC)
 
-### Features in development
+And optionally:
 
-- *Genetic Ancestry*: calculate similarity of target samples to populations in a
-  reference dataset (e.g. [1000 Genomes (1000G)](http://www.nature.com/nature/journal/v526/n7571/full/nature15393.html), 
-  [Human Genome Diversity Project (HGDP)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7115999/)) using principal components analysis (PCA).
-- *PGS Normalization*: Using reference population data and/or PCA projections to report
-  individual-level PGS predictions (e.g. percentiles, z-scores) that account for genetic ancestry.
+- Genetic Ancestry: calculate similarity of target samples to populations in a
+  reference dataset ([1000 Genomes (1000G)](http://www.nature.com/nature/journal/v526/n7571/full/nature15393.html)), using principal components analysis (PCA)
+- PGS Normalization: Using reference population data and/or PCA projections to report
+  individual-level PGS predictions (e.g. percentiles, z-scores) that account for genetic ancestry
 
 ## Quick start
 
