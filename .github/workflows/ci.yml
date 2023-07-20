@@ -68,5 +68,41 @@ jobs:
       cache-key: ${{ needs.preload_docker.outputs.cache-key }}
       docker: true
       tag: ${{ matrix.tags }}
+
+  pytest_workflow_singularity:
+    needs: preload_singularity
+    uses: ./.github/workflows/module.yml
+    strategy:
+      matrix:
+        tags:
+          - "test input check subworkflow"
+          - "test input check subworkflow with PGS catalog API"
+          - "test input check subworkflow with PGS catalog API and whitespace"
+          - "test make compatible subworkflow with bfile"
+          - "test make compatible subworkflow with vcf"
+          - "test make compatible subworkflow with pfile"
+          - "test input check subworkflow with liftover 38to37"
+          - "test input check subworkflow with liftover 37to38"
+          - "test apply score subworkflow"
+          - "test perfect apply score"
+          - "test combine scorefiles module"
+          - "test match module"
+          - "test match combine module"
+          - "plink2 testrelabelpvar"
+          - "plink2 testscore"
+          - "plink2 testsmallscore"
+          - "plink2 testmultiscore"
+          - "plink2 testsmallmultiscore"
+          - "plink2 testmultiscorefail"
+          - "plink2 vcf"
+          - "plink2 testrelabelbim"
+          - "pgscatalog test --pgs_id"
+          - "pgscatalog test --efo_trait --pgp_id and --pgs_id"
+          - "pgscatalog test bad accession"
+          - "pgscatalog test good and bad accessions GRCh38"
+    with:
+      cache-key: ${{ needs.preload_singularity.outputs.cache-key }}
+      docker: true
+      tag: ${{ matrix.tags }}
       
   
