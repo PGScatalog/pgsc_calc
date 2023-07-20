@@ -12,259 +12,35 @@ on:
   release:
     types: [published]
 
-env:
-  SINGULARITY_VERSION: "3.8.3"
-  NXF_ANSI_LOG: false
-  CAPSULE_LOG: none
-  NXF_SINGULARITY_CACHEDIR: "${{ github.workspace }}/singularity"
-
 jobs:
+  preload_ancestry:
+    uses: ./.github/workflows/preload-reference.yml
+
   preload_docker:
-    name: Preload docker images
-    if: ${{ github.event_name == 'push'}}
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Check out pipeline code
-        uses: actions/checkout@v3
-
-      - name: Cache docker
-        id: cache-docker
-        uses: actions/cache@v3
-        with:
-          path: ${{ runner.temp }}/docker
-          key: ${{ runner.os }}-${{ github.sha }}
-
-      - name: Pull and save docker
-        if: matrix.profile == 'docker' && ${{ steps.cache-docker.outputs.cache-hit != 'true' }}
-        run: |
-          git grep 'ext.docker*' ${{ github.workspace }}/conf/modules.config | cut -f 2 -d '=' | xargs -L 2 echo | tr -d ' ' > ${{ runner.temp }}/images.txt
-          cat ${{ runner.temp }}/images.txt | xargs -I {} sh -c 'docker pull --platform linux/amd64 "$1"' - {}
-          mkdir -p ${{ runner.temp }}/docker/
-          cat ${{ runner.temp }}/images.txt | xargs -I {} sh -c 'docker save "$1" > ${{ runner.temp }}/docker/$(basename "$1").tar' - {}
+    uses: ./.github/workflows/preload-docker.yml
 
   preload_singularity:
-    name: Preload singularity images
-    if: ${{ github.event_name == 'push'}}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out pipeline code
-        uses: actions/checkout@v3
+    uses: ./.github/workflows/preload-singularity.yml
 
-      - name: Cache singularity setup
-        id: cache-singularity-setup
-        uses: actions/cache@v3
-        with:
-          path: /opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64
-          key: ${{ runner.os }}-singularity-${{ env.SINGULARITY_VERSION }}
+  standard_test_docker:
+    needs: preload_docker
+    uses: ./.github/workflows/standard-test.yml
+    with:
+      cache-key: ${{ needs.preload_docker.outputs.cache-key }}
+      docker: true
 
-      - name: Set up Singularity
-        uses: eWaterCycle/setup-singularity@v7
-        if: ${{ steps.cache-singularity-setup.outputs.cache-hit != 'true' }}
-        with:
-          singularity-version: ${{ env.SINGULARITY_VERSION }}
+  standard_test_singularity:
+    needs: preload_singularity
+    uses: ./.github/workflows/standard-test.yml
+    with:
+      cache-key: ${{ needs.preload_singularity.outputs.cache-key }}
+      singularity: true
 
-      - name: Add singularity to path
-        if: steps.cache-singularity-setup.outputs.cache-hit == 'true'
-        run: |
-          echo "/opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64/bin" >> $GITHUB_PATH
-
-      - name: Cache singularity images
-        id: cache-singularity-pull
-        uses: actions/cache@v3
-        with:
-          path: ${{ env.NXF_SINGULARITY_CACHEDIR }}
-          key: ${{ runner.os }}-${{ github.sha }}--singularity
-
-      - name: Pull and save singularity
-        if: ${{ steps.cache-singularity-pull.outputs.cache-hit != 'true' }}
-        run: |
-          mkdir -p $NXF_SINGULARITY_CACHEDIR
-          git grep 'ext.singularity*' conf/modules.config | cut -f 2 -d '=' | xargs -L 2 echo | tr -d ' ' > ${{ runner.temp }}/singularity_images.txt
-          cat ${{ runner.temp }}/singularity_images.txt | sed 's/oras:\/\///;s/https:\/\///;s/\//-/g;s/$/.img/;s/:/-/' > ${{ runner.temp }}/singularity_image_paths.txt
-          paste -d '\n' ${{ runner.temp }}/singularity_image_paths.txt ${{ runner.temp }}/singularity_images.txt | xargs -L 2 sh -c 'singularity pull --disable-cache --dir $NXF_SINGULARITY_CACHEDIR $0 $1'
-
-  test:
-    needs: [preload_docker, preload_singularity]
-    name: Run standard workflow test
-    if: ${{ github.event_name == 'push'}}
-    runs-on: ubuntu-latest
-    env:
-      NXF_VER: ${{ matrix.nxf_ver }}
+  pytest_workflow_docker:
+    needs: preload_docker
+    uses: ./.github/workflows/module.yml
     strategy:
-      fail-fast: false
       matrix:
-        test_profile: ["test"]
-        profile: ["docker", "singularity"]
-        nxf_ver: ['22.10.0', ''] # minimum supported version, latest version
-
-    steps:
-      - name: Check out pipeline code
-        uses: actions/checkout@v3
-
-      - name: Install Nextflow
-        run: |
-          wget -qO- get.nextflow.io | bash
-          sudo mv nextflow /usr/local/bin/
-
-      - name: Restore docker cache
-        id: restore-docker
-        uses: actions/cache@v3
-        if: matrix.profile == 'docker'
-        with:
-          path: ${{ runner.temp }}/docker
-          key: ${{ runner.os }}-${{ github.sha }}
-
-      - name: Load docker images from cache
-        if: steps.restore-docker.outputs.cache-hit == 'true'
-        run: |
-          find $HOME -name '*.tar'
-          find ${{ runner.temp }}/docker/ -name '*.tar' -exec sh -c 'docker load < {}' \;
-
-      - name: Cache singularity setup
-        id: restore-singularity-setup
-        if: matrix.profile == 'singularity'
-        uses: actions/cache@v3
-        with:
-          path: /opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64
-          key: ${{ runner.os }}-singularity-${{ env.SINGULARITY_VERSION }}
-
-      - name: Add singularity to path
-        if: steps.restore-singularity-setup.outputs.cache-hit == 'true'
-        run: |
-          echo "/opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64/bin" >> $GITHUB_PATH
-
-      - name: Restore singularity cache
-        id: restore-singularity
-        uses: actions/cache@v3
-        if: matrix.profile == 'singularity'
-        with:
-          path: ${{ env.NXF_SINGULARITY_CACHEDIR }}
-          key: ${{ runner.os }}-${{ github.sha }}--singularity
-
-      - name: Run pipeline with test data
-        continue-on-error: false
-        run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
-
-  # run ancestry separately because it needs large reference data (~500MB)
-  ancestry_test:
-    needs: [preload_docker, preload_singularity]
-    name: ${{ matrix.profile }} ${{ matrix.tags }}
-    if: ${{ github.event_name == 'push'}}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        profile: ["docker", "singularity"]
-        tags:
-          - "ancestry"
-
-    steps:
-      - name: Set Environment Variable
-        run: |
-          echo "ANCESTRY_REF_DIR=$RUNNER_TEMP" >> $GITHUB_ENV
-          echo "ANCESTRY_TARGET_DIR=$RUNNER_TEMP" >> $GITHUB_ENV
-
-      - name: Cache reference data
-        id: cache-ref
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ env.ANCESTRY_TARGET_DIR }}/GRCh38_HAPNEST_TARGET_ALL.pgen
-            ${{ env.ANCESTRY_TARGET_DIR }}/GRCh38_HAPNEST_TARGET_ALL.psam
-            ${{ env.ANCESTRY_TARGET_DIR }}/GRCh38_HAPNEST_TARGET_ALL.pvar.zst
-            ${{ env.ANCESTRY_REF_DIR }}/GRCh38_HAPNEST_reference.tar.zst
-          key: ${{ runner.os }}-ancestry
-
-      - name: Download reference data
-        if: steps.cache-ref.outputs.cache-hit != 'true'
-        run: |
-          wget -qnc -P $ANCESTRY_REF_DIR https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/GRCh38_HAPNEST_reference.tar.zst
-          wget -qnc -P $ANCESTRY_TARGET_DIR https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/GRCh38_HAPNEST_target.tar.zst
-          tar -xf $ANCESTRY_TARGET_DIR/GRCh38_HAPNEST_target.tar.zst -C $ANCESTRY_TARGET_DIR
-
-
-      - name: Check out pipeline code
-        uses: actions/checkout@v3
-
-      - name: Restore docker cache
-        id: restore-docker
-        uses: actions/cache@v3
-        if: matrix.profile == 'docker'
-        with:
-          path: ${{ runner.temp }}/docker
-          key: ${{ runner.os }}-${{ github.sha }}
-
-      - name: Load docker images from cache
-        if: steps.restore-docker.outputs.cache-hit == 'true'
-        run: |
-          find $HOME -name '*.tar'
-          find ${{ runner.temp }}/docker/ -name '*.tar' -exec sh -c 'docker load < {}' \;
-
-      - name: Cache singularity setup
-        id: cache-singularity
-        if: matrix.profile == 'singularity'
-        uses: actions/cache@v3
-        with:
-          path: /opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64
-          key: ${{ runner.os }}-singularity-${{ env.SINGULARITY_VERSION }}
-
-      - name: Set up Singularity
-        uses: eWaterCycle/setup-singularity@v7
-        if: steps.cache-singularity.outputs.cache-hit != 'true' && matrix.profile == 'singularity'
-
-      - name: Add singularity to path
-        if: steps.cache-singularity.outputs.cache-hit == 'true' && matrix.profile == 'singularity'
-        run: |
-          echo "/opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64/bin" >> $GITHUB_PATH
-
-      - name: Restore singularity cache
-        id: restore-singularity
-        uses: actions/cache@v3
-        if: matrix.profile == 'singularity'
-        with:
-          path: ${{ env.NXF_SINGULARITY_CACHEDIR }}
-          key: ${{ runner.os }}-${{ github.sha }}--singularity
-
-      - name: Set up Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.10'
-          cache: 'pip'
-      - run: pip install -r ${{ github.workspace }}/tests/requirements.txt
-
-      - name: Install Nextflow
-        run: |
-          wget -qO- get.nextflow.io | bash
-          sudo mv nextflow /usr/local/bin/
-
-      - name: Run unit tests
-        run: TMPDIR=~ PROFILE=${{ matrix.profile }} pytest --kwdof --symlink --git-aware --wt 2 --tag "${{ matrix.tags }}" --ignore tests/bin
-
-      - name: Upload logs on failure
-        if: failure()
-        uses: actions/upload-artifact@v2
-        with:
-          name: logs-${{ matrix.profile }}
-          path: |
-            /home/runner/pytest_workflow_*/*/.nextflow.log
-            /home/runner/pytest_workflow_*/*/log.out
-            /home/runner/pytest_workflow_*/*/log.err
-            /home/runner/pytest_workflow_*/*/work
-            !/home/runner/pytest_workflow_*/*/work/conda
-            !/home/runner/pytest_workflow_*/*/work/singularity
-
-
-  unit_test:
-    needs: [preload_docker, preload_singularity]
-    name: ${{ matrix.profile }} ${{ matrix.tags }}
-    if: ${{ github.event_name == 'push'}}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        profile: ["docker", "singularity"]
         tags:
           - "test input check subworkflow"
           - "test input check subworkflow with PGS catalog API"
@@ -276,7 +52,6 @@ jobs:
           - "test input check subworkflow with liftover 37to38"
           - "test apply score subworkflow"
           - "test perfect apply score"
-# TODO - "test score correlation"
           - "test combine scorefiles module"
           - "test match module"
           - "test match combine module"
@@ -292,83 +67,59 @@ jobs:
           - "pgscatalog test --efo_trait --pgp_id and --pgs_id"
           - "pgscatalog test bad accession"
           - "pgscatalog test good and bad accessions GRCh38"
+    with:
+      cache-key: ${{ needs.preload_docker.outputs.cache-key }}
+      docker: true
+      tag: ${{ matrix.tags }}
 
-    steps:
-      - name: Check out pipeline code
-        uses: actions/checkout@v3
+  pytest_workflow_singularity:
+    needs: preload_singularity
+    uses: ./.github/workflows/module.yml
+    strategy:
+      matrix:
+        tags:
+          - "test input check subworkflow"
+          - "test input check subworkflow with PGS catalog API"
+          - "test input check subworkflow with PGS catalog API and whitespace"
+          - "test make compatible subworkflow with bfile"
+          - "test make compatible subworkflow with vcf"
+          - "test make compatible subworkflow with pfile"
+          - "test input check subworkflow with liftover 38to37"
+          - "test input check subworkflow with liftover 37to38"
+          - "test apply score subworkflow"
+          - "test perfect apply score"
+          - "test combine scorefiles module"
+          - "test match module"
+          - "test match combine module"
+          - "plink2 testrelabelpvar"
+          - "plink2 testscore"
+          - "plink2 testsmallscore"
+          - "plink2 testmultiscore"
+          - "plink2 testsmallmultiscore"
+          - "plink2 testmultiscorefail"
+          - "plink2 vcf"
+          - "plink2 testrelabelbim"
+          - "pgscatalog test --pgs_id"
+          - "pgscatalog test --efo_trait --pgp_id and --pgs_id"
+          - "pgscatalog test bad accession"
+          - "pgscatalog test good and bad accessions GRCh38"
+    with:
+      cache-key: ${{ needs.preload_singularity.outputs.cache-key }}
+      singularity: true
+      tag: ${{ matrix.tags }}
 
-      - name: Restore docker cache
-        id: restore-docker
-        uses: actions/cache@v3
-        if: matrix.profile == 'docker'
-        with:
-          path: ${{ runner.temp }}/docker
-          key: ${{ runner.os }}-${{ github.sha }}
+  ancestry_docker:
+    needs: [preload_ancestry, preload_docker]
+    uses: ./.github/workflows/ancestry.yml
+    with:
+      container-cache-key: ${{ needs.preload_docker.outputs.cache-key }}
+      ancestry-cache-key: ${{ needs.preload_ancestry.outputs.cache-key }}
+      docker: true
 
-      - name: Load docker images from cache
-        if: steps.restore-docker.outputs.cache-hit == 'true'
-        run: |
-          find $HOME -name '*.tar'
-          find ${{ runner.temp }}/docker/ -name '*.tar' -exec sh -c 'docker load < {}' \;
-
-      - name: Cache singularity setup
-        id: cache-singularity
-        if: matrix.profile == 'singularity'
-        uses: actions/cache@v3
-        with:
-          path: /opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64
-          key: ${{ runner.os }}-singularity-${{ env.SINGULARITY_VERSION }}
-
-      - name: Set up Singularity
-        uses: eWaterCycle/setup-singularity@v7
-        if: steps.cache-singularity.outputs.cache-hit != 'true' && matrix.profile == 'singularity'
-
-      - name: Add singularity to path
-        if: steps.cache-singularity.outputs.cache-hit == 'true' && matrix.profile == 'singularity'
-        run: |
-          echo "/opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64/bin" >> $GITHUB_PATH
-
-      - name: Restore singularity cache
-        id: restore-singularity
-        uses: actions/cache@v3
-        if: matrix.profile == 'singularity'
-        with:
-          path: ${{ env.NXF_SINGULARITY_CACHEDIR }}
-          key: ${{ runner.os }}-${{ github.sha }}--singularity
-
-      - name: Set up Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.10'
-          cache: 'pip'
-      - run: pip install -r ${{ github.workspace }}/tests/requirements.txt
-
-      - name: Install Nextflow
-        run: |
-          wget -qO- get.nextflow.io | bash
-          sudo mv nextflow /usr/local/bin/
-
-      - name: Run unit tests
-        run: TMPDIR=~ PROFILE=${{ matrix.profile }} pytest --kwdof --symlink --git-aware --wt 2 --tag "${{ matrix.tags }}" --ignore tests/bin
-
-      - name: Output log on failure
-        if: failure()
-        run: |
-          echo "======> log.out <======="
-          cat /home/runner/pytest_workflow_*/*/log.out
-          echo
-          echo
-          echo "======> log.err <======="
-          cat /home/runner/pytest_workflow_*/*/log.err
-      - name: Upload logs on failure
-        if: failure()
-        uses: actions/upload-artifact@v2
-        with:
-          name: logs-${{ matrix.profile }}
-          path: |
-            /home/runner/pytest_workflow_*/*/.nextflow.log
-            /home/runner/pytest_workflow_*/*/log.out
-            /home/runner/pytest_workflow_*/*/log.err
-            /home/runner/pytest_workflow_*/*/work
-            !/home/runner/pytest_workflow_*/*/work/conda
-            !/home/runner/pytest_workflow_*/*/work/singularity
+  ancestry_singularity:
+    needs: [preload_ancestry, preload_singularity]
+    uses: ./.github/workflows/ancestry.yml
+    with:
+      container-cache-key: ${{ needs.preload_singularity.outputs.cache-key }}
+      ancestry-cache-key: ${{ needs.preload_ancestry.outputs.cache-key }}
+      singularity: true
