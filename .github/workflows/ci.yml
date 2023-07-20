@@ -13,6 +13,9 @@ on:
     types: [published]
 
 jobs:
+  preload_ancestry:
+    uses: ./.github/workflows/preload-reference.yml
+    
   preload_docker:
     uses: ./.github/workflows/preload-docker.yml
 
@@ -104,5 +107,14 @@ jobs:
       cache-key: ${{ needs.preload_singularity.outputs.cache-key }}
       singularity: true
       tag: ${{ matrix.tags }}
-      
-  
+        
+  ancestry_docker:
+    needs: [preload_ancestry, preload_docker]
+    uses: ./.github/workflows/ancestry.yml
+    with:
+      container-cache-key: ${{ needs.preload_docker.outputs.cache-key }}
+      ancestry-cache-key: ${{ needs.preload_ancestry.outputs.cache-key }}
+      docker: true
+          
+    
+    
