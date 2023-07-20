@@ -114,6 +114,17 @@ jobs:
           path: ${{ env.NXF_SINGULARITY_CACHEDIR }}
           key: ${{ inputs.container-cache-key }}
 
+      - name: Restore reference data
+        uses: actions/cache/restore@v3
+        with:
+          path: |
+            ${{ env.ANCESTRY_TARGET_DIR }}/GRCh38_HAPNEST_TARGET_ALL.pgen
+            ${{ env.ANCESTRY_TARGET_DIR }}/GRCh38_HAPNEST_TARGET_ALL.psam
+            ${{ env.ANCESTRY_TARGET_DIR }}/GRCh38_HAPNEST_TARGET_ALL.pvar.zst
+            ${{ env.ANCESTRY_REF_DIR }}/GRCh38_HAPNEST_reference.tar.zst
+          key: ${{ inputs.ancestry-cache-key }}
+          fail-on-cache-miss: true
+          
       - name: Set up test requirements
         uses: actions/setup-python@v3
         with:
