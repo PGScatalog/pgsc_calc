@@ -34,15 +34,14 @@ jobs:
           version: ${{ matrix.nxf_ver }}
 
       - name: Restore docker images
-        if: matrix.profile == 'docker'
         id: restore-docker
         uses: actions/cache/restore@v3
         with:
           path: ${{ runner.temp }}/docker
           key: ${{ inputs.cache-key }}
+          fail-on-cache-miss: true
 
       - name: Load docker images from cache
-        if: steps.restore-docker.outputs.cache-hit == 'true'
         run: |
           find $HOME -name '*.tar'
           find ${{ runner.temp }}/docker/ -name '*.tar' -exec sh -c 'docker load < {}' \;
