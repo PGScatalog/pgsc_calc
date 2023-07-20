@@ -20,8 +20,9 @@ process SCORE_REPORT {
     // ancestry results are optional also
     path "*.txt.gz", includeInputs: true
     path "*.json.gz", includeInputs: true, optional: true
+    // for testing ancestry workflow
+    path "pop_summary.csv", optional: true
     // normal outputs
-    path "pop_summary.csv"
     path "*.html", emit: report
     path "versions.yml", emit: versions
 
