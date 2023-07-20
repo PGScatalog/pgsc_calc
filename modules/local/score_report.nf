@@ -21,6 +21,7 @@ process SCORE_REPORT {
     path "*.txt.gz", includeInputs: true
     path "*.json.gz", includeInputs: true, optional: true
     // normal outputs
+    path "pop_summary.csv"
     path "*.html", emit: report
     path "versions.yml", emit: versions
 

@@ -19,7 +19,11 @@
     - slow
   stdout:
     contains:
-      - "ANCESTRY_PROJECT"
-      - "ANCESTRY_ANALYSIS"
       - "Pipeline completed successfully"
+  files:
+    - path: "output/test/score/pop_summary.csv"
+      contains:
+        - "AFR,100 (33.33%)"
+        - "EAS,100 (33.33%)"
+        - "EUR,100 (33.33%)"
       

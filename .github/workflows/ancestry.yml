@@ -35,7 +35,6 @@ jobs:
       - uses: nf-core/setup-nextflow@v1
 
       - name: Restore docker images
-        if: matrix.profile == 'docker'
         id: restore-docker
         uses: actions/cache/restore@v3
         with:
@@ -69,3 +68,13 @@ jobs:
       - name: Run unit tests
         run: TMPDIR=~ PROFILE=docker pytest --kwdof --symlink --git-aware --wt 2 --tag "ancestry" --ignore tests/bin
 
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: logs-singularity-ancestry
+          path: |
+            /home/runner/pytest_workflow_*/*/.nextflow.log
+            /home/runner/pytest_workflow_*/*/log.out
+            /home/runner/pytest_workflow_*/*/log.err
+            /home/runner/pytest_workflow_*/*/output/*
