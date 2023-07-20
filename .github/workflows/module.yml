@@ -1,0 +1,73 @@
+name: Run pytest-workflow
+
+on:
+  workflow_call:
+    inputs:
+      cache-key:
+        type: string
+        required: true
+      docker:
+        type: boolean
+      singularity:
+        type: boolean
+      tag:
+        type: string
+        required: true
+
+env:
+  NXF_SINGULARITY_CACHEDIR: ${{ github.workspace }}/singularity
+  SINGULARITY_VERSION: 3.8.3
+  
+jobs:
+  docker:
+    if: ${{ inputs.docker }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v3
+
+      - uses: nf-core/setup-nextflow@v1
+        with:
+          version: ${{ matrix.nxf_ver }}
+
+      - name: Restore docker images
+        if: matrix.profile == 'docker'
+        id: restore-docker
+        uses: actions/cache/restore@v3
+        with:
+          path: ${{ runner.temp }}/docker
+          key: ${{ inputs.cache-key }}
+
+      - name: Load docker images from cache
+        if: steps.restore-docker.outputs.cache-hit == 'true'
+        run: |
+          find $HOME -name '*.tar'
+          find ${{ runner.temp }}/docker/ -name '*.tar' -exec sh -c 'docker load < {}' \;
+
+      - name: Set up test requirements
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+      - run: pip install -r ${{ github.workspace }}/tests/requirements.txt          
+
+      - name: Run unit tests
+        run: TMPDIR=~ PROFILE=docker pytest --kwdof --symlink --git-aware --wt 2 --tag "${{ inputs.tag }}" --ignore tests/bin
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: logs-docker-${{ inputs.tag }}
+          path: |
+            /home/runner/pytest_workflow_*/*/.nextflow.log
+            /home/runner/pytest_workflow_*/*/log.out
+            /home/runner/pytest_workflow_*/*/log.err
+            /home/runner/pytest_workflow_*/*/work
+            !/home/runner/pytest_workflow_*/*/work/conda
+            !/home/runner/pytest_workflow_*/*/work/singularity
+
+        
