@@ -342,18 +342,13 @@ In the future mean-imputation will be supported in small samplesets using ancest
 #### Score extract
 
 ::: {.callout-note}
-Below is a summary of the aggregated scores, which might be useful for debugging.
+Below is a summary of the aggregated scores, which might be useful for debugging. See here for an explanation of [plink2](https://www.cog-genomics.org/plink/2.0/formats#sscore) column names
 :::
 
 ```{r, echo = FALSE}
 scores %>%
-  select(sampleset, IID, ends_with("SUM")) %>%
   tibble::as_tibble(.)
 ```
-
-::: {.callout-note}
-See here for an explanation of [plink2](https://www.cog-genomics.org/plink/2.0/formats#sscore) column names
-:::
 
 #### Density plot(s)
 
