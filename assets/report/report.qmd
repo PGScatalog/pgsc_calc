@@ -15,6 +15,7 @@ params:
   score_path: ""
   sampleset: ""
   run_ancestry: false
+  reference_panel_name: ""
 css: logo.css
 ---
 
