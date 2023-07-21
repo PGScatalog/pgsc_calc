@@ -212,7 +212,7 @@ compat %>%
 ```{r match_table_detailed, echo = FALSE, warning=FALSE}
 log_df %>%
   group_by(sampleset, accession) %>%
-  count(match_status, ambiguous, is_multiallelic, duplicate_best_match, duplicate_ID, wt = count) %>%
+  count(match_status, ambiguous, is_multiallelic,match_flipped, duplicate_best_match, duplicate_ID, wt = count) %>%
   rename(is_ambiguous = ambiguous) %>%
   mutate(percent = round(n / sum(n) * 100, 2),
          match_status = forcats::fct_relevel(match_status, "matched", "excluded", "unmatched")) %>%
@@ -230,6 +230,7 @@ log_df %>%
       "Duplicated matched variants" = "duplicate_ID",
       "Ambiguous" = "is_ambiguous",
       "Multiallelic" = "is_multiallelic",
+      "Matches strand flip" = "match_flipped",
       "%" = "percent"
     ))
 ```
