@@ -17,6 +17,9 @@ The PGS Catalog provides scoring files in builds GRCh37 and GRCh38. The pipeline
 queries the PGS Catalog API and automatically downloads the appropriate scoring
 files to match the input target genome build.
 
+Just set the build of your target genomes with ``--target_build`` and pgsc_calc
+will do the rest.
+
 Lifting over custom scoring files
 ---------------------------------
 
@@ -40,6 +43,9 @@ parameters at runtime:
 
 Where ``--target_build`` can be GRCh37 or GRCh38.
 
+.. note:: You also need to provide the path to liftover chain files
+          ``--hg19_chain`` and ``--hg38_chain``
+
 Putting everything together for an example run, assuming the input genomic data
 are in build GRCh38:
 
@@ -50,7 +56,9 @@ are in build GRCh38:
         --input samplesheet.csv \
         --scorefile MyCustomFile.txt \
         --liftover \
-        --target_build GRCh38
+        --target_build GRCh38 \
+        --hg19_chain <path/to/hg19ToHg38.over.chain.gz> \
+        --hg38_chain <path/to/hg38ToHg19.over.chain.gz>
 
 .. _`header`: https://www.pgscatalog.org/downloads/#scoring_header
 
