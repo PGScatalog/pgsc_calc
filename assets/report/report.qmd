@@ -19,6 +19,11 @@ params:
 css: logo.css
 ---
 
+::: {.callout-note}
+See the online [documentation](https://pgsc-calc.readthedocs.io/en/latest/output.html#report) for additional
+explanation of the terms and data presented in this report.
+:::
+
 ```{r setup, echo=FALSE, warning=FALSE, message=FALSE}
 library(jsonlite)
 library(dplyr)
@@ -51,10 +56,6 @@ cat command.txt | fold -w 80 -s | awk -F ' ' 'NR==1 { print "$", $0} NR>1 { prin
 ```
 
 # Scoring file metadata
-
-::: {.callout-note}
-Additional [documentation](https://pgsc-calc.readthedocs.io/en/latest/output.html#report) is available that explains some of the terms used this report in more detail
-:::
 
 ## Scoring file summary
 
