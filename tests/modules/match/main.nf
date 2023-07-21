@@ -14,10 +14,7 @@ workflow testmatch {
     fam = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.fam')
     scorefile = Channel.fromPath('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/PGS001229_22.txt')
 
-    Channel.fromPath(params.hg19_chain, checkIfExists: true)
-        .mix(Channel.fromPath(params.hg38_chain, checkIfExists: true))
-        .collect()
-        .set { chain_files }
+    Channel.fromPath('NO_FILE', checkIfExists: false).set { chain_files }
 
     COMBINE_SCOREFILES ( scorefile, chain_files )
 

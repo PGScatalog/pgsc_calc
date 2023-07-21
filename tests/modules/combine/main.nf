@@ -12,10 +12,7 @@ workflow testcombine {
                   pgp_id: 'PGP000001',
                   trait_efo: 'EFO_0004214']
 
-    Channel.fromPath(params.hg19_chain, checkIfExists: true)
-        .mix(Channel.fromPath(params.hg38_chain, checkIfExists: true))
-        .collect()
-        .set { chain_files }
+    Channel.fromPath('NO_FILE', checkIfExists: false).set { chain_files }
 
     DOWNLOAD_SCOREFILES(accessions, target_build)
 

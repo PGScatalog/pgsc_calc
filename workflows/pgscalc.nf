@@ -220,13 +220,12 @@ workflow PGSCALC {
 
     if (run_input_check) {
         // chain files are optional input
+        Channel.fromPath('NO_FILE', checkIfExists: false).set { chain_files }
         if (params.hg19_chain && params.hg38_chain) {
-            Channel.fromPath(params.hg19_chain, checkIfExists: false)
-                .mix(Channel.fromPath(params.hg38_chain, checkIfExists: false))
+            Channel.fromPath(params.hg19_chain, checkIfExists: true)
+                .mix(Channel.fromPath(params.hg38_chain, checkIfExists: true))
                 .collect()
                 .set { chain_files }
-        } else {
-            Channel.fromPath('NO_FILE', checkIfExists: false).set { chain_files }
         }
 
         INPUT_CHECK (
