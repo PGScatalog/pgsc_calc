@@ -246,26 +246,34 @@ thousand_genomes_colours <- c("#FFD900", "#E41A1C", "#B15928", "#4DAF4A",
                               "#FF7F00", "#BBB", "#999")
 names(thousand_genomes_colours) <- c("AFR", "AMR", "ASN", "EAS", "EUR", "GME",
                                      "SAS", "MAE", "MAO", "NR", "OTH")
-thousand_genomes_palette <- scale_colour_manual(name = "Most Similar Population", values = thousand_genomes_colours)
+thousand_genomes_palette <- scale_colour_manual(name = "Populations", values = thousand_genomes_colours)
 ```
 
 ```{r, echo = FALSE, message = FALSE, eval=params$run_ancestry}
-popsim <- readr::read_tsv(gsub("_pgs.", "_popsimilarity.", params$score_path))
+popsim <- readr::read_tsv("HGDP_popsimilarity.txt.gz")
 head(popsim)
 
-map_shapes <- c(1, 16)
-map_shapes <- setNames(map_shapes, c({params$sampleset}, 'reference'))
+new_label_target = paste({params$sampleset}, '(Most Similar Population)')
+new_label_ref = paste0('reference (', {params$reference_panel_name}, ' populations)')
 
+popsim$slabel <- new_label_ref
+popsim[popsim$sampleset == {params$sampleset}, 'slabel'] <- new_label_target
+
+map_shapes <- c(1, 16)
+map_shapes <- setNames(map_shapes, c(new_label_target, new_label_ref))
+
+# Placeholder figure: needs better legend labelling
 for(pc in seq.int(1,5,2)){
   pcY = paste('PC', pc, sep='')
   pcX = paste('PC', pc+1, sep='')
   if (pcX %in% colnames(popsim)){
-    p_pca <- ggplot(popsim[popsim$REFERENCE == TRUE,], aes(x=!!sym(pcX), y=!!sym(pcY))) + geom_point(aes(colour=SuperPop, shape=sampleset), alpha=0.25)
-    p_pca <- p_pca + geom_point(data=popsim[popsim$REFERENCE != TRUE,], aes(color=MostSimilarPop, shape=sampleset))
-    p_pca <- p_pca + theme_bw() + thousand_genomes_palette + scale_shape_manual(values=map_shapes)
+    p_pca <- ggplot(popsim[popsim$REFERENCE == TRUE,], aes(x=!!sym(pcX), y=!!sym(pcY))) + geom_point(aes(colour=SuperPop, shape=slabel), alpha=0.25)
+    p_pca <- p_pca + geom_point(data=popsim[popsim$REFERENCE != TRUE,], aes(color=MostSimilarPop, shape=slabel))
+    p_pca <- p_pca + theme_bw() + thousand_genomes_palette + scale_shape_manual(values=map_shapes, name='sampleset')
     print(p_pca)
   }
 }
+```
 ```
 
 ## Population similarity summary
