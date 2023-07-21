@@ -7,7 +7,6 @@
     bash -c "
     sed \"s|ANCESTRY_TARGET_DIR|$ANCESTRY_TARGET_DIR|\" tests/ancestry/samplesheet.csv > samplesheet.csv;
     nextflow run main.nf -c ./tests/config/nextflow.config \
-      -profile test \
       --input samplesheet.csv \
       --run_ancestry $ANCESTRY_REF_DIR/GRCh38_HAPNEST_reference.tar.zst \
       --target_build GRCh38 \
