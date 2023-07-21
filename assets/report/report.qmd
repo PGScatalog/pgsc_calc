@@ -22,6 +22,7 @@ css: logo.css
 ```{r setup, echo=FALSE, warning=FALSE, message=FALSE}
 library(jsonlite)
 library(dplyr)
+library(tidyr)
 library(ggplot2)
 ```
 
@@ -354,28 +355,28 @@ scores %>%
 See here for an explanation of [plink2](https://www.cog-genomics.org/plink/2.0/formats#sscore) column names
 :::
 
-#### Density plot
+#### Density plot(s)
 
 ::: {.callout-note}
 The summary density plots show up to six scoring files
 :::
 
 ```{r density_ancestry, echo=FALSE, message=FALSE, warning=FALSE, eval=params$run_ancestry}
-scores %>%
-  ungroup() %>%
-  select(IID, sampleset, PGS, SUM) %>%
-  group_by(sampleset, PGS) -> long_scores
+# Select which PGS to plot
+uscores <- unique(scores$PGS)
+uscores_plot <- uscores[1:min(length(uscores), 6)] # plot max 6 PGS
 
-group_keys(long_scores) %>%
-  slice(1:6) -> score_keys
-  
-long_scores %>%
-  inner_join(score_keys) %>%
-  ggplot(aes(x = SUM, fill = sampleset)) +
-      geom_density(alpha = 0.3) +
-      facet_wrap(~PGS, ncol = 2, scales = "free") +
-      theme_bw() +
-      labs(x = "PGS (SUM)", y = "Density", title = "PGS Distribution(s)")
+# Plot multiple adjustment methods at once per PGS
+for(current_pgs in uscores_plot){
+  long_scores <- scores %>% select(!percentile_MostSimilarPop) %>% filter(PGS == current_pgs) %>% gather(Method, score, -sampleset, -IID, -PGS)
+  long_scores %>%
+  ggplot(aes(x = score, fill = sampleset)) +
+    geom_density(alpha = 0.3) +
+    facet_wrap(~Method, scales = "free", nrow=1) +
+    theme_bw() +
+    labs(x = 'PGS', y = "Density", title = paste(current_pgs, '(adjusted distributions)')) -> p_dist
+  print(p_dist)
+}
 ```
 
 ```{r, echo = FALSE, message=FALSE, warning=FALSE, eval=!params$run_ancestry}
