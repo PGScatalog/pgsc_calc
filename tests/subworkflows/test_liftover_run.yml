@@ -1,5 +1,5 @@
 - name: test input check subworkflow with liftover 38to37
-  command: nextflow run main.nf -profile test --only_input --pgs_id PGS000193 --liftover --target_build GRCh37 -c ./tests/config/nextflow.config
+  command: nextflow run main.nf -profile test --only_input --pgs_id PGS000193 --liftover --target_build GRCh37 -c ./tests/config/nextflow.config --hg19_chain https://hgdownload.cse.ucsc.edu/goldenpath/hg19/liftOver/hg19ToHg38.over.chain.gz --hg38_chain https://hgdownload.soe.ucsc.edu/goldenPath/hg38/liftOver/hg38ToHg19.over.chain.gz
   tags:
     - liftover
     - subworkflow
@@ -12,7 +12,7 @@
         - "pgscatalog_utils: 0.4.0"
 
 - name: test input check subworkflow with liftover 37to38
-  command: nextflow run main.nf -profile test --only_input --pgs_id PGS001229 --liftover --target_build GRCh38 -c ./tests/config/nextflow.config
+  command: nextflow run main.nf -profile test --only_input --pgs_id PGS001229 --liftover --target_build GRCh38 -c ./tests/config/nextflow.config --hg19_chain https://hgdownload.cse.ucsc.edu/goldenpath/hg19/liftOver/hg19ToHg38.over.chain.gz --hg38_chain https://hgdownload.soe.ucsc.edu/goldenPath/hg38/liftOver/hg38ToHg19.over.chain.gz
   tags:
     - liftover
     - subworkflow
