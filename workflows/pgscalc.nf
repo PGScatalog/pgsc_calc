@@ -45,6 +45,7 @@ if (!params.target_build) {
 if (params.liftover && !params.hg19_chain || params.liftover && !params.hg38_chain) {
     println "ERROR: Missing --hg19_chain or --hg38_chain with --liftover set"
     println "Please download UCSC chain files and set chain file paths"
+    println "See https://pgsc-calc.readthedocs.io/en/latest/how-to/liftover.html"
     System.exit(1)
 }
 
