@@ -252,7 +252,7 @@ thousand_genomes_palette <- scale_colour_manual(name = "Populations", values = t
 ```
 
 ```{r, echo = FALSE, message = FALSE, eval=params$run_ancestry}
-popsim <- readr::read_tsv("HGDP_popsimilarity.txt.gz")
+popsim <- readr::read_tsv(gsub("_pgs.", "_popsimilarity.", params$score_path))
 head(popsim)
 
 new_label_target = paste({params$sampleset}, '(Most Similar Population)')
