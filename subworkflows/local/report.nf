@@ -10,6 +10,7 @@ workflow REPORT {
     log_scorefiles
     log_match
     run_ancestry_assign // bool
+    intersect_count
 
     main:
     ch_versions = Channel.empty()
@@ -74,7 +75,7 @@ workflow REPORT {
         .combine(log_scorefiles) // all samplesets have the same scorefile metadata
         .set { ch_report_input }
 
-    SCORE_REPORT( ch_report_input )
+    SCORE_REPORT( ch_report_input, intersect_count )
     ch_versions = ch_versions.mix(SCORE_REPORT.out.versions)
 
     // if this workflow runs, the report must be written

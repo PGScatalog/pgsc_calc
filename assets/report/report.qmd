@@ -264,6 +264,20 @@ for(pc in seq.int(1,5,2)){
 }
 ```
 
+## Reference matching summary
+
+```{r, echo = FALSE, message = FALSE, eval=params$run_ancestry}
+intersect_stats <- scan("intersect_counts.txt", sep="\n", what=integer())
+
+# TODO: replace with reference name
+tribble(
+  ~reference, ~hit, ~miss,
+  "1000G", intersect_stats[1], intersect_stats[2]
+) %>%
+  mutate(rate = hit / (hit + miss)) %>%
+  DT::datatable()
+```
+
 ## Population similarity summary
 
 ```{r, echo = FALSE, message = FALSE, eval=params$run_ancestry}

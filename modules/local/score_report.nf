@@ -14,6 +14,7 @@ process SCORE_REPORT {
 
     input:
     tuple val(meta), path(scorefile), path(score_log), path(match_summary), path(ancestry)
+    path intersect_count
 
     output:
     // includeInputs to correctly use $meta.id in publishDir path
