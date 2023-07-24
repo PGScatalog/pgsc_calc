@@ -276,7 +276,6 @@ for(pc in seq.int(1,5,2)){
   }
 }
 ```
-```
 
 ## Population similarity summary
 
