@@ -125,6 +125,18 @@ for more information). An example would look like:
 
 .. _harmonized (remapped rsIDs and/or lifted positions): https://www.pgscatalog.org/downloads/#dl_ftp_scoring_hm_pos
 
+3. (Optional) Download reference database
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To enable genetic ancestry similarity calculations and PGS normalisation,
+download our pre-built reference database:
+
+.. code-block:: console
+
+    $ wget https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/pgsc_calc.tar.zst
+
+See :ref:`ancestry` for more details.
+
 3. Putting it all together
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -137,11 +149,13 @@ they match the scoring file genome build.
         -profile <docker/singularity/conda> \
         --input samplesheet.csv --target_build GRCh37 \
         --pgs_id PGS001229 \
-        --ref pgsc_calc.tar.zst 
+        --run_ancestry pgsc_calc.tar.zst 
 
 Congratulations, you've now (`hopefully`) calculated some scores!
 |:partying_face:|
 
+.. tip:: Don't include ``--run_ancestry`` if you didn't download the reference database
+         
 After the workflow executes successfully, the calculated scores and a summary
 report should be available in the ``results/score/`` directory in your current
 working directory (``$PWD``) by default. If you're interested in more
@@ -151,6 +165,7 @@ If the workflow didn't execute successfully, have a look at the
 :ref:`troubleshoot` section. Remember to replace ``<docker/singularity/conda>``
 with the software you have installed on your computer.
 
+         
 4. Next steps & advanced usage
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
