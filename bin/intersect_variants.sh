@@ -77,6 +77,12 @@ fi
 join ref_variants.txt target_variants.txt |\
     awk '{if (NR==1) print $0, "SAME_REF"; else print $0, ($3 == $8)}' > matched_variants.txt
 
+# subtract header line
+wc -l < matched_variants.txt | awk '{ print $0-1}' > intersect_counts.txt
+
+# show lines from the second file that don't match the first file
+join -v 2  ref_variants.txt target_variants.txt | wc -l >> intersect_counts.txt
+
 # Current output columns are:
 #1 : CHR:POS:A0:A1
 #2 : ID_REF
