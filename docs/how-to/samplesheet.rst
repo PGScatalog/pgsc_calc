@@ -70,6 +70,10 @@ Notes
     genome build, no liftover/re-mapping of the genotyping data is performed
     within the pipeline.
 
+.. note:: Your samplesheet can only contain one sampleset name. If you want to
+          run multiple large cohorts (e.g. 1000G and HGDP) then run the workflow
+          separately or combine the files.
+          
 Setting genotype field
 ~~~~~~~~~~~~~~~~~~~~~~
 
