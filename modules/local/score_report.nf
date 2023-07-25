@@ -14,6 +14,7 @@ process SCORE_REPORT {
 
     input:
     tuple val(meta), path(scorefile), path(score_log), path(match_summary), path(ancestry)
+    path intersect_count
     val reference_panel_name
 
     output:

@@ -19,6 +19,7 @@ process INTERSECT_VARIANTS {
 
     output:
     tuple val(id), path("${meta.id}_${meta.chrom}_matched.txt.gz"), emit: intersection
+    path "intersect_counts.txt", emit: intersect_count
     path "versions.yml", emit: versions
 
     script:
@@ -36,7 +37,7 @@ process INTERSECT_VARIANTS {
         exit 1
     else
         mv matched_variants.txt ${meta.id}_${meta.chrom}_matched.txt
-        gzip *.txt
+        gzip *_variants.txt *_matched.txt
     fi
 
     cat <<-END_VERSIONS > versions.yml
