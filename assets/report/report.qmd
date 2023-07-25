@@ -162,6 +162,16 @@ DT::datatable(
 cat params.txt
 ```
 
+## Reference matching summary
+
+```{r, echo = FALSE, message = FALSE, eval=params$run_ancestry}
+intersect_stats <- scan("intersect_counts.txt", sep="\n", what=integer())
+
+tribble(
+  ~'reference', ~'N (matched)', ~'N variants in panel', ~'% matched',
+  {params$reference_panel_name}, intersect_stats[1], intersect_stats[1]+intersect_stats[2], intersect_stats[1] / (intersect_stats[1] + intersect_stats[2])) %>% DT::datatable()
+```
+
 ## Summary
 
 ```{r setup_matches}
@@ -210,29 +220,57 @@ compat %>%
 :::{.column-body-outset}
 
 ```{r match_table_detailed, echo = FALSE, warning=FALSE}
-log_df %>%
-  group_by(sampleset, accession) %>%
-  count(match_status, ambiguous, is_multiallelic,match_flipped, duplicate_best_match, duplicate_ID, wt = count) %>%
-  rename(is_ambiguous = ambiguous) %>%
-  mutate(percent = round(n / sum(n) * 100, 2),
-         match_status = forcats::fct_relevel(match_status, "matched", "excluded", "unmatched")) %>%
-  arrange(accession, match_status) %>%
-  mutate(accession = stringr::str_replace_all(accession, "_", " ")) %>%
-  DT::datatable(rownames=FALSE,
-                extensions = 'Buttons',
-    options = list(dom = 'Bfrtip',
-                   buttons = c('csv')),
-    colnames = c(
-      "Sampleset" = "sampleset",
-      "Scoring file" = "accession",
-      "Match type" = "match_status",
-      "Multiple potential matches" = "duplicate_best_match",
-      "Duplicated matched variants" = "duplicate_ID",
-      "Ambiguous" = "is_ambiguous",
-      "Multiallelic" = "is_multiallelic",
-      "Matches strand flip" = "match_flipped",
-      "%" = "percent"
-    ))
+if(params$run_ancestry == TRUE){
+    # Include match_IDs in the groupby to account for
+    log_df %>%
+      group_by(sampleset, accession) %>%
+      count(match_status, match_IDs, ambiguous, is_multiallelic, match_flipped, duplicate_best_match, duplicate_ID, wt = count) %>%
+      rename(is_ambiguous = ambiguous) %>%
+      mutate(percent = round(n / sum(n) * 100, 2),
+             match_status = forcats::fct_relevel(match_status, "matched", "excluded", "unmatched")) %>%
+      arrange(accession, match_status) %>%
+      mutate(accession = stringr::str_replace_all(accession, "_", " ")) %>%
+      DT::datatable(rownames=FALSE,
+                    extensions = 'Buttons',
+        options = list(dom = 'Bfrtip',
+                       buttons = c('csv')),
+        colnames = c(
+          "Sampleset" = "sampleset",
+          "Scoring file" = "accession",
+          "Match type" = "match_status",
+          "Variant in reference panel" = "match_IDs",
+          "Multiple potential matches" = "duplicate_best_match",
+          "Duplicated matched variants" = "duplicate_ID",
+          "Ambiguous" = "is_ambiguous",
+          "Multiallelic" = "is_multiallelic",
+          "Matches strand flip" = "match_flipped",
+          "%" = "percent"
+        ))
+} else{
+    log_df %>%
+      group_by(sampleset, accession) %>%
+      count(match_status, ambiguous, is_multiallelic,match_flipped, duplicate_best_match, duplicate_ID, wt = count) %>%
+      rename(is_ambiguous = ambiguous) %>%
+      mutate(percent = round(n / sum(n) * 100, 2),
+             match_status = forcats::fct_relevel(match_status, "matched", "excluded", "unmatched")) %>%
+      arrange(accession, match_status) %>%
+      mutate(accession = stringr::str_replace_all(accession, "_", " ")) %>%
+      DT::datatable(rownames=FALSE,
+                    extensions = 'Buttons',
+        options = list(dom = 'Bfrtip',
+                       buttons = c('csv')),
+        colnames = c(
+          "Sampleset" = "sampleset",
+          "Scoring file" = "accession",
+          "Match type" = "match_status",
+          "Multiple potential matches" = "duplicate_best_match",
+          "Duplicated matched variants" = "duplicate_ID",
+          "Ambiguous" = "is_ambiguous",
+          "Multiallelic" = "is_multiallelic",
+          "Matches strand flip" = "match_flipped",
+          "%" = "percent"
+        ))
+}
 ```
 
 :::
@@ -275,20 +313,6 @@ for(pc in seq.int(1,5,2)){
     print(p_pca)
   }
 }
-```
-
-## Reference matching summary
-
-```{r, echo = FALSE, message = FALSE, eval=params$run_ancestry}
-intersect_stats <- scan("intersect_counts.txt", sep="\n", what=integer())
-
-# TODO: replace with reference name
-tribble(
-  ~reference, ~hit, ~miss,
-  "1000G", intersect_stats[1], intersect_stats[2]
-) %>%
-  mutate(rate = hit / (hit + miss)) %>%
-  DT::datatable()
 ```
 
 ## Population similarity summary
