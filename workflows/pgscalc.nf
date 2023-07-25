@@ -42,6 +42,13 @@ if (!params.target_build) {
     System.exit(1)
 }
 
+if (params.liftover && !params.hg19_chain || params.liftover && !params.hg38_chain) {
+    println "ERROR: Missing --hg19_chain or --hg38_chain with --liftover set"
+    println "Please download UCSC chain files and set chain file paths"
+    println "See https://pgsc-calc.readthedocs.io/en/latest/how-to/liftover.html"
+    System.exit(1)
+}
+
 unique_scorefiles = Channel.empty()
 
 if (params.scorefile) {
@@ -213,10 +220,14 @@ workflow PGSCALC {
     scorefiles.collect().set{ ch_scorefiles }
 
     if (run_input_check) {
-        Channel.fromPath(params.hg19_chain, checkIfExists: true)
-            .mix(Channel.fromPath(params.hg38_chain, checkIfExists: true))
-            .collect()
-            .set { chain_files }
+        // chain files are optional input
+        Channel.fromPath('NO_FILE', checkIfExists: false).set { chain_files }
+        if (params.hg19_chain && params.hg38_chain) {
+            Channel.fromPath(params.hg19_chain, checkIfExists: true)
+                .mix(Channel.fromPath(params.hg38_chain, checkIfExists: true))
+                .collect()
+                .set { chain_files }
+        }
 
         INPUT_CHECK (
             ch_input,

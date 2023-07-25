@@ -31,6 +31,10 @@ workflow REPORT {
 
     // ch_scores keeps calculated score file names consistent with --skip_ancestry
     ch_scores = Channel.empty()
+    // used in report rendering
+    // (theoretical support for custom reference panels)
+    reference_panel_name = 'NO_PANEL'
+
     if (run_ancestry_assign) {
         scores
             .combine(ref_relatedness)
@@ -50,6 +54,9 @@ workflow REPORT {
             ANCESTRY_ANALYSIS.out.popsimilarity)
             .map { annotate_sampleset(it) }
             .groupTuple(size: 2)
+
+        // an unpleasant method of grabbing reference panel name
+        reference_panel_name = ch_ancestry_input.map{ it.tail().last().getBaseName().tokenize('_')[1] }
 
         // ancestry_analysis: aggregated_scores.txt.gz -> {sampleset}_pgs.txt.gz
         ch_scores = ch_scores.mix(ANCESTRY_ANALYSIS.out.pgs.map{annotate_sampleset(it)})
@@ -75,7 +82,7 @@ workflow REPORT {
         .combine(log_scorefiles) // all samplesets have the same scorefile metadata
         .set { ch_report_input }
 
-    SCORE_REPORT( ch_report_input, intersect_count )
+    SCORE_REPORT( ch_report_input, intersect_count, reference_panel_name )
     ch_versions = ch_versions.mix(SCORE_REPORT.out.versions)
 
     // if this workflow runs, the report must be written

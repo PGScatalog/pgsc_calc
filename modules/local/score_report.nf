@@ -15,12 +15,15 @@ process SCORE_REPORT {
     input:
     tuple val(meta), path(scorefile), path(score_log), path(match_summary), path(ancestry)
     path intersect_count
+    val reference_panel_name
 
     output:
     // includeInputs to correctly use $meta.id in publishDir path
     // ancestry results are optional also
     path "*.txt.gz", includeInputs: true
     path "*.json.gz", includeInputs: true, optional: true
+    // for testing ancestry workflow
+    path "pop_summary.csv", optional: true
     // normal outputs
     path "*.html", emit: report
     path "versions.yml", emit: versions
@@ -41,7 +44,8 @@ process SCORE_REPORT {
     quarto render report.qmd -M "self-contained:true" \
         -P score_path:$scorefile \
         -P sampleset:$meta.id \
-        -P run_ancestry:$run_ancestry
+        -P run_ancestry:$run_ancestry \
+        -P reference_panel_name:$reference_panel_name
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
