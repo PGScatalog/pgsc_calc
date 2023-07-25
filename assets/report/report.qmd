@@ -166,10 +166,15 @@ cat params.txt
 
 ```{r, echo = FALSE, message = FALSE, eval=params$run_ancestry}
 intersect_stats <- scan("intersect_counts.txt", sep="\n", what=integer())
+n_target <- intersect_stats[1]
+n_ref <- intersect_stats[2]
+n_match <- intersect_stats[3]
 
 tribble(
-  ~'reference', ~'N (matched)', ~'N variants in panel', ~'% matched',
-  {params$reference_panel_name}, intersect_stats[1], intersect_stats[1]+intersect_stats[2], intersect_stats[1] / (intersect_stats[1] + intersect_stats[2])) %>% DT::datatable()
+  ~'reference', ~'n target', ~'N (matched)', ~'N variants in panel', ~'% matched',
+  params$reference_panel_name, n_target, n_match, n_ref, n_match / n_ref
+) %>% 
+  DT::datatable()
 ```
 
 ## Summary
