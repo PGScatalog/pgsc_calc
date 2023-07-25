@@ -162,7 +162,9 @@ DT::datatable(
 cat params.txt
 ```
 
+```{asis, echo = params$run_ancestry}
 ## Reference matching summary
+```
 
 ```{r, echo = FALSE, message = FALSE, eval=params$run_ancestry}
 intersect_stats <- scan("intersect_counts.txt", sep="\n", what=integer())
@@ -280,8 +282,9 @@ if(params$run_ancestry == TRUE){
 
 :::
 
-
+```{asis, echo = params$run_ancestry}
 # Genetic Ancestry
+```
 
 ```{r colour_palette, echo = FALSE, eval=params$run_ancestry}
 # source: https://github.com/PGScatalog/PGS_Catalog/blob/master/catalog/static/catalog/pgs.scss#L2493-L2520
@@ -320,7 +323,9 @@ for(pc in seq.int(1,5,2)){
 }
 ```
 
+```{asis, echo = params$run_ancestry}
 ## Population similarity summary
+```
 
 ```{r, echo = FALSE, message = FALSE, eval=params$run_ancestry}
 popsim %>% 
