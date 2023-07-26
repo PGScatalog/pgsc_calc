@@ -22,8 +22,8 @@ ancestry groups (Figure 1).
     :width: 600
     :alt: Example PGS distributions stratified by population groups.
 
-    Figure 1. Example of a PGS with shifted distributions in different ancestry groups.
-    Shown here is the distribution of PGS000018 (metaGRS_CAD) calculated using the SUM method
+    **Figure 1. Example of a PGS with shifted distributions in different ancestry groups.** Shown
+    here is the distribution of PGS000018 (metaGRS_CAD) calculated using the SUM method
     in the 1000 Genomes reference panel, stratified by genetic ancestry groups (superpopulation labels).
 
 
@@ -38,7 +38,17 @@ account for these differences have been implemented within the pgsc_calc pipelin
 Methods for reporting and adjusting PGS in the context of ancestry
 ------------------------------------------------------------------
 
+.. figure:: screenshots/Fig_AncestryMethods.png
+    :width: 600
+    :alt: Schematic figure detailing methods for contextualizing or adjusting PGS in the context of genetic ancestry.
+
+    **Figure 2. Schematic figure detailing empirical and PCA-based methods for contextualizing or
+    adjusting PGS with genetic ancestry.** Data is for the normalization of PGS000018 (metaGRS_CAD) in 1000 Genomes,
+    when applying ``pgsc_calc`` to data from the Human Genome Diversity Project (HGDP) data.
 
 Implementation within ``pgsc_calc``
 -----------------------------------
 
+
+Interpretation of PGS-adjustment data from ``pgsc_calc``
+--------------------------------------------------------
