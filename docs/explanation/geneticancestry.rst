@@ -19,14 +19,12 @@ population is important, as the mean and variance of a PGS can differ between di
 ancestry groups (Figure 1).
 
 .. figure:: screenshots/p_SUM.png
-    :width: 600
+    :width: 250
     :alt: Example PGS distributions stratified by population groups.
 
     **Figure 1. Example of a PGS with shifted distributions in different ancestry groups.** Shown
     here is the distribution of PGS000018 (metaGRS_CAD) calculated using the SUM method
     in the 1000 Genomes reference panel, stratified by genetic ancestry groups (superpopulation labels).
-
-
 
 It is important to note that differences in the means between different ancestry groups do not
 necessarily correspond to differences in the risk (e.g., changes in disease prevalence, or mean
@@ -37,14 +35,19 @@ account for these differences have been implemented within the pgsc_calc pipelin
 
 Methods for reporting and adjusting PGS in the context of ancestry
 ------------------------------------------------------------------
+If the PGS is being calculated on a genetically homogenous population (e.g. cluster of individuals of similar genetic
+ancestry), then the standard normalization is to normalize the PGS using the sample mean and standard deviation.
+However, if you are calculating a PGS for individual(s) and do not already have a reference population then they can be
+compared to a reference panel of individuals using multiple methods (Figure 2).
 
 .. figure:: screenshots/Fig_AncestryMethods.png
-    :width: 600
+    :width: 1000
     :alt: Schematic figure detailing methods for contextualizing or adjusting PGS in the context of genetic ancestry.
 
     **Figure 2. Schematic figure detailing empirical and PCA-based methods for contextualizing or
     adjusting PGS with genetic ancestry.** Data is for the normalization of PGS000018 (metaGRS_CAD) in 1000 Genomes,
     when applying ``pgsc_calc`` to data from the Human Genome Diversity Project (HGDP) data.
+
 
 Implementation within ``pgsc_calc``
 -----------------------------------
@@ -52,3 +55,4 @@ Implementation within ``pgsc_calc``
 
 Interpretation of PGS-adjustment data from ``pgsc_calc``
 --------------------------------------------------------
+
