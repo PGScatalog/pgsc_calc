@@ -6,26 +6,29 @@ Why not just use ``plink2 --score``?
 You might be curious what ``pgsc_calc`` does that ``plink2 --score`` doesn't. We
 use ``plink2`` internally to calculate all scores but offer some extra features:
 
-- We match the variants from scoring files against the target genome using
-  multiple strategies, trying to take into account stuff like strand alignment,
-  ambiguous matches, different genome builds, etc.
+- We match the variants from scoring files (often from different genome builds) against
+  the target genome using multiple strategies, taking into account the strand alignment,
+  ambiguous or multi-allelic matches, duplicated variants/matches, and overlaps between
+  datasets (e.g. with a reference for ancestry).
 
 - One important output is an auditable log that covers the union of all variants
-  across the scoring files, tracking how the variants matched and if they were
-  excluded from contributing to the final scores and why they might have been
-  excluded.
+  across the scoring files, tracking how the variants matched the target genomes and
+  provide reasons why they are excluded from contributing to the final calculated scores
+  based on user-specified settings and thresholds for variant matching.
 
-- From the best match candidates the workflow outputs a new set of scoring files
-  which are used by plink2. The new scoring files combine multiple scoring files
-  to calculate scores in parallel. These scoring files are automatically split
-  by effect type and across duplicate variant IDs with different effect alleles,
+- From the matched variants the workflow outputs a new set of scoring files
+  which are used by plink2 for scoring. The new scoring files combine multiple PGS in
+  a single file to calculate scores in parallel. These scoring files are automatically
+  split by effect type and across duplicate variant IDs with different effect alleles,
   then the split scores are aggregated.
 
-- We also take care of calculating genetic ancestry similarity to a reference
-  panel using robust PCA methods
+- The pipeline also calculates genetic ancestry using a reference panel (default 1000 Genomes)
+  handling the data handling, variant matching, derivation of the PCA space, and projection of
+  target samples into the PCA space using robust methods (implemented in fraposa_pgsc_).
 
-- Scores can be optionally normalised across different ancestry groups with a
-  range of methods
+- Scores can be adjusted using genetic ancestry data using multiple methods (see norm_).
+
+.. _fraposa_pgsc: https://github.com/PGScatalog/fraposa_pgsc
 
 Summary
 -------
