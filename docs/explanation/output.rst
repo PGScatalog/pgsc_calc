@@ -10,9 +10,10 @@ The pipeline outputs are written to a results directory (``--outdir`` default is
 .. code-block:: console
                 
     results
-    ├── match (scoring files and variant match metadata)
-    ├── pipeline_info (nextflow pipeline execution data)
-    └── score (calculated PGS with summary report)
+    ├── [sampleset] (directory with results for your data)
+    │   ├── match (scoring files and variant match metadata)
+    │   └── score (calculated PGS with summary report)
+    └── pipeline_info (nextflow pipeline execution data)
 
 ``score/``
 ----------
