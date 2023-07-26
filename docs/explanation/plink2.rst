@@ -26,20 +26,20 @@ use ``plink2`` internally to calculate all scores but offer some extra features:
   handling the data handling, variant matching, derivation of the PCA space, and projection of
   target samples into the PCA space using robust methods (implemented in fraposa_pgsc_).
 
-- Scores can be adjusted using genetic ancestry data using multiple methods (see norm_).
+- Scores can be adjusted using genetic ancestry data using multiple methods (see :ref:`norm`).
 
 .. _fraposa_pgsc: https://github.com/PGScatalog/fraposa_pgsc
 
 Summary
 -------
 
-- For a seasoned human genetics bioinformatician the workflow mostly
-  offers convenient integration with the PGS Catalog and simplifies large scale
-  analysis on HPCs.
+- For a seasoned bioinformatician the workflow offers convenient integration with the PGS Catalog
+  and simplifies large scale PGS calculation on HPCs.
 
-- Genetic ancestry similarity calculations and automatic ancestry normalisation
-  may also be helpful
+- Genetic ancestry similarity calculations and adjustment of PGS using established methods
+  using reproducible code and datasets.
 
 - For a data scientist or somebody less familiar with the intricacies of PGS
-  calculation, ``pgsc_calc`` will be more useful
+  calculation, ``pgsc_calc`` automates many of the complex steps and analysis choices needed to
+  calculate PGS using multiple software tools.
 
