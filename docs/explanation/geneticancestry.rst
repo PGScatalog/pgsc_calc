@@ -22,9 +22,7 @@ ancestry groups (Figure 1).
     :width: 600
     :alt: Example PGS distributions stratified by population groups.
 
-    Figure 1. Example of a PGS with shifted distributions in different ancestry groups. Shown
-    here is the distribution of PGS000018 (metaGRS_CAD) calculated using the SUM method in the
-    1000 Genomes reference panel, stratified by genetic ancestry groups (superpopulation labels).
+    Figure 1. Example of a PGS with shifted distributions in different ancestry groups. Shown here is the distribution of PGS000018 (metaGRS_CAD) calculated using the SUM method in the 1000 Genomes reference panel, stratified by genetic ancestry groups (superpopulation labels).
 
 
 It is important to note that differences in the means between different ancestry groups do not
