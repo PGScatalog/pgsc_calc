@@ -16,7 +16,7 @@ PGS are developed to measure an individual’s genetic predisposition to a disea
 A common way to express this is as a relative measure of predisposition (e.g. risk) compared to
 a reference population (often presented as a Z-score or percentile). The choice of reference
 population is important, as the mean and variance of a PGS can differ between different genetic
-ancestry groups (`Figure 1`_) as been shown previously ([Reisberg2017]_, [Martin2017]_).
+ancestry groups (`Figure 1`_) as been shown previously ([#Reisberg2017]_ [#Martin2017]_).
 
 .. _Figure 1:
 .. figure:: screenshots/p_SUM.png
@@ -59,6 +59,11 @@ Interpretation of PGS-adjustment data from ``pgsc_calc``
 --------------------------------------------------------
 
 
+Interpretation of PGS-adjustment data from ``pgsc_calc``
+--------------------------------------------------------
 
-.. [Reisberg2017] Reisberg S, Iljasenko T, Läll K, Fischer K, Vilo J (2017) Comparing distributions of polygenic risk scores of type 2 diabetes and coronary heart disease within different populations. PLoS ONE 12(7): e0179238. https://doi.org/10.1371/journal.pone.0179238
-.. [Martin2017] Alicia R. Martin, Christopher R. Gignoux, Raymond K. Walters, Genevieve L. Wojcik, Benjamin M. Neale, Simon Gravel, Mark J. Daly, Carlos D. Bustamante, Eimear E. Kenny (2017) Human Demographic History Impacts Genetic Risk Prediction across Diverse Populations. The American Journal of Human Genetics 100(4):635-649. https://doi.org/10.1016/j.ajhg.2017.03.004.
+
+
+.. rubric:: Citations
+.. [#Reisberg2017] Reisberg S, Iljasenko T, Läll K, Fischer K, Vilo J (2017) Comparing distributions of polygenic risk scores of type 2 diabetes and coronary heart disease within different populations. PLoS ONE 12(7): e0179238. https://doi.org/10.1371/journal.pone.0179238
+.. [#Martin2017] Alicia R. Martin, Christopher R. Gignoux, Raymond K. Walters, Genevieve L. Wojcik, Benjamin M. Neale, Simon Gravel, Mark J. Daly, Carlos D. Bustamante, Eimear E. Kenny (2017) Human Demographic History Impacts Genetic Risk Prediction across Diverse Populations. The American Journal of Human Genetics 100(4):635-649. https://doi.org/10.1016/j.ajhg.2017.03.004.
