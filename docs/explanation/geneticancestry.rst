@@ -86,8 +86,34 @@ get a new estimate of relative risk (output column: ``Z_norm2``) where the varia
 equal across ancestry groups and approximately 1.
 
 
-Implementation within ``pgsc_calc``
------------------------------------
+Implementation of ancestry steps within ``pgsc_calc``
+-----------------------------------------------------
+The ancestry methods are implemented within the `--run_ancestry` method of the pipeline (:ref:`ancestry`), and has the
+following steps:
+
+1. **Reference panel** (see :ref:`database` for details).
+
+2. **Variant overlap**: Identifying variants that are present in both the target genotypes and the reference panel. Uses
+    the ``INTERSECT_VARIANTS`` module.
+
+3. **PGS Calculation**:
+    1. **preparing scoring files**: in order to normalize the PGS the score has to be calculated on identical variant sets
+    both datasets. The list of overlapping variants between the reference and target datasets are supplied to the
+    ``MATCH_COMBINE`` module to exclude scoring file variants that are matched only in the target genotypes.
+
+    2. **PGS calculation**:
+
+4. **PCA of the reference panel**
+    1. **Variant QC**
+
+    2. **PCA**
+
+5. **Projecting target samples into the reference PCA space**
+
+6. **Ancestry analysis**
+
+
+The modules used to for the ancestry analysis can be found here: https://github.com/PGScatalog/pgsc_calc/tree/main/modules/local/ancestry
 
 
 Interpretation of PGS-adjustment data from ``pgsc_calc``

@@ -28,7 +28,7 @@ parameter, which is a path to the reference database (see
 (Optional) Create reference database
 ------------------------------------
 
-.. danger::
+.. Warning::
    - Making a reference database from scratch can be slow and frustrating
    - It's easiest to download the published reference database from the PGS Catalog FTP
             
