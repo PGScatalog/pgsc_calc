@@ -44,7 +44,7 @@ PCA-based) use these data and the calculated PGS to report the PGS and we descri
 
 .. _Figure 2:
 .. figure:: screenshots/Fig_AncestryMethods.png
-    :width: 1500
+    :width: 1800
     :alt: Schematic figure detailing methods for contextualizing or adjusting PGS in the context of genetic ancestry.
 
     **Figure 2. Schematic figure detailing empirical and PCA-based methods for contextualizing or adjusting PGS
@@ -57,11 +57,11 @@ Empirical methods
 A common way to report the relative PGS for an individual is by comparing their score with a distribution
 of scores from genetically similar individuals (similar to taking a Z-score within a genetically homogenous population
 above). [#ImputeMe] To define the correct reference distribution of PGS for an individual we first train a classifier
-to predict the population labels (pre-defined ancestry groups of the reference panel) from the PCA loadings for the
-reference. This classifier is then applied to individuals in the target dataset to identify the population they are
-most similar to in genetic ancestry space. Then the relative PGS for each individual is calculated by comparing their
-score to the reference distribution and reporting it as a percentile (output column: ``percentile_MostSimilarPop``) or by taking a
-Z-score (output column: ``Z_MostSimilarPop``).
+to predict the population labels (pre-defined ancestry groups from the reference panel) using PCA loadings in the
+reference panel. This classifier is then applied to individuals in the target dataset to identify the population they are
+most similar to in genetic ancestry space. The relative PGS for each individual is then calculated by comparing the
+calculated PGS to the distribution of PGS in the most similar population in the reference panel and reporting it as a
+percentile (output column: ``percentile_MostSimilarPop``) or by taking a Z-score (output column: ``Z_MostSimilarPop``).
 
 
 PCA-based methods
@@ -69,21 +69,21 @@ PCA-based methods
 A second way to remove the effect of genetic ancestry on PGS distributions is to treat ancestry as a continuum
 (represented by loadings in PCA-space) and use regression to adjust for shifts therein. Using regression has the
 benefit of not assigning individuals to specific ancestry groups, which may be particularly problematic for empirical
-methods when an individual has an ancestry that isn’t well represented by the reference panel. The original incarnation
-of this method was proposed by Khera et al. (2019) [#Khera2019]_ and uses the PCA loadings to adjust for differences in
-the means of PGS distributions across ancestries by fitting a regression of PGS values based on PCA-loadings of
-individuals of the reference panel. To calculate the normalized PGS the predicted PGS based on the PCA-loadings is
-subtracted from the PGS and normalized by the standard deviation in the reference population to achieve PGS
-distributions that are centred at 0 for each genetic ancestry group (output column: ``Z_norm1``) with the benefit on not
-relying on any population labels during model fitting.
+methods when an individual has an ancestry that is not represented within the reference panel. This method was first
+proposed by Khera et al. (2019) [#Khera2019]_ and uses the PCA loadings to adjust for differences in the means of PGS
+distributions across ancestries by fitting a regression of PGS values based on PCA-loadings of individuals of the
+reference panel. To calculate the normalized PGS the predicted PGS based on the PCA-loadings is subtracted from the PGS
+and normalized by the standard deviation in the reference population to achieve PGS distributions that are centred
+at 0 for each genetic ancestry group (output column: ``Z_norm1``) while not relying on any population labels during
+model fitting.
 
 The first method (``Z_norm1``)  has the result of normalizing the first moment of the PGS distribution (mean); however,
 the second moment of the PGS distribution (variance) can also differ between ancestry groups. A second regression of
 the PCA-loadings on the squared residuals (difference of the PGS and the predicted PGS) can be fit to estimate a
 predicted standard deviation based on genetic ancestry, as was proposed by Khan et al. (2022). [#Khan2022]_  The
 predicted standard deviation (distance from the mean PGS based on ancestry) is used to normalize the residual PGS and
-get a new estimate of relative risk (output column: ``Z_norm2``) where the dispersion of the PGS distribution is more equal
-across ancestry groups.
+get a new estimate of relative risk (output column: ``Z_norm2``) where the variance of the PGS distribution is more
+equal across ancestry groups and approximately 1.
 
 
 Implementation within ``pgsc_calc``
