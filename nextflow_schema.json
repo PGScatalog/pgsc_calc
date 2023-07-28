@@ -113,7 +113,7 @@
         },
         "n_normalization": {
           "type": "integer",
-          "default": 4,
+          "default": 5,
           "description": "Number of PCs used for population normalisation"
         },
         "load_afreq": {
