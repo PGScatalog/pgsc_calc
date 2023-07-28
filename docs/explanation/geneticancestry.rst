@@ -157,11 +157,6 @@ following steps:
 .. _`FRAPOSA`: https://github.com/PGScatalog/fraposa_pgsc
 .. _`pgscatalog_utils`: https://github.com/PGScatalog/pgscatalog_utils
 
-Interpretation of PGS-adjustment data from ``pgsc_calc``
---------------------------------------------------------
-
-
-
 
 .. rubric:: Citations
 .. [#Reisberg2017] Reisberg S, et al. (2017) Comparing distributions of polygenic risk scores of type 2 diabetes and coronary heart disease within different populations. PLoS ONE 12(7):e0179238. https://doi.org/10.1371/journal.pone.0179238
