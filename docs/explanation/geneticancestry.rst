@@ -93,9 +93,11 @@ Implementation of ancestry steps within ``pgsc_calc``
 The ancestry methods are implemented within the `--run_ancestry` method of the pipeline (:ref:`ancestry`), and has the
 following steps:
 
-1. **Reference panel** (see :ref:`database` for details).
+1.  **Reference panel**: preparing and/or extracting data of the reference panel for use in the pipeline (see
+    :ref:`database` for details).
 
-2. **Variant overlap**: Identifying variants that are present in both the target genotypes and the reference panel. Uses the ``INTERSECT_VARIANTS`` module.
+2.  **Variant overlap**: Identifying variants that are present in both the target genotypes and the reference panel.
+    Uses the ``INTERSECT_VARIANTS`` module.
 
 3. **PGS Calculation**:
     1.  **Preparing scoring files**: in order to normalize the PGS the score has to be calculated on identical variant sets both datasets.
@@ -146,7 +148,8 @@ following steps:
     2.  **PGS adjustment**: the results of the genetic similarity analysis are combined with the PCA-loadings and
         calculated PGS to perform the `adjustment methods`_ described in the previous section. To perform the
         **empirical adjusments** (``percentile_MostSimilarPop``, ``Z_MostSimilarPop``) the PGS and the population
-        labels are used. To perform the **PCA-based adjusments** only the PGS and PCA-loadings are used.
+        labels are used. To perform the **PCA-based adjusments** (``Z_norm1``, ``Z_norm2``) only the PGS and
+        PCA-loadings are used.
 
 7.  **Reporting & Outputs**: the final results are output to txt files for further analysis, and an HTML report with
     visualizations of the PCA data and PGS distributions (see :ref:`interpret`_ for additional details).
