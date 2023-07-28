@@ -95,32 +95,31 @@ following steps:
 
 1. **Reference panel** (see :ref:`database` for details).
 
-2. **Variant overlap**: Identifying variants that are present in both the target genotypes and the reference panel. Uses
-    the ``INTERSECT_VARIANTS`` module.
+2. **Variant overlap**: Identifying variants that are present in both the target genotypes and the reference panel. Uses the ``INTERSECT_VARIANTS`` module.
 
 3. **PGS Calculation**:
-    1. **Preparing scoring files**: in order to normalize the PGS the score has to be calculated on identical variant sets both datasets.
+    1.  **Preparing scoring files**: in order to normalize the PGS the score has to be calculated on identical variant sets both datasets.
         The list of overlapping variants between the reference and target datasets are supplied to the ``MATCH_COMBINE``
         module to exclude scoring file variants that are matched only in the target genotypes.
 
-    2. **PGS Scoring**: the scoring files are the supplied to the ``PLINK2_SCORE`` module, along with allele frequency
+    2.  **PGS Scoring**: the scoring files are the supplied to the ``PLINK2_SCORE`` module, along with allele frequency
         information from the reference panel to ensure consistent scoring of the PGS SUMs across datasets. The scoring
         is made efficient by scoring all PGS in parallel.
 
 4. **PCA of the reference panel**
-    1. **Preparing reference panel for PCA**: the refrence panel is filtered to unrelated samples with standard filters
+    1.  **Preparing reference panel for PCA**: the refrence panel is filtered to unrelated samples with standard filters
         for variant-level QC (SNPs in Hardy–Weinberg equilibrium [p > 1e-06] that are bi-allelic and non-ambiguous,
         with low missingness [<10%], and minor allele frequency [MAF > 1%]) and sample-quality (missingness [<10%]).
         LD-pruning is then applied to the variants and sample passing these checks (r2 threshold = 0.05) and exclusion
         of complex regions with high LD (e.g. MHC) dependant on the target genome build. These methods are implemented
         in the ``FILTER_VARIANTS`` module.
 
-    2. **PCA**: the LD-pruned variants of the unrelated samples passing QC are then used to define the PCA space of the
+    2.  **PCA**: the LD-pruned variants of the unrelated samples passing QC are then used to define the PCA space of the
         reference panel (default: 10 PCs) using `FRAPOSA`_ (Fast and Robust Ancestry Prediction by using Online singular
         value decomposition and Shrinkage Adjustment). [#zhangfraposa]_ This is implemented in the ``FRAPOSA_PCA``
         module.
 
-5. **Projecting target samples into the reference PCA space**: the PCA of the reference panel (variant-PC loadings, and
+5.  **Projecting target samples into the reference PCA space**: the PCA of the reference panel (variant-PC loadings, and
     reference sample projections) are then used to determine the placement of the target samples in the PCA space using
     projection. Naive projection (using loadings) is prone to shrinkage which biases the projection of individuals
     towards the null of an existing space, which would introduce errors into PCA-loading based adjustments of PGS. To
@@ -130,12 +129,12 @@ following steps:
     target and reference dataset to ensure that the composition of the target doesn't impact the structure of the PCA.
     This is implemented in the ``FRAPOSA_OADP`` module.
 
-6. **Ancestry analysis**: the calculated PGS (SUM), reference panel PCA, and target sample projection into the PCA space
+6.  **Ancestry analysis**: the calculated PGS (SUM), reference panel PCA, and target sample projection into the PCA space
     are supplied to an analysis script that performs the analyses needed to adjust the PGS for genetic ancestry. This
     functionality is implemented within the ``ANCESTRY_ANALYSIS`` module and tool of our `pgscatalog_utils`_ package,
     and includes:
 
-    1. **Genetic similarity analysis**: first each indvidual in the target sample is compared to the reference panel to
+    1.  **Genetic similarity analysis**: first each indvidual in the target sample is compared to the reference panel to
         determine the population that they are most genetically similar to. By default this is done by fitting a
         RandomForest classifier to predict reference panel population assignments using the PCA-loadings (default:
         10 PCs) and then applying the classifier to the target samples to identify the most genetically similar
@@ -144,12 +143,12 @@ following steps:
         population (minimum distance). The probability of membership for each reference population and most similar
         population assignments are recorded and output.
 
-    2. **PGS adjustment**: the results of the genetic similarity analysis are combined with the PCA-loadings and
+    2.  **PGS adjustment**: the results of the genetic similarity analysis are combined with the PCA-loadings and
         calculated PGS to perform the `adjustment methods`_ described in the previous section. To perform the
         **empirical adjusments** (``percentile_MostSimilarPop``, ``Z_MostSimilarPop``) the PGS and the population
         labels are used. To perform the **PCA-based adjusments** only the PGS and PCA-loadings are used.
 
-7. **Reporting & Outputs**: the final results are output to txt files for further analysis, and an HTML report with
+7.  **Reporting & Outputs**: the final results are output to txt files for further analysis, and an HTML report with
     visualizations of the PCA data and PGS distributions (see :ref:`interpret`_ for additional details).
 
 .. _`FRAPOSA`: https://github.com/PGScatalog/fraposa_pgsc
