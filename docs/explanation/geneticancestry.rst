@@ -56,7 +56,7 @@ Empirical methods
 ~~~~~~~~~~~~~~~~~
 A common way to report the relative PGS for an individual is by comparing their score with a distribution
 of scores from genetically similar individuals (similar to taking a Z-score within a genetically homogenous population
-above). [#ImputeMe] To define the correct reference distribution of PGS for an individual we first train a classifier
+above). [#ImputeMe]_ To define the correct reference distribution of PGS for an individual we first train a classifier
 to predict the population labels (pre-defined ancestry groups from the reference panel) using PCA loadings in the
 reference panel. This classifier is then applied to individuals in the target dataset to identify the population they are
 most similar to in genetic ancestry space. The relative PGS for each individual is then calculated by comparing the
@@ -97,16 +97,26 @@ following steps:
     the ``INTERSECT_VARIANTS`` module.
 
 3. **PGS Calculation**:
-    1. **preparing scoring files**: in order to normalize the PGS the score has to be calculated on identical variant sets
-    both datasets. The list of overlapping variants between the reference and target datasets are supplied to the
-    ``MATCH_COMBINE`` module to exclude scoring file variants that are matched only in the target genotypes.
+    1. **Preparing scoring files**: in order to normalize the PGS the score has to be calculated on identical variant sets both datasets.
+        The list of overlapping variants between the reference and target datasets are supplied to the ``MATCH_COMBINE``
+        module to exclude scoring file variants that are matched only in the target genotypes.
 
-    2. **PGS calculation**:
+    2. **PGS Scoring**: the scoring files are the supplied to the ``PLINK2_SCORE`` module, along with allele frequency
+        information from the reference panel to ensure consistent scoring of the PGS SUMs across datasets. The scoring
+        is made efficient by scoring all PGS in parallel.
 
 4. **PCA of the reference panel**
-    1. **Variant QC**
+    1. **Preparing reference panel for PCA**: the refrence panel is filtered to unrelated samples with standard filters
+        for variant-level QC (SNPs in Hardy–Weinberg equilibrium [p > 1e-06] that are bi-allelic and non-ambiguous,
+        with low missingness [<10%], and minor allele frequency [MAF > 1%]) and sample-quality (missingness [<10%]).
+        LD-pruning is then applied to the variants and sample passing these checks (r2 threshold = 0.05) and exlcusion
+        of complex regions with high LD (e.g. MHC) dependant on the target genome build. These methods are implmeneted
+        in the ``FILTER_VARIANTS`` module.
 
-    2. **PCA**
+    2. **PCA**: the LD-pruned variants of the unrelated samples passing QC are then used to derive the PCA space for the
+        reference panel (default: 10 PCs) using `FRAPOSA`_ (Fast and Robust Ancestry Prediction by using Online singular
+        value decomposition and Shrinkage Adjustment). [#zhangfraposa]_
+
 
 5. **Projecting target samples into the reference PCA space**
 
@@ -115,6 +125,7 @@ following steps:
 
 The modules used to for the ancestry analysis can be found here: https://github.com/PGScatalog/pgsc_calc/tree/main/modules/local/ancestry
 
+.. _`FRAPOSA`: https://github.com/PGScatalog/fraposa_pgsc
 
 Interpretation of PGS-adjustment data from ``pgsc_calc``
 --------------------------------------------------------
@@ -128,3 +139,4 @@ Interpretation of PGS-adjustment data from ``pgsc_calc``
 .. [#ImputeMe] Folkersen, L., et al. (2020) Impute.me: An Open-Source, Non-profit Tool for Using Data From Direct-to-Consumer Genetic Testing to Calculate and Interpret Polygenic Risk Scores. Frontiers in Genetics 11:578. https://doi.org/10.3389/fgene.2020.00578
 .. [#Khera2019] Khera A.V., et al. (2019) Whole-Genome Sequencing to Characterize Monogenic and Polygenic Contributions in Patients Hospitalized With Early-Onset Myocardial Infarction. Circulation 139:1593–1602. https://doi.org/10.1161/CIRCULATIONAHA.118.035658
 .. [#Khan2022] Khan, A., et al. (2022) Genome-wide polygenic score to predict chronic kidney disease across ancestries. Nature Medicine. https://doi.org/10.1038/s41591-022-01869-1
+.. [#zhangfraposa] Zhang, D., et al. (2020) Fast and robust ancestry prediction using principal component analysis. Bioinformatics 36(11):3439–3446. https://doi.org/10.1093/bioinformatics/btaa152
