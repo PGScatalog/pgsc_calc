@@ -19,47 +19,56 @@ The pipeline outputs are written to a results directory (``--outdir`` default is
 ----------
 
 Calculated scores are stored in a gzipped-text space-delimted text file called
-``aggregated_scores.txt.gz``. Each row represents an individual, and there should
-be at least three columns with the following headers:
+``[sampleset]_pgs.txt.gz``. The data is presented in long form where each PGS for an individual is presented on a
+seperate row (``length = n_samples*n_pgs``), and there will be at least four columns with the following headers:
 
-- ``dataset``: the name of the input sampleset
-- ``IID``: the identifier of each sample within the dataset
-- ``[PGS NAME]_SUM``: reports the weighted sum of *effect_allele* dosages multiplied by their *effect_weight*
-  for each matched variant in the scoring file. The column name will be different depending on the scores
-  you have chosen to use (e.g. ``PGS000001_SUM``).
+- ``sampleset``: the name of the input sampleset, or ``reference`` for the panel.
+- ``IID``: the identifier of each sample within the dataset.
+- ``PGS``: the accession ID of the PGS being reported.
+- ``SUM``: reports the weighted sum of *effect_allele* dosages multiplied by their *effect_weight*
+  for each matched variant in the scoring file for the PGS.
 
-At least one score must be present in this file (the third column). Extra columns might be
-present if you calculated more than one score, or if you calculated the PGS on a dataset with a
-small sample size (n < 50, in this cases a column named ``[PGS NAME]_AVG`` will be added that
-normalizes the PGS using the number of non-missing genotypes to avoid using allele frequency data
-from the target sample).
+If you have run the pipeline **without** using ancestry information the following columns may be present:
+
+- ``DENOM``: the number of non-missing genotypes used to calculate the PGS for this individual.
+- ``AVG``: normalizes ``SUM`` by the ``DENOM`` field (displayed when you calculate the PGS on a small sample size n<50
+  to avoid using unreliable allele frequency estimates for missing genotypes.
+from the target sample
+
+If you have run the pipeline **using ancestry information** (``--run_ancesty``) the following columns may be present
+depending on the ancestry adjustments that were run (see `adjustment methods`_ for more details):
+[``percentile_MostSimilarPop``, ``Z_MostSimilarPop``, ``Z_norm1``, ``Z_norm2``].
 
 Report
 ~~~~~~
 
-A summary report is also available (``report.html``). The report should open in
-a web browser and contains useful information about the PGS that were applied,
-how well the variants match with the genotyping data, and some simple graphs
-displaying the distribution of scores in your dataset(s) as a density plot.
+A summary report is also available (``report.html``). The report should open in a web browser and contains useful
+information about the PGS that were applied, how well the variants in your target dataset match with the reference
+panel and scoring files, a summary of the computed genetic ancestry data, and some simple graphs displaying the
+distribution of scores in your dataset(s) as a density plot. Some of the sections are only displayed with
+``--run_ancestry``, but we provide them here for reference.
 
-The fist section of the report reproduces the nextflow command, and metadata (imported
-from the PGS Catalog for each PGS ID) describing the scoring files that were applied
-to your sampleset(s):
+The fist section of the report reproduces the nextflow command, and scoring file metadata (imported from the PGS Catalog
+for each PGS ID) describing the scoring files that were applied to your sampleset(s):
 
-.. image:: screenshots/Report_1_Header.png
+.. figure:: screenshots/Report_1_Header.png
     :width: 600
     :alt: Example PGS Catalog Report: header sections
 
-Within the scoring file metadata section are two tables describing how well the variants within
-each scoring file match with target sampleset(s). The first table provides a summary of the
-number and percentage of variants within each score that have been matched, and whether that
-score passed the ``--min_overlap`` threshold (Passed Matching column) for calculation. The second
+    **Figure 1. Example of PGS Catalog report header.**
+
+The next section describes how the variants in the target sampleset match. The first table describes the number of
+variants in the target dataset that overlap with the reference panel (*only present with* ``--run_ancestry``). The
+second table provides a summary of the number and percentage of variants within each score that have been matched, and
+whether that score passed the ``--min_overlap`` threshold (Passed Matching column) for calculation. The third
 table provides a more detailed summary of variant matches broken down by types of variants (strand ambiguous,
 multiallelic, duplicates) for the matched, excluded, and unmatched variants (see ``match/`` section for details):
 
-.. image:: screenshots/Report_2_VariantMatching.png
+.. figure:: screenshots/Report_2_VariantMatching.png
     :width: 600
     :alt: Example PGS Catalog Report: Variant matching/qc tables (summary & detailed)
+
+    **Figure 2. Example of variant matching summaries in the PGS Catalog report.**
 
 The final section shows an example of the results table that contains the sample identifiers and
 calculated PGS in the *Score extract* panel. A visual display of the PGS distribution for a set of example
