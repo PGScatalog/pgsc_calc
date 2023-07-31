@@ -144,7 +144,7 @@ Citations
 
 If you use ``pgscatalog/pgsc_calc`` in your analysis, please cite:
 
-    PGS Catalog Calculator (in development) [0]_. PGS Catalog
+    PGS Catalog Calculator (preprint forthcoming) [0]_. PGS Catalog
     Team. https://github.com/PGScatalog/pgsc_calc
 
     Lambert `et al.` (2021) The Polygenic Score Catalog as an open database for
