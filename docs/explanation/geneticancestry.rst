@@ -28,21 +28,21 @@ different genetic ancestry groups (`Figure 1`_) as been shown previously. [#Reis
 It is important to note that differences in the means between different ancestry groups do not necessarily correspond
 to differences in the risk (e.g., changes in disease prevalence, or mean biomarker values) between the populations.
 Instead, these differences are caused by changes in allele frequencies and linkage disequilibrium (LD) patterns between
-ancestry groups. This illustrates that the genetic ancestry is important for determining the relative risk, and multiple
-methods that can account for these differences have been implemented within the pgsc_calc pipeline.
+ancestry groups. This illustrates that genetic ancestry is important for determining relative risk, and multiple
+methods to adjust for these differences have been implemented within the pgsc_calc pipeline.
 
 Methods for reporting and adjusting PGS in the context of ancestry
 ------------------------------------------------------------------
 .. _adjustment methods:
 
 When a PGS is being applied to a genetically homogenous population (e.g. cluster of individuals of similar genetic
-ancestry), then the standard normalization is to normalize the calculated PGS using the sample mean and standard
-deviation. This can be performed by running pgsc_calc and taking the Z-score of the PGS SUM. However, wish to adjust
-the score to remove the effects of genetic ancestry on score distributions than the ``--run_ancestry`` method can
-combine your PGS with a reference panel of individuals (default 1000 Genomes) and adjusted using multiple methods
-(`Figure 2`_). These methods both start by creating a PCA of the reference panel, and projecting individual(s) genotypes
-into the genetic ancestry space to determine their placement. The two groups of methods (empirical and continuous
-PCA-based) use these data and the calculated PGS to report the PGS and we describe them below.
+ancestry), then the standard method is to normalize the calculated PGS using the sample mean and standard
+deviation. This can be performed by running pgsc_calc and taking the Z-score of the PGS SUM. However, if you wish to
+adjust the PGS in order to remove the effects of genetic ancestry on score distributions than the
+``--run_ancestry`` method can combine your PGS with a reference panel of individuals (default 1000 Genomes) and apply
+standard methods for adjusting PGS (`Figure 2`_). These methods both start by creating a PCA of the reference panel,
+and projecting individual(s) into the genetic ancestry space to determine their placement and most similar population.
+The two groups of methods (empirical and continuous PCA-based) use these data and the calculated PGS to report the PGS.
 
 .. _Figure 2:
 .. figure:: screenshots/Fig_AncestryMethods.png
@@ -61,14 +61,14 @@ of scores from genetically similar individuals (similar to taking a Z-score with
 above). [#ImputeMe]_ To define the correct reference distribution of PGS for an individual we first train a classifier
 to predict the population labels (pre-defined ancestry groups from the reference panel) using PCA loadings in the
 reference panel. This classifier is then applied to individuals in the target dataset to identify the population they are
-most similar to in genetic ancestry space. The relative PGS for each individual is then calculated by comparing the
+most similar to in genetic ancestry space. The relative PGS for each individual is calculated by comparing the
 calculated PGS to the distribution of PGS in the most similar population in the reference panel and reporting it as a
-percentile (output column: ``percentile_MostSimilarPop``) or by taking a Z-score (output column: ``Z_MostSimilarPop``).
+percentile (output column: ``percentile_MostSimilarPop``) or as a Z-score (output column: ``Z_MostSimilarPop``).
 
 
 PCA-based methods
 ~~~~~~~~~~~~~~~~~
-A second way to remove the effect of genetic ancestry on PGS distributions is to treat ancestry as a continuum
+Another way to remove the effects of genetic ancestry on PGS distributions is to treat ancestry as a continuum
 (represented by loadings in PCA-space) and use regression to adjust for shifts therein. Using regression has the
 benefit of not assigning individuals to specific ancestry groups, which may be particularly problematic for empirical
 methods when an individual has an ancestry that is not represented within the reference panel. This method was first
@@ -76,12 +76,12 @@ proposed by Khera et al. (2019) [#Khera2019]_ and uses the PCA loadings to adjus
 distributions across ancestries by fitting a regression of PGS values based on PCA-loadings of individuals of the
 reference panel. To calculate the normalized PGS the predicted PGS based on the PCA-loadings is subtracted from the PGS
 and normalized by the standard deviation in the reference population to achieve PGS distributions that are centred
-at 0 for each genetic ancestry group (output column: ``Z_norm1``) while not relying on any population labels during
+at 0 for each genetic ancestry group (output column: ``Z_norm1``), while not relying on any population labels during
 model fitting.
 
 The first method (``Z_norm1``)  has the result of normalizing the first moment of the PGS distribution (mean); however,
 the second moment of the PGS distribution (variance) can also differ between ancestry groups. A second regression of
-the PCA-loadings on the squared residuals (difference of the PGS and the predicted PGS) can be fit to estimate a
+the PCA-loadings on the squared residuals (difference of the PGS and the predicted PGS) can be fitted to estimate a
 predicted standard deviation based on genetic ancestry, as was proposed by Khan et al. (2022). [#Khan2022]_  The
 predicted standard deviation (distance from the mean PGS based on ancestry) is used to normalize the residual PGS and
 get a new estimate of relative risk (output column: ``Z_norm2``) where the variance of the PGS distribution is more
@@ -90,11 +90,11 @@ equal across ancestry groups and approximately 1.
 
 Implementation of ancestry steps within ``pgsc_calc``
 -----------------------------------------------------
-The ancestry methods are implemented within the `--run_ancestry` method of the pipeline (:ref:`ancestry`), and has the
-following steps:
+The ancestry methods are implemented within the ```--run_ancestry``` method of the pipeline (see :ref:`ancestry` for a
+how-to guide), and has the following steps:
 
 1.  **Reference panel**: preparing and/or extracting data of the reference panel for use in the pipeline (see
-    :ref:`database` for details).
+    :ref:`database` for details about downloading the existing reference [1000 Genomes] or setting up your own).
 
 2.  **Variant overlap**: Identifying variants that are present in both the target genotypes and the reference panel.
     Uses the ``INTERSECT_VARIANTS`` module.
@@ -112,9 +112,8 @@ following steps:
     1.  **Preparing reference panel for PCA**: the refrence panel is filtered to unrelated samples with standard filters
         for variant-level QC (SNPs in Hardy–Weinberg equilibrium [p > 1e-06] that are bi-allelic and non-ambiguous,
         with low missingness [<10%], and minor allele frequency [MAF > 1%]) and sample-quality (missingness [<10%]).
-        LD-pruning is then applied to the variants and sample passing these checks (r2 threshold = 0.05) and exclusion
-        of complex regions with high LD (e.g. MHC) dependant on the target genome build. These methods are implemented
-        in the ``FILTER_VARIANTS`` module.
+        LD-pruning is then applied to the variants and sample passing these checks (r2 threshold = 0.05), excluding
+        complex regions with high LD (e.g. MHC). These methods are implemented in the ``FILTER_VARIANTS`` module.
 
     2.  **PCA**: the LD-pruned variants of the unrelated samples passing QC are then used to define the PCA space of the
         reference panel (default: 10 PCs) using `FRAPOSA`_ (Fast and Robust Ancestry Prediction by using Online singular
@@ -132,18 +131,18 @@ following steps:
     This is implemented in the ``FRAPOSA_OADP`` module.
 
 6.  **Ancestry analysis**: the calculated PGS (SUM), reference panel PCA, and target sample projection into the PCA space
-    are supplied to an analysis script that performs the analyses needed to adjust the PGS for genetic ancestry. This
+    are supplied to a script that performs the analyses needed to adjust the PGS for genetic ancestry. This
     functionality is implemented within the ``ANCESTRY_ANALYSIS`` module and tool of our `pgscatalog_utils`_ package,
     and includes:
 
-    1.  **Genetic similarity analysis**: first each indvidual in the target sample is compared to the reference panel to
+    1.  **Genetic similarity analysis**: first each individual in the target sample is compared to the reference panel to
         determine the population that they are most genetically similar to. By default this is done by fitting a
         RandomForest classifier to predict reference panel population assignments using the PCA-loadings (default:
         10 PCs) and then applying the classifier to the target samples to identify the most genetically similar
         population in the reference panel (e.g. highest-probability). Alternatively, the Mahalanobis distance between
         each individual and each reference population can be calculated and used to identify the most similar reference
         population (minimum distance). The probability of membership for each reference population and most similar
-        population assignments are recorded and output.
+        population assignments are recorded and output for all methods.
 
     2.  **PGS adjustment**: the results of the genetic similarity analysis are combined with the PCA-loadings and
         calculated PGS to perform the `adjustment methods`_ described in the previous section. To perform the
@@ -152,7 +151,7 @@ following steps:
         PCA-loadings are used.
 
 7.  **Reporting & Outputs**: the final results are output to txt files for further analysis, and an HTML report with
-    visualizations of the PCA data and PGS distributions (see :ref:`interpret`_ for additional details).
+    visualizations of the PCA data and PGS distributions (see :ref:`interpret` for additional details).
 
 .. _`FRAPOSA`: https://github.com/PGScatalog/fraposa_pgsc
 .. _`pgscatalog_utils`: https://github.com/PGScatalog/pgscatalog_utils
