@@ -19,7 +19,7 @@ and/or user-defined PGS/PRS.
 ## Pipeline summary
 
 <p align="center">
-  <img width="70%" src="https://user-images.githubusercontent.com/11425618/195053396-a3eaf31c-b3d5-44ff-a36c-4ef6d7958668.png">
+  <img width="80%" src="https://github.com/PGScatalog/pgsc_calc/assets/11425618/f766b28c-0f75-4344-abf3-3463946e36cc">
 </p>
 
 * Downloading scoring files using the PGS Catalog API in a specified genome build (GRCh37 and GRCh38).
