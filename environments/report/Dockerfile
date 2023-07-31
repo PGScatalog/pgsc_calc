@@ -18,5 +18,5 @@ ONBUILD RUN wget https://github.com/quarto-dev/quarto-cli/releases/download/v1.3
     
 FROM quarto_${TARGETARCH}
 
-RUN R -e 'install.packages(c("DT", "purrr", "jsonlite", "dplyr", "ggplot2", "tidyr", "forcats", "readr"), clean=TRUE)'
+RUN R -e 'install.packages(c("DT", "data.table", "purrr", "jsonlite", "dplyr", "ggplot2", "tidyr", "forcats", "readr"), clean=TRUE)'
 
