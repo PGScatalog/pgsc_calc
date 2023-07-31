@@ -55,7 +55,8 @@ for each PGS ID) describing the scoring files that were applied to your samplese
     :width: 600
     :alt: Example PGS Catalog Report: header sections
 
-    **Figure 1. Example of PGS Catalog report header.**
+    **Figure 1. Example of pgsc_calc header.**
+
 
 The next section describes how the variants in the target sampleset match. The first table describes the number of
 variants in the target dataset that overlap with the reference panel (*only present with* ``--run_ancestry``). The
@@ -68,16 +69,33 @@ multiallelic, duplicates) for the matched, excluded, and unmatched variants (see
     :width: 600
     :alt: Example PGS Catalog Report: Variant matching/qc tables (summary & detailed)
 
-    **Figure 2. Example of variant matching summaries in the PGS Catalog report.**
+    **Figure 2. Example of variant matching summaries in the pgsc_calc report.**
+
+
+The next section describes the results of the genetic ancestry analysis of the target genotypes with the reference
+panel data. It first displays a snippet of the ``[sampleset]_popsim.txt.gz`` file for reference. A visual display of the
+projection of the target data into the reference panel PCA space is plot for the first 6 PCs, where the target samples
+are coloured according to the population that they are most similar to in the reference panel. A table describing the
+distribution of ancestries within the reference panel and proportions of the target samples who are most similar to
+those populations is also displayed.
+
+.. figure:: screenshots/Report_3_PCA.png
+    :width: 600
+    :alt: Example PGS Catalog Report: PCA plot of genetic ancestry data
+
+    **Figure 3. Visualization of genetic ancestry analysis within the report.**
+
 
 The final section shows an example of the results table that contains the sample identifiers and
 calculated PGS in the *Score extract* panel. A visual display of the PGS distribution for a set of example
-score(s) (up to 6) is provided in the *Density plot* panel which can be helpful for looking at the distributions in
-multiple dataset(s):
+score(s) (up to 6) is provided in the *Density plot* panel which can be helpful for looking at the distributions of the
+scores in the target and reference dataset and how it changes for difference PGS adjustment methods:
 
-.. image:: screenshots/Report_3_Scores.png
+.. figure:: screenshots/Report_4_Scores.png
     :width: 600
-    :alt: Example PGS Catalog Report: Variant matching/qc tables (summary & detailed)
+    :alt: Example PGS Catalog Report: table and density plots of score distributions
+
+    **Figure 4. Example of the** ``[sampleset]_pgs.txt.gz`` **table and plots of PGS distributions.**
 
 ``match/``
 ----------
