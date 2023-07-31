@@ -100,10 +100,9 @@ scores in the target and reference dataset and how it changes for difference PGS
 ``match/``
 ----------
 
-This directory contains information about the matching of scoring file variants to
-the genotyping data (samplesets). First a summary file (also displayed in the report)
-details whether each scoring file passes the minimum variant matching threshold, and
-the types of variants that were included in the score:
+This directory contains information about the matching of scoring file variants to your genotyping data (sampleset).
+First a summary file (also displayed in the report) details whether each scoring file passes the minimum variant
+matching threshold, and the types of variants that were included in the score:
 
 .. list-table:: ``[sampleset]_summary.csv`` metadata
     :widths: 20, 20, 60
@@ -140,18 +139,25 @@ the types of variants that were included in the score:
       - ``duplicate_ID``
       - True/False flag indicating whether multiple scoring file variants match a single target ID. This usually occurs
         when scoring files have been lifted across builds and two variants now point to the same position (e.g. rsID mergers).
+    * - Matches strand flip
+      - ``match_flipped``
+      - True/False flag indicating whether the scoring file variant is originally reported on the opposite strand (and
+        thus flipped to match)
+    * - Variant in reference panel
+      - ``match_IDs``
+      - True/False flag indicating whether the variant from the scoring file that is matched in the target samples is
+        also present in the variants that overlap with the reference population panel (required for PGS adjustment).
     * - n
       - ``count``
       - Number of variants with this combination of metadata (grouped by: ``[ match_status, ambiguous, is_multiallelic,
-        duplicate_best_match, duplicate_ID]``
+        duplicate_best_match, duplicate_ID, match_flipped, match_IDs]``
     * - %
       - ``percent``
       - Percent of the scoring file's variants that have the combination of metadata in count.
 
 
-The log file is a :term:`CSV` that contains all possible matches
-for each variant in the combined input scoring files. This information is useful to debug a
-score that is causing problems. Columns contain information about how each
+The log file is a :term:`CSV` that contains all possible matches for each variant in the combined input scoring files.
+This information is useful to debug a score that is causing problems. Columns contain information about how each
 variant was matched against the target genomes:
 
 
@@ -198,11 +204,19 @@ variant was matched against the target genomes:
       - True/False flag indicating whether the matched variant is multi-allelic (multiple ALT alleles).
     * - ``ambiguous``
       - True/False flag indicating whether the matched variant is strand-ambiguous (e.g. A/T and C/G variants).
+    * - ``match_flipped``
+      - True/False flag indicating whether the matched variant is on the opposite strand (flipped).
+    * - ``best_match``
+      - True/False flag indicating whether this the best ``match_type`` for the current scoring file variant.
+    * - ``exclude``
+      - True/False flag indicating whether this matched variant is excluded from the final scoring file.
     * - ``duplicate_best_match``
       - True/False flag indicating whether a single scoring file variants has multiple potential matches to the target genome.
         This usually occurs when the variant has no other_allele, and with variants that have different REF alleles.
     * - ``duplicate_ID``
       - True/False flag indicating whether multiple scoring file variants match a single target ID.
+    * - ``match_IDs``
+      - True/False flag indicating whether the matched variant is also found in the reference panel genotypes.
     * - ``match_status``
       - Indicates whether the variant is *matched* (included in the final scoring file), *excluded* (matched but removed
         based on variant filters), *not_best* (a different match candidate was selected for this scoring file variant),
@@ -211,12 +225,10 @@ variant was matched against the target genomes:
       - Name of the sampleset/genotyping data.
 
 
-Processed scoring files are also present in this directory. Briefly, variants in
-the scoring files are matched against the target genomes. Common variants across
-different scores are combined (left joined, so each score is an additional
-column). The combined scores are then partially split to overcome PLINK2
-technical limitations (e.g. calculating different effect types such as dominant
-/ recessive). Once scores are calculated from these partially split scoring
+Processed scoring files are also present in this directory. Briefly, variants in the scoring files are matched against
+the target genomes. Common variants across different scores are combined (left joined, so each score is an additional
+column). The combined scores are then partially split to overcome PLINK2 technical limitations (e.g. calculating
+different effect types such as dominant/recessive). Once scores are calculated from these partially split scoring
 files, scores are aggregated to produce the final results in ``score/``.
 
 ``pipeline_info/``
