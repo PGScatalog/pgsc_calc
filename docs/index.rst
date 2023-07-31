@@ -17,8 +17,9 @@ normalisation methods are also supported.
 Workflow summary
 ----------------
 
-.. image:: https://user-images.githubusercontent.com/11425618/195053396-a3eaf31c-b3d5-44ff-a36c-4ef6d7958668.png
+.. image:: https://user-images.githubusercontent.com/11425618/257213197-f766b28c-0f75-4344-abf3-3463946e36cc.png
     :width: 600
+    :align: center
     :alt: `pgsc_calc` workflow diagram
 
 |
