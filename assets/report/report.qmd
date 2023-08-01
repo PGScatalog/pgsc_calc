@@ -15,13 +15,21 @@ params:
   score_path: ""
   sampleset: ""
   run_ancestry: false
+  reference_panel_name: ""
 css: logo.css
 ---
+
+::: {.callout-note}
+See the online [documentation](https://pgsc-calc.readthedocs.io/en/latest/output.html#report) for additional
+explanation of the terms and data presented in this report.
+:::
 
 ```{r setup, echo=FALSE, warning=FALSE, message=FALSE}
 library(jsonlite)
 library(dplyr)
+library(tidyr)
 library(ggplot2)
+library(data.table)
 ```
 
 ```{r setup_logs, echo=FALSE}
@@ -50,14 +58,10 @@ cat command.txt | fold -w 80 -s | awk -F ' ' 'NR==1 { print "$", $0} NR>1 { prin
 
 # Scoring file metadata
 
-::: {.callout-note}
-Additional [documentation](https://pgsc-calc.readthedocs.io/en/latest/output.html#report) is available that explains some of the terms used this report in more detail
-:::
-
 ## Scoring file summary
 
 ```{r load_scorefiles}
-json_scorefiles <- read_json(params$log_scorefiles, simplifyVector=TRUE)
+json_scorefiles <- read_json(params$log_scorefiles, simplifyVector=TRUE) 
 
 link_traits <- function(trait_efo, mapped) {
   if (length(trait_efo) == 0) {
@@ -159,6 +163,23 @@ DT::datatable(
 cat params.txt
 ```
 
+```{asis, echo = params$run_ancestry}
+## Reference matching summary
+```
+
+```{r, echo = FALSE, message = FALSE, eval=params$run_ancestry}
+intersect_stats <- scan("intersect_counts.txt", sep="\n", what=integer())
+n_target <- intersect_stats[1]
+n_ref <- intersect_stats[2]
+n_match <- intersect_stats[3]
+
+tribble(
+  ~'reference', ~'n target', ~'N (matched)', ~'N variants in panel', ~'% matched',
+  params$reference_panel_name, n_target, n_match, n_ref, n_match / n_ref
+) %>% 
+  DT::datatable()
+```
+
 ## Summary
 
 ```{r setup_matches}
@@ -207,34 +228,64 @@ compat %>%
 :::{.column-body-outset}
 
 ```{r match_table_detailed, echo = FALSE, warning=FALSE}
-log_df %>%
-  group_by(sampleset, accession) %>%
-  count(match_status, ambiguous, is_multiallelic, duplicate_best_match, duplicate_ID, wt = count) %>%
-  rename(is_ambiguous = ambiguous) %>%
-  mutate(percent = round(n / sum(n) * 100, 2),
-         match_status = forcats::fct_relevel(match_status, "matched", "excluded", "unmatched")) %>%
-  arrange(accession, match_status) %>%
-  mutate(accession = stringr::str_replace_all(accession, "_", " ")) %>%
-  DT::datatable(rownames=FALSE,
-                extensions = 'Buttons',
-    options = list(dom = 'Bfrtip',
-                   buttons = c('csv')),
-    colnames = c(
-      "Sampleset" = "sampleset",
-      "Scoring file" = "accession",
-      "Match type" = "match_status",
-      "Multiple potential matches" = "duplicate_best_match",
-      "Duplicated matched variants" = "duplicate_ID",
-      "Ambiguous" = "is_ambiguous",
-      "Multiallelic" = "is_multiallelic",
-      "%" = "percent"
-    ))
+if(params$run_ancestry == TRUE){
+    # Include match_IDs in the groupby to account for
+    log_df %>%
+      group_by(sampleset, accession) %>%
+      count(match_status, match_IDs, ambiguous, is_multiallelic, match_flipped, duplicate_best_match, duplicate_ID, wt = count) %>%
+      rename(is_ambiguous = ambiguous) %>%
+      mutate(percent = round(n / sum(n) * 100, 2),
+             match_status = forcats::fct_relevel(match_status, "matched", "excluded", "unmatched")) %>%
+      arrange(accession, match_status) %>%
+      mutate(accession = stringr::str_replace_all(accession, "_", " ")) %>%
+      DT::datatable(rownames=FALSE,
+                    extensions = 'Buttons',
+        options = list(dom = 'Bfrtip',
+                       buttons = c('csv')),
+        colnames = c(
+          "Sampleset" = "sampleset",
+          "Scoring file" = "accession",
+          "Match type" = "match_status",
+          "Variant in reference panel" = "match_IDs",
+          "Multiple potential matches" = "duplicate_best_match",
+          "Duplicated matched variants" = "duplicate_ID",
+          "Ambiguous" = "is_ambiguous",
+          "Multiallelic" = "is_multiallelic",
+          "Matches strand flip" = "match_flipped",
+          "%" = "percent"
+        ))
+} else{
+    log_df %>%
+      group_by(sampleset, accession) %>%
+      count(match_status, ambiguous, is_multiallelic,match_flipped, duplicate_best_match, duplicate_ID, wt = count) %>%
+      rename(is_ambiguous = ambiguous) %>%
+      mutate(percent = round(n / sum(n) * 100, 2),
+             match_status = forcats::fct_relevel(match_status, "matched", "excluded", "unmatched")) %>%
+      arrange(accession, match_status) %>%
+      mutate(accession = stringr::str_replace_all(accession, "_", " ")) %>%
+      DT::datatable(rownames=FALSE,
+                    extensions = 'Buttons',
+        options = list(dom = 'Bfrtip',
+                       buttons = c('csv')),
+        colnames = c(
+          "Sampleset" = "sampleset",
+          "Scoring file" = "accession",
+          "Match type" = "match_status",
+          "Multiple potential matches" = "duplicate_best_match",
+          "Duplicated matched variants" = "duplicate_ID",
+          "Ambiguous" = "is_ambiguous",
+          "Multiallelic" = "is_multiallelic",
+          "Matches strand flip" = "match_flipped",
+          "%" = "percent"
+        ))
+}
 ```
 
 :::
 
-
+```{asis, echo = params$run_ancestry}
 # Genetic Ancestry
+```
 
 ```{r colour_palette, echo = FALSE, eval=params$run_ancestry}
 # source: https://github.com/PGScatalog/PGS_Catalog/blob/master/catalog/static/catalog/pgs.scss#L2493-L2520
@@ -244,27 +295,38 @@ thousand_genomes_colours <- c("#FFD900", "#E41A1C", "#B15928", "#4DAF4A",
                               "#FF7F00", "#BBB", "#999")
 names(thousand_genomes_colours) <- c("AFR", "AMR", "ASN", "EAS", "EUR", "GME",
                                      "SAS", "MAE", "MAO", "NR", "OTH")
-thousand_genomes_palette <- scale_colour_manual(name = "Most Similar Population", values = thousand_genomes_colours)
+thousand_genomes_palette <- scale_colour_manual(name = "Populations", values = thousand_genomes_colours)
 ```
 
 ```{r, echo = FALSE, message = FALSE, eval=params$run_ancestry}
 popsim <- readr::read_tsv(gsub("_pgs.", "_popsimilarity.", params$score_path))
 head(popsim)
 
+new_label_target = paste({params$sampleset}, '(Most Similar Population)')
+new_label_ref = paste0('reference (', {params$reference_panel_name}, ' populations)')
+
+popsim$slabel <- new_label_ref
+popsim[popsim$sampleset == {params$sampleset}, 'slabel'] <- new_label_target
+
+map_shapes <- c(1, 16)
+map_shapes <- setNames(map_shapes, c(new_label_target, new_label_ref))
+
 # Placeholder figure: needs better legend labelling
 for(pc in seq.int(1,5,2)){
   pcY = paste('PC', pc, sep='')
   pcX = paste('PC', pc+1, sep='')
   if (pcX %in% colnames(popsim)){
-    p_pca <- ggplot(popsim[popsim$REFERENCE == TRUE,], aes(x=!!sym(pcX), y=!!sym(pcY))) + geom_point(aes(colour=SuperPop), alpha=0.25)
-    p_pca <- p_pca + geom_point(data=popsim[popsim$REFERENCE != TRUE,], aes(color=MostSimilarPop), shape=1)
-    p_pca <- p_pca + theme_bw() + thousand_genomes_palette
+    p_pca <- ggplot(popsim[popsim$REFERENCE == TRUE,], aes(x=!!sym(pcX), y=!!sym(pcY))) + geom_point(aes(colour=SuperPop, shape=slabel), alpha=0.25)
+    p_pca <- p_pca + geom_point(data=popsim[popsim$REFERENCE != TRUE,], aes(color=MostSimilarPop, shape=slabel))
+    p_pca <- p_pca + theme_bw() + thousand_genomes_palette + scale_shape_manual(values=map_shapes, name='sampleset')
     print(p_pca)
   }
 }
 ```
 
+```{asis, echo = params$run_ancestry}
 ## Population similarity summary
+```
 
 ```{r, echo = FALSE, message = FALSE, eval=params$run_ancestry}
 popsim %>% 
@@ -292,9 +354,22 @@ pop_summary %>%
 # Scores
 
 ```{r, echo = FALSE, message = FALSE, eval=!params$run_ancestry}
-scores <- readr::read_tsv(params$score_path) 
+# problem: aggregated_scores.txt.gz  has a different structure to the ancestry outputs
+# solution: pivot the table in the report, but fix in pgscatalog_utils in a future release
+# problem: big scores can take a lot of memory
+# use data.table as a temporary solution to pivoting datasets
+scores <- data.table::fread(params$score_path)
 n_scores <- sum(grepl("*_SUM$", colnames(scores)))
 n_samples <- nrow(scores)
+
+id_cols <- c("sampleset", "IID")
+melted_scores <- data.table::melt(scores, id.vars=id_cols, measure.vars=patterns(SUM="*_SUM$", DENOM="DENOM", AVG="*_AVG$"), variable.name = "PGS")
+
+# annoying fix for scores getting converted to a factor level integer
+# fixed in data.table 1.14.9 but not released yet
+score_names <- sub("_.*", "", colnames(scores)[grepl("_SUM$", colnames(scores))])
+setattr(melted_scores$PGS, "levels", score_names)
+data.table::fwrite(melted_scores, params$score_path, sep="\t", compress="gzip")
 ```
 
 ```{r, echo = FALSE, message = FALSE, eval=params$run_ancestry}
@@ -338,41 +413,36 @@ In the future mean-imputation will be supported in small samplesets using ancest
 #### Score extract
 
 ::: {.callout-note}
-Below is a summary of the aggregated scores, which might be useful for debugging.
+Below is a summary of the aggregated scores, which might be useful for debugging. See here for an explanation of [plink2](https://www.cog-genomics.org/plink/2.0/formats#sscore) column names
 :::
 
 ```{r, echo = FALSE}
 scores %>%
-  select(sampleset, IID, ends_with("SUM")) %>%
   tibble::as_tibble(.)
 ```
 
-::: {.callout-note}
-See here for an explanation of [plink2](https://www.cog-genomics.org/plink/2.0/formats#sscore) column names
-:::
-
-#### Density plot
+#### Density plot(s)
 
 ::: {.callout-note}
 The summary density plots show up to six scoring files
 :::
 
 ```{r density_ancestry, echo=FALSE, message=FALSE, warning=FALSE, eval=params$run_ancestry}
-scores %>%
-  ungroup() %>%
-  select(IID, sampleset, PGS, SUM) %>%
-  group_by(sampleset, PGS) -> long_scores
+# Select which PGS to plot
+uscores <- unique(scores$PGS)
+uscores_plot <- uscores[1:min(length(uscores), 6)] # plot max 6 PGS
 
-group_keys(long_scores) %>%
-  slice(1:6) -> score_keys
-  
-long_scores %>%
-  inner_join(score_keys) %>%
-  ggplot(aes(x = SUM, fill = sampleset)) +
-      geom_density(alpha = 0.3) +
-      facet_wrap(~PGS, ncol = 2, scales = "free") +
-      theme_bw() +
-      labs(x = "PGS (SUM)", y = "Density", title = "PGS Distribution(s)")
+# Plot multiple adjustment methods at once per PGS
+for(current_pgs in uscores_plot){
+  long_scores <- scores %>% select(!percentile_MostSimilarPop) %>% filter(PGS == current_pgs) %>% gather(Method, score, -sampleset, -IID, -PGS)
+  long_scores %>%
+  ggplot(aes(x = score, fill = sampleset)) +
+    geom_density(alpha = 0.3) +
+    facet_wrap(~Method, scales = "free", nrow=1) +
+    theme_bw() +
+    labs(x = 'PGS', y = "Density", title = paste(current_pgs, '(adjusted distributions)')) -> p_dist
+  print(p_dist)
+}
 ```
 
 ```{r, echo = FALSE, message=FALSE, warning=FALSE, eval=!params$run_ancestry}

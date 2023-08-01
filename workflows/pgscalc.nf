@@ -260,6 +260,8 @@ workflow PGSCALC {
 
     // reference allelic frequencies are optional inputs to scoring subworkflow
     ref_afreq = Channel.fromPath(file('NO_FILE'))
+    intersect_count = Channel.fromPath(file('NO_FILE_INTERSECT_COUNT'))
+
     if (run_ancestry_assign) {
         intersection = Channel.empty()
         ref_geno = Channel.empty()
@@ -279,6 +281,8 @@ workflow PGSCALC {
         ref_geno = ref_geno.mix(ANCESTRY_PROJECT.out.ref_geno)
         ref_pheno = ref_pheno.mix(ANCESTRY_PROJECT.out.ref_pheno)
         ref_var = ref_var.mix(ANCESTRY_PROJECT.out.ref_var)
+        intersect_count = ANCESTRY_PROJECT.out.intersect_count
+
         if (params.load_afreq) {
             ref_afreq = ANCESTRY_PROJECT.out.ref_afreq
         }
@@ -369,7 +373,8 @@ workflow PGSCALC {
             projections,
             INPUT_CHECK.out.log_scorefiles,
             MATCH.out.db,
-            run_ancestry_assign
+            run_ancestry_assign,
+            intersect_count
         )
     }
 

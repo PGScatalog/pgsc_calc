@@ -14,6 +14,8 @@ process SCORE_REPORT {
 
     input:
     tuple val(meta), path(scorefile), path(score_log), path(match_summary), path(ancestry)
+    path intersect_count
+    val reference_panel_name
 
     output:
     // includeInputs to correctly use $meta.id in publishDir path
@@ -42,7 +44,8 @@ process SCORE_REPORT {
     quarto render report.qmd -M "self-contained:true" \
         -P score_path:$scorefile \
         -P sampleset:$meta.id \
-        -P run_ancestry:$run_ancestry
+        -P run_ancestry:$run_ancestry \
+        -P reference_panel_name:$reference_panel_name
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

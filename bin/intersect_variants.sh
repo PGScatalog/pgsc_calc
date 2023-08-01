@@ -77,6 +77,10 @@ fi
 join ref_variants.txt target_variants.txt |\
     awk '{if (NR==1) print $0, "SAME_REF"; else print $0, ($3 == $8)}' > matched_variants.txt
 
+wc -l < target_variants.txt | awk '{ print $0-1}' > intersect_counts.txt
+wc -l < ref_variants.txt | awk '{ print $0-1}' >> intersect_counts.txt
+wc -l < matched_variants.txt | awk '{ print $0-1}' >> intersect_counts.txt
+
 # Current output columns are:
 #1 : CHR:POS:A0:A1
 #2 : ID_REF
