@@ -3,7 +3,7 @@ process ANCESTRY_ANALYSIS {
     label 'process_low'
     label 'pgscatalog_utils' // controls conda, docker, + singularity options
 
-    conda (params.enable_conda ? "${task.ext.conda}" : null)
+    conda "${task.ext.conda}"
 
     container "${ workflow.containerEngine == 'singularity' &&
         !task.ext.singularity_pull_docker_container ?
