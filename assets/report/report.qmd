@@ -61,7 +61,7 @@ cat command.txt | fold -w 80 -s | awk -F ' ' 'NR==1 { print "$", $0} NR>1 { prin
 ## Scoring file summary
 
 ```{r load_scorefiles}
-json_scorefiles <- read_json(params$log_scorefiles, simplifyVector=TRUE)
+json_scorefiles <- read_json(params$log_scorefiles, simplifyVector=TRUE) 
 
 link_traits <- function(trait_efo, mapped) {
   if (length(trait_efo) == 0) {
