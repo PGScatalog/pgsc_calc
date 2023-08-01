@@ -24,21 +24,21 @@ Workflow summary
 
 |
 
-The workflow does the following steps:
+The workflow performs the following steps:
 
 - Downloading scoring files using the PGS Catalog API in a specified genome build (GRCh37 and GRCh38).
 - Reading custom scoring files (and performing a liftover if genotyping data is in a different build).
 - Automatically combines and creates scoring files for efficient parallel
-  computation of multiple PGS
-- Matching variants in the scoring files against variants in the target dataset (in plink bfile/pfile or VCF format)
-- Calculates PGS for all samples (linear sum of weights and dosages)
-- Creates a summary report to visualize score distributions and pipeline metadata (variant matching QC)
+  computation of multiple PGS.
+- Matches variants in the scoring files against variants in the target dataset (in plink bfile/pfile or VCF format).
+- Calculates PGS for all samples (linear sum of weights and dosages).
+- Creates a summary report to visualize score distributions and pipeline metadata (variant matching QC).
 
-And optionally:
+And optionally has additional functionality to:
 
-- Using reference genomes to automatically assign the genetic ancestry of target
-  genomes
-- Normalising calculated PGS to account for genetic ancestry
+- Use a reference panel to obtain genetic ancestry data using PCA, and define the most similar population in the
+  reference panel for each target sample.
+- Report PGS using methods to adjust for genetic ancestry.
 
 .. tip:: To enable these optional steps, see :ref:`ancestry`
          
@@ -111,7 +111,7 @@ Documentation
 - :doc:`Get started<getting-started>`: install pgsc_calc and calculate some polygenic scores quickly
 - :doc:`How-to guides<how-to/index>`: step-by-step guides, covering different use cases
 - :doc:`Reference guides<reference/index>`: technical information about workflow configuration
-- :doc:`Explanations<explanation/index>`: more detailed explanations about PGS calculation
+- :doc:`Explanations<explanation/index>`: more detailed explanations about PGS calculation and results
 
 Changelog
 ---------
@@ -144,7 +144,7 @@ Citations
 
 If you use ``pgscatalog/pgsc_calc`` in your analysis, please cite:
 
-    PGS Catalog Calculator (preprint forthcoming) [0]_. PGS Catalog
+    PGS Catalog Calculator [0]_. PGS Catalog
     Team. https://github.com/PGScatalog/pgsc_calc
 
     Lambert `et al.` (2021) The Polygenic Score Catalog as an open database for
@@ -157,7 +157,7 @@ you use in your analyses, and the underlying data/software tools described in th
 .. _citations file: https://github.com/PGScatalog/pgsc_calc/blob/master/CITATIONS.md
 .. _10.1038/s41588-021-00783-5: https://doi.org/10.1038/s41588-021-00783-5
 .. [0] A manuscript is in development but the calculated scores have been
-       validated against UK Biobank since v1.1.0
+       for consistency in UK Biobank since v1.1.0
 
 
 License Information

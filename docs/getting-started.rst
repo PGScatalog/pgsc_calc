@@ -117,11 +117,11 @@ then the pipeline will download a `harmonized (remapped rsIDs and/or lifted posi
 scoring file(s) in the user-specified build of the genotyping datasets.
 
 Custom scoring files can be lifted between genome builds using the ``--liftover`` flag, (see :ref:`liftover`
-for more information). An example would look like:
+for more information). If your custom PGS was in GRCh37 an example would look like:
 
 .. code-block:: console
 
-    ---scorefile MyPGSFile.txt --target_build GRCh38
+    ---scorefile MyPGSFile.txt --target_build GRCh38 --liftover
 
 .. _harmonized (remapped rsIDs and/or lifted positions): https://www.pgscatalog.org/downloads/#dl_ftp_scoring_hm_pos
 

@@ -1,7 +1,7 @@
 .. _interpret:
 
-``pgsc_calc`` Outputs & results
-===============================
+``pgsc_calc`` Outputs & report
+==============================
 
 
 The pipeline outputs are written to a results directory (``--outdir`` default is
