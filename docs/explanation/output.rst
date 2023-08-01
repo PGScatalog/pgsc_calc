@@ -32,21 +32,25 @@ If you have run the pipeline **without** using ancestry information the followin
 
 - ``DENOM``: the number of non-missing genotypes used to calculate the PGS for this individual.
 - ``AVG``: normalizes ``SUM`` by the ``DENOM`` field (displayed when you calculate the PGS on a small sample size n<50
-  to avoid using unreliable allele frequency estimates for missing genotypes.
-from the target sample
+  to avoid using unreliable allele frequency estimates for missing genotypes in the target sample.
 
 If you have run the pipeline **using ancestry information** (``--run_ancesty``) the following columns may be present
 depending on the ancestry adjustments that were run (see `adjustment methods`_ for more details):
-[``percentile_MostSimilarPop``, ``Z_MostSimilarPop``, ``Z_norm1``, ``Z_norm2``].
+
+- ``percentile_MostSimilarPop``: PGS reported as a percentile of the distribution for the Most Similar Population
+- ``Z_MostSimilarPop``: PGS reported as a Z-score in reference to the mean/sd of the Most Similar Population
+- ``Z_norm1``: PGS adjusted to have mean 0 across ancestry groups (result of regressing *PGS ~ PCs*)
+- ``Z_norm2``: PGS adjusted to have mean 0 and unit variance across ancestry groups (result of regressing
+  *resid(PGS)^2 ~ PCs*)
 
 Report
 ~~~~~~
 
-A summary report is also available (``report.html``). The report should open in a web browser and contains useful
-information about the PGS that were applied, how well the variants in your target dataset match with the reference
-panel and scoring files, a summary of the computed genetic ancestry data, and some simple graphs displaying the
-distribution of scores in your dataset(s) as a density plot. Some of the sections are only displayed with
-``--run_ancestry``, but we provide them here for reference.
+A summary report is also provided for your samples (``report.html``). The report should open in a web browser and
+contains useful information about the PGS that were applied, how well the variants in your target dataset match with the
+reference panel and scoring files, a summary of the computed genetic ancestry data, and some simple graphs displaying
+the distribution of scores in your dataset(s) as a density plot. Some of the sections are only displayed with
+``--run_ancestry``, but we show them all here for reference.
 
 The fist section of the report reproduces the nextflow command, and scoring file metadata (imported from the PGS Catalog
 for each PGS ID) describing the scoring files that were applied to your sampleset(s):
@@ -58,11 +62,11 @@ for each PGS ID) describing the scoring files that were applied to your samplese
     **Figure 1. Example of pgsc_calc header.**
 
 
-The next section describes how the variants in the target sampleset match. The first table describes the number of
-variants in the target dataset that overlap with the reference panel (*only present with* ``--run_ancestry``). The
-second table provides a summary of the number and percentage of variants within each score that have been matched, and
-whether that score passed the ``--min_overlap`` threshold (Passed Matching column) for calculation. The third
-table provides a more detailed summary of variant matches broken down by types of variants (strand ambiguous,
+The next section reports how the variants in the target sampleset match the other data. The first table describes the
+number of variants in the target dataset that overlap with the reference panel (*only present with* ``--run_ancestry``).
+The second table provides a summary of the number and percentage of variants within each score that have been matched,
+and whether that score passed the ``--min_overlap`` threshold (Passed Matching column) for calculation. The third
+table provides a more detailed summary of variant matches broken down by types of variants (e.g., strand ambiguous,
 multiallelic, duplicates) for the matched, excluded, and unmatched variants (see ``match/`` section for details):
 
 .. figure:: screenshots/Report_2_VariantMatching.png
@@ -73,11 +77,11 @@ multiallelic, duplicates) for the matched, excluded, and unmatched variants (see
 
 
 The next section describes the results of the genetic ancestry analysis of the target genotypes with the reference
-panel data. It first displays a snippet of the ``[sampleset]_popsim.txt.gz`` file for reference. A visual display of the
-projection of the target data into the reference panel PCA space is plot for the first 6 PCs, where the target samples
-are coloured according to the population that they are most similar to in the reference panel. A table describing the
-distribution of ancestries within the reference panel and proportions of the target samples who are most similar to
-those populations is also displayed.
+panel data. It first displays a snippet of the ``[sampleset]_popsimilarity.txt.gz`` file for reference. A visual display
+of the projection of the target data into the reference panel PCA space is plot for the first 6 PCs, where the target
+samples are coloured according to the population that they are most similar to in the reference panel. A table
+describing the distribution of ancestries within the reference panel and proportions of the target samples who are most
+similar to those populations is also provided.
 
 .. figure:: screenshots/Report_3_PCA.png
     :width: 600
@@ -86,8 +90,8 @@ those populations is also displayed.
     **Figure 3. Visualization of genetic ancestry analysis within the report.**
 
 
-The final section shows an example of the results table that contains the sample identifiers and
-calculated PGS in the *Score extract* panel. A visual display of the PGS distribution for a set of example
+The final section shows an example of the main results dataframe that contains the sample identifiers and
+calculated PGS in the *Score extract* section. A visual display of the PGS distribution for a set of example
 score(s) (up to 6) is provided in the *Density plot* panel which can be helpful for looking at the distributions of the
 scores in the target and reference dataset and how it changes for difference PGS adjustment methods:
 
@@ -123,22 +127,24 @@ matching threshold, and the types of variants that were included in the score:
         and is included in the final scoring file.
     * - Match type
       - ``match_status``
-      - Indicates whether the variant is matched (included in the final scoring file),
-        excluded (matched but removed based on variant filters), or unmatched.
+      - Indicates whether the variants are matched (included in the final scoring file), excluded (matched but removed
+        based on variant filters), or unmatched.
     * - Ambiguous
       - ``ambiguous``
-      - True/False flag indicating whether the matched variant is strand-ambiguous (e.g. A/T and C/G variants).
+      - True/False flag indicating whether the matched variants are strand-ambiguous (e.g. A/T and C/G variants).
     * - Multiallelic
       - ``is_multiallelic``
-      - True/False flag indicating whether the matched variant is multi-allelic (multiple ALT alleles).
+      - True/False flag indicating whether the matched variants are multi-allelic (multiple ALT alleles).
     * - Multiple potential matches
       - ``duplicate_best_match``
-      - True/False flag indicating whether a single scoring file variants has multiple potential matches to the target genome.
-        This usually occurs when the variant has no other_allele, and with variants that have different REF alleles.
+      - True/False flag indicating whether a single scoring file variant has multiple potential matches to the target genome.
+        This usually occurs when the variant has no other/non-effect allele, and with variants that have different
+        REF alleles.
     * - Duplicated matched variants
       - ``duplicate_ID``
       - True/False flag indicating whether multiple scoring file variants match a single target ID. This usually occurs
-        when scoring files have been lifted across builds and two variants now point to the same position (e.g. rsID mergers).
+        when scoring files have been lifted across builds and two variants now point to the same position (e.g. rsID
+        mergers).
     * - Matches strand flip
       - ``match_flipped``
       - True/False flag indicating whether the scoring file variant is originally reported on the opposite strand (and

@@ -90,7 +90,7 @@ equal across ancestry groups and approximately 1.
 
 Implementation of ancestry steps within ``pgsc_calc``
 -----------------------------------------------------
-The ancestry methods are implemented within the ```--run_ancestry``` method of the pipeline (see :ref:`ancestry` for a
+The ancestry methods are implemented within the ``--run_ancestry`` method of the pipeline (see :ref:`ancestry` for a
 how-to guide), and has the following steps:
 
 1.  **Reference panel**: preparing and/or extracting data of the reference panel for use in the pipeline (see
@@ -125,7 +125,7 @@ how-to guide), and has the following steps:
     projection. Naive projection (using loadings) is prone to shrinkage which biases the projection of individuals
     towards the null of an existing space, which would introduce errors into PCA-loading based adjustments of PGS. To
     ensure correct placement of individuals we use the **online augmentation, decomposition and Procrustes (OADP)**
-    method of the `FRAPOSA`_ package to achieve a unbiased projection of new indidividuals into the reference panel PCA
+    method of the `FRAPOSA`_ package for a less biased projection of new indidividuals into the reference panel PCA
     space. [#zhangfraposa]_ We chose to implement PCA-based projection over derivation of the PCA space on a merged
     target and reference dataset to ensure that the composition of the target doesn't impact the structure of the PCA.
     This is implemented in the ``FRAPOSA_OADP`` module.
