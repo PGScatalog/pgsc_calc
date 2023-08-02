@@ -13,3 +13,5 @@ dependencies:
   - r-jsonlite
   - r-data.table
   - quarto=1.3.433
+  - r-rmarkdown
+  - r-r.utils
