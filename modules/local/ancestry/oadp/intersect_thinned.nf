@@ -13,7 +13,7 @@ process INTERSECT_THINNED {
     tag "$meta.id"
     storeDir "$workDir/thinned_intersection/${params.target_build}/${meta.id}"
 
-    conda (params.enable_conda ? "${task.ext.conda}" : null)
+    conda "${task.ext.conda}"
 
     container "${ workflow.containerEngine == 'singularity' &&
         !task.ext.singularity_pull_docker_container ?

@@ -5,7 +5,7 @@ process FILTER_VARIANTS {
 
     tag "$meta.id $params.target_build"
 
-    conda (params.enable_conda ? "${task.ext.conda}" : null)
+    conda "${task.ext.conda}"
 
     container "${ workflow.containerEngine == 'singularity' &&
         !task.ext.singularity_pull_docker_container ?

@@ -6,7 +6,7 @@ process FRAPOSA_PROJECT {
     tag "${target_geno.baseName.tokenize('_')[1]}"
     storeDir "$workDir/fraposa/${params.target_build}/${target_geno.baseName}/${split_fam}"
 
-    conda (params.enable_conda ? "${task.ext.conda}" : null)
+    conda "${task.ext.conda}"
 
     container "${ workflow.containerEngine == 'singularity' &&
         !task.ext.singularity_pull_docker_container ?
@@ -31,7 +31,7 @@ process FRAPOSA_PROJECT {
         --dim_ref 10 \
         --stu_filepref ${target_geno.baseName} \
         --stu_filt_iid <(cut -f1 $split_fam) \
-	--out ${target_geno.baseName}_${split_fam}
+        --out ${target_geno.baseName}_${split_fam}
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

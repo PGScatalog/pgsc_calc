@@ -4,7 +4,7 @@ process SCORE_AGGREGATE {
     label 'pgscatalog_utils' // controls conda, docker, + singularity options
     tag "$meta.id"
 
-    conda (params.enable_conda ? "${task.ext.conda}" : null)
+    conda "${task.ext.conda}"
 
     container "${ workflow.containerEngine == 'singularity' &&
         !task.ext.singularity_pull_docker_container ?
