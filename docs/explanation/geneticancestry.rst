@@ -14,7 +14,7 @@ Motivation: PGS distributions and genetic ancestry
 PGS are developed to measure an individual’s genetic predisposition to a disease or trait. A common way to express this
 is as a relative measure of predisposition (e.g. risk) compared to a reference population (often presented as a Z-score
 or percentile). The choice of reference population is important, as the mean and variance of a PGS can differ between
-different genetic ancestry groups (`Figure 1`_) as been shown previously. [#Reisberg2017]_ [#Martin2017]_
+different genetic ancestry groups (`Figure 1`_) as has been shown previously.\ [#Reisberg2017]_\ [#Martin2017]_
 
 .. _Figure 1:
 .. figure:: screenshots/p_SUM.png
@@ -58,7 +58,7 @@ Empirical methods
 ~~~~~~~~~~~~~~~~~
 A common way to report the relative PGS for an individual is by comparing their score with a distribution
 of scores from genetically similar individuals (similar to taking a Z-score within a genetically homogenous population
-above). [#ImputeMe]_ To define the correct reference distribution of PGS for an individual we first train a classifier
+above).\ [#ImputeMe]_ To define the correct reference distribution of PGS for an individual we first train a classifier
 to predict the population labels (pre-defined ancestry groups from the reference panel) using PCA loadings in the
 reference panel. This classifier is then applied to individuals in the target dataset to identify the population they are
 most similar to in genetic ancestry space. The relative PGS for each individual is calculated by comparing the
@@ -72,7 +72,7 @@ Another way to remove the effects of genetic ancestry on PGS distributions is to
 (represented by loadings in PCA-space) and use regression to adjust for shifts therein. Using regression has the
 benefit of not assigning individuals to specific ancestry groups, which may be particularly problematic for empirical
 methods when an individual has an ancestry that is not represented within the reference panel. This method was first
-proposed by Khera et al. (2019) [#Khera2019]_ and uses the PCA loadings to adjust for differences in the means of PGS
+proposed by Khera et al. (2019)\ [#Khera2019]_ and uses the PCA loadings to adjust for differences in the means of PGS
 distributions across ancestries by fitting a regression of PGS values based on PCA-loadings of individuals of the
 reference panel. To calculate the normalized PGS the predicted PGS based on the PCA-loadings is subtracted from the PGS
 and normalized by the standard deviation in the reference population to achieve PGS distributions that are centred
@@ -82,10 +82,10 @@ model fitting.
 The first method (``Z_norm1``)  has the result of normalizing the first moment of the PGS distribution (mean); however,
 the second moment of the PGS distribution (variance) can also differ between ancestry groups. A second regression of
 the PCA-loadings on the squared residuals (difference of the PGS and the predicted PGS) can be fitted to estimate a
-predicted standard deviation based on genetic ancestry, as was proposed by Khan et al. (2022). [#Khan2022]_  The
-predicted standard deviation (distance from the mean PGS based on ancestry) is used to normalize the residual PGS and
-get a new estimate of relative risk (output column: ``Z_norm2``) where the variance of the PGS distribution is more
-equal across ancestry groups and approximately 1.
+predicted standard deviation based on genetic ancestry, as was proposed by Khan et al. (2022)\ [#Khan2022]_ and
+implemented within the eMERGE GIRA.\ [#GIRA]_ The predicted standard deviation (distance from the mean PGS based on
+ancestry) is used to normalize the residual PGS and get a new estimate of relative risk (output column: ``Z_norm2``)
+where the variance of the PGS distribution is more equal across ancestry groups and approximately 1.
 
 
 Implementation of ancestry steps within ``pgsc_calc``
@@ -104,31 +104,30 @@ how-to guide), and has the following steps:
         The list of overlapping variants between the reference and target datasets are supplied to the ``MATCH_COMBINE``
         module to exclude scoring file variants that are matched only in the target genotypes.
 
-    2.  **PGS Scoring**: the scoring files are the supplied to the ``PLINK2_SCORE`` module, along with allele frequency
-        information from the reference panel to ensure consistent scoring of the PGS SUMs across datasets. The scoring
-        is made efficient by scoring all PGS in parallel.
+    2.  **PGS Scoring**: those scoring files are then supplied to the ``PLINK2_SCORE`` module, along with allele
+        frequency information from the reference panel to ensure consistent scoring of the PGS SUMs across datasets.
+        The scoring is made efficient by scoring all PGS in parallel.
 
 4. **PCA of the reference panel**
     1.  **Preparing reference panel for PCA**: the refrence panel is filtered to unrelated samples with standard filters
         for variant-level QC (SNPs in Hardy–Weinberg equilibrium [p > 1e-06] that are bi-allelic and non-ambiguous,
-        with low missingness [<10%], and minor allele frequency [MAF > 1%]) and sample-quality (missingness [<10%]).
-        LD-pruning is then applied to the variants and sample passing these checks (r2 threshold = 0.05), excluding
+        with low missingness [<10%], and minor allele frequency [MAF > 1%]) and sample-quality (missingness <10%).
+        LD-pruning is then applied to the variants and sample passing these checks (r\ :sup:`2` threshold = 0.05), excluding
         complex regions with high LD (e.g. MHC). These methods are implemented in the ``FILTER_VARIANTS`` module.
 
     2.  **PCA**: the LD-pruned variants of the unrelated samples passing QC are then used to define the PCA space of the
         reference panel (default: 10 PCs) using `FRAPOSA`_ (Fast and Robust Ancestry Prediction by using Online singular
-        value decomposition and Shrinkage Adjustment). [#zhangfraposa]_ This is implemented in the ``FRAPOSA_PCA``
+        value decomposition and Shrinkage Adjustment).\ [#zhangfraposa]_ This is implemented in the ``FRAPOSA_PCA``
         module.
 
 5.  **Projecting target samples into the reference PCA space**: the PCA of the reference panel (variant-PC loadings, and
     reference sample projections) are then used to determine the placement of the target samples in the PCA space using
     projection. Naive projection (using loadings) is prone to shrinkage which biases the projection of individuals
-    towards the null of an existing space, which would introduce errors into PCA-loading based adjustments of PGS. To
-    ensure correct placement of individuals we use the **online augmentation, decomposition and Procrustes (OADP)**
-    method of the `FRAPOSA`_ package for a less biased projection of new indidividuals into the reference panel PCA
-    space. [#zhangfraposa]_ We chose to implement PCA-based projection over derivation of the PCA space on a merged
-    target and reference dataset to ensure that the composition of the target doesn't impact the structure of the PCA.
-    This is implemented in the ``FRAPOSA_OADP`` module.
+    towards the null of an existing space, which would introduce errors into PCA-loading based adjustments of PGS.
+    For less biased projection of individuals into the reference panel PCA space we use the **online augmentation,
+    decomposition and Procrustes (OADP)** method of the `FRAPOSA`_ package.\ [#zhangfraposa]_ We chose to implement
+    PCA-based projection over derivation of the PCA space on a merged target and reference dataset to ensure that the
+    composition of the target doesn't impact the structure of the PCA. This is implemented in the ``FRAPOSA_OADP`` module.
 
 6.  **Ancestry analysis**: the calculated PGS (SUM), reference panel PCA, and target sample projection into the PCA space
     are supplied to a script that performs the analyses needed to adjust the PGS for genetic ancestry. This
@@ -163,4 +162,5 @@ how-to guide), and has the following steps:
 .. [#ImputeMe] Folkersen, L., et al. (2020) Impute.me: An Open-Source, Non-profit Tool for Using Data From Direct-to-Consumer Genetic Testing to Calculate and Interpret Polygenic Risk Scores. Frontiers in Genetics 11:578. https://doi.org/10.3389/fgene.2020.00578
 .. [#Khera2019] Khera A.V., et al. (2019) Whole-Genome Sequencing to Characterize Monogenic and Polygenic Contributions in Patients Hospitalized With Early-Onset Myocardial Infarction. Circulation 139:1593–1602. https://doi.org/10.1161/CIRCULATIONAHA.118.035658
 .. [#Khan2022] Khan, A., et al. (2022) Genome-wide polygenic score to predict chronic kidney disease across ancestries. Nature Medicine. https://doi.org/10.1038/s41591-022-01869-1
+.. [#GIRA] Linder, J.E., et al. (2023) Returning integrated genomic risk and clinical recommendations: The eMERGE study. Genetics in Medicine 25(4):100006. https://doi.org/10.1016/j.gim.2023.100006.
 .. [#zhangfraposa] Zhang, D., et al. (2020) Fast and robust ancestry prediction using principal component analysis. Bioinformatics 36(11):3439–3446. https://doi.org/10.1093/bioinformatics/btaa152
