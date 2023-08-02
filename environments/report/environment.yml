@@ -11,4 +11,5 @@ dependencies:
   - r-readr
   - r-purrr
   - r-jsonlite
-  - r-datatable
+  - r-data.table
+  - quarto=1.3.433
