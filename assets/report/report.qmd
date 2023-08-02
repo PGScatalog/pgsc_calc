@@ -168,15 +168,18 @@ cat params.txt
 ```
 
 ```{r, echo = FALSE, message = FALSE, eval=params$run_ancestry}
-intersect_stats <- scan("intersect_counts.txt", sep="\n", what=integer())
-n_target <- intersect_stats[1]
-n_ref <- intersect_stats[2]
-n_match <- intersect_stats[3]
+intersect_stats_files <- list.files(pattern = "intersect_counts*")
+intersect_stats <- lapply(intersect_stats_files, function(x) scan(x, sep = "\n", what=integer()))
 
-tribble(
-  ~'reference', ~'n target', ~'N (matched)', ~'N variants in panel', ~'% matched',
-  params$reference_panel_name, n_target, n_match, n_ref, n_match / n_ref
-) %>% 
+n_target <- purrr::map_int(intersect_stats, ~ .x[[1]])
+n_ref <- purrr::map_int(intersect_stats, ~ .x[[2]])
+n_match <- purrr::map_int(intersect_stats, ~ .x[[3]])
+
+data.frame(reference = params$reference_panel_name, n_target = n_target, n_match = n_match, n_ref = n_ref) %>%
+  group_by(reference) %>%
+  summarise(n_target = sum(n_target), n_ref = sum(n_ref), n_match = sum(n_match)) %>%
+  mutate("% matched" = round(n_match / n_ref * 100, 2)) %>%
+  rename("n target" = n_target, "n (matched)" = n_match, "N variants in panel" = n_ref) %>%
   DT::datatable()
 ```
 

@@ -259,7 +259,7 @@ workflow ANCESTRY_PROJECT {
 
     emit:
     intersection = INTERSECT_VARIANTS.out.intersection
-    intersect_count = INTERSECT_VARIANTS.out.intersect_count
+    intersect_count = INTERSECT_VARIANTS.out.intersect_count.collect()
     projections = ch_projections.combine(ch_ref_projections)
     ref_geno = ch_ref.geno
     ref_pheno = ch_ref.pheno
