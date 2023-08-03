@@ -1,0 +1,38 @@
+name: test conda on publish
+
+on:
+  - release:
+      types: [published]
+  - workflow_dispatch
+
+jobs:
+  test_mamba_standard:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        test_profile: ["test"]
+        profile: ["conda"]
+        nxf_ver: ["22.10.0", "latest"]
+
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version: '17'
+
+      - uses: nf-core/setup-nextflow@v1
+        with:
+          version: ${{ matrix.nxf_ver }}
+          
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniconda-version: "latest"
+          channels: conda-forge,bioconda,defaults
+
+      - name: Run pipeline with test data
+        run: |
+          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
