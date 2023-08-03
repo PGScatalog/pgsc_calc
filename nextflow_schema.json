@@ -115,7 +115,7 @@
                 },
                 "n_popcomp": {
                     "type": "integer",
-                    "default": 10,
+                    "default": 5,
                     "description": "Number of PCs used for population assignment"
                 },
                 "normalization_method": {
@@ -195,14 +195,14 @@
                 },
                 "maf_ref": {
                     "type": "number",
-                    "default": 0.01,
+                    "default": 0.05,
                     "description": "Exclude variants with allele frequency lower than a threshold (in reference genomes)",
                     "minimum": 0,
                     "maximum": 1
                 },
                 "hwe_ref": {
                     "type": "number",
-                    "default": 1e-06,
+                    "default": 1e-04,
                     "description": "Exclude variants with Hardy-Weinberg equilibrium exact test p-values below  a threshold (in reference genomes)",
                     "minimum": 0,
                     "maximum": 1
