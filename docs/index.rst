@@ -137,7 +137,10 @@ are written by Benjamin Wingfield, Samuel Lambert, Laurent Gil with additional i
 from Aoife McMahon (EBI). Development of new features, testing, and code review
 is ongoing including Inouye lab members (Rodrigo Canovas, Scott Ritchie) and others. A
 manuscript describing the tool is in preparation (see `Citations <Citations_>`_) and we
-welcome ongoing community feedback before then.
+welcome ongoing community feedback before then via our `discussion board`_ or `issue tracker`_.
+
+.. _discussion board: https://github.com/PGScatalog/pgsc_calc/discussions
+.. _issue tracker: https://github.com/pgscatalog/pgsc_calc/issues
 
 Citations
 ~~~~~~~~~
