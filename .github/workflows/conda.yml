@@ -1,9 +1,9 @@
 name: test conda on publish
 
 on:
-  - release:
+  release:
       types: [published]
-  - workflow_dispatch
+  workflow_dispatch:
 
 jobs:
   test_mamba_standard:
