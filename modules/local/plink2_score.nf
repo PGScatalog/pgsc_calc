@@ -40,10 +40,11 @@ process PLINK2_SCORE {
     // custom args2
     def maxcol = (scoremeta.n_scores.toInteger() + 2) // id + effect allele = 2 cols
     def no_imputation = 'no-mean-imputation'
+    def error_on_freq_calc = '--error-on-freq-calc'
     def cols = (meta.n_samples.toInteger() < 50) ? 'header-read cols=+scoresums,+denom,-fid' : 'header-read cols=+scoresums,+denom,-fid'
     def recessive = (scoremeta.effect_type == 'recessive') ? ' recessive ' : ''
     def dominant = (scoremeta.effect_type == 'dominant') ? ' dominant ' : ''
-    args2 = [args2, cols, 'list-variants', no_imputation, recessive, dominant].join(' ')
+    args2 = [args2, cols, 'list-variants', no_imputation, recessive, dominant, error_on_freq_calc].join(' ')
 
     if (scoremeta.n_scores.toInteger() == 1)
         """
