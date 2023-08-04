@@ -110,15 +110,16 @@ how-to guide), and has the following steps:
 
 4. **PCA of the reference panel**
     1.  **Preparing reference panel for PCA**: the refrence panel is filtered to unrelated samples with standard filters
-        for variant-level QC (SNPs in Hardy–Weinberg equilibrium [p > 1e-06] that are bi-allelic and non-ambiguous,
-        with low missingness [<10%], and minor allele frequency [MAF > 1%]) and sample-quality (missingness <10%).
+        for variant-level QC (SNPs in Hardy–Weinberg equilibrium [p > 1e-04] that are bi-allelic and non-ambiguous,
+        with low missingness [<10%], and minor allele frequency [MAF > 5%]) and sample-quality (missingness <10%).
         LD-pruning is then applied to the variants and sample passing these checks (r\ :sup:`2` threshold = 0.05), excluding
         complex regions with high LD (e.g. MHC). These methods are implemented in the ``FILTER_VARIANTS`` module.
 
     2.  **PCA**: the LD-pruned variants of the unrelated samples passing QC are then used to define the PCA space of the
         reference panel (default: 10 PCs) using `FRAPOSA`_ (Fast and Robust Ancestry Prediction by using Online singular
         value decomposition and Shrinkage Adjustment).\ [#zhangfraposa]_ This is implemented in the ``FRAPOSA_PCA``
-        module.
+        module. *Note: it is important to inspect the PCA in the report to make sure that it looks correct and places
+        the different reference populations correctly.*
 
 5.  **Projecting target samples into the reference PCA space**: the PCA of the reference panel (variant-PC loadings, and
     reference sample projections) are then used to determine the placement of the target samples in the PCA space using
@@ -128,6 +129,8 @@ how-to guide), and has the following steps:
     decomposition and Procrustes (OADP)** method of the `FRAPOSA`_ package.\ [#zhangfraposa]_ We chose to implement
     PCA-based projection over derivation of the PCA space on a merged target and reference dataset to ensure that the
     composition of the target doesn't impact the structure of the PCA. This is implemented in the ``FRAPOSA_OADP`` module.
+    *Note: the quality of the projection should be visually assessed in the report - we plan to furhter optimize the QC
+    in this step in future versions.*
 
 6.  **Ancestry analysis**: the calculated PGS (SUM), reference panel PCA, and target sample projection into the PCA space
     are supplied to a script that performs the analyses needed to adjust the PGS for genetic ancestry. This
@@ -150,7 +153,9 @@ how-to guide), and has the following steps:
         PCA-loadings are used.
 
 7.  **Reporting & Outputs**: the final results are output to txt files for further analysis, and an HTML report with
-    visualizations of the PCA data and PGS distributions (see :ref:`interpret` for additional details).
+    visualizations of the PCA data and PGS distributions (see :ref:`interpret` for additional details). It is important
+    to inspect the PCA projections and post-adjustment distributions of PGS before using these data in any downstream
+    analysis.
 
 .. _`FRAPOSA`: https://github.com/PGScatalog/fraposa_pgsc
 .. _`pgscatalog_utils`: https://github.com/PGScatalog/pgscatalog_utils

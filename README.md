@@ -22,6 +22,8 @@ and/or user-defined PGS/PRS.
   <img width="80%" src="https://github.com/PGScatalog/pgsc_calc/assets/11425618/f766b28c-0f75-4344-abf3-3463946e36cc">
 </p>
 
+The workflow performs the following steps:
+
 * Downloading scoring files using the PGS Catalog API in a specified genome build (GRCh37 and GRCh38).
 * Reading custom scoring files (and performing a liftover if genotyping data is in a different build).
 * Automatically combines and creates scoring files for efficient parallel computation of multiple PGS
@@ -35,6 +37,8 @@ And optionally:
   reference dataset ([1000 Genomes (1000G)](http://www.nature.com/nature/journal/v526/n7571/full/nature15393.html)), using principal components analysis (PCA)
 - PGS Normalization: Using reference population data and/or PCA projections to report
   individual-level PGS predictions (e.g. percentiles, z-scores) that account for genetic ancestry
+
+See documentation for a list of planned [features under development](https://pgsc-calc.readthedocs.io/en/latest/index.html#Features-under-development).
 
 ## Quick start
 

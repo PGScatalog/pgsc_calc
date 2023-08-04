@@ -41,7 +41,10 @@ And optionally has additional functionality to:
 - Report PGS using methods to adjust for genetic ancestry.
 
 .. tip:: To enable these optional steps, see :ref:`ancestry`
-         
+
+See `Features under development`_ section for information about planned updates.
+
+
 The workflow relies on open source scientific software, including:
 
 - `PLINK 2`_
@@ -53,6 +56,7 @@ A full description of included software is described in :ref:`containers`.
 .. _PLINK 2: https://www.cog-genomics.org/plink/2.0/
 .. _PGS Catalog Utilities: https://github.com/PGScatalog/pgscatalog_utils
 .. _FRAPOSA: https://github.com/PGScatalog/fraposa_pgsc
+
 
 Quick example
 -------------
@@ -118,6 +122,18 @@ Changelog
 
 The :doc:`Changelog page<changelog>` describes fixes and enhancements for each version.
 
+Features under development
+--------------------------
+
+These are some of the fetures and improvements we're planning for the ``pgsc_calc``:
+
+- Improved population reference panels (merged 1000 Genomes & Human Genome Diversity Project (HGDP) for use
+  within the pipeline
+- Further optimizations to the PCA & ancestry similarity analysis steps focused on improving automatic QC
+- Performance improvments to make ``pgsc_calc`` work with 1000s of scoring files in paralell (e.g. integration
+  with `OmicsPred`_)
+
+.. _OmicsPred: https://www.omicspred.org
 
 Credits
 -------
