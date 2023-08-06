@@ -8,19 +8,23 @@ will only occur in major versions with changes noted in this changelog.
 
 .. _`semantic versioning`: https://semver.org/
 
-pgsc_calc v2.0.0 (2023-XX-XX)
+pgsc_calc v2.0.0 (2023-08-08)
 -----------------------------
 
 This major release features breaking changes to samplesheet structure to provide
 more flexible support for extra genomic file types in the future. Two major new
 features were implemented in this release:
 
-- Genetic ancestry group similarity measures are calculated using 1000 Genomes
-  reference panel for all input genomes
-- Calculated PGS are normalised for each ancestry group label using a range of
-  methods
+- Genetic ancestry group similarity is calculated to a population reference panel
+  (default: 1000 Genomes) when the ``--run_ancestry`` flag is supplied. This runs
+  using PCA and projection implemented in the ``fraposa_pgsc (v0.1.0)`` package.
+- Calculated PGS can be adjusted for genetic ancestry using empirical PGS distributions
+  from the most similar reference panel population or continuous PCA-based regressions.
 
-These new features are optional and don't run in the default workflow.  
+These new features are optional and don't run in the default workflow. Other features
+included in the release are:
+
+- Speed optimizations for PGS scoring (skipping allele frequency calculation)
 
 pgsc_calc v1.3.2 (2023-01-27)
 -----------------------------
