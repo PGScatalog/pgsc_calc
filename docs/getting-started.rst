@@ -5,10 +5,18 @@
 Getting started
 ===============
 
-``pgsc_calc`` requires Nextflow and one of Docker, Singularity, or
-Anaconda. You will need a POSIX compatible system, like Linux or macOS, to run ``pgsc_calc``.
+``pgsc_calc`` has a few important software dependencies:
 
-1. Start by `installing nextflow`_:
+* Nextflow
+* Docker, Singularity, or Anaconda
+* Linux or macOS
+
+Without these dependencies installed you won't be able to run ``pgsc_calc``.
+
+Step by step setup
+------------------
+
+1. `Install nextflow`_:
 
 .. code-block:: console
 
@@ -19,165 +27,66 @@ Anaconda. You will need a POSIX compatible system, like Linux or macOS, to run `
 
     $ mv nextflow ~/bin/
 
-2. Next, `install Docker`_, `Singularity`_, or `Anaconda`_
+2. Next, `install Docker`_, `Singularity`_, or `Anaconda`_ (Docker or
+   Singularity are best)
 
-3. Finally, check Nextflow is working:
-
-.. code-block:: console
-
-    $ nextflow run pgscatalog/pgsc_calc --help
-    N E X T F L O W  ~  version 21.04.0
-    Launching `pgscatalog/pgsc_calc` [condescending_stone] - revision: cf3e5c886b [master]
-    ...
-
-And check if Docker, Singularity, or Anaconda are working by running the
-workflow with bundled test data and replacing ``<docker/singularity/conda>`` in
-the command below with the specific container manager you intend to use:
+3. Run the ``pgsc_calc`` test profile:
 
 .. code-block:: console
 
-    $ nextflow run pgscatalog/pgsc_calc -profile test,<docker/singularity/conda>
-    ... <configuration messages intentionally not shown> ...
-    ------------------------------------------------------
-    If you use pgscatalog/pgsc_calc for your analysis please cite:
+    $ nextflow run pgscatalog/pgsc_calc -profile test,<docker|singularity|conda>
 
-    * The Polygenic Score Catalog
-      https://doi.org/10.1038/s41588-021-00783-5
-
-    * The nf-core framework
-      https://doi.org/10.1038/s41587-020-0439-x
-
-    * Software dependencies
-      https://github.com/pgscatalog/pgsc_calc/blob/master/CITATIONS.md
-    ------------------------------------------------------
-    executor >  local (7)
-    [06/6462a0] process > PGSCATALOG_PGSCALC:PGSCALC:INPUT_CHECK:SAMPLESHEET_JSON (samplesheet.csv)                         [100%] 1 of 1 ✔
-    [b3/d80f09] process > PGSCATALOG_PGSCALC:PGSCALC:INPUT_CHECK:COMBINE_SCOREFILES (1)                                     [100%] 1 of 1 ✔
-    [bd/ad4d8c] process > PGSCATALOG_PGSCALC:PGSCALC:MAKE_COMPATIBLE:PLINK2_RELABELBIM (cineca_synthetic_subset chromoso... [100%] 1 of 1 ✔
-    [-        ] process > PGSCATALOG_PGSCALC:PGSCALC:MAKE_COMPATIBLE:PLINK2_RELABELPVAR                                     -
-    [-        ] process > PGSCATALOG_PGSCALC:PGSCALC:MAKE_COMPATIBLE:PLINK2_VCF                                             -
-    [09/bda9b3] process > PGSCATALOG_PGSCALC:PGSCALC:MAKE_COMPATIBLE:MATCH_VARIANTS (cineca_synthetic_subset)               [100%] 1 of 1 ✔
-    [23/2decd9] process > PGSCATALOG_PGSCALC:PGSCALC:APPLY_SCORE:PLINK2_SCORE (cineca_synthetic_subset chromosome 22 eff... [100%] 1 of 1 ✔
-    [25/6b87fc] process > PGSCATALOG_PGSCALC:PGSCALC:APPLY_SCORE:SCORE_REPORT (1)                                           [100%] 1 of 1 ✔
-    [6b/52087d] process > PGSCATALOG_PGSCALC:PGSCALC:DUMPSOFTWAREVERSIONS (1)                                               [100%] 1 of 1 ✔
-    -[pgscatalog/pgsc_calc] Pipeline completed successfully-
-
-
-.. _`installing nextflow`: https://www.nextflow.io/docs/latest/getstarted.html
+.. _`Install nextflow`: https://www.nextflow.io/docs/latest/getstarted.html
 .. _`install Docker`: https://docs.docker.com/engine/install/
 .. _`Singularity`: https://sylabs.io/guides/3.0/user-guide/installation.html
 .. _`Anaconda`: https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html
 
-.. note:: Replace ``<docker/singularity/conda>`` with what you have installed on
-          your computer (e.g., ``docker``, ``singularity``, or ``conda``). These
-          options are mutually exclusive!
+.. note:: Remember to replace ``<docker|singularity|conda>`` one of ``docker``, ``singularity``, or ``conda``
+
+.. warning:: If you have an ARM processor (like Apple sillicon) please check :ref:`arm`      
+
+
+Please note the test profile genomes are not biologically meaningful, won't
+produce valid scores, and aren't compatible with scores on the PGS Catalog. We
+provide these genomes to make checking installation and automated testing
+easier.
 
 Calculate your first polygenic scores
-=====================================
+-------------------------------------
 
-If you've completed the installation process that means you've already
-calculated some polygenic scores |:heart_eyes:| However, these scores were
-calculated using synthetic data from a single chromosome. Let's try calculating scores
-with your genomic data, which are probably genotypes from real people!
+If you've completed the setup guide successfully then you're ready to calculate
+scores with your genomic data, which are probably genotypes from real
+people. Exciting!
 
+.. warning:: The format of samplesheets changed in v2.0.0 to better accommodate
+             extra file formats in the future
+   
 .. warning:: You might need to prepare input genomic data before calculating
            polygenic scores, see :ref:`prepare`
 
-1. Samplesheet setup
---------------------
+1. Set up samplesheet
+~~~~~~~~~~~~~~~~~~~~~
 
 First, you need to describe the structure of your genomic data in a standardised
-way. To do this, set up a spreadsheet that looks like one of the examples below:
+way. To do this, set up a spreadsheet that looks like:
 
-.. list-table:: Example bfile samplesheet
-   :widths: 20 20 20 20 20
+.. csv-table:: Example samplesheet for a combined plink2 file set
+   :file: ../assets/examples/samplesheet_multichrom.csv
    :header-rows: 1
 
-   * - sampleset
-     - vcf_path
-     - bfile_path
-     - pfile_path
-     - chrom
-   * - cineca_synthetic_subset
-     -
-     - /full/path/to/bfile_prefix
-     -
-     - 22
-   * - cineca_synthetic_subset
-     -
-     - /full/path/to/bfile_prefix
-     -
-     - 21
-
-.. list-table:: Example multi-chromosome bfile samplesheet
-   :widths: 20 20 20 20 20
+.. csv-table:: Example samplesheet for a plink2 file set split by chromosome
+   :file: ../assets/examples/samplesheet.csv
    :header-rows: 1
 
-   * - sampleset
-     - vcf_path
-     - bfile_path
-     - pfile_path
-     - chrom
-   * - cineca_synthetic_subset
-     -
-     - /full/path/to/bfile_prefix
-     -
-     -
-
-.. list-table:: Example split VCF samplesheet
-   :widths: 20 20 20 20 20
+.. csv-table:: Example samplesheet for a combined VCF file
+   :file: ../assets/examples/samplesheet_multichrom_vcf.csv
    :header-rows: 1
 
-   * - sampleset
-     - vcf_path
-     - bfile_path
-     - pfile_path
-     - chrom
-   * - cineca_synthetic_subset_vcf
-     - /full/path/to/vcf.gz
-     -
-     -
-     - 22
-   * - cineca_synthetic_subset_vcf
-     - /full/path/to/vcf.gz
-     -
-     -
-     - 21
-
-There are five mandatory columns. Columns that specify genomic data paths
-(**vcf_path**, **bfile_path**, and **pfile_path**) are mutually exclusive:
-
-- **sampleset**: A text string referring to the name of a :term:`target dataset` of
-  genotyping data containing at least one sample/individual (however cohort datasets
-  will often contain many individuals with combined genotyped/imputed data). Data from a
-  sampleset may be input as a single file, or split across chromosomes into multiple files.
-  Scores generated from files with the same sampleset name are combined in later stages of the
-  analysis.
-- **vcf_path**: A text string of a file path pointing to a multi-sample
-  :term:`VCF` file. File names must be unique. It's best to use full file paths,
-  not relative file paths. By default hard-called genotypes (``GT`` field) are imported,
-  if you would like to import dosages (``DS``) a it needs to be specified in the ``vcf_genotype_field``
-  column, see :ref:`setup samplesheet` for additional information.
-- **bfile_path**: A text string of a file path pointing to the prefix of a plink
-  binary fileset. For example, if a binary fileset consists of plink.bed,
-  plink.bim, and plink.fam then the prefix would be "plink". Must be
-  unique. It's best to use full file paths, not relative file paths.
-- **pfile_path**: Like **bfile_path**, but for a PLINK2 format fileset (pgen /
-  psam / pvar)
-- **chrom**: An integer (range 1-22) or string (X, Y). If the target genomic data file contains
-  multiple chromosomes, leave empty. Don't use a mix of empty and integer
-  chromosomes in the same sample.
-
-Save this spreadsheet in :term:`CSV` format (e.g., ``samplesheet.csv``).
-
-.. note::
-    All samplesets have to be in the same genome build (either GRCh37 or GRCh38) which is specified
-    using the ``--target_build [GRCh3#]`` command. All scoring files are downloaded or mapped to match the specified
-    genome build, no liftover/re-mapping of the genotyping data is performed within the pipeline.
+See :ref:`setup samplesheet` for more details.
 
 
 2. Select scoring files
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
 
 pgsc_calc makes it simple to work with polygenic scores that have been published
 in the PGS Catalog. You can specify one or more scores using the ``--pgs_id``
@@ -188,6 +97,9 @@ parameter:
     --pgs_id PGS001229 # one score
     --pgs_id PGS001229,PGS001405 # many scores separated by , (no spaces)
 
+.. note:: You can also select scores associated with traits (``--efo_id``) and
+          publications (``--pgp_id``)
+          
 If you would like to use a custom scoring file not published in the PGS Catalog,
 that's OK too (see :ref:`calculate custom`).
 
@@ -205,16 +117,28 @@ then the pipeline will download a `harmonized (remapped rsIDs and/or lifted posi
 scoring file(s) in the user-specified build of the genotyping datasets.
 
 Custom scoring files can be lifted between genome builds using the ``--liftover`` flag, (see :ref:`liftover`
-for more information). An example would look like:
+for more information). If your custom PGS was in GRCh37 an example would look like:
 
 .. code-block:: console
 
-    ---scorefile MyPGSFile.txt --target_build GRCh38
+    ---scorefile MyPGSFile.txt --target_build GRCh38 --liftover
 
 .. _harmonized (remapped rsIDs and/or lifted positions): https://www.pgscatalog.org/downloads/#dl_ftp_scoring_hm_pos
 
+3. (Optional) Download reference database
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To enable genetic ancestry similarity calculations and PGS normalisation,
+download our pre-built reference database:
+
+.. code-block:: console
+
+    $ wget https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/pgsc_calc.tar.zst
+
+See :ref:`ancestry` for more details.
+
 3. Putting it all together
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For this example, we'll assume that the input genomes are in build GRCh37 and that
 they match the scoring file genome build.
@@ -224,11 +148,14 @@ they match the scoring file genome build.
     $ nextflow run pgscatalog/pgsc_calc \
         -profile <docker/singularity/conda> \
         --input samplesheet.csv --target_build GRCh37 \
-        --pgs_id PGS001229
+        --pgs_id PGS001229 \
+        --run_ancestry pgsc_calc.tar.zst 
 
 Congratulations, you've now (`hopefully`) calculated some scores!
 |:partying_face:|
 
+.. tip:: Don't include ``--run_ancestry`` if you didn't download the reference database
+         
 After the workflow executes successfully, the calculated scores and a summary
 report should be available in the ``results/score/`` directory in your current
 working directory (``$PWD``) by default. If you're interested in more
@@ -238,8 +165,9 @@ If the workflow didn't execute successfully, have a look at the
 :ref:`troubleshoot` section. Remember to replace ``<docker/singularity/conda>``
 with the software you have installed on your computer.
 
+         
 4. Next steps & advanced usage
-------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The pipeline distributes with settings that easily allow for it to be run on a
 personal computer on smaller datasets (e.g. 1000 Genomes, HGDP). The minimum

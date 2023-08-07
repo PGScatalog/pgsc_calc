@@ -1,0 +1,28 @@
+name: Preload docker containers
+
+on:
+  workflow_call:
+    outputs:
+      cache-key:
+        value: docker-${{ github.sha }}
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v3
+
+      - name: Pull and save docker
+        run: |
+          git grep 'ext.docker*' ${{ github.workspace }}/conf/modules.config | cut -f 2 -d '=' | xargs -L 2 echo | tr -d ' ' > ${{ runner.temp }}/images.txt
+          cat ${{ runner.temp }}/images.txt | xargs -I {} sh -c 'docker pull --platform linux/amd64 "$1"' - {}
+          mkdir -p ${{ runner.temp }}/docker/
+          cat ${{ runner.temp }}/images.txt | xargs -I {} sh -c 'docker save "$1" > ${{ runner.temp }}/docker/$(basename "$1").tar' - {}
+
+      - name: Save docker
+        id: cache-docker
+        uses: actions/cache@v3
+        with:
+          path: ${{ runner.temp }}/docker
+          key: docker-${{ github.sha }}

@@ -1,2 +1,2 @@
-sampleset,vcf_path,bfile_path,pfile_path,chrom
-cineca,,,assets/examples/target_genomes/cineca_synthetic_subset,22
+sampleset,path_prefix,chrom,format
+cineca,assets/examples/target_genomes/cineca_synthetic_subset,22,pfile

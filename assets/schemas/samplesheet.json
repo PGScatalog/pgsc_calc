@@ -14,150 +14,43 @@
         "pattern": "^\\S+$",
         "description": "Sampleset name must be provided and cannot contain spaces"
       },
-      "vcf_path": {
+      "path": {
+        "description": "A list of resolved target genome file paths",
+        "type": "array",
+        "uniqueItems": true,
+        "minItems": 1,
+        "maxItems": 3,
+        "items": {
+          "type": "string"
+        }
+      },
+      "chrom": {
+        "description": "Specify the chromosome of associated genotyping data (must be in {1-22, X, XY, Y}). If all chromosomes are in the associated file (e.g. your data is not split by chromosome), set to null.",
+        "type": [
+          "null",
+          "string"
+        ],
+        "minLength": 1
+      },
+      "format": {
+        "description": "Target genome data format.",
         "type": "string",
-        "pattern": "^\\S+\\.vcf\\.gz$",
-        "description": "VCF path must end with .vcf.gz, mutually exclusive with other formats",
-        "anyOf": [
-          {
-            "type": "string",
-            "pattern": "^\\S+\\.vcf\\.gz$"
-          },
-          {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 0
-          }
+        "enum": [
+          "pfile",
+          "bfile",
+          "vcf"
         ]
       },
       "vcf_genotype_field": {
         "description": "Specify whether to import genotypes (default: GT), or imputed dosages (DS) from the VCF file.",
-        "anyOf": [
-          {
-            "type": "string",
-            "pattern": "/^(GT|DS)$/"
-          },
-          {
-            "type": "null"
-          }
-        ]
-      },
-      "bfile_path": {
-        "description": "Plink 1 binary fileset prefix, must not end with bed / bim / fam, mutually exclusive with other formats",
-        "anyOf": [
-          {
-            "type": "string",
-            "pattern": "^(?!vcf$|vcf\\.gz$|bim$|bed$|fam$)[^.]+$"
-          },
-          {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 0
-          }
-        ]
-      },
-      "pfile_path": {
-        "description": "Plink 2 binary fileset prefix, must not end with pvar / pgen / psam, mutually exclusive with other formats. Must not be zstd compressed.",
-        "anyOf": [
-          {
-            "type": "string",
-            "pattern": "^(?!vcf$|vcf\\.gz$|psam$|pvar$|pgen$)[^.]+$"
-          },
-          {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 0
-          }
-        ]
-      },
-      "chrom": {
-        "description": "Specify the chromosome of associated genotyping data (must be in {1-22, X, XY, Y}). If all chromosomes are in the associated file (e.g. your data is not split by chromosome), set to an empty string.",
-        "anyOf": [
-          {
-            "type": "null"
-          },
-          {
-            "type": "string"
-          }
-        ]
+        "type": "boolean"
       }
     },
     "required": [
-      "sample",
+      "sampleset",
+      "path",
+      "format",
       "chrom"
-    ],
-    "oneOf": [
-      {
-        "required": [
-          "vcf_path"
-        ]
-      },
-      {
-        "required": [
-          "bfile_path"
-        ]
-      },
-      {
-        "required": [
-          "pfile_path"
-        ]
-      }
-    ],
-    "dependencies": {
-      "pfile_path": {
-        "allOf": [
-          {
-            "not": {
-              "required": [
-                "vcf_path"
-              ]
-            }
-          },
-          {
-            "not": {
-              "required": [
-                "bfile_path"
-              ]
-            }
-          }
-        ]
-      },
-      "bfile_path": {
-        "allOf": [
-          {
-            "not": {
-              "required": [
-                "vcf_path"
-              ]
-            }
-          },
-          {
-            "not": {
-              "required": [
-                "pfile_path"
-              ]
-            }
-          }
-        ]
-      },
-      "vcf_path": {
-        "allOf": [
-          {
-            "not": {
-              "required": [
-                "pfile_path"
-              ]
-            }
-          },
-          {
-            "not": {
-              "required": [
-                "bfile_path"
-              ]
-            }
-          }
-        ]
-      }
-    }
+    ]
   }
 }

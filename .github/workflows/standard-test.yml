@@ -1,0 +1,93 @@
+name: Run standard test with singularity and docker profiles
+
+on:
+  workflow_call:
+    inputs:
+      cache-key:
+        type: string
+        required: true
+      docker:
+        type: boolean
+      singularity:
+        type: boolean
+
+env:
+  NXF_SINGULARITY_CACHEDIR: ${{ github.workspace }}/singularity
+  SINGULARITY_VERSION: 3.8.3
+  
+jobs:
+  docker:
+    if: ${{ inputs.docker }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        test_profile: ["test"]
+        profile: ["docker"]
+        nxf_ver: ['22.10.0', 'latest']
+
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v3
+
+      - uses: nf-core/setup-nextflow@v1
+        with:
+          version: ${{ matrix.nxf_ver }}
+
+      - name: Restore docker images
+        id: restore-docker
+        uses: actions/cache/restore@v3
+        with:
+          path: ${{ runner.temp }}/docker
+          key: ${{ inputs.cache-key }}
+          fail-on-cache-miss: true          
+
+      - name: Load docker images from cache
+        run: |
+          find $HOME -name '*.tar'
+          find ${{ runner.temp }}/docker/ -name '*.tar' -exec sh -c 'docker load < {}' \;
+
+      - name: Run pipeline with test data
+        run: |
+          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
+
+  singularity:
+    if: ${{ inputs.singularity }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        test_profile: ["test"]
+        profile: ["singularity"]
+        nxf_ver: ['22.10.0', 'latest']
+
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v3
+
+      - uses: nf-core/setup-nextflow@v1
+        with:
+          version: ${{ matrix.nxf_ver }}
+
+      - name: Restore singularity setup
+        id: restore-singularity-setup
+        uses: actions/cache@v3
+        with:
+          path: /opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64
+          key: ${{ runner.os }}-singularity-${{ env.SINGULARITY_VERSION }}
+          fail-on-cache-miss: true
+
+      - name: Add singularity to path
+        run: |
+          echo "/opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64/bin" >> $GITHUB_PATH
+
+      - name: Restore singularity container images
+        id: restore-singularity
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.NXF_SINGULARITY_CACHEDIR }}
+          key: ${{ inputs.cache-key }}
+
+      - name: Run pipeline with test data
+        run: |
+          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile}},${{ matrix.profile }}

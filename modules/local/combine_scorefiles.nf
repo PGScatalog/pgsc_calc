@@ -1,12 +1,14 @@
 process COMBINE_SCOREFILES {
+    // labels are defined in conf/modules.config
     label 'process_medium'
-    label 'verbose'
+    label 'pgscatalog_utils' // controls conda, docker, + singularity options
 
-    conda (params.enable_conda ? "$projectDir/environments/pgscatalog_utils/environment.yml" : null)
-    def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/pgscatalog_utils:${params.platform}-0.3.1"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/pgscatalog_utils:amd64-0.3.1' :
-        dockerimg }"
+    conda "${task.ext.conda}"
+
+    container "${ workflow.containerEngine == 'singularity' &&
+        !task.ext.singularity_pull_docker_container ?
+        "${task.ext.singularity}${task.ext.singularity_version}" :
+        "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
     path raw_scores
@@ -22,9 +24,6 @@ process COMBINE_SCOREFILES {
 
     if (params.liftover)
         """
-        # extract chain files from database
-        sqlite3 pgsc_calc_ref.sqlar -Ax hg19ToHg38.over.chain.gz hg38ToHg19.over.chain.gz
-
         combine_scorefiles -s $raw_scores \
             --liftover \
             -t $params.target_build \

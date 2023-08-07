@@ -1,39 +1,51 @@
 process SCORE_REPORT {
-    label 'process_high_memory'
+    // first elemenet of tag must be sampleset
+    tag "$meta.id" 
 
-    def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/report:${params.platform}-2.14"
-    conda (params.enable_conda ? "$projectDir/environments/report/environment.yml" : null)
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/report:2.14' :
-        dockerimg }"
+    label 'process_high_memory'
+    label 'report'
+
+    conda "${task.ext.conda}"
+
+    container "${ workflow.containerEngine == 'singularity' &&
+        !task.ext.singularity_pull_docker_container ?
+        "${task.ext.singularity}${task.ext.singularity_version}" :
+        "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
-    path scorefiles
-    path log_scorefiles
-    path report
-    path logo
-    path '*' // list of summary csvs, staged with original names
+    tuple val(meta), path(scorefile), path(score_log), path(match_summary), path(ancestry)
+    path intersect_count
+    val reference_panel_name
 
     output:
-    path "*.html"      , emit: report
+    // includeInputs to correctly use $meta.id in publishDir path
+    // ancestry results are optional also
+    path "*.txt.gz", includeInputs: true
+    path "*.json.gz", includeInputs: true, optional: true
+    // for testing ancestry workflow
+    path "pop_summary.csv", optional: true
+    // normal outputs
+    path "*.html", emit: report
     path "versions.yml", emit: versions
 
     script:
     def args = task.ext.args ?: ''
+    run_ancestry = params.run_ancestry ? true : false
     """
-    # R and symlinks don't get along
-    cp -LR $report real_report.Rmd
-    mv real_report.Rmd report.Rmd
-    cp -LR $log_scorefiles log_combined.json
-
-
     echo $workflow.commandLine > command.txt
     echo "keep_multiallelic: $params.keep_multiallelic" > params.txt
     echo "keep_ambiguous   : $params.keep_ambiguous"    >> params.txt
     echo "min_overlap      : $params.min_overlap"       >> params.txt
 
-    R -e 'rmarkdown::render("report.Rmd", \
-        output_options = list(self_contained=TRUE))'
+    cp -r $projectDir/assets/report/* .
+    # workaround for unhelpful filenotfound quarto errors in some HPCs
+    mkdir temp && TMPDIR=temp
+
+    quarto render report.qmd -M "self-contained:true" \
+        -P score_path:$scorefile \
+        -P sampleset:$meta.id \
+        -P run_ancestry:$run_ancestry \
+        -P reference_panel_name:$reference_panel_name
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

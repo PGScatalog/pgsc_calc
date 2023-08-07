@@ -16,3 +16,4 @@ nextflow run main.nf \
     --target_build GRCh37 \
     --pgs_id PGS000018,PGS000027,PGS000049,PGS000137,PGS000337,PGS000904 \
     --keep_multiallelic false
+    --keep_ambiguous false

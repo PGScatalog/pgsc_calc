@@ -1,4 +1,32 @@
 - name: test make compatible subworkflow with bfile
+  command: nextflow run main.nf -profile test --input ./assets/examples/samplesheet_bfile.csv --only_compatible -c ./tests/config/nextflow.config
+  tags:
+    - makecompatible
+    - subworkflow
+    - fast
+  files:
+    - path: output/samplesheet/out.json
+    - path: output/combine/scorefiles.txt.gz
+    - path: output/plink2/GRCh37_cineca_22.bim.zst
+    - path: output/plink2/GRCh37_cineca_22.bed
+    - path: output/plink2/GRCh37_cineca_22.fam
+    - path: output/plink2/GRCh37_cineca_22.vmiss.gz
+
+- name: test make compatible subworkflow with vcf
+  command: nextflow run main.nf -profile test --input ./assets/examples/samplesheet_vcf.csv --only_compatible  -c ./tests/config/nextflow.config
+  tags:
+    - makecompatible
+    - subworkflow
+    - fast
+  files:
+    - path: output/samplesheet/out.json
+    - path: output/combine/scorefiles.txt.gz
+    - path: output/plink2/GRCh37_vcf_22.pgen
+    - path: output/plink2/GRCh37_vcf_22.pvar.zst
+    - path: output/plink2/GRCh37_vcf_22.psam
+    - path: output/plink2/GRCh37_vcf_22.vmiss.gz      
+
+- name: test make compatible subworkflow with pfile
   command: nextflow run main.nf -profile test --only_compatible -c ./tests/config/nextflow.config
   tags:
     - makecompatible
@@ -7,38 +35,7 @@
   files:
     - path: output/samplesheet/out.json
     - path: output/combine/scorefiles.txt.gz
-    - path: output/plink2/cineca_synthetic_subset_22.bim.zst
-    - path: output/plink2/cineca_synthetic_subset_22.bed
-    - path: output/plink2/cineca_synthetic_subset_22.fam
-    - path: output/match/cineca-synthetic-subset_22_additive_0.scorefile.gz
-    - path: output/match/cineca-synthetic-subset_log.csv.gz
-
-- name: test make compatible subworkflow with vcf
-  command: nextflow run main.nf -profile test --input "https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/samplesheet_vcf.csv" --only_compatible  -c ./tests/config/nextflow.config
-  tags:
-    - makecompatible
-    - subworkflow
-    - fast
-  files:
-    - path: output/samplesheet/out.json
-    - path: output/combine/scorefiles.txt.gz
-    - path: output/plink2/vcf_cineca_synthetic_subset_22.pgen
-    - path: output/plink2/vcf_cineca_synthetic_subset_22.pvar.zst
-    - path: output/plink2/vcf_cineca_synthetic_subset_22.psam
-    - path: output/match/cineca-synthetic-subset_22_additive_0.scorefile.gz
-    - path: output/match/cineca-synthetic-subset_log.csv.gz
-
-- name: test make compatible subworkflow with pfile
-  command: nextflow run main.nf -profile test --input ./assets/examples/samplesheet.csv --only_compatible -c ./tests/config/nextflow.config
-  tags:
-    - makecompatible
-    - subworkflow
-    - fast
-  files:
-    - path: output/samplesheet/out.json
-    - path: output/combine/scorefiles.txt.gz
-    - path: output/plink2/cineca_22.pgen
-    - path: output/plink2/cineca_22.pvar.zst
-    - path: output/plink2/cineca_22.psam
-    - path: output/match/cineca_22_additive_0.scorefile.gz
-    - path: output/match/cineca_log.csv.gz
+    - path: output/plink2/GRCh37_cineca_22.pgen
+    - path: output/plink2/GRCh37_cineca_22.pvar.zst
+    - path: output/plink2/GRCh37_cineca_22.psam
+    - path: output/plink2/GRCh37_cineca_22.vmiss.gz

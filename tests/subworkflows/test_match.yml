@@ -1,0 +1,14 @@
+- name: test match subworkflow
+  command: nextflow run main.nf -profile test --only_match -c ./tests/config/nextflow.config
+  tags:
+    - match
+    - subworkflow
+    - fast
+  files:
+    - path: output/samplesheet/out.json
+    - path: output/combine/scorefiles.txt.gz
+    - path: output/plink2/GRCh37_cineca_22.pgen
+    - path: output/plink2/GRCh37_cineca_22.pvar.zst
+    - path: output/plink2/GRCh37_cineca_22.psam
+    - path: output/plink2/GRCh37_cineca_22.vmiss.gz
+

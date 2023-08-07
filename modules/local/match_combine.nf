@@ -1,17 +1,21 @@
 process MATCH_COMBINE {
-    tag "$meta.id"
-    scratch true
+    // labels are defined in conf/modules.config
     label 'process_medium'
-    errorStrategy 'finish'
+    label 'pgscatalog_utils' // controls conda, docker, + singularity options
 
-    conda (params.enable_conda ? "$projectDir/environments/pgscatalog_utils/environment.yml" : null)
-    def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/pgscatalog_utils:${params.platform}-0.3.1"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/pgscatalog_utils:amd64-0.3.1' :
-        dockerimg }"
+    // first element of tag must be sampleset
+    tag "$meta.id"
+    scratch (workflow.containerEngine == 'singularity' || params.parallel ? true : false)
+
+    conda "${task.ext.conda}"
+
+    container "${ workflow.containerEngine == 'singularity' &&
+        !task.ext.singularity_pull_docker_container ?
+        "${task.ext.singularity}${task.ext.singularity_version}" :
+        "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
-    tuple val(meta), val(chrom), path('???.ipc.zst'), path(scorefile)
+    tuple val(meta), path('???.ipc.zst'), path(scorefile), path(shared)
 
     output:
     tuple val(scoremeta), path("*.scorefile.gz"), emit: scorefile
@@ -23,7 +27,14 @@ process MATCH_COMBINE {
     def args  = task.ext.args               ?: ''
     def ambig = params.keep_ambiguous       ? '--keep_ambiguous'    : ''
     def multi = params.keep_multiallelic    ? '--keep_multiallelic' : ''
-    def split = !chrom.contains("ALL") ? '--split' : ''
+    // output one (or more) scoring files per chromosome?
+    def split_output = !meta.chrom.contains("ALL") ? '--split' : ''
+    // output one (or more) scoring file per sampleset?
+    def combined_output = (meta.chrom.contains("ALL") || shared.name != 'NO_FILE') ? '--combined' : ''
+    // filter match candidates to intersect with reference:
+    // omit multi-allelic variants in reference because these will cause errors with relabelling!...
+    // ... unclear whether we should remove them from target with '&& ($9 == 0') as well?
+    def filter_mode = shared.name != 'NO_FILE' ? "--filter_IDs <(awk '(\$6 == 0) {print \$7}' <(zcat $shared))" : ''
     scoremeta = [:]
     scoremeta.id = "$meta.id"
 
@@ -39,8 +50,10 @@ process MATCH_COMBINE {
         --min_overlap $params.min_overlap \
         $ambig \
         $multi \
+        $filter_mode \
         --outdir \$PWD \
-        $split \
+        $split_output \
+        $combined_output \
         -v
 
     cat <<-END_VERSIONS > versions.yml

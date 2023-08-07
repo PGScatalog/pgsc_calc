@@ -1,20 +1,25 @@
 process SCORE_AGGREGATE {
-    label 'process_low'
+    // labels are defined in conf/modules.config
+    label 'process_high_memory'
+    label 'pgscatalog_utils' // controls conda, docker, + singularity options
+    tag "$meta.id"
 
-    conda (params.enable_conda ? "$projectDir/environments/pgscatalog_utils/environment.yml" : null)
-    def dockerimg = "dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/pgscatalog_utils:${params.platform}-0.3.1"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://dockerhub.ebi.ac.uk/gdp-public/pgsc_calc/singularity/pgscatalog_utils:amd64-0.3.1' :
-        dockerimg }"
+    conda "${task.ext.conda}"
+
+    container "${ workflow.containerEngine == 'singularity' &&
+        !task.ext.singularity_pull_docker_container ?
+        "${task.ext.singularity}${task.ext.singularity_version}" :
+        "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
-    path scorefiles
+    tuple val(meta), path(scorefiles)
 
     output:
-    path "aggregated_scores.txt.gz", emit: scores
-    path "versions.yml"            , emit: versions
+    tuple val(scoremeta), path("*.txt.gz"), emit: scores
+    path "versions.yml", emit: versions
 
     script:
+    scoremeta = meta.subMap('id')
     """
     aggregate_scores -s $scorefiles -o . -v
 

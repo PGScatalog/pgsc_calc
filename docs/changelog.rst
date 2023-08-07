@@ -8,7 +8,25 @@ will only occur in major versions with changes noted in this changelog.
 
 .. _`semantic versioning`: https://semver.org/
 
-pgsc_calc v1.3.2 (2022-01-27)
+pgsc_calc v2.0.0-alpha (2023-08-08)
+-----------------------------
+
+This major release features breaking changes to samplesheet structure to provide
+more flexible support for extra genomic file types in the future. Two major new
+features were implemented in this release:
+
+- Genetic ancestry group similarity is calculated to a population reference panel
+  (default: 1000 Genomes) when the ``--run_ancestry`` flag is supplied. This runs
+  using PCA and projection implemented in the ``fraposa_pgsc (v0.1.0)`` package.
+- Calculated PGS can be adjusted for genetic ancestry using empirical PGS distributions
+  from the most similar reference panel population or continuous PCA-based regressions.
+
+These new features are optional and don't run in the default workflow. Other features
+included in the release are:
+
+- Speed optimizations for PGS scoring (skipping allele frequency calculation)
+
+pgsc_calc v1.3.2 (2023-01-27)
 -----------------------------
 
 This patch fixes a bug that made some PGS Catalog scoring files incompatible
@@ -18,7 +36,7 @@ reporting the problem.
 
 .. _`@j0n-a`: https://github.com/PGScatalog/pgsc_calc/issues/79
 
-pgsc_calc v1.3.1 (2022-01-24)
+pgsc_calc v1.3.1 (2023-01-24)
 -----------------------------
 
 This patch fixes a bug that breaks the workflow if all variants in one or more

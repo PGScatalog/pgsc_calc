@@ -1,0 +1,3 @@
+name: zstd
+dependencies:
+- zstd=1.4.8

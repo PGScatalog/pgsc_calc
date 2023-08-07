@@ -12,27 +12,7 @@ slower |:man_running:|
 1. Samplesheet setup
 --------------------
 
-First, you need to describe the structure of your genomic data in a standardised
-way. To do this, set up a spreadsheet that looks like:
-
-.. list-table:: Example samplesheet
-   :widths: 25 25 25 25
-   :header-rows: 1
-
-   * - sample
-     - vcf_path
-     - bfile_path
-     - chrom
-   * - cineca_synthetic_subset
-     -
-     - path/to/bfile_prefix
-     - 22
-   * - cineca_synthetic_subset_vcf
-     - path/to/vcf.gz
-     -
-     - 22
-
-Save the file as ``samplesheet.csv``. See :ref:`setup samplesheet` for more details.
+Set up a samplesheet as described in: :ref:`setup samplesheet`.
 
 2. Multiple PGS Catalog scores
 ------------------------------
@@ -46,6 +26,10 @@ example:
 .. code-block:: console
                 
     --pgs_id PGS001229,PGS000802
+
+.. note:: If you'd like to calculate hundreds of PGS Catalog scoring files
+          simultaneously, it's easiest to store parameters in a text file
+          instead of setting ``--pgs_id`` in a terminal. See :ref:`params file`.
 
 3. Multiple custom scorefiles
 -----------------------------

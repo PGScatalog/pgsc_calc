@@ -1,8 +1,6 @@
 include { PLINK2_VCF         } from '../../modules/local/plink2_vcf'
 include { PLINK2_RELABELBIM  } from '../../modules/local/plink2_relabelbim'
 include { PLINK2_RELABELPVAR } from '../../modules/local/plink2_relabelpvar'
-include { MATCH_VARIANTS     } from '../../modules/local/match_variants'
-include { MATCH_COMBINE      } from '../../modules/local/match_combine'
 
 workflow MAKE_COMPATIBLE {
     take:
@@ -10,7 +8,6 @@ workflow MAKE_COMPATIBLE {
     pheno
     variants
     vcf
-    scorefile
 
     main:
     ch_versions = Channel.empty()
@@ -36,54 +33,26 @@ workflow MAKE_COMPATIBLE {
     PLINK2_RELABELBIM.out.geno
         .mix(PLINK2_RELABELPVAR.out.geno, PLINK2_VCF.out.pgen)
         .dump(tag: 'make_compatible')
-        .set{ geno_std }
+        .set{ geno_all }
 
     PLINK2_RELABELBIM.out.pheno
         .mix(PLINK2_RELABELPVAR.out.pheno, PLINK2_VCF.out.psam)
         .dump(tag: 'make_compatible')
-        .set{ pheno_std }
+        .set{ pheno_all }
 
     PLINK2_RELABELBIM.out.variants
         .mix(PLINK2_RELABELPVAR.out.variants, PLINK2_VCF.out.pvar)
+        .set{ variants_all }
+
+    PLINK2_RELABELBIM.out.vmiss
+        .mix(PLINK2_RELABELPVAR.out.vmiss, PLINK2_VCF.out.vmiss)
         .dump(tag: 'make_compatible')
-        .set{ variants_std }
-
-    variants_std
-        .combine( scorefile )
-        .dump(tag: 'match_variants_input')
-        .set { ch_variants }
-
-    MATCH_VARIANTS ( ch_variants )
-
-    // create custom groupKey() to set a different group size for each
-    // sampleset.  different samplesets may have different numbers of
-    // chromosomes. so if a groupKey size is not provided then nextflow must
-    // wait for the entire process to finish before releasing the grouped
-    // tuples. setting a groupKey size avoids lots of unnecessary waiting.
-    MATCH_VARIANTS.out.matches.map{
-        tuple(groupKey(it[0].subMap(['id', 'is_vcf', 'is_bfile', 'is_pfile']),
-                       it[0].n_chrom),
-              it[0].chrom,
-              it[1])
-    }
-        .groupTuple()
-        .combine( scorefile )
-        .dump(tag: 'match_variants_output')
-        .set { matches }
-
-    MATCH_COMBINE ( matches )
-
-    scorefiles = MATCH_COMBINE.out.scorefile
-    db = MATCH_COMBINE.out.summary
-
-
-    ch_versions = ch_versions.mix(MATCH_VARIANTS.out.versions)
+        .set { vmiss }
 
     emit:
-    geno       = geno_std
-    pheno      = pheno_std
-    variants   = variants_std
-    scorefiles = scorefiles
-    db         = db
+    geno       = geno_all
+    pheno      = pheno_all
+    variants   = variants_all
+    vmiss      = vmiss
     versions   = ch_versions
 }

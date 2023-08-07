@@ -10,7 +10,7 @@ workflow INPUT_CHECK {
     input // file: /path/to/samplesheet.csv
     format // csv or JSON
     scorefile // flat list of paths
-    reference
+    chain_files
 
     main:
     /* all genomic data should be represented as a list of : [[meta], file]
@@ -68,7 +68,7 @@ workflow INPUT_CHECK {
     }
         .set { ch_pfiles }
 
-    COMBINE_SCOREFILES ( scorefile, reference )
+    COMBINE_SCOREFILES ( scorefile, chain_files )
 
     versions = ch_versions.mix(COMBINE_SCOREFILES.out.versions)
 
@@ -101,37 +101,37 @@ def json_to_genome(HashMap slurped) {
     def meta      = [:]
 
     meta.id       = slurped.sampleset
-    meta.is_vcf   = slurped.vcf_path ? true : false
-    meta.is_bfile = slurped.bed ? true : false
-    meta.is_pfile = slurped.pgen ? true : false
-    meta.chrom    = slurped.chrom? slurped.chrom.toString() : "ALL"
+    meta.is_vcf   = slurped.format == 'vcf' ? true : false
+    meta.is_bfile = slurped.format == 'bfile' ? true : false
+    meta.is_pfile = slurped.format == 'pfile' ? true : false
+    meta.chrom    = slurped.chrom ? slurped.chrom.toString() : "ALL"
+    meta.build    = params.target_build
 
     def genome_lst = []
 
     if (meta.is_vcf) {
-        vcf_path   = file(slurped.vcf_path, checkIfExists: true)
+        vcf_path = file(grab_path(slurped, "vcf"), checkIfExists: true)
         meta.vcf_import_dosage = slurped.vcf_import_dosage ? true : false
         genome_lst = [ meta, [ vcf_path ] ]
     } else if (meta.is_bfile) {
-        if (params.vzs) { // compressed variant information
-            bim = file(slurped.bim + '.zst', checkIfExists: true)
-        } else {
-            bim = file(slurped.bim, checkIfExists: true)
-        }
-        bed = file(slurped.bed, checkIfExists: true)
-        fam = file(slurped.fam, checkIfExists: true)
+        bim = file(grab_path(slurped, "bim"), checkIfExists: true)
+        bed = file(grab_path(slurped, "bed"), checkIfExists: true)
+        fam = file(grab_path(slurped, "fam"), checkIfExists: true)
         genome_lst = [ meta, [ bed, bim, fam ] ]
     } else if (meta.is_pfile) {
-        if (params.vzs) { // compressed variant information
-            pvar = file(slurped.pvar + '.zst', checkIfExists: true)
-        } else {
-            pvar = file(slurped.pvar, checkIfExists: true)
-        }
-        pgen = file(slurped.pgen, checkIfExists: true)
-        psam = file(slurped.psam, checkIfExists: true)
+        pvar = file(grab_path(slurped, "pvar"), checkIfExists: true)
+        pgen = file(grab_path(slurped, "pgen"), checkIfExists: true)
+        psam = file(grab_path(slurped, "psam"), checkIfExists: true)
         genome_lst = [ meta, [ pgen, psam, pvar ] ]
     }
     return genome_lst
+}
+
+def grab_path(parsed, extension) {
+    /* Extract a single path from the parsed JSON by extension
+     [[path: [list, of, paths]], ..., format: pfile]
+     */
+    return parsed.path.flatten().find { it.contains(extension) }
 }
 
 def count_chrom(ArrayList genomes) {

@@ -3,6 +3,7 @@
 //
 import java.util.zip.GZIPInputStream
 
+include { RELABEL_IDS as RELABEL_SCOREFILE_IDS; RELABEL_IDS as RELABEL_AFREQ_IDS } from '../../modules/local/ancestry/relabel_ids'
 include { PLINK2_SCORE }    from '../../modules/local/plink2_score'
 include { SCORE_AGGREGATE } from '../../modules/local/score_aggregate'
 include { SCORE_REPORT    } from '../../modules/local/score_report'
@@ -12,65 +13,119 @@ workflow APPLY_SCORE {
     geno
     pheno
     variants
+    intersection
     scorefiles
-    log_scorefiles
-    db
+    ref_afreq
 
     main:
     ch_versions = Channel.empty()
 
     scorefiles
         .flatMap { annotate_scorefiles(it) }
-        .dump(tag: 'final_scorefiles')
+        .dump(tag: 'final_scorefiles', pretty: true)
         .set { annotated_scorefiles }
 
-    // intersect genomic data with split scoring files -------------------------
     geno
         .mix(pheno, variants)
         .groupTuple(size: 3, sort: true) // sorting is important for annotate_genomic
-        .map { annotate_genomic(it) }
-        .dump( tag: 'final_genomes')
+        .branch {
+            ref: it.first().id == 'reference'
+            target: it.first().id != 'reference'
+        }
+        .set { ch_genomes }
+
+    ch_apply_ref = Channel.empty()
+    if (params.run_ancestry) {
+        // prepare scorefiles for reference data -----------------------------------
+        //   1. extract the combined scoring files from the annotated scoring files
+        //      (more than one may be present to handle duplicates or effect types)
+        //   2. join with a list of variants that intersect
+        //   3. combine reference genome with scoring files
+        //   3. relabel scoring file IDs from ID_REF -> ID_TARGET
+        // assumptions:
+        //   - input reference genomes are always combined (i.e. chrom: ALL)
+        annotated_scorefiles
+            .filter{ it.first().chrom == 'ALL'}
+            .map { tuple(it.first().subMap('id'), it) }
+            .dump( tag: 'reference_scorefiles', pretty: true)
+            .set { ch_ref_scorefile }
+
+        intersection
+            .map { tuple( it.first().subMap('id'), it.last() ) }
+            .groupTuple()
+            .set { ch_grouped_intersections }
+
+        ch_grouped_intersections
+            // ref genome must be combined with _all_ scorefiles
+            .combine ( ch_ref_scorefile, by: 0 )
+        // re-order: [scoremeta, scorefile, [variant match reports]]
+            .map { tuple(it.last().first(), it.last().last(), it.tail().head()) }
+            .set { ch_scorefile_relabel_input }
+
+        // relabel scoring file ids to match reference format
+        RELABEL_SCOREFILE_IDS ( ch_scorefile_relabel_input )
+
+        RELABEL_SCOREFILE_IDS.out.relabelled
+            .transpose()
+            .map { annotate_chrom(it) }
+            .map { tuple(it.first().subMap('chrom'), it) }
+            .set { ch_target_scorefile }
+
+        ch_genomes.ref
+            .map { annotate_genomic(it).flatten() }
+            .map { tuple(it.first().subMap('chrom'), it) }
+            .combine( ch_target_scorefile, by: 0 )
+            .map { it.tail().flatten() }
+            .set { ch_apply_ref }
+
+        // [meta, file, [matches]]
+        ch_grouped_intersections
+            .combine( ref_afreq )
+            .map{ [it.first(), it.last(), it[1]] }
+            .set { ch_afreq }
+
+        // map afreq IDs from reference -> target
+        RELABEL_AFREQ_IDS ( ch_afreq )
+        ref_afreq = RELABEL_AFREQ_IDS.out.relabelled
+    }
+
+    // intersect genomic data with split scoring files -------------------------
+    ch_genomes.target
+        .map { annotate_genomic(it) } // add n_samples
+        .dump( tag: 'final_genomes', pretty: true)
         .cross ( annotated_scorefiles ) { m, it -> [m.id, m.chrom] }
         .map { it.flatten() }
-        .dump(tag: 'ready_to_score')
+        .mix( ch_apply_ref ) // add reference genomes!
+        .combine( ref_afreq.map { it.last() } ) // add allelic frequencies
+        .dump(tag: 'ready_to_score', pretty: true)
         .set { ch_apply }
 
-    // make sure the workflow tries to process at least one score, or explode
-    def score_fail = true
-    ch_apply.subscribe onNext: { score_fail = false }, onComplete: { score_error(score_fail) }
-
     PLINK2_SCORE ( ch_apply )
-
     ch_versions = ch_versions.mix(PLINK2_SCORE.out.versions.first())
 
+    // [ [meta], [list, of, score, paths] ]
     PLINK2_SCORE.out.scores
         .collect()
+        .map { [ it.first(), it.tail().findAll { !(it instanceof LinkedHashMap) }]}
         .set { ch_scores }
 
     SCORE_AGGREGATE ( ch_scores )
-
     ch_versions = ch_versions.mix(SCORE_AGGREGATE.out.versions)
 
-    SCORE_REPORT(
-        SCORE_AGGREGATE.out.scores,
-        log_scorefiles,
-        Channel.fromPath("$projectDir/bin/report.Rmd", checkIfExists: true),
-        Channel.fromPath("$projectDir/assets/PGS_Logo.png", checkIfExists: true),
-        db.collect()
-    )
-
-    ch_versions = ch_versions.mix(SCORE_REPORT.out.versions)
+    // aggregated score output from this subworkflow is mandatory
+    def aggregate_fail = true
+    SCORE_AGGREGATE.out.scores.subscribe onNext: { aggregate_fail = false },
+      onComplete: { aggregate_error(aggregate_fail) }
 
     emit:
     versions = ch_versions
+    scores = SCORE_AGGREGATE.out.scores
 }
 
-def score_error(boolean fail) {
+def aggregate_error(boolean fail) {
     if (fail) {
         log.error "ERROR: No scores calculated!"
         System.exit(1)
-    } else {
-        log.info "INFO: Scores ready for calculation"
     }
 }
 
@@ -147,4 +202,12 @@ def count_scores(Path f) {
         assert n_scores > 0 : "Counting scores failed, please check scoring file"
         return n_scores
     }
+}
+
+// TODO: turn this into a utility function
+def annotate_chrom(ArrayList it) {
+    // extract chrom from filename prefix and add to hashmap
+    meta = it.first().clone()
+    meta.chrom = it.last().getBaseName().tokenize('_')[1]
+    return [meta, it.last()]
 }
