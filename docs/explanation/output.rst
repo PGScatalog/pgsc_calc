@@ -35,7 +35,7 @@ If you have run the pipeline **without** using ancestry information the followin
   to avoid using unreliable allele frequency estimates for missing genotypes in the target sample.
 
 If you have run the pipeline **using ancestry information** (``--run_ancesty``) the following columns may be present
-depending on the ancestry adjustments that were run (see `adjustment methods`_ for more details):
+depending on the ancestry adjustments that were run (see :ref:`norm` for more details):
 
 - ``percentile_MostSimilarPop``: PGS reported as a percentile of the distribution for the Most Similar Population
 - ``Z_MostSimilarPop``: PGS reported as a Z-score in reference to the mean/sd of the Most Similar Population
