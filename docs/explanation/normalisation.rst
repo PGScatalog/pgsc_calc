@@ -1,6 +1,0 @@
-.. _norm:
-
-Normalisation
-=============
-
-

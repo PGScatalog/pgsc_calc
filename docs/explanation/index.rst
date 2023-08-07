@@ -8,3 +8,4 @@ Explanation
 
    output
    normalisation
+   plink2

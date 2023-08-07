@@ -1,7 +1,7 @@
 .. _interpret:
 
-``pgsc_calc`` Outputs & results
-===============================
+``pgsc_calc`` Outputs & report
+==============================
 
 
 The pipeline outputs are written to a results directory (``--outdir`` default is
@@ -10,72 +10,103 @@ The pipeline outputs are written to a results directory (``--outdir`` default is
 .. code-block:: console
                 
     results
-    ├── match (scoring files and variant match metadata)
-    ├── pipeline_info (nextflow pipeline execution data)
-    └── score (calculated PGS with summary report)
+    ├── [sampleset] (directory with results for your data)
+    │   ├── match (scoring files and variant match metadata)
+    │   └── score (calculated PGS with summary report)
+    └── pipeline_info (nextflow pipeline execution data)
 
 ``score/``
 ----------
 
 Calculated scores are stored in a gzipped-text space-delimted text file called
-``aggregated_scores.txt.gz``. Each row represents an individual, and there should
-be at least three columns with the following headers:
+``[sampleset]_pgs.txt.gz``. The data is presented in long form where each PGS for an individual is presented on a
+seperate row (``length = n_samples*n_pgs``), and there will be at least four columns with the following headers:
 
-- ``dataset``: the name of the input sampleset
-- ``IID``: the identifier of each sample within the dataset
-- ``[PGS NAME]_SUM``: reports the weighted sum of *effect_allele* dosages multiplied by their *effect_weight*
-  for each matched variant in the scoring file. The column name will be different depending on the scores
-  you have chosen to use (e.g. ``PGS000001_SUM``).
+- ``sampleset``: the name of the input sampleset, or ``reference`` for the panel.
+- ``IID``: the identifier of each sample within the dataset.
+- ``PGS``: the accession ID of the PGS being reported.
+- ``SUM``: reports the weighted sum of *effect_allele* dosages multiplied by their *effect_weight*
+  for each matched variant in the scoring file for the PGS.
 
-At least one score must be present in this file (the third column). Extra columns might be
-present if you calculated more than one score, or if you calculated the PGS on a dataset with a
-small sample size (n < 50, in this cases a column named ``[PGS NAME]_AVG`` will be added that
-normalizes the PGS using the number of non-missing genotypes to avoid using allele frequency data
-from the target sample).
+If you have run the pipeline **without** using ancestry information the following columns may be present:
+
+- ``DENOM``: the number of non-missing genotypes used to calculate the PGS for this individual.
+- ``AVG``: normalizes ``SUM`` by the ``DENOM`` field (displayed when you calculate the PGS on a small sample size n<50
+  to avoid using unreliable allele frequency estimates for missing genotypes in the target sample.
+
+If you have run the pipeline **using ancestry information** (``--run_ancesty``) the following columns may be present
+depending on the ancestry adjustments that were run (see `adjustment methods`_ for more details):
+
+- ``percentile_MostSimilarPop``: PGS reported as a percentile of the distribution for the Most Similar Population
+- ``Z_MostSimilarPop``: PGS reported as a Z-score in reference to the mean/sd of the Most Similar Population
+- ``Z_norm1``: PGS adjusted to have mean 0 across ancestry groups (result of regressing *PGS ~ PCs*)
+- ``Z_norm2``: PGS adjusted to have mean 0 and unit variance across ancestry groups (result of regressing
+  *resid(PGS)^2 ~ PCs*)
 
 Report
 ~~~~~~
 
-A summary report is also available (``report.html``). The report should open in
-a web browser and contains useful information about the PGS that were applied,
-how well the variants match with the genotyping data, and some simple graphs
-displaying the distribution of scores in your dataset(s) as a density plot.
+A summary report is also provided for your samples (``report.html``). The report should open in a web browser and
+contains useful information about the PGS that were applied, how well the variants in your target dataset match with the
+reference panel and scoring files, a summary of the computed genetic ancestry data, and some simple graphs displaying
+the distribution of scores in your dataset(s) as a density plot. Some of the sections are only displayed with
+``--run_ancestry``, but we show them all here for reference.
 
-The fist section of the report reproduces the nextflow command, and metadata (imported
-from the PGS Catalog for each PGS ID) describing the scoring files that were applied
-to your sampleset(s):
+The fist section of the report reproduces the nextflow command, and scoring file metadata (imported from the PGS Catalog
+for each PGS ID) describing the scoring files that were applied to your sampleset(s):
 
-.. image:: screenshots/Report_1_Header.png
+.. figure:: screenshots/Report_1_Header.png
     :width: 600
     :alt: Example PGS Catalog Report: header sections
 
-Within the scoring file metadata section are two tables describing how well the variants within
-each scoring file match with target sampleset(s). The first table provides a summary of the
-number and percentage of variants within each score that have been matched, and whether that
-score passed the ``--min_overlap`` threshold (Passed Matching column) for calculation. The second
-table provides a more detailed summary of variant matches broken down by types of variants (strand ambiguous,
+    **Figure 1. Example of pgsc_calc header.**
+
+
+The next section reports how the variants in the target sampleset match the other data. The first table describes the
+number of variants in the target dataset that overlap with the reference panel (*only present with* ``--run_ancestry``).
+The second table provides a summary of the number and percentage of variants within each score that have been matched,
+and whether that score passed the ``--min_overlap`` threshold (Passed Matching column) for calculation. The third
+table provides a more detailed summary of variant matches broken down by types of variants (e.g., strand ambiguous,
 multiallelic, duplicates) for the matched, excluded, and unmatched variants (see ``match/`` section for details):
 
-.. image:: screenshots/Report_2_VariantMatching.png
+.. figure:: screenshots/Report_2_VariantMatching.png
     :width: 600
     :alt: Example PGS Catalog Report: Variant matching/qc tables (summary & detailed)
 
-The final section shows an example of the results table that contains the sample identifiers and
-calculated PGS in the *Score extract* panel. A visual display of the PGS distribution for a set of example
-score(s) (up to 6) is provided in the *Density plot* panel which can be helpful for looking at the distributions in
-multiple dataset(s):
+    **Figure 2. Example of variant matching summaries in the pgsc_calc report.**
 
-.. image:: screenshots/Report_3_Scores.png
+
+The next section describes the results of the genetic ancestry analysis of the target genotypes with the reference
+panel data. It first displays a snippet of the ``[sampleset]_popsimilarity.txt.gz`` file for reference. A visual display
+of the projection of the target data into the reference panel PCA space is plot for the first 6 PCs, where the target
+samples are coloured according to the population that they are most similar to in the reference panel. A table
+describing the distribution of ancestries within the reference panel and proportions of the target samples who are most
+similar to those populations is also provided.
+
+.. figure:: screenshots/Report_3_PCA.png
     :width: 600
-    :alt: Example PGS Catalog Report: Variant matching/qc tables (summary & detailed)
+    :alt: Example PGS Catalog Report: PCA plot of genetic ancestry data
+
+    **Figure 3. Visualization of genetic ancestry analysis within the report.**
+
+
+The final section shows an example of the main results dataframe that contains the sample identifiers and
+calculated PGS in the *Score extract* section. A visual display of the PGS distribution for a set of example
+score(s) (up to 6) is provided in the *Density plot* panel which can be helpful for looking at the distributions of the
+scores in the target and reference dataset and how it changes for difference PGS adjustment methods:
+
+.. figure:: screenshots/Report_4_Scores.png
+    :width: 600
+    :alt: Example PGS Catalog Report: table and density plots of score distributions
+
+    **Figure 4. Example of the** ``[sampleset]_pgs.txt.gz`` **table and plots of PGS distributions.**
 
 ``match/``
 ----------
 
-This directory contains information about the matching of scoring file variants to
-the genotyping data (samplesets). First a summary file (also displayed in the report)
-details whether each scoring file passes the minimum variant matching threshold, and
-the types of variants that were included in the score:
+This directory contains information about the matching of scoring file variants to your genotyping data (sampleset).
+First a summary file (also displayed in the report) details whether each scoring file passes the minimum variant
+matching threshold, and the types of variants that were included in the score:
 
 .. list-table:: ``[sampleset]_summary.csv`` metadata
     :widths: 20, 20, 60
@@ -96,34 +127,43 @@ the types of variants that were included in the score:
         and is included in the final scoring file.
     * - Match type
       - ``match_status``
-      - Indicates whether the variant is matched (included in the final scoring file),
-        excluded (matched but removed based on variant filters), or unmatched.
+      - Indicates whether the variants are matched (included in the final scoring file), excluded (matched but removed
+        based on variant filters), or unmatched.
     * - Ambiguous
       - ``ambiguous``
-      - True/False flag indicating whether the matched variant is strand-ambiguous (e.g. A/T and C/G variants).
+      - True/False flag indicating whether the matched variants are strand-ambiguous (e.g. A/T and C/G variants).
     * - Multiallelic
       - ``is_multiallelic``
-      - True/False flag indicating whether the matched variant is multi-allelic (multiple ALT alleles).
+      - True/False flag indicating whether the matched variants are multi-allelic (multiple ALT alleles).
     * - Multiple potential matches
       - ``duplicate_best_match``
-      - True/False flag indicating whether a single scoring file variants has multiple potential matches to the target genome.
-        This usually occurs when the variant has no other_allele, and with variants that have different REF alleles.
+      - True/False flag indicating whether a single scoring file variant has multiple potential matches to the target genome.
+        This usually occurs when the variant has no other/non-effect allele, and with variants that have different
+        REF alleles.
     * - Duplicated matched variants
       - ``duplicate_ID``
       - True/False flag indicating whether multiple scoring file variants match a single target ID. This usually occurs
-        when scoring files have been lifted across builds and two variants now point to the same position (e.g. rsID mergers).
+        when scoring files have been lifted across builds and two variants now point to the same position (e.g. rsID
+        mergers).
+    * - Matches strand flip
+      - ``match_flipped``
+      - True/False flag indicating whether the scoring file variant is originally reported on the opposite strand (and
+        thus flipped to match)
+    * - Variant in reference panel
+      - ``match_IDs``
+      - True/False flag indicating whether the variant from the scoring file that is matched in the target samples is
+        also present in the variants that overlap with the reference population panel (required for PGS adjustment).
     * - n
       - ``count``
       - Number of variants with this combination of metadata (grouped by: ``[ match_status, ambiguous, is_multiallelic,
-        duplicate_best_match, duplicate_ID]``
+        duplicate_best_match, duplicate_ID, match_flipped, match_IDs]``
     * - %
       - ``percent``
       - Percent of the scoring file's variants that have the combination of metadata in count.
 
 
-The log file is a :term:`CSV` that contains all possible matches
-for each variant in the combined input scoring files. This information is useful to debug a
-score that is causing problems. Columns contain information about how each
+The log file is a :term:`CSV` that contains all possible matches for each variant in the combined input scoring files.
+This information is useful to debug a score that is causing problems. Columns contain information about how each
 variant was matched against the target genomes:
 
 
@@ -170,11 +210,19 @@ variant was matched against the target genomes:
       - True/False flag indicating whether the matched variant is multi-allelic (multiple ALT alleles).
     * - ``ambiguous``
       - True/False flag indicating whether the matched variant is strand-ambiguous (e.g. A/T and C/G variants).
+    * - ``match_flipped``
+      - True/False flag indicating whether the matched variant is on the opposite strand (flipped).
+    * - ``best_match``
+      - True/False flag indicating whether this the best ``match_type`` for the current scoring file variant.
+    * - ``exclude``
+      - True/False flag indicating whether this matched variant is excluded from the final scoring file.
     * - ``duplicate_best_match``
       - True/False flag indicating whether a single scoring file variants has multiple potential matches to the target genome.
         This usually occurs when the variant has no other_allele, and with variants that have different REF alleles.
     * - ``duplicate_ID``
       - True/False flag indicating whether multiple scoring file variants match a single target ID.
+    * - ``match_IDs``
+      - True/False flag indicating whether the matched variant is also found in the reference panel genotypes.
     * - ``match_status``
       - Indicates whether the variant is *matched* (included in the final scoring file), *excluded* (matched but removed
         based on variant filters), *not_best* (a different match candidate was selected for this scoring file variant),
@@ -183,12 +231,10 @@ variant was matched against the target genomes:
       - Name of the sampleset/genotyping data.
 
 
-Processed scoring files are also present in this directory. Briefly, variants in
-the scoring files are matched against the target genomes. Common variants across
-different scores are combined (left joined, so each score is an additional
-column). The combined scores are then partially split to overcome PLINK2
-technical limitations (e.g. calculating different effect types such as dominant
-/ recessive). Once scores are calculated from these partially split scoring
+Processed scoring files are also present in this directory. Briefly, variants in the scoring files are matched against
+the target genomes. Common variants across different scores are combined (left joined, so each score is an additional
+column). The combined scores are then partially split to overcome PLINK2 technical limitations (e.g. calculating
+different effect types such as dominant/recessive). Once scores are calculated from these partially split scoring
 files, scores are aggregated to produce the final results in ``score/``.
 
 ``pipeline_info/``

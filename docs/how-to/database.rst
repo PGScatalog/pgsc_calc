@@ -16,19 +16,19 @@ Download reference database
 
 A reference database is available to download here:
 
-``ftp.pgscatalog.org/...``
+``https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/pgsc_calc.tar.zst``
 
 The database is about 7GB and supports both GRCh37 and GRCh38 input target
 genomes.
 
-Once the reference database is included, remember you must include the ``--ref``
+Once the reference database is included, remember you must include the ``--run_ancestry``
 parameter, which is a path to the reference database (see
 :ref:`schema`).
 
 (Optional) Create reference database
 ------------------------------------
 
-.. danger::
+.. Warning::
    - Making a reference database from scratch can be slow and frustrating
    - It's easiest to download the published reference database from the PGS Catalog FTP
             

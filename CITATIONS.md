@@ -13,11 +13,11 @@
 * [PGS Catalog API](https://pubmed.ncbi.nlm.nih.gov/33692568/)
     > Lambert SA, Gil L, Jupp S, Ritchie SC, Xu Y, Buniello A, McMahon A, Abraham G, Chapman M, Parkinson H, Danesh J. The Polygenic Score Catalog as an open database for reproducibility and systematic evaluation. Nature Genetics. 2021 Apr;53(4):420-5. doi: 10.1038/s41588-021-00783-5. PubMed PMID: 33692568.
 
-* [PLINK 1](https://pubmed.ncbi.nlm.nih.gov/17701901/)
-    > Purcell S, Neale B, Todd-Brown K, Thomas L, Ferreira MA, Bender D, Maller J, Sklar P, De Bakker PI, Daly MJ, Sham PC. PLINK: a tool set for whole-genome association and population-based linkage analyses. The American journal of human genetics. 2007 Sep 1;81(3):559-75. doi: 10.1086/519795. PubMed PMID:  17701901. PubMed Central PMCID: PMC1950838.
-
 * [PLINK 2](https://pubmed.ncbi.nlm.nih.gov/25722852/)
     > Chang CC, Chow CC, Tellier LC, Vattikuti S, Purcell SM, Lee JJ. Second-generation PLINK: rising to the challenge of larger and richer datasets. Gigascience. 2015 Dec 1;4(1):s13742-015. doi: 10.1186/s13742-015-0047-8. PubMed PMID: 25722852. PubMed Central PMCID: PMC4342193.
+
+* [FRAPOSA](https://pubmed.ncbi.nlm.nih.gov/32196066/)
+    > Zhang, D., et al. (2020) Fast and robust ancestry prediction using principal component analysis. Bioinformatics 36(11):3439–3446. https://doi.org/10.1093/bioinformatics/btaa152
 
 ## Software packaging/containerisation tools
 

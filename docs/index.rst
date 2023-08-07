@@ -17,27 +17,33 @@ normalisation methods are also supported.
 Workflow summary
 ----------------
 
-.. image:: https://user-images.githubusercontent.com/11425618/195053396-a3eaf31c-b3d5-44ff-a36c-4ef6d7958668.png
+.. image:: https://user-images.githubusercontent.com/11425618/257213197-f766b28c-0f75-4344-abf3-3463946e36cc.png
     :width: 600
+    :align: center
     :alt: `pgsc_calc` workflow diagram
 
 |
 
-The workflow does the following steps:
+The workflow performs the following steps:
 
 - Downloading scoring files using the PGS Catalog API in a specified genome build (GRCh37 and GRCh38).
 - Reading custom scoring files (and performing a liftover if genotyping data is in a different build).
 - Automatically combines and creates scoring files for efficient parallel
-  computation of multiple PGS
-- Matching variants in the scoring files against variants in the target dataset (in plink bfile/pfile or VCF format)
-- Calculates PGS for all samples (linear sum of weights and dosages)
-- Creates a summary report to visualize score distributions and pipeline metadata (variant matching QC)
+  computation of multiple PGS.
+- Matches variants in the scoring files against variants in the target dataset (in plink bfile/pfile or VCF format).
+- Calculates PGS for all samples (linear sum of weights and dosages).
+- Creates a summary report to visualize score distributions and pipeline metadata (variant matching QC).
 
-And optionally:
+And optionally has additional functionality to:
 
-- Using reference genomes to automatically assign the genetic ancestry of target
-  genomes
-- Normalising calculated PGS to account for genetic ancestry
+- Use a reference panel to obtain genetic ancestry data using PCA, and define the most similar population in the
+  reference panel for each target sample.
+- Report PGS using methods to adjust for genetic ancestry.
+
+.. tip:: To enable these optional steps, see :ref:`ancestry`
+
+See `Features under development`_ section for information about planned updates.
+
 
 The workflow relies on open source scientific software, including:
 
@@ -50,6 +56,7 @@ A full description of included software is described in :ref:`containers`.
 .. _PLINK 2: https://www.cog-genomics.org/plink/2.0/
 .. _PGS Catalog Utilities: https://github.com/PGScatalog/pgscatalog_utils
 .. _FRAPOSA: https://github.com/PGScatalog/fraposa_pgsc
+
 
 Quick example
 -------------
@@ -108,27 +115,25 @@ Documentation
 - :doc:`Get started<getting-started>`: install pgsc_calc and calculate some polygenic scores quickly
 - :doc:`How-to guides<how-to/index>`: step-by-step guides, covering different use cases
 - :doc:`Reference guides<reference/index>`: technical information about workflow configuration
-
+- :doc:`Explanations<explanation/index>`: more detailed explanations about PGS calculation and results
 
 Changelog
 ---------
 
 The :doc:`Changelog page<changelog>` describes fixes and enhancements for each version.
 
-Features Under Development
+Features under development
 --------------------------
 
-In the future, the calculator will include new features for PGS interpretation:
+These are some of the fetures and improvements we're planning for the ``pgsc_calc``:
 
-- *Genetic Ancestry*: calculate similarity of target samples to populations in a
-  reference dataset (e.g. `1000 Genomes (1000G)`_, `Human Genome Diversity Project (HGDP)`_)
-  using principal components analysis (PCA).
-- *PGS Normalization*: Using reference population data and/or PCA projections to report
-  individual-level PGS predictions (e.g. percentiles, z-scores) that account for genetic ancestry.
+- Improved population reference panels (merged 1000 Genomes & Human Genome Diversity Project (HGDP) for use
+  within the pipeline
+- Further optimizations to the PCA & ancestry similarity analysis steps focused on improving automatic QC
+- Performance improvments to make ``pgsc_calc`` work with 1000s of scoring files in paralell (e.g. integration
+  with `OmicsPred`_)
 
-.. _1000 Genomes (1000G): http://www.nature.com/nature/journal/v526/n7571/full/nature15393.html
-.. _Human Genome Diversity Project (HGDP): https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7115999/
-
+.. _OmicsPred: https://www.omicspred.org
 
 Credits
 -------
@@ -148,14 +153,17 @@ are written by Benjamin Wingfield, Samuel Lambert, Laurent Gil with additional i
 from Aoife McMahon (EBI). Development of new features, testing, and code review
 is ongoing including Inouye lab members (Rodrigo Canovas, Scott Ritchie) and others. A
 manuscript describing the tool is in preparation (see `Citations <Citations_>`_) and we
-welcome ongoing community feedback before then.
+welcome ongoing community feedback before then via our `discussion board`_ or `issue tracker`_.
+
+.. _discussion board: https://github.com/PGScatalog/pgsc_calc/discussions
+.. _issue tracker: https://github.com/pgscatalog/pgsc_calc/issues
 
 Citations
 ~~~~~~~~~
 
 If you use ``pgscatalog/pgsc_calc`` in your analysis, please cite:
 
-    PGS Catalog Calculator `(in development)`. PGS Catalog
+    PGS Catalog Calculator [0]_. PGS Catalog
     Team. https://github.com/PGScatalog/pgsc_calc
 
     Lambert `et al.` (2021) The Polygenic Score Catalog as an open database for
@@ -167,6 +175,8 @@ you use in your analyses, and the underlying data/software tools described in th
 
 .. _citations file: https://github.com/PGScatalog/pgsc_calc/blob/master/CITATIONS.md
 .. _10.1038/s41588-021-00783-5: https://doi.org/10.1038/s41588-021-00783-5
+.. [0] A manuscript is in development but the calculated scores have been
+       for consistency in UK Biobank since v1.1.0
 
 
 License Information

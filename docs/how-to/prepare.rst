@@ -7,10 +7,9 @@ Target genome data requirements
 -------------------------------
 
 .. note:: This workflow will work best with the output of an imputation server
-          like `Michigan`_ or `TopMed`_
+          like `Michigan`_ or `TopMed`_.
 
-.. danger:: If you'd like to input WGS genomes, some extra preprocessing steps
-            are required          
+          If you'd like to input WGS genomes, some extra preprocessing steps are required.
 
 .. _`Michigan`: https://imputationserver.sph.umich.edu/index.html           
 .. _`TopMed`: https://imputation.biodatacatalyst.nhlbi.nih.gov/

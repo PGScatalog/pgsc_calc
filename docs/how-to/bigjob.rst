@@ -11,6 +11,14 @@ these types of systems by creating and editing `nextflow .config files`_.
 
 .. _nextflow .config files: https://www.nextflow.io/docs/latest/config.html
 
+.. warning:: ``--max_cpus`` and ``--max_memory`` don't increase the amount of
+             resources for each process. These parameters **cap the maximum
+             amount of resources** `a process can use`_. You need to edit
+             configuration files to increase process resources, as described
+             below.
+
+.. _`a process can use`: https://github.com/PGScatalog/pgsc_calc/issues/71#issuecomment-1423846928
+
 Configuring ``pgsc_calc`` to use more resources locally
 -------------------------------------------------------
 
@@ -123,9 +131,7 @@ instead:
 .. note:: The name of the nextflow and singularity modules will be different in
           your local environment
 
-.. note:: Think about enabling fast variant matching with ``--fast_match``!
-
-.. warning:: Make sure to copy input data to fast storage, and run the pipeline
+          .. warning:: Make sure to copy input data to fast storage, and run the pipeline
             on the same fast storage area. You might include these steps in your
             bash script. Ask your sysadmin for help if you're not sure what this
             means.
