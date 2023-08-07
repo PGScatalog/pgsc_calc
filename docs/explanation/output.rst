@@ -89,6 +89,9 @@ similar to those populations is also provided.
 
     **Figure 3. Visualization of genetic ancestry analysis within the report.**
 
+.. note:: It is important to visually inspect the PCA to make sure that it looks correct (placing the reference
+    populations correctly), and that the projection of individuals from the target dataset looks sensible.
+
 
 The final section shows an example of the main results dataframe that contains the sample identifiers and
 calculated PGS in the *Score extract* section. A visual display of the PGS distribution for a set of example
