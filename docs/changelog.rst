@@ -8,7 +8,7 @@ will only occur in major versions with changes noted in this changelog.
 
 .. _`semantic versioning`: https://semver.org/
 
-pgsc_calc v2.0.0 (2023-08-08)
+pgsc_calc v2.0.0-alpha (2023-08-08)
 -----------------------------
 
 This major release features breaking changes to samplesheet structure to provide
