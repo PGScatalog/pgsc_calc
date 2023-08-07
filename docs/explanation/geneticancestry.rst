@@ -77,7 +77,7 @@ distributions across ancestries by fitting a regression of PGS values based on P
 reference panel. To calculate the normalized PGS the predicted PGS based on the PCA-loadings is subtracted from the PGS
 and normalized by the standard deviation in the reference population to achieve PGS distributions that are centred
 at 0 for each genetic ancestry group (output column: ``Z_norm1``), while not relying on any population labels during
-model fitting.
+model fitting (see `Figure 3`_).
 
 The first method (``Z_norm1``)  has the result of normalizing the first moment of the PGS distribution (mean); however,
 the second moment of the PGS distribution (variance) can also differ between ancestry groups. A second regression of
@@ -85,7 +85,17 @@ the PCA-loadings on the squared residuals (difference of the PGS and the predict
 predicted standard deviation based on genetic ancestry, as was proposed by Khan et al. (2022)\ [#Khan2022]_ and
 implemented within the eMERGE GIRA.\ [#GIRA]_ The predicted standard deviation (distance from the mean PGS based on
 ancestry) is used to normalize the residual PGS and get a new estimate of relative risk (output column: ``Z_norm2``)
-where the variance of the PGS distribution is more equal across ancestry groups and approximately 1.
+where the variance of the PGS distribution is more equal across ancestry groups and approximately 1 (see `Figure 3`_).
+
+.. _Figure 3:
+.. figure:: screenshots/p_MergedDist.png
+    :width: 650
+    :alt: Figure detailing the distributions from the PGS SUM, and PCA-based adjustment (Z_norm1 and Z_norm2).
+
+    **Figure 3. Visualization of PGS distributions before and after PCA-based adjustment.** The distribution for the
+    PGS SUM (**A**) is shown for PGS000018 (metaGRS_CAD) in the 1000 Genomes reference panel, stratified by genetic
+    ancestry groups (superpopulation labels). PCA-based adjustment for differences in the mean (**B**, ``Z_norm1``)
+    and variances (**C**, ``Z_norm2``) make the distributions more similar across population labels.
 
 
 Implementation of ancestry steps within ``pgsc_calc``
