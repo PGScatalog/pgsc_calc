@@ -23,13 +23,20 @@ different genetic ancestry groups (`Figure 1`_) as has been shown previously.\ [
 
     **Figure 1. Example of a PGS with shifted distributions in different ancestry groups.** Shown
     here is the distribution of PGS000018 (metaGRS_CAD) calculated using the SUM method
-    in the 1000 Genomes reference panel, stratified by genetic ancestry groups (superpopulation labels).
+    in the 1000 Genomes reference panel\ [#1000G]_, stratified by genetic ancestry groups (superpopulation labels).
 
 It is important to note that differences in the means between different ancestry groups do not necessarily correspond
 to differences in the risk (e.g., changes in disease prevalence, or mean biomarker values) between the populations.
 Instead, these differences are caused by changes in allele frequencies and linkage disequilibrium (LD) patterns between
 ancestry groups. This illustrates that genetic ancestry is important for determining relative risk, and multiple
 methods to adjust for these differences have been implemented within the pgsc_calc pipeline.
+
+.. note:: The ``pgsc_calc`` pipeline uses the 1000 Genomes resource\ [#1000G]_ as a population reference panel,
+    and uses global ancestry labels (superpopulation) for visualizing PGS distributions and reporting PGS
+    using reference distributions. The panel and the labels are not comprehensive or deterministic, thus we only
+    describe samples from the target dataset in terms of their genetic similarity to these reference populations
+    so as not to transfer labels that may not reflect the new individuals as per recent guidelines.\ [#NASEM]_
+
 
 Methods for reporting and adjusting PGS in the context of ancestry
 ------------------------------------------------------------------
@@ -89,11 +96,11 @@ where the variance of the PGS distribution is more equal across ancestry groups 
 
 .. _Figure 3:
 .. figure:: screenshots/p_MergedDist.png
-    :width: 650
+    :width: 800
     :alt: Figure detailing the distributions from the PGS SUM, and PCA-based adjustment (Z_norm1 and Z_norm2).
 
     **Figure 3. Visualization of PGS distributions before and after PCA-based adjustment.** The distribution for the
-    PGS SUM (**A**) is shown for PGS000018 (metaGRS_CAD) in the 1000 Genomes reference panel, stratified by genetic
+    PGS ``SUM`` (**A**) is shown for PGS000018 (metaGRS_CAD) in the 1000 Genomes reference panel, stratified by genetic
     ancestry groups (superpopulation labels). PCA-based adjustment for differences in the mean (**B**, ``Z_norm1``)
     and variances (**C**, ``Z_norm2``) make the distributions more similar across population labels.
 
@@ -104,7 +111,7 @@ The ancestry methods are implemented within the ``--run_ancestry`` method of the
 how-to guide), and has the following steps:
 
 1.  **Reference panel**: preparing and/or extracting data of the reference panel for use in the pipeline (see
-    :ref:`database` for details about downloading the existing reference [1000 Genomes] or setting up your own).
+    :ref:`database` for details about downloading the existing reference [1000 Genomes] [#1000G]_ or setting up your own).
 
 2.  **Variant overlap**: Identifying variants that are present in both the target genotypes and the reference panel.
     Uses the ``INTERSECT_VARIANTS`` module.
@@ -172,6 +179,8 @@ how-to guide), and has the following steps:
 
 
 .. rubric:: Citations
+.. [#1000G] The 1000 Genomes Project Consortium. (2015) A global reference for human genetic variation. Nature 526:68-74. https://doi.org/10.1038/nature15393.
+.. [#NASEM] National Academies of Sciences, Engineering, and Medicine. (2023) Using Population Descriptors in Genetics and Genomics Research: A New Framework for an Evolving Field. Washington, DC: The National Academies Press. https://doi.org/10.17226/26902
 .. [#Reisberg2017] Reisberg S., et al. (2017) Comparing distributions of polygenic risk scores of type 2 diabetes and coronary heart disease within different populations. PLoS ONE 12(7):e0179238. https://doi.org/10.1371/journal.pone.0179238
 .. [#Martin2017] Martin, A.R., et al. (2017) Human Demographic History Impacts Genetic Risk Prediction across Diverse Populations. The American Journal of Human Genetics 100(4):635-649. https://doi.org/10.1016/j.ajhg.2017.03.004
 .. [#ImputeMe] Folkersen, L., et al. (2020) Impute.me: An Open-Source, Non-profit Tool for Using Data From Direct-to-Consumer Genetic Testing to Calculate and Interpret Polygenic Risk Scores. Frontiers in Genetics 11:578. https://doi.org/10.3389/fgene.2020.00578
