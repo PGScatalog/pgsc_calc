@@ -163,7 +163,7 @@ Citations
 
 If you use ``pgscatalog/pgsc_calc`` in your analysis, please cite:
 
-    PGS Catalog Calculator [0]_. PGS Catalog
+    PGS Catalog Calculator (`in development` [0]_). PGS Catalog
     Team. https://github.com/PGScatalog/pgsc_calc
 
     Lambert `et al.` (2021) The Polygenic Score Catalog as an open database for
@@ -175,8 +175,7 @@ you use in your analyses, and the underlying data/software tools described in th
 
 .. _citations file: https://github.com/PGScatalog/pgsc_calc/blob/master/CITATIONS.md
 .. _10.1038/s41588-021-00783-5: https://doi.org/10.1038/s41588-021-00783-5
-.. [0] A manuscript is in development but the calculated scores have been
-       for consistency in UK Biobank since v1.1.0
+.. [0] A manuscript is in development but calculated scores have been tested on UK Biobank since v1.1.0
 
 
 License Information
