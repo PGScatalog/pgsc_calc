@@ -109,7 +109,7 @@ how-to guide), and has the following steps:
         The scoring is made efficient by scoring all PGS in parallel.
 
 4. **PCA of the reference panel**
-    1.  **Preparing reference panel for PCA**: the refrence panel is filtered to unrelated samples with standard filters
+    1.  **Preparing reference panel for PCA**: the reference panel is filtered to unrelated samples with standard filters
         for variant-level QC (SNPs in Hardy–Weinberg equilibrium [p > 1e-04] that are bi-allelic and non-ambiguous,
         with low missingness [<10%], and minor allele frequency [MAF > 5%]) and sample-quality (missingness <10%).
         LD-pruning is then applied to the variants and sample passing these checks (r\ :sup:`2` threshold = 0.05), excluding
