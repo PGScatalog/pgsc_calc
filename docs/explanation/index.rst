@@ -7,5 +7,5 @@ Explanation
    :maxdepth: 1
 
    output
-   normalisation
+   geneticancestry
    plink2
