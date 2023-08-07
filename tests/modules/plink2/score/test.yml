@@ -12,6 +12,7 @@
     - path: output/plink2/test_null_null_null.log
       contains:
         - "no-mean-imputation"
+        - "error-on-freq-calc"
     - path: output/plink2/versions.yml
       contains:
         - "plink2: 2.00a3.3"
@@ -30,6 +31,7 @@
     - path: output/plink2/test_null_null_null.log
       contains:
         - "no-mean-imputation"
+        - "error-on-freq-calc"
     - path: output/plink2/versions.yml
       contains:
         - "plink2: 2.00a3.3"
@@ -48,6 +50,8 @@
         - "second_score_SUM"
     - path: output/plink2/test_null_null_null.log
       contains:
+        - "error-on-freq-calc"
+        - "no-mean-imputation"
         - "--score-col-nums"
     - path: output/plink2/versions.yml
       contains:
@@ -68,6 +72,7 @@
     - path: output/plink2/test_null_null_null.log
       contains:
         - "no-mean-imputation"
+        - "error-on-freq-calc"
         - "--score-col-nums"
     - path: output/plink2/versions.yml
       contains:
