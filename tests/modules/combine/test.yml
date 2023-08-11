@@ -1,5 +1,5 @@
 - name: test combine scorefiles module
-  command: nextflow run ./tests/modules/combine -entry testcombine -c ./tests/config/nextflow.config -profile test --target_build GRCh38
+  command: nextflow run ./tests/modules/combine -entry testcombine -c ./tests/config/nextflow.config --target_build GRCh38
   tags:
     - module
     - combine

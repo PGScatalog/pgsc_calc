@@ -1,5 +1,5 @@
 - name: plink2 vcf
-  command: nextflow run ./tests/modules/plink2/vcf -entry testvcf -c ./tests/config/nextflow.config -profile test
+  command: nextflow run ./tests/modules/plink2/vcf -entry testvcf -c ./tests/config/nextflow.config
   tags:
     - module
     - plink2
