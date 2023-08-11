@@ -12,7 +12,8 @@
       --target_build GRCh38 \
       --pgs_id PGS001229 \
       --min_overlap 0.50 \
-      --target_build GRCh38
+      --target_build GRCh38 \
+      --scorefile false
     "
   tags:
     - ancestry

@@ -8,8 +8,17 @@ will only occur in major versions with changes noted in this changelog.
 
 .. _`semantic versioning`: https://semver.org/
 
+pgsc_calc v2.0.0-alpha.1 (2023-08-11)
+-------------------------------------
+
+This patch fixes a bug when running the workflow directly from github with the
+test profile (i.e. without cloning first). Thanks to `@staedlern`_ for reporting the
+problem.
+
+.. _`@staedlern`: https://github.com/PGScatalog/pgsc_calc/issues/151
+
 pgsc_calc v2.0.0-alpha (2023-08-08)
------------------------------
+-----------------------------------
 
 This major release features breaking changes to samplesheet structure to provide
 more flexible support for extra genomic file types in the future. Two major new

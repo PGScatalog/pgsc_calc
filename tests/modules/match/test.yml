@@ -1,6 +1,6 @@
 # IPC files aren't published so can't test
 - name: test match module
-  command: nextflow run ./tests/modules/match -entry testmatch -c ./tests/config/nextflow.config -profile test
+  command: nextflow run ./tests/modules/match -entry testmatch -c ./tests/config/nextflow.config
   tags:
     - module
     - match
@@ -11,7 +11,7 @@
         - "pgscatalog_utils: 0.4.0"
 
 - name: test match combine module
-  command: nextflow run ./tests/modules/match -entry testmatchcombine -c ./tests/config/nextflow.config -profile test
+  command: nextflow run ./tests/modules/match -entry testmatchcombine -c ./tests/config/nextflow.config
   tags:
     - module
     - match

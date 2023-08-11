@@ -1,5 +1,5 @@
 - name: test input check subworkflow
-  command: nextflow run main.nf -profile test --only_input -c ./tests/config/nextflow.config
+  command: nextflow run main.nf --only_input -c ./tests/config/nextflow.config
   tags:
     - inputcheck
     - subworkflow
@@ -9,7 +9,7 @@
     - path: output/combine/scorefiles.txt.gz
 
 - name: test input check subworkflow with PGS catalog API 
-  command: nextflow run main.nf -profile test --pgs_id PGS001229 --only_input -c ./tests/config/nextflow.config
+  command: nextflow run main.nf --pgs_id PGS001229 --only_input -c ./tests/config/nextflow.config
   tags:
     - inputcheck
     - subworkflow
@@ -20,7 +20,7 @@
     - path: output/combine/scorefiles.txt.gz
 
 - name: test input check subworkflow with PGS catalog API and whitespace
-  command: nextflow run main.nf -profile test --pgs_id "PGS001229, PGS000802" --only_input  -c ./tests/config/nextflow.config
+  command: nextflow run main.nf --pgs_id "PGS001229, PGS000802" --only_input  -c ./tests/config/nextflow.config
   tags:
     - inputcheck
     - subworkflow

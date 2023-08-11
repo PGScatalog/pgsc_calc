@@ -27,9 +27,11 @@ jobs:
         nxf_ver: ['22.10.0', 'latest']
 
     steps:
-      - name: Check out pipeline code
-        uses: actions/checkout@v3
-
+      - name: Extract branch name
+        shell: bash
+        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+        id: extract_branch
+        
       - uses: nf-core/setup-nextflow@v1
         with:
           version: ${{ matrix.nxf_ver }}
@@ -49,7 +51,7 @@ jobs:
 
       - name: Run pipeline with test data
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
+          nextflow run pgscatalog/pgsc_calc -r ${{ steps.extract_branch.outputs.branch }} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
 
   singularity:
     if: ${{ inputs.singularity }}
@@ -62,9 +64,11 @@ jobs:
         nxf_ver: ['22.10.0', 'latest']
 
     steps:
-      - name: Check out pipeline code
-        uses: actions/checkout@v3
-
+      - name: Extract branch name
+        shell: bash
+        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+        id: extract_branch
+      
       - uses: nf-core/setup-nextflow@v1
         with:
           version: ${{ matrix.nxf_ver }}
@@ -90,4 +94,4 @@ jobs:
 
       - name: Run pipeline with test data
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
+          nextflow run pgscatalog/pgsc_calc -r ${{ steps.extract_branch.outputs.branch }} -profile ${{ matrix.test_profile}},${{ matrix.profile }}

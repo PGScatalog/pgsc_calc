@@ -1,6 +1,6 @@
 # get a scores with two columns in output (test profile + PGS001229) for custom test
 - name: test apply score subworkflow
-  command: nextflow run main.nf -profile test --only_score -c ./tests/config/nextflow.config --pgs_id PGS001229 --min_overlap 0
+  command: nextflow run main.nf --only_score -c ./tests/config/nextflow.config --pgs_id PGS001229 --min_overlap 0
   tags:
     - applyscore
     - subworkflow
@@ -14,9 +14,8 @@
     - path: output/plink2/cineca_22_additive_0.sscore.vars
     - path: output/score/aggregated_scores.txt.gz
 
-# TODO: fix overlap -> 1 in pgscatalog_utils
 - name: test perfect apply score
-  command: nextflow run main.nf -profile test --only_score -c ./tests/config/nextflow.config --scorefile ./tests/subworkflows/perfect.txt 
+  command: nextflow run main.nf --only_score -c ./tests/config/nextflow.config --scorefile ./tests/subworkflows/perfect.txt 
   tags:
     - applyscore
     - subworkflow

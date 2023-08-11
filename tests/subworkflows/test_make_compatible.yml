@@ -1,5 +1,5 @@
 - name: test make compatible subworkflow with bfile
-  command: nextflow run main.nf -profile test --input ./assets/examples/samplesheet_bfile.csv --only_compatible -c ./tests/config/nextflow.config
+  command: nextflow run main.nf --input ./assets/examples/samplesheet_bfile.csv --only_compatible -c ./tests/config/nextflow.config
   tags:
     - makecompatible
     - subworkflow
@@ -13,7 +13,7 @@
     - path: output/plink2/GRCh37_cineca_22.vmiss.gz
 
 - name: test make compatible subworkflow with vcf
-  command: nextflow run main.nf -profile test --input ./assets/examples/samplesheet_vcf.csv --only_compatible  -c ./tests/config/nextflow.config
+  command: nextflow run main.nf --input ./assets/examples/samplesheet_vcf.csv --only_compatible  -c ./tests/config/nextflow.config
   tags:
     - makecompatible
     - subworkflow
@@ -27,7 +27,7 @@
     - path: output/plink2/GRCh37_vcf_22.vmiss.gz      
 
 - name: test make compatible subworkflow with pfile
-  command: nextflow run main.nf -profile test --only_compatible -c ./tests/config/nextflow.config
+  command: nextflow run main.nf --only_compatible -c ./tests/config/nextflow.config
   tags:
     - makecompatible
     - subworkflow

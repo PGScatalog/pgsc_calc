@@ -1,5 +1,5 @@
 - name: test match subworkflow
-  command: nextflow run main.nf -profile test --only_match -c ./tests/config/nextflow.config
+  command: nextflow run main.nf --only_match -c ./tests/config/nextflow.config
   tags:
     - match
     - subworkflow
