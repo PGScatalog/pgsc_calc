@@ -46,7 +46,7 @@ jobs:
 
       - name: Run pipeline with test data
         run: |
-          nextflow run -r ${GITHUB_REF} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
+          nextflow run pgscatalog/pgsc_calc -r ${GITHUB_REF} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
 
   singularity:
     if: ${{ inputs.singularity }}
@@ -84,4 +84,4 @@ jobs:
 
       - name: Run pipeline with test data
         run: |
-          nextflow run -r ${GITHUB_REF} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
+          nextflow run pgscatalog/pgsc_calc -r ${GITHUB_REF} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
