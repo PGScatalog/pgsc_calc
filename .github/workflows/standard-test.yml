@@ -27,9 +27,6 @@ jobs:
         nxf_ver: ['22.10.0', 'latest']
 
     steps:
-      - name: Check out pipeline code
-        uses: actions/checkout@v3
-
       - uses: nf-core/setup-nextflow@v1
         with:
           version: ${{ matrix.nxf_ver }}
@@ -49,7 +46,7 @@ jobs:
 
       - name: Run pipeline with test data
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
+          nextflow run -r ${GITHUB_REF} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
 
   singularity:
     if: ${{ inputs.singularity }}
@@ -62,9 +59,6 @@ jobs:
         nxf_ver: ['22.10.0', 'latest']
 
     steps:
-      - name: Check out pipeline code
-        uses: actions/checkout@v3
-
       - uses: nf-core/setup-nextflow@v1
         with:
           version: ${{ matrix.nxf_ver }}
@@ -90,4 +84,4 @@ jobs:
 
       - name: Run pipeline with test data
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
+          nextflow run -r ${GITHUB_REF} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
