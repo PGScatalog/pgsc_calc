@@ -38,7 +38,7 @@
 
 # Publish
 
-- [ ] Tag new release with semver on dev branch
+- [ ] Tag new release with semver on dev branch (in `nextflow.config`)
 - [ ] Submit PR
 - [ ] Submit to FAIR workflow registry
 - [ ] Announce!
