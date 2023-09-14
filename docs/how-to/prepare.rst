@@ -17,7 +17,7 @@ Target genome data requirements
 - Only human chromosomes 1 -- 22, X, Y, and XY are supported by the pipeline,
   although sex chromosomes are rarely used in scoring files.
 - If input data contain other chromosomes (e.g. patch regions) then
-  the pipeline may probably complain loudly and stop calculating.
+  the pipeline may complain loudly and stop calculating.
 
 
 Supported file formats
