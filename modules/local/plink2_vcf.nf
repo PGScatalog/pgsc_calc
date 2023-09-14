@@ -33,6 +33,7 @@ process PLINK2_VCF {
     def dosage_options = meta.vcf_import_dosage ? 'dosage=DS' : ''
     // rewriting genotypes, so use --max-alleles instead of using generic ID
     def set_ma_missing = params.keep_multiallelic ? '' : '--max-alleles 2'
+    def chrom_filter = meta.chrom == "ALL" ? "--chr 1-22, X, Y, XY" : "--chr ${meta.chrom}" // filter to canonical/stated chromosome
     newmeta = meta.clone() // copy hashmap for updating...
     newmeta.is_pfile = true // now it's converted to a pfile :)
 
@@ -45,6 +46,7 @@ process PLINK2_VCF {
         --missing vcols=fmissdosage,fmiss \\
         $args \\
         --vcf $vcf $dosage_options \\
+        --allow-extra-chr $chrom_filter \\
         --make-pgen vzs \\
         --out ${params.target_build}_${prefix}${meta.chrom}
 

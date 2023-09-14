@@ -16,8 +16,8 @@ Target genome data requirements
 
 - Only human chromosomes 1 -- 22, X, Y, and XY are supported by the pipeline,
   although sex chromosomes are rarely used in scoring files.
-- If input data contain other chromosomes (e.g. pseudoautosomal regions) then
-  the pipeline will probably complain loudly and stop calculating.
+- If input data contain other chromosomes (e.g. patch regions) then
+  the pipeline may complain loudly and stop calculating.
 
 
 Supported file formats
@@ -41,10 +41,16 @@ VCF from an imputation server
     plink2 --vcf <full_path_to_vcf.vcf.gz> \
         --allow-extra-chr \
         --chr 1-22, X, Y, XY \
-        -make-pgen --out <1000G>_axy
+        -make-pgen --out <short name>_axy
+
+.. note:: Non-standard chromosomes/patches should not cause errors in versions >v2.0.0-alpha.3;
+    however, they will be be filtered out from the list of variants available for PGS scoring.
 
 VCF from WGS
 ------------
+
+See https://github.com/PGScatalog/pgsc_calc/discussions/123 for discussion about tools
+to convert the VCF files into ones suitable for calculating PGS.
 
 
 ``plink`` binary fileset (bfile)
