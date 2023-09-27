@@ -63,7 +63,7 @@ jobs:
 
       - name: Make VCF
         run: |
-	    plink2 --pfile ${{ env.ANCESTRY_TARGET_DIR }}/GRCh38_HAPNEST_TARGET_ALL vzs \
+	  plink2 --pfile ${{ env.ANCESTRY_TARGET_DIR }}/GRCh38_HAPNEST_TARGET_ALL vzs \
 	    --export vcf bgz \
 	    --out ${{ env.ANCESTRY_TARGET_DIR }}/GRCh38_HAPNEST_TARGET_ALL
 
