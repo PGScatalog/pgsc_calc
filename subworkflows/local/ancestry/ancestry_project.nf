@@ -71,7 +71,7 @@ workflow ANCESTRY_PROJECT {
     //
 
     ch_genomes
-        .join(vmiss)
+        .join(vmiss, failOnMismatch: true)
         .combine( ch_db.map{ it.tail() } ) // (drop hashmap)
         .flatten()
         .buffer(size: 8)

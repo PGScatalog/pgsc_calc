@@ -23,7 +23,7 @@ process PLINK2_VCF {
     tuple val(newmeta), path("*.pgen"), emit: pgen
     tuple val(newmeta), path("*.psam"), emit: psam
     tuple val(newmeta), path("*.zst") , emit: pvar
-    tuple val(meta), path("*.vmiss.gz"), emit: vmiss
+    tuple val(newmeta), path("*.vmiss.gz"), emit: vmiss
     path "versions.yml"            , emit: versions
 
     script:
