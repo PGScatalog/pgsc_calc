@@ -40,9 +40,8 @@ process PLINK2_SCORE {
     // custom args2
     def maxcol = (scoremeta.n_scores.toInteger() + 2) // id + effect allele = 2 cols
 
-    // if we have allelic frequencies or enough samples don't do mean imputation
+    // if we have allelic frequencies or enough samples don't do mean imputation and skip freq-calc
     def no_imputation = ((ref_afreq.name == 'NO_FILE') && (meta.n_samples.toInteger() < 50)) ? "no-mean-imputation" : ""
-    // speed up the calculation by only considering scoring-file variants for allele frequency calculation
     def error_on_freq_calc = (no_imputation == "no-mean-imputation") ? "--error-on-freq-calc" : ""
 
     def cols = 'header-read cols=+scoresums,+denom,-fid'
@@ -50,6 +49,7 @@ process PLINK2_SCORE {
     def dominant = (scoremeta.effect_type == 'dominant') ? ' dominant ' : ''
     args2 = [args2, cols, 'list-variants', no_imputation, recessive, dominant, error_on_freq_calc].join(' ')
 
+    // speed up the calculation by only considering scoring-file variants for allele frequency calculation (--extract)
     if (scoremeta.n_scores.toInteger() == 1)
         """
         plink2 \
