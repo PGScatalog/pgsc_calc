@@ -62,9 +62,9 @@ jobs:
         run: sudo apt-get install -y plink2
 
       - name: run plink2
-        run: |
-	  plink2 --pfile ${ANCESTRY_TARGET_DIR}/GRCh38_HAPNEST_TARGET_ALL vzs \
-	    --export vcf bgz \
+        run: >
+	  plink2 --pfile ${ANCESTRY_TARGET_DIR}/GRCh38_HAPNEST_TARGET_ALL vzs 
+	    --export vcf bgz 
 	    --out ${ANCESTRY_TARGET_DIR}/GRCh38_HAPNEST_TARGET_ALL
 
       - name: Set up test requirements
