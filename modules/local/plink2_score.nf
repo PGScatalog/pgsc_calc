@@ -41,11 +41,11 @@ process PLINK2_SCORE {
     def maxcol = (scoremeta.n_scores.toInteger() + 2) // id + effect allele = 2 cols
 
     // if we load allelic frequencies, don't do mean imputation
-    def no_imputation = (ref_afreq.name == 'NO_FILE') ? "no-mean-imputation" : ""
+    def no_imputation = ((ref_afreq.name == 'NO_FILE') && (meta.n_samples.toInteger() < 50)) ? "no-mean-imputation" : ""
     // if no-mean-imputation, be more efficient
     def error_on_freq_calc = (no_imputation == "no-mean-imputation") ? "--error-on-freq-calc" : ""
 
-    def cols = (meta.n_samples.toInteger() < 50) ? 'header-read cols=+scoresums,+denom,-fid' : 'header-read cols=+scoresums,+denom,-fid'
+    def cols = 'header-read cols=+scoresums,+denom,-fid'
     def recessive = (scoremeta.effect_type == 'recessive') ? ' recessive ' : ''
     def dominant = (scoremeta.effect_type == 'dominant') ? ' dominant ' : ''
     args2 = [args2, cols, 'list-variants', no_imputation, recessive, dominant, error_on_freq_calc].join(' ')
