@@ -128,7 +128,7 @@ if (params.only_projection) {
     run_ancestry_bootstrap = true
     run_input_check = true
     run_make_compatible = true
-    run_match = false
+    run_match = true
     run_ancestry_assign = true
     run_apply_score = false
     run_report = false
