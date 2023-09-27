@@ -3,7 +3,7 @@
 # extract target in $ANCESTRY_TARGET_DIR
 # need to convert target to VCF
 
-- name: test ancestry projection and scoring
+- name: test ancestry projection and scoring with VCF input
   command: >
     bash -c "
     sed \"s|ANCESTRY_TARGET_DIR|$ANCESTRY_TARGET_DIR|\" tests/ancestry/samplesheet.csv > samplesheet.csv;
