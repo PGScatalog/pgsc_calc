@@ -130,7 +130,13 @@ jobs:
             ${{ env.ANCESTRY_REF_DIR }}/GRCh38_HAPNEST_reference.tar.zst
           key: ${{ inputs.ancestry-cache-key }}
           fail-on-cache-miss: true
-          
+
+      - name: Install plink2 to recode
+        run: sudo apt-get install -y plink2
+
+      - name: Recode VCF
+        run: plink2 --pfile ${ANCESTRY_TARGET_DIR}/GRCh38_HAPNEST_TARGET_ALL vzs --export vcf bgz --out ${ANCESTRY_TARGET_DIR}/GRCh38_HAPNEST_TARGET_ALL
+
       - name: Set up test requirements
         uses: actions/setup-python@v3
         with:
@@ -140,7 +146,7 @@ jobs:
       - run: pip install -r ${{ github.workspace }}/tests/requirements.txt
 
       - name: Run ancestry test
-        run: TMPDIR=~ PROFILE=singularity pytest --kwdof --symlink --git-aware --wt 2 --tag "ancestry" --ignore tests/bin
+        run: TMPDIR=~ PROFILE=singularity pytest --kwdof --symlink --git-aware --wt 2 --tag "ancestry vcf" --ignore tests/bin
 
       - name: Upload logs on failure
         if: failure()
