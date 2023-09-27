@@ -1,4 +1,4 @@
-name: Run ancestry test with singularity or docker profiles
+name: Run ancestry test with singularity or docker profiles with VCF input
 
 on:
   workflow_call:
