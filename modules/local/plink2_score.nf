@@ -40,10 +40,10 @@ process PLINK2_SCORE {
     // custom args2
     def maxcol = (scoremeta.n_scores.toInteger() + 2) // id + effect allele = 2 cols
 
-    // if we load allelic frequencies, don't do mean imputation
+    // if we have allelic frequencies or enough samples don't do mean imputation
     def no_imputation = ((ref_afreq.name == 'NO_FILE') && (meta.n_samples.toInteger() < 50)) ? "no-mean-imputation" : ""
-    // if no-mean-imputation, be more efficient
-    def error_on_freq_calc = (no_imputation == "no-mean-imputation") ? "--error-on-freq-calc" : ""
+    // speed up the calculation by only considering scoring-file variants for allele frequency calculation
+    def error_on_freq_calc = (ref_afreq.name != 'NO_FILE') ? "--error-on-freq-calc" : "--extract $scorefile"
 
     def cols = 'header-read cols=+scoresums,+denom,-fid'
     def recessive = (scoremeta.effect_type == 'recessive') ? ' recessive ' : ''
