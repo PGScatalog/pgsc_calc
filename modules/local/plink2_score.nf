@@ -43,7 +43,7 @@ process PLINK2_SCORE {
     // if we have allelic frequencies or enough samples don't do mean imputation
     def no_imputation = ((ref_afreq.name == 'NO_FILE') && (meta.n_samples.toInteger() < 50)) ? "no-mean-imputation" : ""
     // speed up the calculation by only considering scoring-file variants for allele frequency calculation
-    def error_on_freq_calc = (ref_afreq.name != 'NO_FILE') ? "--error-on-freq-calc" : "--extract $scorefile"
+    def error_on_freq_calc = (no_imputation == "no-mean-imputation") ? "--error-on-freq-calc" : ""
 
     def cols = 'header-read cols=+scoresums,+denom,-fid'
     def recessive = (scoremeta.effect_type == 'recessive') ? ' recessive ' : ''
@@ -56,6 +56,7 @@ process PLINK2_SCORE {
             --threads $task.cpus \
             --memory $mem_mb \
             --seed 31 \
+            --extract $scorefile \
             $load_afreq \
             $args \
             --score $scorefile $args2 \
@@ -73,6 +74,7 @@ process PLINK2_SCORE {
             --threads $task.cpus \
             --memory $mem_mb \
             --seed 31 \
+            --extract $scorefile \
             $load_afreq \
             $args \
             --score $scorefile $args2 \
