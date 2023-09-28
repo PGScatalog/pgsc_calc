@@ -9,7 +9,7 @@
     - path: output/combine/scorefiles.txt.gz
     - path: output/combine/versions.yml      
       contains:
-        - "pgscatalog_utils: 0.4.1"
+        - "pgscatalog_utils: 0.4.2"
 
 - name: test input check subworkflow with liftover 37to38
   command: nextflow run main.nf --only_input --pgs_id PGS001229 --liftover --target_build GRCh38 -c ./tests/config/nextflow.config --hg19_chain https://hgdownload.cse.ucsc.edu/goldenpath/hg19/liftOver/hg19ToHg38.over.chain.gz --hg38_chain https://hgdownload.soe.ucsc.edu/goldenPath/hg38/liftOver/hg38ToHg19.over.chain.gz
@@ -22,4 +22,4 @@
     - path: output/combine/scorefiles.txt.gz
     - path: output/combine/versions.yml
       contains:
-        - "pgscatalog_utils: 0.4.1"
+        - "pgscatalog_utils: 0.4.2"
