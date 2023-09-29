@@ -10,7 +10,7 @@
       contains:
         - "PGS001229_22_SUM"
     - path: output/plink2/test_null_null_null.log
-      contains:
+      must_not_contain:
         - "no-mean-imputation"
         - "error-on-freq-calc"
     - path: output/plink2/versions.yml
