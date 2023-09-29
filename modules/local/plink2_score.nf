@@ -3,6 +3,7 @@ process PLINK2_SCORE {
     // labels are defined in conf/modules.config
     label 'process_low'
     label 'process_long'
+    label 'error_retry'
     label 'plink2' // controls conda, docker, + singularity options
 
     tag "$meta.id chromosome $meta.chrom effect type $scoremeta.effect_type $scoremeta.n"
