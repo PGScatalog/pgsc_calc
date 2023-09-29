@@ -8,20 +8,11 @@ on:
         required: true
   
 jobs:
-  test_mamba_vcf:
+  test_mamba_ancestry:
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash -el {0}
-    strategy:
-      fail-fast: false
-      matrix:
-        test_profile: ["test"]
-        profile: ["mamba"]
-        nxf_ver: ["22.10.0", ""]
-
-    env:
-      NXF_VER: ${{ matrix.nxf_ver }}
 
     steps:
       - name: Check out pipeline code
