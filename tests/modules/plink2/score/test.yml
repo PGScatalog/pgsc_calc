@@ -10,6 +10,8 @@
       contains:
         - "PGS001229_22_SUM"
     - path: output/plink2/test_null_null_null.log
+      contains:
+        - "--extract"
       must_not_contain:
         - "no-mean-imputation"
         - "error-on-freq-calc"
@@ -32,6 +34,7 @@
       contains:
         - "no-mean-imputation"
         - "error-on-freq-calc"
+        - "--extract"
     - path: output/plink2/versions.yml
       contains:
         - "plink2: 2.00a3.3"
@@ -51,6 +54,7 @@
     - path: output/plink2/test_null_null_null.log
       contains:
         - "--score-col-nums"
+        - "--extract"
       must_not_contain:
         - "error-on-freq-calc"
         - "no-mean-imputation"
@@ -75,6 +79,7 @@
         - "no-mean-imputation"
         - "error-on-freq-calc"
         - "--score-col-nums"
+        - "--extract" 
     - path: output/plink2/versions.yml
       contains:
         - "plink2: 2.00a3.3"
