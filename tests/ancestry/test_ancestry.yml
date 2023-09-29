@@ -27,4 +27,11 @@
         - "AFR,100 (33.33%)"
         - "EAS,100 (33.33%)"
         - "EUR,100 (33.33%)"
+    - path: output/plink2/test_ALL_additive_0.log
+      contains:
+        - "--read-freq"
+        - "--extract"
+      must_not_contain:
+        - "no-mean-imputation"
+        - "error-on-freq-calc"
       
