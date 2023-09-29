@@ -1,4 +1,4 @@
-name: test conda on publish
+name: test conda profiles on demand and on publish
 
 on:
   release:
@@ -6,6 +6,15 @@ on:
   workflow_dispatch:
 
 jobs:
+  preload_ancestry:
+    uses: ./.github/workflows/preload-reference.yml
+
+  test_mamba_ancestry:
+    uses: ./.github/workflows/ancestry-conda.yml
+    needs: [preload_ancestry]
+    with:
+      ancestry-cache-key: ${{ needs.preload_ancestry.outputs.cache-key }}
+
   test_mamba_standard:
     runs-on: ubuntu-latest
     defaults:
