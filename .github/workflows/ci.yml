@@ -9,6 +9,7 @@ on:
     branches:
       - dev
       - main
+      - fix_vcf
   release:
     types: [published]
 
@@ -117,6 +118,22 @@ jobs:
       docker: true
 
   ancestry_singularity:
+    needs: [preload_ancestry, preload_singularity]
+    uses: ./.github/workflows/ancestry.yml
+    with:
+      container-cache-key: ${{ needs.preload_singularity.outputs.cache-key }}
+      ancestry-cache-key: ${{ needs.preload_ancestry.outputs.cache-key }}
+      singularity: true
+
+  ancestry_vcf_docker:
+    needs: [preload_ancestry, preload_docker]
+    uses: ./.github/workflows/ancestry-vcf.yml
+    with:
+      container-cache-key: ${{ needs.preload_docker.outputs.cache-key }}
+      ancestry-cache-key: ${{ needs.preload_ancestry.outputs.cache-key }}
+      docker: true
+
+  ancestry_vcf_singularity:
     needs: [preload_ancestry, preload_singularity]
     uses: ./.github/workflows/ancestry.yml
     with:

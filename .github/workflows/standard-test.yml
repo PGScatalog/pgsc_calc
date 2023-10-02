@@ -14,6 +14,7 @@ on:
 env:
   NXF_SINGULARITY_CACHEDIR: ${{ github.workspace }}/singularity
   SINGULARITY_VERSION: 3.8.3
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   
 jobs:
   docker:
