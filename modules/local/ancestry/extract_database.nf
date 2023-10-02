@@ -27,7 +27,17 @@ process EXTRACT_DATABASE {
     meta37 = ['build': 'GRCh37']
 
     """
-    tar -xvf $reference --wildcards "${params.target_build}*"
+    tar -xf $reference --wildcards "${params.target_build}*" meta.txt 2> /dev/null
+
+    DB_VERSION=\$(cat meta.txt)
+
+    if [ "\$DB_VERSION" != "2.0.0-alpha.3" ]; then
+      echo "Old reference database version detected, please redownload the latest version and try again"
+      echo "See https://pgsc-calc.readthedocs.io/en/latest/how-to/ancestry.html"
+      exit 1
+    else
+      echo "Database version good"
+    fi
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
