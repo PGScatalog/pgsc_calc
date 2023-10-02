@@ -21,10 +21,10 @@
   files:
     - path: output/samplesheet/out.json
     - path: output/combine/scorefiles.txt.gz
-    - path: output/plink2/GRCh37_vcf_22.pgen
-    - path: output/plink2/GRCh37_vcf_22.pvar.zst
-    - path: output/plink2/GRCh37_vcf_22.psam
-    - path: output/plink2/GRCh37_vcf_22.vmiss.gz      
+    - path: output/plink2/GRCh37_cineca_22_vcf.pgen
+    - path: output/plink2/GRCh37_cineca_22_vcf.pvar.zst
+    - path: output/plink2/GRCh37_cineca_22_vcf.psam
+    - path: output/plink2/GRCh37_cineca_22_vcf.vmiss.gz      
 
 - name: test make compatible subworkflow with pfile
   command: nextflow run main.nf --only_compatible -c ./tests/config/nextflow.config

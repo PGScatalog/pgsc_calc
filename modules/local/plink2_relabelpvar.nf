@@ -6,8 +6,8 @@ process PLINK2_RELABELPVAR {
 
     tag "$meta.id chromosome $meta.chrom"
 
-    storeDir ( params.genotypes_cache ? "$params.genotypes_cache/${meta.id}/${params.target_build}/${meta.chrom}" :
-              "$workDir/genomes/${meta.id}/${params.target_build}/${meta.chrom}/")
+    storeDir ( params.genotypes_cache ? "$params.genotypes_cache/${meta.id}/${meta.build}/${meta.chrom}" :
+              "$workDir/genomes/${meta.id}/${meta.build}/${meta.chrom}/")
 
     conda "${task.ext.conda}"
 
@@ -21,9 +21,9 @@ process PLINK2_RELABELPVAR {
     tuple val(meta), path(geno), path(pheno), path(variants)
 
     output:
-    tuple val(meta), path("*.pgen"), emit: geno
-    tuple val(meta), path("*.zst") , emit: variants
-    tuple val(meta), path("*.psam"), emit: pheno
+    tuple val(meta), path("${meta.build}_*.pgen"), emit: geno
+    tuple val(meta), path("${meta.build}_*.pvar.zst") , emit: variants
+    tuple val(meta), path("${meta.build}_*.psam"), emit: pheno
     tuple val(meta), path("*.vmiss.gz"), emit: vmiss
     path "versions.yml"            , emit: versions
 
@@ -34,7 +34,7 @@ process PLINK2_RELABELPVAR {
     script:
     def args = task.ext.args ?: ''
     def compressed = variants.getName().endsWith("zst") ? 'vzs' : ''
-    def prefix = task.ext.suffix ? "${meta.id}_${task.ext.suffix}_" : "${meta.id}_"
+    def prefix = task.ext.suffix ? "${meta.id}_${task.ext.suffix}" : "${meta.id}"
     def mem_mb = task.memory.toMega() // plink is greedy
     // if dropping multiallelic variants, set a generic ID that won't match
     def set_ma_missing = params.keep_multiallelic ? '' : '--var-id-multi @:#'
@@ -49,11 +49,12 @@ process PLINK2_RELABELPVAR {
         $set_ma_missing \\
         --pfile ${geno.baseName} $compressed \\
         --make-just-pvar zs \\
-        --out ${params.target_build}_${prefix}${meta.chrom}
+        --out ${meta.build}_${prefix}_${meta.chrom}
 
     # cross platform (mac, linux) method of preserving symlinks
-    cp -a $geno ${params.target_build}_${prefix}${meta.chrom}.pgen
-    cp -a $pheno ${params.target_build}_${prefix}${meta.chrom}.psam
+    cp -a $geno ${meta.build}_${prefix}_${meta.chrom}.pgen
+    cp -a $pheno ${meta.build}_${prefix}_${meta.chrom}.psam
+   
     gzip *.vmiss
 
     cat <<-END_VERSIONS > versions.yml
