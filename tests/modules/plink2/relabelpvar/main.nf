@@ -7,7 +7,7 @@ include { PLINK2_RELABELPVAR } from '../../../../modules/local/plink2_relabelpva
 
 workflow testrelabelpvar {
     vcf = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.vcf.gz')
-    def meta = [id: 'test', chrom: 22]
+    def meta = [id: 'test', 'build': 'GRCh37', chrom: 22]
 
     PLINK2_VCF(Channel.of([meta, vcf]))
 
