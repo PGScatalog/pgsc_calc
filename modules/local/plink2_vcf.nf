@@ -6,8 +6,8 @@ process PLINK2_VCF {
 
     tag "$meta.id chromosome $meta.chrom"
 
-    storeDir ( params.genotypes_cache ? "$params.genotypes_cache/${meta.id}/${params.target_build}/${meta.chrom}" :
-              "$workDir/genomes/${meta.id}/${params.target_build}/${meta.chrom}/")
+    storeDir ( params.genotypes_cache ? "$params.genotypes_cache/${meta.id}/${meta.build}/${meta.chrom}" :
+              "$workDir/genomes/${meta.id}/${meta.build}/${meta.chrom}/")
 
     conda "${task.ext.conda}"
 
@@ -20,15 +20,15 @@ process PLINK2_VCF {
     tuple val(meta), path(vcf)
 
     output:
-    tuple val(newmeta), path("*.pgen"), emit: pgen
-    tuple val(newmeta), path("*.psam"), emit: psam
-    tuple val(newmeta), path("*.zst") , emit: pvar
-    tuple val(newmeta), path("*.vmiss.gz"), emit: vmiss
+    tuple val(newmeta), path("${meta.build}_*.pgen"), emit: pgen
+    tuple val(newmeta), path("${meta.build}_*.psam"), emit: psam
+    tuple val(newmeta), path("${meta.build}_*.zst") , emit: pvar
+    tuple val(newmeta), path("${meta.build}_*.vmiss.gz"), emit: vmiss
     path "versions.yml"            , emit: versions
 
     script:
     def args = task.ext.args ?: ''
-    def prefix = task.ext.prefix ?: "${meta.id}_"
+    def prefix = task.ext.suffix ? "${meta.id}_${task.ext.suffix}" : "${meta.id}"
     def mem_mb = task.memory.toMega()
     def dosage_options = meta.vcf_import_dosage ? 'dosage=DS' : ''
     // rewriting genotypes, so use --max-alleles instead of using generic ID
@@ -48,7 +48,7 @@ process PLINK2_VCF {
         --vcf $vcf $dosage_options \\
         --allow-extra-chr $chrom_filter \\
         --make-pgen vzs \\
-        --out ${params.target_build}_${prefix}${meta.chrom}
+        --out ${meta.build}_${prefix}_${meta.chrom}_vcf
 
     gzip *.vmiss
 
