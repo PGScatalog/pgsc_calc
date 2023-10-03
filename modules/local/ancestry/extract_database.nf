@@ -31,7 +31,7 @@ process EXTRACT_DATABASE {
 
     DB_VERSION=\$(cat meta.txt)
 
-    if [ "\$DB_VERSION" != "2.0.0-alpha.3" ]; then
+    if [ "\$DB_VERSION" != "${params.ref_format_version}" ]; then
       echo "Old reference database version detected, please redownload the latest version and try again"
       echo "See https://pgsc-calc.readthedocs.io/en/latest/how-to/ancestry.html"
       exit 1

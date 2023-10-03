@@ -26,7 +26,7 @@ process MAKE_DATABASE {
     """
     md5sum -c $checksums
 
-    echo $workflow.manifest.version > meta.txt
+    echo ${params.ref_format_version} > meta.txt
 
     # can't use meta variables in stageAs
     # don't want to use renameTo because it's destructive for the input
