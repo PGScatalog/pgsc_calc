@@ -8,6 +8,26 @@ will only occur in major versions with changes noted in this changelog.
 
 .. _`semantic versioning`: https://semver.org/
 
+pgsc_calc v2.0.0-alpha.3 (2023-10-02)
+-------------------------------------
+
+Improvements:
+
+* Automatically retry scoring with more RAM on larger datasets
+* Describe scoring precision in docs 
+* Change handling of VCFs to reduce errors when recoding 
+* Internal changes to improve support for custom reference panels
+
+Bug fixes:
+
+* Fix VCF input to ancestry projection subworkflow (thanks `@frahimov`_ and `@AWS-crafter`_ for patiently debugging)
+* Fix scoring options when reading allelic frequencies from a reference panel (thanks `@raimondsre`_ for reporting the changes from v1.3.2 -> 2.0.0-alpha)
+* Fix conda profile action
+
+.. _`@frahimov`: https://github.com/PGScatalog/pgsc_calc/issues/172
+.. _`@AWS-crafter`: https://github.com/PGScatalog/pgsc_calc/issues/155
+.. _`@raimondsre`: https://github.com/PGScatalog/pgsc_calc/pull/139#issuecomment-1736313211
+
 pgsc_calc v2.0.0-alpha.1 (2023-08-11)
 -------------------------------------
 
