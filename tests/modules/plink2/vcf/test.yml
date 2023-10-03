@@ -5,9 +5,9 @@
     - plink2
     - fast
   files:
-    - path: output/plink2/GRCh37_vcf_null.pgen
-    - path: output/plink2/GRCh37_vcf_null.psam
-    - path: output/plink2/GRCh37_vcf_null.pvar.zst
+    - path: output/plink2/GRCh37_test_22_vcf.pgen
+    - path: output/plink2/GRCh37_test_22_vcf.psam
+    - path: output/plink2/GRCh37_test_22_vcf.pvar.zst
     - path: output/plink2/versions.yml
       contains:
         - "plink2: 2.00a3.3"

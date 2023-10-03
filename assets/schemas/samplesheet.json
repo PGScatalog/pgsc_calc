@@ -11,8 +11,8 @@
     "properties": {
       "sampleset": {
         "type": "string",
-        "pattern": "^\\S+$",
-        "description": "Sampleset name must be provided and cannot contain spaces"
+        "pattern": "^[a-zA-Z0-9]*$",
+        "description": "Sampleset name must be provided and cannot contain spaces or reserved characters ('_' or '.')"
       },
       "path": {
         "description": "A list of resolved target genome file paths",

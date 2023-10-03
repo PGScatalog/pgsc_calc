@@ -1,6 +1,7 @@
 process MATCH_COMBINE {
     // labels are defined in conf/modules.config
     label 'process_medium'
+    label 'error_retry'
     label 'pgscatalog_utils' // controls conda, docker, + singularity options
 
     // first element of tag must be sampleset

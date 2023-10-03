@@ -25,11 +25,11 @@ download here <../../assets/examples/samplesheet.csv>`.
 
 There are four mandatory columns:
 
-- **sampleset**: A text string referring to the name of a :term:`target dataset`
-  of genotyping data containing at least one sample/individual (however cohort
-  datasets will often contain many individuals with combined genotyped/imputed
-  data). Data from a sampleset may be input as a single file, or split across
-  chromosomes into multiple files.  Scores generated from files with the same
+- **sampleset**: A text string (no spaces, or reserved characters [ '.' or '_' ]) referring
+  to the name of a :term:`target dataset` of genotyping data containing at least one
+  sample/individual (however cohort datasets will often contain many individuals with
+  combined genotyped/imputed data). Data from a sampleset may be input as a single file,
+  or split across chromosomes into multiple files.  Scores generated from files with the same
   sampleset name are combined in later stages of the analysis.
 
   .. danger::

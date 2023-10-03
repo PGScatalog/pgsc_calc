@@ -2,7 +2,7 @@
 // Create a database containing reference data required for ancestry inference
 //
 include { SETUP_RESOURCE } from '../../../modules/local/ancestry/bootstrap/setup_resource'
-include { PLINK2_RELABELPVAR } from '../../../modules/local/plink2_relabelpvar'
+include { PLINK2_RELABELPVAR as BOOTSTRAP_RELABEL } from '../../../modules/local/plink2_relabelpvar'
 include { MAKE_DATABASE } from '../../../modules/local/ancestry/bootstrap/make_database'
 
 workflow BOOTSTRAP_ANCESTRY {
@@ -33,11 +33,11 @@ workflow BOOTSTRAP_ANCESTRY {
 
     SETUP_RESOURCE.out.plink.dump( tag: 'ref_setup' )
 
-    PLINK2_RELABELPVAR( SETUP_RESOURCE.out.plink )
-    ch_versions = ch_versions.mix(PLINK2_RELABELPVAR.out.versions.first())
+    BOOTSTRAP_RELABEL( SETUP_RESOURCE.out.plink )
+    ch_versions = ch_versions.mix(BOOTSTRAP_RELABEL.out.versions.first())
 
-    PLINK2_RELABELPVAR.out.geno
-        .concat(PLINK2_RELABELPVAR.out.pheno, PLINK2_RELABELPVAR.out.variants)
+    BOOTSTRAP_RELABEL.out.geno
+        .concat(BOOTSTRAP_RELABEL.out.pheno, BOOTSTRAP_RELABEL.out.variants)
         .dump(tag: 'ancestry_relabelled')
         .set { relabelled }
 
@@ -47,12 +47,14 @@ workflow BOOTSTRAP_ANCESTRY {
         .groupTuple(size: 3)
         .dump(tag: 'ancestry_relabelled_grouped')
         .map { drop_meta_keys(it).flatten() }
-        .set{ relabelled_flat }
+        .set{ relabelled_flat }     
 
-    ref.king
-        .map { drop_meta_keys(it) }
-    // dropping meta keys simplifies the join
-        .join( relabelled_flat )
+    ref.king.branch {
+        GRCh37: it[0].build == "GRCh37"
+        GRCh38: it[0].build == "GRCh38"
+    }.set { ch_king }
+
+    relabelled_flat
         .flatten()
         .filter(Path)
         .collect()
@@ -62,7 +64,7 @@ workflow BOOTSTRAP_ANCESTRY {
     Channel.fromPath(params.ancestry_checksums, checkIfExists: true)
         .set { ch_checksums }
 
-    MAKE_DATABASE( ch_raw_ref, ch_checksums )
+    MAKE_DATABASE( ch_raw_ref, ch_king.GRCh37, ch_king.GRCh38, ch_checksums )
     ch_versions = ch_versions.mix(MAKE_DATABASE.out.versions)
 
     emit:

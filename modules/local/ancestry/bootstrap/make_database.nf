@@ -14,6 +14,8 @@ process MAKE_DATABASE {
 
     input:
     path '*'
+    tuple val(grch37_king_meta), path(grch37_king)
+    tuple val(grch38_king_meta), path(grch38_king)
     path checksums
 
     output:
@@ -24,7 +26,13 @@ process MAKE_DATABASE {
     """
     md5sum -c $checksums
 
-    echo $workflow.manifest.version > meta.txt
+    echo ${params.ref_format_version} > meta.txt
+
+    # can't use meta variables in stageAs
+    # don't want to use renameTo because it's destructive for the input
+    cp -L $grch37_king ${grch37_king_meta.build}_${grch37_king_meta.id}.king.cutoff.out.id
+    cp -L $grch38_king ${grch38_king_meta.build}_${grch38_king_meta.id}.king.cutoff.out.id
+    rm $grch37_king $grch38_king
 
     tar --dereference -acf pgsc_calc.tar.zst *
 

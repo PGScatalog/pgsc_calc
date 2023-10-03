@@ -1,2 +1,2 @@
 sampleset,path_prefix,chrom,format
-cineca,assets/examples/target_genomes/cineca_synthetic_subset,22,vcf
+cineca,target_genomes/cineca_synthetic_subset,22,vcf

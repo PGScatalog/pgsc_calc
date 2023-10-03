@@ -3,6 +3,7 @@ process PLINK2_SCORE {
     // labels are defined in conf/modules.config
     label 'process_low'
     label 'process_long'
+    label 'error_retry'
     label 'plink2' // controls conda, docker, + singularity options
 
     tag "$meta.id chromosome $meta.chrom effect type $scoremeta.effect_type $scoremeta.n"
@@ -40,22 +41,23 @@ process PLINK2_SCORE {
     // custom args2
     def maxcol = (scoremeta.n_scores.toInteger() + 2) // id + effect allele = 2 cols
 
-    // if we load allelic frequencies, don't do mean imputation
-    def no_imputation = (ref_afreq.name == 'NO_FILE') ? "no-mean-imputation" : ""
-    // if no-mean-imputation, be more efficient
+    // if we have allelic frequencies or enough samples don't do mean imputation and skip freq-calc
+    def no_imputation = ((ref_afreq.name == 'NO_FILE') && (meta.n_samples.toInteger() < 50)) ? "no-mean-imputation" : ""
     def error_on_freq_calc = (no_imputation == "no-mean-imputation") ? "--error-on-freq-calc" : ""
 
-    def cols = (meta.n_samples.toInteger() < 50) ? 'header-read cols=+scoresums,+denom,-fid' : 'header-read cols=+scoresums,+denom,-fid'
+    def cols = 'header-read cols=+scoresums,+denom,-fid'
     def recessive = (scoremeta.effect_type == 'recessive') ? ' recessive ' : ''
     def dominant = (scoremeta.effect_type == 'dominant') ? ' dominant ' : ''
     args2 = [args2, cols, 'list-variants', no_imputation, recessive, dominant, error_on_freq_calc].join(' ')
 
+    // speed up the calculation by only considering scoring-file variants for allele frequency calculation (--extract)
     if (scoremeta.n_scores.toInteger() == 1)
         """
         plink2 \
             --threads $task.cpus \
             --memory $mem_mb \
             --seed 31 \
+            --extract $scorefile \
             $load_afreq \
             $args \
             --score $scorefile $args2 \
@@ -73,6 +75,7 @@ process PLINK2_SCORE {
             --threads $task.cpus \
             --memory $mem_mb \
             --seed 31 \
+            --extract $scorefile \
             $load_afreq \
             $args \
             --score $scorefile $args2 \

@@ -1,4 +1,4 @@
-name: test conda on publish
+name: test conda profiles on demand and on publish
 
 on:
   release:
@@ -6,33 +6,50 @@ on:
   workflow_dispatch:
 
 jobs:
+  preload_ancestry:
+    uses: ./.github/workflows/preload-reference.yml
+
+  test_mamba_ancestry:
+    uses: ./.github/workflows/ancestry-conda.yml
+    needs: [preload_ancestry]
+    with:
+      ancestry-cache-key: ${{ needs.preload_ancestry.outputs.cache-key }}
+
   test_mamba_standard:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}
     strategy:
       fail-fast: false
       matrix:
         test_profile: ["test"]
         profile: ["mamba"]
-        nxf_ver: ["22.10.0", "latest"]
+        nxf_ver: ["22.10.0", ""]
+
+    env:
+      NXF_VER: ${{ matrix.nxf_ver }}
 
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v3
 
+      - uses: conda-incubator/setup-miniconda@v2
+        with:  
+          channels: conda-forge,bioconda,defaults
+          miniforge-variant: Mambaforge
+          miniforge-version: latest
+          python-version: "3.10"
+          
       - uses: actions/setup-java@v3
         with:
           distribution: 'corretto'
           java-version: '17'
 
-      - uses: nf-core/setup-nextflow@v1
-        with:
-          version: ${{ matrix.nxf_ver }}
-          
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          miniforge-variant: Mambaforge
-          miniforge-version: latest          
-          channels: conda-forge,bioconda,defaults
+      - name: install nxf
+        run: |
+          wget -qO- get.nextflow.io | bash
+          sudo mv nextflow /usr/local/bin/
 
       - name: Run pipeline with test data
         run: |

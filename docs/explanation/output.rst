@@ -34,6 +34,10 @@ If you have run the pipeline **without** using ancestry information the followin
 - ``AVG``: normalizes ``SUM`` by the ``DENOM`` field (displayed when you calculate the PGS on a small sample size n<50
   to avoid using unreliable allele frequency estimates for missing genotypes in the target sample.
 
+.. note:: The PGS ``SUM`` & ``AVG`` are rounded to a precision of 6 decimal places in the ouput of the PLINK2_SCORE
+    commands; however, the calculation of the PGS is based on the full precision of the effect_weight value in the
+    scoring file.
+
 If you have run the pipeline **using ancestry information** (``--run_ancesty``) the following columns may be present
 depending on the ancestry adjustments that were run (see :ref:`norm` for more details):
 
