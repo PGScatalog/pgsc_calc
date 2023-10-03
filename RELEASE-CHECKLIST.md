@@ -31,6 +31,10 @@
 - [ ] Has the changelog been updated?
 - [ ] Update the nextflow schema
 
+# Reference panels
+- [ ] Did anything change to the modules for creating the reference panel? Bump ref_format_version in nextflow.config
+   - [ ] Publish new reference panels to FTP, update any documentation.
+
 # Tests
 
 - [ ] Make sure unit tests pass on singularity, docker, and conda (CI)
