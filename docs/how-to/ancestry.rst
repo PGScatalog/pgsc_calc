@@ -6,17 +6,23 @@ How do I normalise calculated scores across different genetic ancestry groups?
 Download reference data
 -----------------------
 
-The fastest method of getting started is to download our reference panel:
+The fastest method of getting started is to download a `reference panel`_:
 
 .. code-block:: console
 
-    $ wget https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/pgsc_calc.tar.zst
+    $ wget https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/pgsc_1000G_v1.tar.zst
 
-The reference panel is based on 1000 Genomes. It was originally downloaded from
-the PLINK 2 `resources section`_. To minimise file size INFO annotations are
-excluded. KING pedigree corrections were enabled.
+This example reference panel is based on 1000 Genomes. 
+
+We also provide a reference panel that includes Human Genome Diversity Project data, 
+which includes more ancestry groups:
+
+.. code-block:: console
+
+    $ wget https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/pgsc_HGDP+1kGP_v1.tar.zst
 
 .. _`resources section`: https://www.cog-genomics.org/plink/2.0/resources
+.. _`reference panel`: https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/
 
 Bootstrap reference data
 ~~~~~~~~~~~~~~~~~~~~~~~~
