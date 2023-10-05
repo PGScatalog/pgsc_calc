@@ -27,6 +27,9 @@ which includes additional samples and ancestry groups:
 .. _`Nature 2015`: https://doi.org/10.1038/nature15393
 .. _`Koenig, Yohannes et al. bioRxiv 2023`: https://doi.org/10.1101/2023.01.23.525248
 
+.. note:: These reference databases are not compatible with the test profile. 
+  The test profile is not biologically meaningful, and is only used to test the workflow installed.
+
 Bootstrap reference data
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
