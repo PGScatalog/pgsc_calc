@@ -12,10 +12,11 @@ The fastest method of getting started is to download a `reference panel`_:
 
     $ wget https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/pgsc_1000G_v1.tar.zst
 
-This example reference panel is based on 1000 Genomes. 
+This example reference panel is based on 1000 Genomes (`Nature 2015`_).
 
-We also provide a reference panel that includes Human Genome Diversity Project data, 
-which includes more ancestry groups:
+We also provide a reference panel that combines 1000 Genomes with data from the Human Genome
+Diversity Project derived from the gnomAD release (v3.1, `Koenig, Yohannes et al. bioRxiv 2023`_),
+which includes additional samples and ancestry groups:
 
 .. code-block:: console
 
@@ -23,6 +24,8 @@ which includes more ancestry groups:
 
 .. _`resources section`: https://www.cog-genomics.org/plink/2.0/resources
 .. _`reference panel`: https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/
+.. _`Nature 2015`: https://doi.org/10.1038/nature15393
+.. _`Koenig, Yohannes et al. bioRxiv 2023`: https://doi.org/10.1101/2023.01.23.525248
 
 Bootstrap reference data
 ~~~~~~~~~~~~~~~~~~~~~~~~
