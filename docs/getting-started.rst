@@ -97,7 +97,7 @@ parameter:
     --pgs_id PGS001229 # one score
     --pgs_id PGS001229,PGS001405 # many scores separated by , (no spaces)
 
-.. note:: You can also select scores associated with traits (``--efo_id``) and
+.. note:: You can also select scores associated with traits (``--trait_efo``) and
           publications (``--pgp_id``)
           
 If you would like to use a custom scoring file not published in the PGS Catalog,
