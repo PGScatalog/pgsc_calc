@@ -20,7 +20,7 @@ css: logo.css
 ---
 
 ::: {.callout-note}
-See the online [documentation](https://pgsc-calc.readthedocs.io/en/latest/output.html#report) for additional
+See the online [documentation](https://pgsc-calc.readthedocs.io/en/latest/explanation/output.html) for additional
 explanation of the terms and data presented in this report.
 :::
 
