@@ -155,7 +155,7 @@ they match the scoring file genome build.
         -profile <docker/singularity/conda> \
         --input samplesheet.csv --target_build GRCh37 \
         --pgs_id PGS001229 \
-        --run_ancestry pgsc_calc.tar.zst 
+        --run_ancestry pgsc_HGDP+1kGP_v1.tar.zst
 
 Congratulations, you've now (`hopefully`) calculated some scores!
 |:partying_face:|
