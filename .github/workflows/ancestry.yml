@@ -135,8 +135,8 @@ jobs:
 
       - name: Run ancestry test
         run: TMPDIR=~ PROFILE=singularity pytest --kwdof --symlink --git-aware --wt 2 --tag "ancestry" --ignore tests/bin
-	env:
-	  TMPDIR: ${{ runner.temp }}
+        env:
+          TMPDIR: ${{ runner.temp }}
 
       - name: Upload logs on failure
         if: failure()
