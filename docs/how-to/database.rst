@@ -8,17 +8,18 @@ A reference database is required to run some parts of the workflow:
 - Automatic genetic ancestry assignment with Principal Component Analysis
 - PGS normalisation methods that account for genetic ancestry
 
-.. note:: It's simplest to download the reference database we have hosted at the
-          PGS Catalog
+.. note:: It's simplest to download a reference database we host at the
+          PGS Catalog FTP
 
 Download reference database
 ---------------------------
 
-A reference database is available to download here:
+PGS Catalog created reference database(s) are available to download here:
 
-``https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/pgsc_calc.tar.zst``
+``https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/pgsc_1000G_v1.tar.zst``
+``https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/pgsc_HGDP+1kGP_v1.tar.zst``
 
-The database is about 7GB and supports both GRCh37 and GRCh38 input target
+The databases are either 7GB or 16GB and support both GRCh37 and GRCh38 input target
 genomes.
 
 Once the reference database is included, remember you must include the ``--run_ancestry``
