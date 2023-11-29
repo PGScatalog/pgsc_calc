@@ -17,7 +17,6 @@ on:
 env:
   NXF_SINGULARITY_CACHEDIR: ${{ github.workspace }}/singularity
   SINGULARITY_VERSION: 3.8.3
-  TMPDIR: ${{ runner.temp }}
 
 jobs:
   docker:
@@ -136,6 +135,8 @@ jobs:
 
       - name: Run ancestry test
         run: TMPDIR=~ PROFILE=singularity pytest --kwdof --symlink --git-aware --wt 2 --tag "ancestry" --ignore tests/bin
+	env:
+	  TMPDIR: ${{ runner.temp }}
 
       - name: Upload logs on failure
         if: failure()
