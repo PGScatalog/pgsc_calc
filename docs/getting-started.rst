@@ -129,11 +129,17 @@ for more information). If your custom PGS was in GRCh37 an example would look li
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To enable genetic ancestry similarity calculations and PGS normalisation,
-download our pre-built reference database:
+download one of our pre-built reference databases:
 
 .. code-block:: console
 
-    $ wget https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/pgsc_calc.tar.zst
+    $ wget https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/pgsc_HGDP+1kGP_v1.tar.zst
+
+This database contains a merged 1000 Genomes and Human Genome Diversity Project reference panel, and is the recommended default panel. 
+
+You may prefer to use 1000 Genomes only:
+
+    $ wget https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/pgsc_1000G_v1.tar.zst
 
 See :ref:`ancestry` for more details.
 
@@ -149,7 +155,7 @@ they match the scoring file genome build.
         -profile <docker/singularity/conda> \
         --input samplesheet.csv --target_build GRCh37 \
         --pgs_id PGS001229 \
-        --run_ancestry pgsc_calc.tar.zst 
+        --run_ancestry pgsc_HGDP+1kGP_v1.tar.zst
 
 Congratulations, you've now (`hopefully`) calculated some scores!
 |:partying_face:|

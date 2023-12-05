@@ -46,6 +46,6 @@ To enable genetic similarity analysis and score normalisation, just include the
 .. code-block:: console
 
     $ nextflow run pgscatalog/pgsc_calc -profile test,docker \
-        --run_ancestry path/to/reference/pgsc_calc.tar.zst
+        --run_ancestry path/to/reference/pgsc_HGDP+1kGP_v1.tar.zst
 
 The ``--run_ancestry`` parameter requires the path to the reference database.
