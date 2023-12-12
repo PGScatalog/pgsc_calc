@@ -383,7 +383,11 @@ melted_scores <- data.table::melt(scores, id.vars=id_cols, measure.vars=patterns
 # fixed in data.table 1.14.9 but not released yet
 score_names <- sub("_.*", "", colnames(scores)[grepl("_SUM$", colnames(scores))])
 setattr(melted_scores$PGS, "levels", score_names)
-data.table::fwrite(melted_scores, params$score_path, sep="\t", compress="gzip")
+
+# don't overwrite params$score_path until report has compiled 
+# OOM crashes can cause corrupted data
+temp_out_path <- tempfile(fileext=".txt.gz")
+data.table::fwrite(melted_scores, temp_out_path, sep="\t", compress="gzip")
 ```
 
 ```{r, echo = FALSE, message = FALSE, eval=params$run_ancestry}
@@ -504,3 +508,33 @@ For scores from the PGS Catalog, please remember to cite the original publicatio
 > PGS Catalog Calculator (in development). PGS Catalog Team. `https://github.com/PGScatalog/pgsc_calc`
 
 > Lambert et al. (2021) The Polygenic Score Catalog as an open database for reproducibility and systematic evaluation. Nature Genetics. 53:420–425 doi:10.1038/s41588-021-00783-5.
+
+## Score licenses
+
+::: {.callout-tip}
+* Scores deposited in the PGS Catalog may have specific license terms
+* It's important to follow the license terms when you reuse scoring files
+* Please check below for a summary of license terms
+:::
+
+```{r}
+# as of 2023-12-12 only non-default licenses are recorded in the scoring file header
+default_ebi_terms <- "PGS obtained from the Catalog should be cited appropriately, and used in accordance with any licensing restrictions set by the authors. See EBI Terms of Use (https://www.ebi.ac.uk/about/terms-of-use/) for additional details."
+
+tibble::tibble(json = json_scorefiles) %>%
+  mutate(pgs_id = purrr::map_chr(json, ~ extract_chr_handle_null(.x, "pgs_id")),
+         license_text = purrr::map_chr(json, ~ extract_chr_handle_null(.x, "license"))) %>%
+  mutate(license_text = ifelse(license_text == "", default_ebi_terms, license_text)) %>%
+  # display license terms for files in the PGS Catalog only (with a PGS ID)
+  filter(startsWith(pgs_id, "PGS")) %>%
+  select(-json) %>%
+  DT::datatable(., colnames = c(
+      "PGS ID" = "pgs_id",
+      "License text" = "license_text"
+    ))
+```
+
+```{r cleanup, eval=!params$run_ancestry, echo=FALSE}
+# prevent the report crashing from corrupting the aggregated scores
+invisible(file.copy(temp_out_path, params$score_path, overwrite=TRUE))
+```
