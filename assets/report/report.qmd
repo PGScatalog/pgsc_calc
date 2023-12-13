@@ -515,6 +515,7 @@ For scores from the PGS Catalog, please remember to cite the original publicatio
 * Scores deposited in the PGS Catalog may have specific license terms
 * It's important to follow the license terms when you reuse scoring files
 * Please check below for a summary of license terms
+* License terms for custom scoring files aren't reported here, please check how the creators of the scoring file licensed their data
 :::
 
 ```{r}
