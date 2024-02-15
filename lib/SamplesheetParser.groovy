@@ -113,12 +113,16 @@ class SamplesheetParser {
             return f
         }
 
-        def other_paths = suffix.subMap(["geno", "pheno"]).collect { k, v ->
-            Nextflow.file(resolved_path + v, checkIfExists: true)
+        def path_list
+        if (row.format != "vcf") {
+            def other_paths = suffix.subMap(["geno", "pheno"]).collect { k, v ->
+                Nextflow.file(resolved_path + v, checkIfExists: true)
+            }
+            path_list = other_paths.plus(1, variant_path)
+        } else {
+            // vcfs aren't split into geno / variant / pheno
+            path_list = variant_path
         }
-
-        // call unique to remove duplicate entries for VCFs, adding at index to preserve order
-        def path_list = other_paths.plus(1, variant_path).unique()
 
         return path_list
     }
