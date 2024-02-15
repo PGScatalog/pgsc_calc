@@ -1,14 +1,11 @@
 [
     {
         "sampleset": "hgdp",
-        "chrom": "X",
+        "chrom": null,
         "vcf_import_dosage": false,
-        "n_chrom": 23,
-        "path": [
-            "/Users/bwingfield/Documents/data/hgdp/split/hgdp_chrX.pgen",
-            "/Users/bwingfield/Documents/data/hgdp/split/hgdp_chrX.pvar.zst",
-            "/Users/bwingfield/Documents/data/hgdp/split/hgdp_chrX.psam"
-        ],
-        "format": "pfile"
+        "geno": "https:\/\/gitlab.ebi.ac.uk\/nebfield\/test-datasets\/-\/raw\/master\/pgsc_calc\/cineca_synthetic_subset.bed",
+        "pheno": "https:\/\/gitlab.ebi.ac.uk\/nebfield\/test-datasets\/-\/raw\/master\/pgsc_calc\/cineca_synthetic_subset.fam",
+        "variants": "https:\/\/gitlab.ebi.ac.uk\/nebfield\/test-datasets\/-\/raw\/master\/pgsc_calc\/cineca_synthetic_subset.bim",
+        "format": "bfile"
     }
 ]

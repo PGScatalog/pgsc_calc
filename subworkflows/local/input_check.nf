@@ -32,7 +32,7 @@ workflow INPUT_CHECK {
     if (format.equals("csv")) {
         def n_chrom
         n_chrom = file(input_path).countLines() - 1 // ignore header
-        parser = new SamplesheetParser(file(input_path), n_chrom, params.target_build)   
+        parser = new SamplesheetParser(file(input_path), n_chrom, params.target_build)           
         input.splitCsv(header:true)
                 .collect()
                 .map { rows -> parser.verifySamplesheet(rows) }
@@ -40,10 +40,15 @@ workflow INPUT_CHECK {
                 .map { row -> parser.parseCSVRow(row)}
                 .set { parsed_input }
     } else if (format.equals("json")) {
-        in_ch = input.splitJson()
         def n_chrom
-        n_chrom = file(input_path).countJson() // ignore header
-        throw new Exception("Not implemented")
+        n_chrom = file(input_path).countJson()
+        parser = new SamplesheetParser(file(input_path), n_chrom, params.target_build)               
+        input.splitJson()
+            .collect()
+            .map { rows -> parser.verifySamplesheet(rows)}
+            .flatten()
+            .map { row -> parser.parseJSONRow(row)}
+            .set { parsed_input }
     }
 
     parsed_input.branch {
@@ -64,8 +69,8 @@ workflow INPUT_CHECK {
 
     ch_branched.pfile.multiMap { it ->
         pgen: [it[0], it[1][0]]
-        psam: [it[0], it[1][1]]
-        pvar: [it[0], it[1][2]]
+        pvar: [it[0], it[1][1]]
+        psam: [it[0], it[1][2]]
     }
         .set { ch_pfiles }
     
@@ -73,9 +78,9 @@ workflow INPUT_CHECK {
 
     versions = ch_versions.mix(COMBINE_SCOREFILES.out.versions)
 
-    ch_bfiles.bed.mix(ch_pfiles.pgen).dump(tag: 'input').set { geno }
-    ch_bfiles.bim.mix(ch_pfiles.pvar).dump(tag: 'input').set { variants }
-    ch_bfiles.fam.mix(ch_pfiles.psam).dump(tag: 'input').set { pheno }
+    ch_bfiles.bed.mix(ch_pfiles.pgen).dump(tag: 'geno').set { geno }
+    ch_bfiles.bim.mix(ch_pfiles.pvar).dump(tag: 'variants').set { variants }
+    ch_bfiles.fam.mix(ch_pfiles.psam).dump(tag: 'pheno').set { pheno }
     ch_branched.vcf.dump(tag: 'input').set{vcf}
     COMBINE_SCOREFILES.out.scorefiles.dump(tag: 'input').set{ scorefiles }
     COMBINE_SCOREFILES.out.log_scorefiles.dump(tag: 'input').set{ log_scorefiles }

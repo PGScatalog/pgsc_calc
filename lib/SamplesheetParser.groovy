@@ -26,6 +26,17 @@ class SamplesheetParser {
         return [parsed_row, getFilePaths(row)]
     }
 
+    def parseJSONRow(row) {
+        // note: we don't check for file existence here
+        def parsed_row = row.subMap("chrom", "vcf_import_dosage", "n_chrom", "format") 
+        parsed_row.id = row.sampleset
+        parsed_row = parsed_row + getFlagMap(row)
+        parsed_row.build = this.target_build
+        parsed_row.chrom = truncateChrom(row)
+
+        return [parsed_row, [row.geno, row.variants, row.pheno]]
+    }
+
     def verifySamplesheet(rows) {
         checkChroms(rows)
         checkOneSampleset(rows)
@@ -34,7 +45,7 @@ class SamplesheetParser {
         return rows
     }
 
-    def getFlagMap(row) {
+    private def getFlagMap(row) {
         // make a map with some helpful bool flags. useful for both JSON and CSV
         def flags = [:]
         flags.is_vcf = false
