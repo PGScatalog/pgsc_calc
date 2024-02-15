@@ -45,9 +45,9 @@ workflow INPUT_CHECK {
         parser = new SamplesheetParser(file(input_path), n_chrom, params.target_build)               
         input.splitJson()
             .collect()
-            .map { rows -> parser.verifySamplesheet(rows)}
+            .map { jsonarray -> parser.verifySamplesheet(jsonarray)}
             .flatten()
-            .map { row -> parser.parseJSONRow(row)}
+            .map { json -> parser.parseJSON(json)}
             .set { parsed_input }
     }
 

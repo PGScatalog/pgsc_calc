@@ -26,15 +26,16 @@ class SamplesheetParser {
         return [parsed_row, getFilePaths(row)]
     }
 
-    def parseJSONRow(row) {
-        // note: we don't check for file existence here
-        def parsed_row = row.subMap("chrom", "vcf_import_dosage", "n_chrom", "format") 
-        parsed_row.id = row.sampleset
-        parsed_row = parsed_row + getFlagMap(row)
-        parsed_row.build = this.target_build
-        parsed_row.chrom = truncateChrom(row)
+    def parseJSON(json) {
+        // note: we don't check for file existence here 
+        // relative paths won't work, because the JSON object doesn't use path_prefix
+        def parsed = json.subMap("chrom", "vcf_import_dosage", "n_chrom", "format") 
+        parsed.id = json.sampleset
+        parsed = parsed + getFlagMap(json)
+        parsed.build = this.target_build
+        parsed.chrom = truncateChrom(json)
 
-        return [parsed_row, [row.geno, row.variants, row.pheno]]
+        return [parsed, [json.geno, json.variants, json.pheno]]
     }
 
     def verifySamplesheet(rows) {
