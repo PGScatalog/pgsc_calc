@@ -32,7 +32,7 @@ workflow INPUT_CHECK {
     if (format.equals("csv")) {
         def n_chrom
         n_chrom = file(input_path).countLines() - 1 // ignore header
-        parser = new SamplesheetParser(file(input_path), n_chrom)   
+        parser = new SamplesheetParser(file(input_path), n_chrom, params.target_build)   
         input.splitCsv(header:true)
                 .collect()
                 .map { rows -> parser.verifySamplesheet(rows) }

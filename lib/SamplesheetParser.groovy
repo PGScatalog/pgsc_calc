@@ -5,10 +5,12 @@ import nextflow.Nextflow
 class SamplesheetParser {
     Path path
     Integer n_chrom
+    String target_build
 
-    SamplesheetParser(path, n_chrom) {
+    SamplesheetParser(path, n_chro, target_build) {
         this.path = path
         this.n_chrom = n_chrom
+        this.target_build = target_build
     }
 
     def parseCSVRow(row) {
@@ -17,6 +19,7 @@ class SamplesheetParser {
         parsed_row.n_chrom = this.n_chrom
         parsed_row.chrom = truncateChrom(row)
         parsed_row.format = row.format
+        parsed_row.build = this.target_build
         parsed_row.vcf_import_dosage = importDosage(row)
         parsed_row = parsed_row + getFlagMap(row)
 
