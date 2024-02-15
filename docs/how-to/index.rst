@@ -42,7 +42,6 @@ Working in different environments
    bigjob
    arm
    offline
-   mount
 
 Working with complex datasets
 -----------------------------
