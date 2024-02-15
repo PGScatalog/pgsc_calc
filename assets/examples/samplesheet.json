@@ -1,1 +1,11 @@
-[{"sampleset":"cineca_synthetic_subset","vcf_path":null,"chrom":22,"bed":"https:\/\/gitlab.ebi.ac.uk\/nebfield\/test-datasets\/-\/raw\/master\/pgsc_calc\/cineca_synthetic_subset.bim","bim":"https:\/\/gitlab.ebi.ac.uk\/nebfield\/test-datasets\/-\/raw\/master\/pgsc_calc\/cineca_synthetic_subset.bed","fam":"https:\/\/gitlab.ebi.ac.uk\/nebfield\/test-datasets\/-\/raw\/master\/pgsc_calc\/cineca_synthetic_subset.fam"}]
+[
+    {
+        "sampleset": "hgdp",
+        "chrom": null,
+        "vcf_import_dosage": false,
+        "geno": "https:\/\/gitlab.ebi.ac.uk\/nebfield\/test-datasets\/-\/raw\/master\/pgsc_calc\/cineca_synthetic_subset.bed",
+        "pheno": "https:\/\/gitlab.ebi.ac.uk\/nebfield\/test-datasets\/-\/raw\/master\/pgsc_calc\/cineca_synthetic_subset.fam",
+        "variants": "https:\/\/gitlab.ebi.ac.uk\/nebfield\/test-datasets\/-\/raw\/master\/pgsc_calc\/cineca_synthetic_subset.bim",
+        "format": "bfile"
+    }
+]

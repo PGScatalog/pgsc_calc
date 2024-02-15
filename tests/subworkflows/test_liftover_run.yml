@@ -5,7 +5,6 @@
     - subworkflow
     - fast
   files:
-    - path: output/samplesheet/out.json
     - path: output/combine/scorefiles.txt.gz
     - path: output/combine/versions.yml      
       contains:
@@ -18,7 +17,6 @@
     - subworkflow
     - fast
   files:
-    - path: output/samplesheet/out.json
     - path: output/combine/scorefiles.txt.gz
     - path: output/combine/versions.yml
       contains:

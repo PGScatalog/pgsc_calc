@@ -5,7 +5,6 @@
     - subworkflow
     - fast
   files:
-    - path: output/samplesheet/out.json
     - path: output/combine/scorefiles.txt.gz
 
 - name: test input check subworkflow with PGS catalog API 
@@ -16,7 +15,6 @@
     - fast
   files:
     - path: output/download/PGS001229_hmPOS_GRCh37.txt.gz
-    - path: output/samplesheet/out.json
     - path: output/combine/scorefiles.txt.gz
 
 - name: test input check subworkflow with PGS catalog API and whitespace
@@ -28,5 +26,4 @@
   files:
     - path: output/download/PGS000802_hmPOS_GRCh37.txt.gz
     - path: output/download/PGS001229_hmPOS_GRCh37.txt.gz
-    - path: output/samplesheet/out.json
     - path: output/combine/scorefiles.txt.gz

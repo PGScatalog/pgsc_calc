@@ -25,9 +25,6 @@ if (params.platform == 'arm64') {
     }
 }
 
-// Check mandatory parameters
-ch_input = Channel.fromPath(params.input, checkIfExists: true)
-
 // Set up scorefile channels ---------------------------------------------------
 
 if (![params.scorefile, params.pgs_id, params.trait_efo, params.pgp_id].any()) {
@@ -230,7 +227,7 @@ workflow PGSCALC {
         }
 
         INPUT_CHECK (
-            ch_input,
+            params.input,
             params.format,
             ch_scorefiles,
             chain_files
