@@ -1,455 +1,449 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "https://raw.githubusercontent.com/pgscatalog/pgsc_calc/master/nextflow_schema.json",
-    "title": "pgscatalog/pgsc_calc pipeline parameters",
-    "description": "This pipeline applies scoring files from the PGS Catalog to target set(s) of genotyped samples",
-    "type": "object",
-    "definitions": {
-        "input_output_options": {
-            "title": "Input/output options",
-            "type": "object",
-            "fa_icon": "fas fa-terminal",
-            "description": "Define where the pipeline should find input data and save output data.",
-            "properties": {
-                "input": {
-                    "type": "string",
-                    "description": "Path to input samplesheet",
-                    "format": "file-path"
-                },
-                "format": {
-                    "type": "string",
-                    "default": "csv",
-                    "fa_icon": "fas fa-cog",
-                    "description": "Format of input samplesheet",
-                    "enum": [
-                        "csv",
-                        "json"
-                    ]
-                },
-                "scorefile": {
-                    "type": "string",
-                    "description": "Path to a scoring file in PGS Catalog format. Multiple scorefiles can be specified using wildcards (e.g., ``--scorefile \"path/to/scores/*.txt\"``)",
-                    "fa_icon": "fas fa-file-alt",
-                    "format": "file-path"
-                },
-                "pgs_id": {
-                    "type": "string",
-                    "description": "A comma separated list of PGS score IDs, e.g. PGS000802"
-                },
-                "pgp_id": {
-                    "type": "string",
-                    "description": "A comma separated list of PGS Catalog publications, e.g. PGP000001"
-                },
-                "trait_efo": {
-                    "type": "string",
-                    "description": "A comma separated list of PGS Catalog EFO traits, e.g. EFO_0004214"
-                },
-                "efo_direct": {
-                    "type": "boolean",
-                    "description": "Return only PGS tagged with exact EFO term (e.g. no PGS for child/descendant terms in the ontology)"
-                },
-                "copy_genomes": {
-                    "type": "boolean",
-                    "description": "Copy harmonised genomes (plink2 pgen/pvar/psam files) to outdir"
-                },
-                "genotypes_cache": {
-                    "type": "string",
-                    "default": "None",
-                    "description": "A path to a directory that should contain relabelled genotypes",
-                    "format": "directory-path"
-                },
-                "outdir": {
-                    "type": "string",
-                    "description": "Path to the output directory where the results will be saved.",
-                    "default": "./results",
-                    "fa_icon": "fas fa-folder-open",
-                    "format": "directory-path"
-                },
-                "email": {
-                    "type": "string",
-                    "description": "Email address for completion summary.",
-                    "fa_icon": "fas fa-envelope",
-                    "help_text": "Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to specify this on the command line for every run.",
-                    "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$"
-                }
-            },
-            "required": [
-                "input",
-                "format"
-            ]
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://raw.githubusercontent.com/pgscatalog/pgsc_calc/master/nextflow_schema.json",
+  "title": "pgscatalog/pgsc_calc pipeline parameters",
+  "description": "This pipeline applies scoring files from the PGS Catalog to target set(s) of genotyped samples",
+  "type": "object",
+  "definitions": {
+    "input_output_options": {
+      "title": "Input/output options",
+      "type": "object",
+      "fa_icon": "fas fa-terminal",
+      "description": "Define where the pipeline should find input data and save output data.",
+      "properties": {
+        "input": {
+          "type": "string",
+          "description": "Path to input samplesheet",
+          "format": "file-path"
         },
-        "ancestry_options": {
-            "title": "Ancestry options",
-            "type": "object",
-            "description": "",
-            "default": "",
-            "properties": {
-                "ancestry_params_file": {
-                    "type": "string",
-                    "default": "None",
-                    "description": "A YAML or JSON file that contains parameters for handling ancestry options"
-                },
-                "projection_method": {
-                    "type": "string",
-                    "default": "oadp",
-                    "enum": [
-                        "oadp",
-                        "sp",
-                        "adp"
-                    ],
-                    "description": "The method for PCA prediction. oadp: most accurate. adp: accurate but slow. sp: fast but inaccurate."
-                },
-                "ancestry_method": {
-                    "type": "string",
-                    "default": "RandomForest",
-                    "description": "Method used for population/ancestry assignment",
-                    "enum": [
-                        "Mahalanobis",
-                        "RandomForest"
-                    ]
-                },
-                "ref_label": {
-                    "type": "string",
-                    "default": "SuperPop",
-                    "description": "Population labels in reference psam to use for assignment"
-                },
-                "n_popcomp": {
-                    "type": "integer",
-                    "default": 5,
-                    "description": "Number of PCs used for population assignment"
-                },
-                "normalization_method": {
-                    "type": "string",
-                    "default": "empirical mean mean+var",
-                    "description": "Method used for normalisation of genetic ancestry",
-                    "enum": [
-                        "empirical",
-                        "mean",
-                        "mean+var",
-                        "empirical mean mean+var"
-                    ]
-                },
-                "n_normalization": {
-                    "type": "integer",
-                    "default": 4,
-                    "description": "Number of PCs used for population normalisation"
-                },
-                "load_afreq": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Load allelic frequencies from reference panel when scoring target genomes"
-                }
-            },
-            "required": [
-                "projection_method",
-                "ancestry_method",
-                "ref_label",
-                "n_popcomp",
-                "normalization_method",
-                "n_normalization",
-                "load_afreq"
-            ]
+        "format": {
+          "type": "string",
+          "default": "csv",
+          "fa_icon": "fas fa-cog",
+          "description": "Format of input samplesheet",
+          "enum": ["csv", "json"]
         },
-        "reference_options": {
-            "title": "Reference options",
-            "type": "object",
-            "description": "Define how reference genomes are defined and processed",
-            "default": "",
-            "properties": {
-                "run_ancestry": {
-                    "type": "string",
-                    "default": "None",
-                    "format": "file-path",
-                    "description": "Path to reference database. Must be set if --ref_samplesheet is not set."
-                },
-                "ref_samplesheet": {
-                    "type": "string",
-                    "description": "Path to a samplesheet that describes the structure of reference data. Must be set if --ref isn't set."
-                },
-                "hg19_chain": {
-                    "type": "string",
-                    "description": "Path to a UCSC chain file for converting from hg19 to hg38.  Needed if lifting over a custom scoring file.",
-                    "pattern": ".*chain.gz$",
-                    "format": "file-path",
-                    "mimetype": "application/gzip"
-                },
-                "hg38_chain": {
-                    "type": "string",
-                    "description": "Path to a UCSC chain file for converting from hg38 to hg19.  Needed if lifting over a custom scoring file.",
-                    "format": "file-path",
-                    "mimetype": "application/gzip"
-                },
-                "geno_ref": {
-                    "type": "number",
-                    "default": 0.1,
-                    "description": "Exclude variants with missing call frequencies greater than a threshold (in reference genomes)",
-                    "minimum": 0,
-                    "maximum": 1
-                },
-                "mind_ref": {
-                    "type": "number",
-                    "default": 0.1,
-                    "description": "Exclude samples with missing call frequencies greater than a threshold (in reference genomes)",
-                    "minimum": 0,
-                    "maximum": 1
-                },
-                "maf_ref": {
-                    "type": "number",
-                    "default": 0.05,
-                    "description": "Exclude variants with allele frequency lower than a threshold (in reference genomes)",
-                    "minimum": 0,
-                    "maximum": 1
-                },
-                "hwe_ref": {
-                    "type": "number",
-                    "default": 1e-04,
-                    "description": "Exclude variants with Hardy-Weinberg equilibrium exact test p-values below  a threshold (in reference genomes)",
-                    "minimum": 0,
-                    "maximum": 1
-                },
-                "indep_pairwise_ref": {
-                    "type": "string",
-                    "default": "1000 50 0.05",
-                    "description": "Used to generate a list of variants in approximate linkage equilibrium in reference genomes. Window size - step size - unphased hardcall r^2 threshold."
-                },
-                "ld_grch37": {
-                    "type": "string",
-                    "description": "Path to a file that contains areas of high linkage disequilibrium in the reference data (build GRCh37).",
-                    "format": "file-path",
-                    "mimetype": "text/plain"
-                },
-                "ld_grch38": {
-                    "type": "string",
-                    "description": "Path to a file that contains areas of high linkage disequilibrium in the reference data (build GRCh38).",
-                    "format": "file-path",
-                    "mimetype": "text/plain"
-                }
-            },
-            "required": [
-                "geno_ref",
-                "mind_ref",
-                "maf_ref",
-                "hwe_ref",
-                "indep_pairwise_ref",
-                "ld_grch37",
-                "ld_grch38"
-            ]
+        "scorefile": {
+          "type": "string",
+          "description": "Path to a scoring file in PGS Catalog format. Multiple scorefiles can be specified using wildcards (e.g., ``--scorefile \"path/to/scores/*.txt\"``)",
+          "fa_icon": "fas fa-file-alt",
+          "format": "file-path"
         },
-        "compatibility_options": {
-            "title": "Compatibility options",
-            "type": "object",
-            "description": "Define parameters that control how scoring files and target genomes are made compatible with each other",
-            "default": "",
-            "properties": {
-                "compat_params_file": {
-                    "type": "string",
-                    "default": "None",
-                    "description": "A YAML or JSON file that contains parameters for handling compatibility options"
-                },
-                "target_build": {
-                    "type": "string",
-                    "enum": [
-                        "GRCh37",
-                        "GRCh38"
-                    ],
-                    "description": "Genome build of target genomes"
-                },
-                "liftover": {
-                    "type": "boolean",
-                    "description": "Lift scoring files to match your target genomes. Requires build information in the header of the scoring files."
-                },
-                "min_lift": {
-                    "type": "number",
-                    "default": 0.95,
-                    "description": "Minimum proportion of variants required to successfully remap a scoring file to a different genome build",
-                    "minimum": 0,
-                    "maximum": 1
-                }
-            },
-            "required": [
-                "target_build"
-            ]
+        "pgs_id": {
+          "type": "string",
+          "description": "A comma separated list of PGS score IDs, e.g. PGS000802"
         },
-        "matching_options": {
-            "title": "Matching options",
-            "type": "object",
-            "description": "Define how variants are matched across scoring files and target genomes",
-            "default": "",
-            "properties": {
-                "keep_multiallelic": {
-                    "type": "boolean",
-                    "description": "Allow matches of scoring file variants to multiallelic variants in the target dataset"
-                },
-                "keep_ambiguous": {
-                    "type": "boolean",
-                    "description": "Keep matches of scoring file variants to strand ambiguous variants (e.g. A/T and C/G SNPs) in the target dataset. This assumes the scoring file and target dataset report variants on the same strand."
-                },
-                "fast_match": {
-                    "type": "boolean",
-                    "description": "Enable fast matching, which significantly increases RAM usage (32GB minimum recommended)"
-                },
-                "min_overlap": {
-                    "type": "number",
-                    "default": 0.75,
-                    "description": "Minimum proportion of variants present in both the score file and input target genomic data",
-                    "fa_icon": "fas fa-cog",
-                    "minimum": 0,
-                    "maximum": 1
-                }
-            },
-            "fa_icon": "fas fa-user-cog"
+        "pgp_id": {
+          "type": "string",
+          "description": "A comma separated list of PGS Catalog publications, e.g. PGP000001"
         },
-        "max_job_request_options": {
-            "title": "Max job request options",
-            "type": "object",
-            "fa_icon": "fab fa-acquisitions-incorporated",
-            "description": "Set the top limit for requested resources for any single job.",
-            "help_text": "If you are running on a smaller system, a pipeline step requesting more resources than are available may cause the Nextflow to stop the run with an error. These options allow you to cap the maximum resources requested by any single job so that the pipeline will run on your system.\n\nNote that you can not _increase_ the resources requested by any job using these options. For that you will need your own configuration file. See [the nf-core website](https://nf-co.re/usage/configuration) for details.",
-            "properties": {
-                "max_cpus": {
-                    "type": "integer",
-                    "description": "Maximum number of CPUs that can be requested for any single job.",
-                    "default": 16,
-                    "fa_icon": "fas fa-microchip",
-                    "hidden": true,
-                    "help_text": "Use to set an upper-limit for the CPU requirement for each process. Should be an integer e.g. `--max_cpus 1`"
-                },
-                "max_memory": {
-                    "type": "string",
-                    "description": "Maximum amount of memory that can be requested for any single job.",
-                    "default": "128.GB",
-                    "fa_icon": "fas fa-memory",
-                    "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$",
-                    "hidden": true,
-                    "help_text": "Use to set an upper-limit for the memory requirement for each process. Should be a string in the format integer-unit e.g. `--max_memory '8.GB'`"
-                },
-                "max_time": {
-                    "type": "string",
-                    "description": "Maximum amount of time that can be requested for any single job.",
-                    "default": "240.h",
-                    "fa_icon": "far fa-clock",
-                    "pattern": "^(\\d+\\.?\\s*(s|m|h|day)\\s*)+$",
-                    "hidden": true,
-                    "help_text": "Use to set an upper-limit for the time requirement for each process. Should be a string in the format integer-unit e.g. `--max_time '2.h'`"
-                }
-            }
+        "trait_efo": {
+          "type": "string",
+          "description": "A comma separated list of PGS Catalog EFO traits, e.g. EFO_0004214"
         },
-        "generic_options": {
-            "title": "Generic options",
-            "type": "object",
-            "fa_icon": "fas fa-file-import",
-            "description": "Less common options for the pipeline, typically set in a config file.",
-            "help_text": "These options are common to all nf-core pipelines and allow you to customise some of the core preferences for how the pipeline runs.\n\nTypically these options would be set in a Nextflow config file loaded for all pipeline runs, such as `~/.nextflow/config`.",
-            "properties": {
-                "help": {
-                    "type": "boolean",
-                    "description": "Display help text.",
-                    "fa_icon": "fas fa-question-circle",
-                    "hidden": true
-                },
-                "publish_dir_mode": {
-                    "type": "string",
-                    "default": "copy",
-                    "description": "Method used to save pipeline results to output directory.",
-                    "help_text": "The Nextflow `publishDir` option specifies which intermediate files should be saved to the output directory. This option tells the pipeline what method should be used to move these files. See [Nextflow docs](https://www.nextflow.io/docs/latest/process.html#publishdir) for details.",
-                    "fa_icon": "fas fa-copy",
-                    "enum": [
-                        "symlink",
-                        "rellink",
-                        "link",
-                        "copy",
-                        "copyNoFollow",
-                        "move"
-                    ],
-                    "hidden": true
-                },
-                "email_on_fail": {
-                    "type": "string",
-                    "description": "Email address for completion summary, only when pipeline fails.",
-                    "fa_icon": "fas fa-exclamation-triangle",
-                    "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$",
-                    "help_text": "An email address to send a summary email to when the pipeline is completed - ONLY sent if the pipeline does not exit successfully.",
-                    "hidden": true
-                },
-                "plaintext_email": {
-                    "type": "boolean",
-                    "description": "Send plain-text email instead of HTML.",
-                    "fa_icon": "fas fa-remove-format",
-                    "hidden": true
-                },
-                "monochrome_logs": {
-                    "type": "boolean",
-                    "description": "Do not use coloured log outputs.",
-                    "fa_icon": "fas fa-palette",
-                    "hidden": true
-                },
-                "tracedir": {
-                    "type": "string",
-                    "description": "Directory to keep pipeline Nextflow logs and reports.",
-                    "default": "${params.outdir}/pipeline_info",
-                    "fa_icon": "fas fa-cogs",
-                    "hidden": true
-                },
-                "validate_params": {
-                    "type": "boolean",
-                    "description": "Boolean whether to validate parameters against the schema at runtime",
-                    "default": true,
-                    "fa_icon": "fas fa-check-square",
-                    "hidden": true
-                },
-                "show_hidden_params": {
-                    "type": "boolean",
-                    "fa_icon": "far fa-eye-slash",
-                    "description": "Show all params when using `--help`",
-                    "hidden": true,
-                    "help_text": "By default, parameters set as _hidden_ in the schema are not shown on the command line when a user runs with `--help`. Specifying this option will tell the pipeline to show all parameters."
-                },
-                "platform": {
-                    "type": "string",
-                    "default": "amd64",
-                    "enum": [
-                        "amd64",
-                        "arm64"
-                    ],
-                    "description": "What platform is the pipeline executing on?"
-                },
-                "parallel": {
-                    "type": "boolean",
-                    "description": "Enable parallel calculation of scores. This is I/O and RAM intensive."
-                }
-            },
-            "required": [
-                "platform"
-            ]
+        "efo_direct": {
+          "type": "boolean",
+          "description": "Return only PGS tagged with exact EFO term (e.g. no PGS for child/descendant terms in the ontology)"
+        },
+        "copy_genomes": {
+          "type": "boolean",
+          "description": "Copy harmonised genomes (plink2 pgen/pvar/psam files) to outdir"
+        },
+        "genotypes_cache": {
+          "type": "string",
+          "description": "A path to a directory that should contain relabelled genotypes",
+          "format": "directory-path"
+        },
+        "outdir": {
+          "type": "string",
+          "description": "Path to the output directory where the results will be saved.",
+          "fa_icon": "fas fa-folder-open",
+          "format": "directory-path"
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address for completion summary.",
+          "fa_icon": "fas fa-envelope",
+          "help_text": "Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to specify this on the command line for every run.",
+          "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$"
         }
+      },
+      "required": ["input", "format"]
     },
-    "allOf": [
-        {
-            "$ref": "#/definitions/input_output_options"
+    "ancestry_options": {
+      "title": "Ancestry options",
+      "type": "object",
+      "description": "",
+      "default": "",
+      "properties": {
+        "projection_method": {
+          "type": "string",
+          "default": "oadp",
+          "enum": ["oadp", "sp", "adp"],
+          "description": "The method for PCA prediction. oadp: most accurate. adp: accurate but slow. sp: fast but inaccurate."
         },
-        {
-            "$ref": "#/definitions/ancestry_options"
+        "ancestry_method": {
+          "type": "string",
+          "default": "RandomForest",
+          "description": "Method used for population/ancestry assignment",
+          "enum": ["Mahalanobis", "RandomForest"]
         },
-        {
-            "$ref": "#/definitions/reference_options"
+        "ref_label": {
+          "type": "string",
+          "default": "SuperPop",
+          "description": "Population labels in reference psam to use for assignment"
         },
-        {
-            "$ref": "#/definitions/compatibility_options"
+        "n_popcomp": {
+          "type": "integer",
+          "default": 5,
+          "description": "Number of PCs used for population assignment"
         },
-        {
-            "$ref": "#/definitions/matching_options"
+        "normalization_method": {
+          "type": "string",
+          "default": "empirical mean mean+var",
+          "description": "Method used for normalisation of genetic ancestry",
+          "enum": ["empirical", "mean", "mean+var", "empirical mean mean+var"]
         },
-        {
-            "$ref": "#/definitions/max_job_request_options"
+        "n_normalization": {
+          "type": "integer",
+          "default": 4,
+          "description": "Number of PCs used for population normalisation"
         },
-        {
-            "$ref": "#/definitions/generic_options"
+        "load_afreq": {
+          "type": "boolean",
+          "default": true,
+          "description": "Load allelic frequencies from reference panel when scoring target genomes"
         }
-    ],
-    "properties": {
-        "ancestry_checksums": {
-            "type": "string",
-            "default": "/Users/bwingfield/Documents/projects/pgsc_calc/assets/ancestry/checksums.txt"
+      },
+      "required": [
+        "projection_method",
+        "ancestry_method",
+        "ref_label",
+        "n_popcomp",
+        "normalization_method",
+        "n_normalization",
+        "load_afreq"
+      ]
+    },
+    "reference_options": {
+      "title": "Reference options",
+      "type": "object",
+      "description": "Define how reference genomes are defined and processed",
+      "default": "",
+      "properties": {
+        "run_ancestry": {
+          "type": "string",
+          "format": "file-path",
+          "description": "Path to reference database. Must be set if --ref_samplesheet is not set."
+        },
+        "ref_samplesheet": {
+          "type": "string",
+          "description": "Path to a samplesheet that describes the structure of reference data. Must be set if --ref isn't set."
+        },
+        "hg19_chain": {
+          "type": "string",
+          "description": "Path to a UCSC chain file for converting from hg19 to hg38.  Needed if lifting over a custom scoring file.",
+          "pattern": ".*chain.gz$",
+          "format": "file-path",
+          "mimetype": "application/gzip"
+        },
+        "hg38_chain": {
+          "type": "string",
+          "description": "Path to a UCSC chain file for converting from hg38 to hg19.  Needed if lifting over a custom scoring file.",
+          "format": "file-path",
+          "mimetype": "application/gzip"
+        },
+        "geno_ref": {
+          "type": "number",
+          "default": 0.1,
+          "description": "Exclude variants with missing call frequencies greater than a threshold (in reference genomes)",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "mind_ref": {
+          "type": "number",
+          "default": 0.1,
+          "description": "Exclude samples with missing call frequencies greater than a threshold (in reference genomes)",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "maf_ref": {
+          "type": "number",
+          "default": 0.05,
+          "description": "Exclude variants with allele frequency lower than a threshold (in reference genomes)",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "hwe_ref": {
+          "type": "number",
+          "default": 0.0001,
+          "description": "Exclude variants with Hardy-Weinberg equilibrium exact test p-values below  a threshold (in reference genomes)",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "indep_pairwise_ref": {
+          "type": "string",
+          "default": "1000 50 0.05",
+          "description": "Used to generate a list of variants in approximate linkage equilibrium in reference genomes. Window size - step size - unphased hardcall r^2 threshold."
+        },
+        "ld_grch37": {
+          "type": "string",
+          "description": "Path to a file that contains areas of high linkage disequilibrium in the reference data (build GRCh37).",
+          "format": "file-path",
+          "mimetype": "text/plain"
+        },
+        "ld_grch38": {
+          "type": "string",
+          "description": "Path to a file that contains areas of high linkage disequilibrium in the reference data (build GRCh38).",
+          "format": "file-path",
+          "mimetype": "text/plain"
         }
+      },
+      "required": [
+        "geno_ref",
+        "mind_ref",
+        "maf_ref",
+        "hwe_ref",
+        "indep_pairwise_ref",
+        "ld_grch37",
+        "ld_grch38"
+      ]
+    },
+    "compatibility_options": {
+      "title": "Compatibility options",
+      "type": "object",
+      "description": "Define parameters that control how scoring files and target genomes are made compatible with each other",
+      "default": "",
+      "properties": {
+        "target_build": {
+          "type": "string",
+          "enum": ["GRCh37", "GRCh38"],
+          "description": "Genome build of target genomes"
+        },
+        "liftover": {
+          "type": "boolean",
+          "description": "Lift scoring files to match your target genomes. Requires build information in the header of the scoring files."
+        },
+        "min_lift": {
+          "type": "number",
+          "default": 0.95,
+          "description": "Minimum proportion of variants required to successfully remap a scoring file to a different genome build",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": ["target_build"]
+    },
+    "matching_options": {
+      "title": "Matching options",
+      "type": "object",
+      "description": "Define how variants are matched across scoring files and target genomes",
+      "default": "",
+      "properties": {
+        "keep_multiallelic": {
+          "type": "boolean",
+          "description": "Allow matches of scoring file variants to multiallelic variants in the target dataset"
+        },
+        "keep_ambiguous": {
+          "type": "boolean",
+          "description": "Keep matches of scoring file variants to strand ambiguous variants (e.g. A/T and C/G SNPs) in the target dataset. This assumes the scoring file and target dataset report variants on the same strand."
+        },
+        "fast_match": {
+          "type": "boolean",
+          "description": "Enable fast matching, which significantly increases RAM usage (32GB minimum recommended)"
+        },
+        "min_overlap": {
+          "type": "number",
+          "default": 0.75,
+          "description": "Minimum proportion of variants present in both the score file and input target genomic data",
+          "fa_icon": "fas fa-cog",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "fa_icon": "fas fa-user-cog"
+    },
+    "max_job_request_options": {
+      "title": "Max job request options",
+      "type": "object",
+      "fa_icon": "fab fa-acquisitions-incorporated",
+      "description": "Set the top limit for requested resources for any single job.",
+      "help_text": "If you are running on a smaller system, a pipeline step requesting more resources than are available may cause the Nextflow to stop the run with an error. These options allow you to cap the maximum resources requested by any single job so that the pipeline will run on your system.\n\nNote that you can not _increase_ the resources requested by any job using these options. For that you will need your own configuration file. See [the nf-core website](https://nf-co.re/usage/configuration) for details.",
+      "properties": {
+        "max_cpus": {
+          "type": "integer",
+          "description": "Maximum number of CPUs that can be requested for any single job.",
+          "default": 16,
+          "fa_icon": "fas fa-microchip",
+          "hidden": true,
+          "help_text": "Use to set an upper-limit for the CPU requirement for each process. Should be an integer e.g. `--max_cpus 1`"
+        },
+        "max_memory": {
+          "type": "string",
+          "description": "Maximum amount of memory that can be requested for any single job.",
+          "default": "128.GB",
+          "fa_icon": "fas fa-memory",
+          "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$",
+          "hidden": true,
+          "help_text": "Use to set an upper-limit for the memory requirement for each process. Should be a string in the format integer-unit e.g. `--max_memory '8.GB'`"
+        },
+        "max_time": {
+          "type": "string",
+          "description": "Maximum amount of time that can be requested for any single job.",
+          "default": "240.h",
+          "fa_icon": "far fa-clock",
+          "pattern": "^(\\d+\\.?\\s*(s|m|h|day)\\s*)+$",
+          "hidden": true,
+          "help_text": "Use to set an upper-limit for the time requirement for each process. Should be a string in the format integer-unit e.g. `--max_time '2.h'`"
+        }
+      }
+    },
+    "generic_options": {
+      "title": "Generic options",
+      "type": "object",
+      "fa_icon": "fas fa-file-import",
+      "description": "Less common options for the pipeline, typically set in a config file.",
+      "help_text": "These options are common to all nf-core pipelines and allow you to customise some of the core preferences for how the pipeline runs.\n\nTypically these options would be set in a Nextflow config file loaded for all pipeline runs, such as `~/.nextflow/config`.",
+      "properties": {
+        "help": {
+          "type": "boolean",
+          "description": "Display help text.",
+          "fa_icon": "fas fa-question-circle",
+          "hidden": true
+        },
+        "publish_dir_mode": {
+          "type": "string",
+          "default": "copy",
+          "description": "Method used to save pipeline results to output directory.",
+          "help_text": "The Nextflow `publishDir` option specifies which intermediate files should be saved to the output directory. This option tells the pipeline what method should be used to move these files. See [Nextflow docs](https://www.nextflow.io/docs/latest/process.html#publishdir) for details.",
+          "fa_icon": "fas fa-copy",
+          "enum": [
+            "symlink",
+            "rellink",
+            "link",
+            "copy",
+            "copyNoFollow",
+            "move"
+          ],
+          "hidden": true
+        },
+        "email_on_fail": {
+          "type": "string",
+          "description": "Email address for completion summary, only when pipeline fails.",
+          "fa_icon": "fas fa-exclamation-triangle",
+          "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$",
+          "help_text": "An email address to send a summary email to when the pipeline is completed - ONLY sent if the pipeline does not exit successfully.",
+          "hidden": true
+        },
+        "plaintext_email": {
+          "type": "boolean",
+          "description": "Send plain-text email instead of HTML.",
+          "fa_icon": "fas fa-remove-format",
+          "hidden": true
+        },
+        "monochrome_logs": {
+          "type": "boolean",
+          "description": "Do not use coloured log outputs.",
+          "fa_icon": "fas fa-palette",
+          "hidden": true
+        },
+        "validate_params": {
+          "type": "boolean",
+          "description": "Boolean whether to validate parameters against the schema at runtime",
+          "default": true,
+          "fa_icon": "fas fa-check-square",
+          "hidden": true
+        }
+      }
     }
+  },
+  "allOf": [
+    {
+      "$ref": "#/definitions/input_output_options"
+    },
+    {
+      "$ref": "#/definitions/ancestry_options"
+    },
+    {
+      "$ref": "#/definitions/reference_options"
+    },
+    {
+      "$ref": "#/definitions/compatibility_options"
+    },
+    {
+      "$ref": "#/definitions/matching_options"
+    },
+    {
+      "$ref": "#/definitions/max_job_request_options"
+    },
+    {
+      "$ref": "#/definitions/generic_options"
+    }
+  ],
+  "properties": {
+    "ancestry_checksums": {
+      "type": "string"
+    },
+    "ref_format_version": {
+      "type": "string",
+      "default": "v0.1"
+    },
+    "only_bootstrap": {
+      "type": "boolean"
+    },
+    "only_input": {
+      "type": "boolean"
+    },
+    "only_compatible": {
+      "type": "boolean"
+    },
+    "only_match": {
+      "type": "boolean"
+    },
+    "only_projection": {
+      "type": "boolean"
+    },
+    "only_score": {
+      "type": "boolean"
+    },
+    "skip_ancestry": {
+      "type": "boolean",
+      "default": true
+    },
+    "hook_url": {
+      "type": "string"
+    },
+    "version": {
+      "type": "boolean"
+    },
+    "config_profile_name": {
+      "type": "string"
+    },
+    "config_profile_description": {
+      "type": "string"
+    },
+    "custom_config_version": {
+      "type": "string",
+      "default": "master"
+    },
+    "custom_config_base": {
+      "type": "string",
+      "default": "https://raw.githubusercontent.com/nf-core/configs/master"
+    },
+    "config_profile_contact": {
+      "type": "string"
+    },
+    "config_profile_url": {
+      "type": "string"
+    },
+    "validationFailUnrecognisedParams": {
+      "type": "boolean"
+    },
+    "validationLenientMode": {
+      "type": "boolean"
+    },
+    "validationShowHiddenParams": {
+      "type": "boolean"
+    }
+  }
 }

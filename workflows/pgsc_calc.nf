@@ -1,75 +1,25 @@
 /*
-========================================================================================
-    VALIDATE INPUTS (SAMPLESHEET)
-========================================================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    PRINT PARAMS SUMMARY
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
+include { paramsSummaryLog; paramsSummaryMap } from 'plugin/nf-validation'
 
-// Validate input parameters
-WorkflowPgscalc.initialise(params, log)
+def logo = NfcoreTemplate.logo(workflow, params.monochrome_logs)
+def citation = '\n' + WorkflowMain.citation(workflow) + '\n'
+def summary_params = paramsSummaryMap(workflow)
 
-// Check input path parameters to see if they exist
-def checkPathParamList = [params.input]
+// Print parameter summary log to screen
+log.info logo + paramsSummaryLog(workflow) + citation
 
-for (param in checkPathParamList) {
-    file(param, checkIfExists: true)
-}
+WorkflowPgscCalc.initialise(params, log)
 
-
-if (params.platform == 'arm64') {
-    profiles = summary_params['Core Nextflow options'].profile.tokenize(',')
-    if (profiles.contains('singularity') | profiles.contains('conda')) {
-        println "ERROR: arm64 platform only supports -profile docker"
-        System.exit(1)
-    }
-}
-
-// Set up scorefile channels ---------------------------------------------------
-
-if (![params.scorefile, params.pgs_id, params.trait_efo, params.pgp_id].any()) {
-    println " ERROR: You didn't set any scores to use! \
-        Please set --scorefile, --pgs_id, --trait_efo, or --pgp_id"
-    System.exit(1)
-}
-
-if (!params.target_build) {
-    println "ERROR: You didn't set the target build of your target genomes"
-    println "Please set --target_build GRCh37 or --target_build GRCh38"
-    System.exit(1)
-}
-
-if (params.liftover && !params.hg19_chain || params.liftover && !params.hg38_chain) {
-    println "ERROR: Missing --hg19_chain or --hg38_chain with --liftover set"
-    println "Please download UCSC chain files and set chain file paths"
-    println "See https://pgsc-calc.readthedocs.io/en/latest/how-to/liftover.html"
-    System.exit(1)
-}
-
-unique_scorefiles = Channel.empty()
-
-if (params.scorefile) {
-    Channel.fromPath(params.scorefile, checkIfExists: true)
-        .set { scorefiles }
-
-    scorefiles
-        .unique()
-        .join(scorefiles)
-        .set { unique_scorefiles }
-}
-
-def process_accessions(String accession) {
-    if (accession) {
-        return accession.replaceAll('\\s','').tokenize(',').unique().join(' ')
-    } else {
-        return ''
-    }
-}
-
-def String unique_trait_efo = process_accessions(params.trait_efo)
-def String unique_pgp_id    = process_accessions(params.pgp_id)
-def String unique_pgs_id    = process_accessions(params.pgs_id)
-
+/*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    DEBUG OPTIONS TO HALT WORKFLOW EXECUTION
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
 
 def run_ancestry_bootstrap = true
 def run_input_check = true
@@ -101,6 +51,16 @@ if (params.only_input) {
     run_report = false
 }
 
+if (params.only_projection) {
+    run_ancestry_bootstrap = true
+    run_input_check = true
+    run_make_compatible = true
+    run_match = true
+    run_ancestry_assign = true
+    run_apply_score = false
+    run_report = false
+}
+
 if (params.only_compatible) {
     run_ancestry_bootstrap = true
     run_input_check = true
@@ -112,16 +72,6 @@ if (params.only_compatible) {
 }
 
 if (params.only_match) {
-    run_ancestry_bootstrap = true
-    run_input_check = true
-    run_make_compatible = true
-    run_match = true
-    run_ancestry_assign = true
-    run_apply_score = false
-    run_report = false
-}
-
-if (params.only_projection) {
     run_ancestry_bootstrap = true
     run_input_check = true
     run_make_compatible = true
@@ -151,6 +101,7 @@ if (params.run_ancestry) {
     run_ancestry_adjust = false
 }
 
+// don't try to bootstrap if we're not estimating or adjusting
 if (!run_ancestry_assign && !run_ancestry_adjust) {
     run_ancestry_bootstrap = false
 }
@@ -172,13 +123,26 @@ include { APPLY_SCORE          } from '../subworkflows/local/apply_score'
 include { REPORT               } from '../subworkflows/local/report'
 include { DUMPSOFTWAREVERSIONS } from '../modules/local/dumpsoftwareversions'
 
+
+/*
+========================================================================================
+    DEPRECATION WARNINGS
+========================================================================================
+*/
+
+if (params.platform) {
+    println "--platform has been deprecated to match nf-core framework"
+    println "Please use -profile docker,arm instead"
+    sys.exit(1)
+}
+
 /*
 ========================================================================================
     RUN MAIN WORKFLOW
 ========================================================================================
 */
 
-workflow PGSCALC {
+workflow PGSCCALC {
     ch_versions = Channel.empty()
 
     //
@@ -200,25 +164,36 @@ workflow PGSCALC {
     //
     // SUBWORKFLOW: Get scoring file from PGS Catalog accession
     //
-    def accessions = [pgs_id: unique_pgs_id, pgp_id: unique_pgp_id,
-                      trait_efo: unique_trait_efo]
+    ch_scores = Channel.empty()
+    if (params.scorefile) {
+        ch_scores = ch_scores.mix(Channel.fromPath(params.scorefile, checkIfExists: true))
+    }
 
-    if (!accessions.every( { it.value == '' })) {
-        DOWNLOAD_SCOREFILES ( accessions, params.target_build )
-        scorefiles = DOWNLOAD_SCOREFILES.out.scorefiles.mix(unique_scorefiles)
-    } else {
-        scorefiles = unique_scorefiles
+    // make sure accessions look sensible before querying PGS Catalog
+    def pgs_id = WorkflowPgscCalc.prepareAccessions(params.pgs_id, "pgs_id")
+    def pgp_id = WorkflowPgscCalc.prepareAccessions(params.pgp_id, "pgp_id")
+    def trait_efo = WorkflowPgscCalc.prepareAccessions(params.trait_efo, "trait_efo")
+    def accessions = pgs_id + pgp_id + trait_efo
+
+    if (!accessions.every { it.value == "" }) {
+        DOWNLOAD_SCOREFILES(accessions, params.target_build)
+        ch_versions = ch_versions.mix(DOWNLOAD_SCOREFILES.out.versions)
+        ch_scores = ch_scores.mix(DOWNLOAD_SCOREFILES.out.scorefiles)
+    }
+
+    if (!params.scorefile && accessions.every { it.value == "" }) {
+        Nextflow.error("No valid accessions or scoring files provided. Please double check --pgs_id, --pgp_id, --trait_efo, or --scorefile parameters")
     }
 
     //
     // SUBWORKFLOW: Validate and stage input files
     //
 
-    scorefiles.collect().set{ ch_scorefiles }
-
     if (run_input_check) {
+        // flatten the score channel
+        ch_scorefiles = ch_scores.collect()
         // chain files are optional input
-        Channel.fromPath('NO_FILE', checkIfExists: false).set { chain_files }
+        Channel.fromPath("$projectDir/assets/NO_FILE", checkIfExists: false).set { chain_files }
         if (params.hg19_chain && params.hg38_chain) {
             Channel.fromPath(params.hg19_chain, checkIfExists: true)
                 .mix(Channel.fromPath(params.hg38_chain, checkIfExists: true))
