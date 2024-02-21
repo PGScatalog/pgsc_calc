@@ -29,7 +29,6 @@ library(jsonlite)
 library(dplyr)
 library(tidyr)
 library(ggplot2)
-library(data.table)
 ```
 
 ```{r setup_logs, echo=FALSE}
@@ -367,36 +366,12 @@ pop_summary %>%
 
 # Scores
 
-```{r, echo = FALSE, message = FALSE, eval=!params$run_ancestry}
-# problem: aggregated_scores.txt.gz  has a different structure to the ancestry outputs
-# solution: pivot the table in the report, but fix in pgscatalog_utils in a future release
-# problem: big scores can take a lot of memory
-# use data.table as a temporary solution to pivoting datasets
-scores <- data.table::fread(params$score_path)
-n_scores <- sum(grepl("*_SUM$", colnames(scores)))
-n_samples <- nrow(scores)
-
-id_cols <- c("sampleset", "IID")
-melted_scores <- data.table::melt(scores, id.vars=id_cols, measure.vars=patterns(SUM="*_SUM$", DENOM="DENOM", AVG="*_AVG$"), variable.name = "PGS")
-
-# annoying fix for scores getting converted to a factor level integer
-# fixed in data.table 1.14.9 but not released yet
-score_names <- sub("_.*", "", colnames(scores)[grepl("_SUM$", colnames(scores))])
-setattr(melted_scores$PGS, "levels", score_names)
-
-# don't overwrite params$score_path until report has compiled 
-# OOM crashes can cause corrupted data
-temp_out_path <- tempfile(fileext=".txt.gz")
-data.table::fwrite(melted_scores, temp_out_path, sep="\t", compress="gzip")
-```
-
 ```{r, echo = FALSE, message = FALSE, eval=params$run_ancestry}
 scores <- readr::read_tsv(params$score_path) 
 n_scores <- length(unique(scores$PGS))
 n_samples <- length(unique(scores$IID))
 print(n_samples)
 ```
-
 
 ```{asis, echo = any(table(scores$sampleset) < 50) && !params$run_ancestry}
 
@@ -535,7 +510,3 @@ tibble::tibble(json = json_scorefiles) %>%
     ))
 ```
 
-```{r cleanup, eval=!params$run_ancestry, echo=FALSE}
-# prevent the report crashing from corrupting the aggregated scores
-invisible(file.copy(temp_out_path, params$score_path, overwrite=TRUE))
-```
