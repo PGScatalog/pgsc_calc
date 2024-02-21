@@ -366,7 +366,7 @@ pop_summary %>%
 
 # Scores
 
-```{r, echo = FALSE, message = FALSE, eval=params$run_ancestry}
+```{r, echo = FALSE, message = FALSE}
 scores <- readr::read_tsv(params$score_path) 
 n_scores <- length(unique(scores$PGS))
 n_samples <- length(unique(scores$IID))
