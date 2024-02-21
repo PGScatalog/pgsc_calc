@@ -398,7 +398,7 @@ print(n_samples)
 ```
 
 
-```{asis, echo = any(table(scores$sampleset) < 50)}
+```{asis, echo = any(table(scores$sampleset) < 50) && !params$run_ancestry}
 
 ::: {.callout-important title="Warning: small sampleset size (n < 50) detected"}
 * plink2 uses allele frequency data to [mean impute](https://www.cog-genomics.org/plink/2.0/score) the dosages of missing genotypes
