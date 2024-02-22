@@ -4,7 +4,7 @@ process INTERSECT_VARIANTS {
     label 'zstd' // controls conda, docker, + singularity options
 
     tag "$meta.id chromosome $meta.chrom"
-    storeDir "$workDir/intersected/$meta.id/$meta.chrom"
+    storeDir "${workDir.resolve()}/intersected/$meta.id/$meta.chrom"
 
     conda "${task.ext.conda}"
 

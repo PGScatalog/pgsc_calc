@@ -7,7 +7,7 @@ process PLINK2_VCF {
     tag "$meta.id chromosome $meta.chrom"
 
     storeDir ( params.genotypes_cache ? "$params.genotypes_cache/${meta.id}/${meta.build}/${meta.chrom}" :
-              "$workDir/genomes/${meta.id}/${meta.build}/${meta.chrom}/")
+              "${workDir.resolve()}/genomes/${meta.id}/${meta.build}/${meta.chrom}")
 
     conda "${task.ext.conda}"
 

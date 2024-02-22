@@ -32,15 +32,15 @@ process SCORE_REPORT {
     def args = task.ext.args ?: ''
     run_ancestry = params.run_ancestry ? true : false
     """
+    cp $projectDir/assets/report/report.qmd .
+    export DENO_DIR=\$(mktemp -d)
+    export XDG_CACHE_HOME=\$(mktemp -d)
+
     echo $workflow.commandLine > command.txt
     echo "keep_multiallelic: $params.keep_multiallelic" > params.txt
     echo "keep_ambiguous   : $params.keep_ambiguous"    >> params.txt
     echo "min_overlap      : $params.min_overlap"       >> params.txt
-
-    cp -r $projectDir/assets/report/* .
-    # workaround for unhelpful filenotfound quarto errors in some HPCs
-    mkdir temp && TMPDIR=temp
-
+    
     quarto render report.qmd -M "self-contained:true" \
         -P score_path:$scorefile \
         -P sampleset:$meta.id \
@@ -53,3 +53,4 @@ process SCORE_REPORT {
     END_VERSIONS
     """
 }
+
