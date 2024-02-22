@@ -197,6 +197,13 @@
           "description": "Path to a file that contains areas of high linkage disequilibrium in the reference data (build GRCh38).",
           "format": "file-path",
           "mimetype": "text/plain"
+        },
+        "ref_format_version": {
+          "type": "string",
+          "default": "v0.1"
+        },
+        "ancestry_checksums": {
+          "type": "string"
         }
       },
       "required": [
@@ -381,34 +388,34 @@
     }
   ],
   "properties": {
-    "ancestry_checksums": {
-      "type": "string"
-    },
-    "ref_format_version": {
-      "type": "string",
-      "default": "v0.1"
-    },
     "only_bootstrap": {
-      "type": "boolean"
+      "type": "boolean",
+      "hidden": true
     },
     "only_input": {
-      "type": "boolean"
+      "type": "boolean",
+      "hidden": true
     },
     "only_compatible": {
-      "type": "boolean"
+      "type": "boolean",
+      "hidden": true
     },
     "only_match": {
-      "type": "boolean"
+      "type": "boolean",
+      "hidden": true
     },
     "only_projection": {
-      "type": "boolean"
+      "type": "boolean",
+      "hidden": true
     },
     "only_score": {
-      "type": "boolean"
+      "type": "boolean",
+      "hidden": true
     },
     "skip_ancestry": {
       "type": "boolean",
-      "default": true
+      "default": true,
+      "hidden": true
     },
     "hook_url": {
       "type": "string"
