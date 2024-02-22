@@ -34,6 +34,7 @@ library(ggplot2)
 library(DT)
 library(tibble)
 library(forcats)
+library(readr)
 ```
 
 ```{r setup_logs, echo=FALSE}
