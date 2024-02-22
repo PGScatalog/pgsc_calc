@@ -19,10 +19,6 @@ RUN R -e "renv::restore(clean=TRUE, prompt=FALSE)"
 
 # RUN conda env export > environment.yml
 
-ENV DENO_DIR=/tmp
-
 RUN wget https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-${TARGETARCH}.deb && \
     dpkg -i quarto-${QUARTO_VERSION}-linux-${TARGETARCH}.deb && \
     rm quarto-${QUARTO_VERSION}-linux-${TARGETARCH}.deb
-
-

@@ -32,18 +32,15 @@ process SCORE_REPORT {
     def args = task.ext.args ?: ''
     run_ancestry = params.run_ancestry ? true : false
     """
-    export DENO_DIR=\$PWD/.cache
-    mkdir -p \$DENO_DIR
+    cp $projectDir/assets/report/report.qmd .
 
     echo $workflow.commandLine > command.txt
     echo "keep_multiallelic: $params.keep_multiallelic" > params.txt
     echo "keep_ambiguous   : $params.keep_ambiguous"    >> params.txt
     echo "min_overlap      : $params.min_overlap"       >> params.txt
 
-    cp -r $projectDir/assets/report/* .
-    # workaround for unhelpful filenotfound quarto errors in some HPCs
-    mkdir temp && TMPDIR=temp
-
+    export XDG_CACHE_HOME=\$(mktemp -d)
+    
     quarto render report.qmd -M "self-contained:true" \
         -P score_path:$scorefile \
         -P sampleset:$meta.id \
@@ -55,4 +52,6 @@ process SCORE_REPORT {
         R: \$(echo \$(R --version 2>&1) | head -n 1 | cut -f 3 -d ' ')
     END_VERSIONS
     """
+    // XDG_CACHE_HOME note: https://github.com/quarto-dev/quarto-cli/issues/4594#issuecomment-1619177667
 }
+
