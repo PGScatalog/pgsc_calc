@@ -131,9 +131,9 @@ include { DUMPSOFTWAREVERSIONS } from '../modules/local/dumpsoftwareversions'
 */
 
 if (params.platform) {
-    println "--platform has been deprecated to match nf-core framework"
-    println "Please use -profile docker,arm instead"
-    sys.exit(1)
+    System.err.println "--platform has been deprecated to match nf-core framework"
+    System.err.println "Please use -profile docker,arm instead"
+    System.exit(1)
 }
 
 /*
@@ -359,18 +359,27 @@ workflow PGSCCALC {
 }
 
 /*
-========================================================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     COMPLETION EMAIL AND SUMMARY
-========================================================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
 workflow.onComplete {
     if (params.email || params.email_on_fail) {
-        NfcoreTemplate.email(workflow, params, summary_params, projectDir, log, multiqc_report)
+        NfcoreTemplate.email(workflow, params, summary_params, projectDir, log)
     }
+    NfcoreTemplate.dump_parameters(workflow, params)
     NfcoreTemplate.summary(workflow, params, log)
-    println "Please remember to cite polygenic score authors if you publish with them!"
-    println "Check the output report for citation details"
+    if (params.hook_url) {
+        NfcoreTemplate.IM_notification(workflow, params, summary_params, projectDir, log)
+    }
+}
+
+workflow.onError {
+    if (workflow.errorReport.contains("Process requirement exceeds available memory")) {
+        println("🛑 Default resources exceed availability 🛑 ")
+        println("💡 See here on how to configure pipeline: https://nf-co.re/docs/usage/configuration#tuning-workflow-resources 💡")
+    }
 }
 
 /*

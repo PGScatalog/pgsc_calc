@@ -35,7 +35,7 @@ class WorkflowPgscCalc {
         def good_accessions = []
         unique_accession.each { it ->
             if (!(it ==~ "(?:PGP|PGS)[0-9]{6}|(?:[A-Za-z]+)_[0-9]+")) {
-                println "${it} doesn't seem like a valid PGS Catalog accession, ignoring"
+                System.err.println "WARNING: ${it} doesn't seem like a valid PGS Catalog accession, ignoring"
             } else {
                 good_accessions.add(it)
             }
