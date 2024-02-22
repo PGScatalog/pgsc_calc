@@ -8,7 +8,7 @@
   files:
     - path: output/test/match/versions.yml
       contains:
-        - "pgscatalog_utils: 0.4.2"
+        - "pgscatalog_utils: 0.5.2"
 
 - name: test match combine module
   command: nextflow run ./tests/modules/match -entry testmatchcombine -c ./tests/config/nextflow.config
@@ -20,7 +20,7 @@
   files:
     - path: output/combine/versions.yml
       contains:
-        - "pgscatalog_utils: 0.4.2"
+        - "pgscatalog_utils: 0.5.2"
     - path: output/combine/scorefiles.txt.gz
       contains:
         - "effect_allele"
