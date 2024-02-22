@@ -28,7 +28,12 @@ explanation of the terms and data presented in this report.
 library(jsonlite)
 library(dplyr)
 library(tidyr)
+library(stringr)
+library(purrr)
 library(ggplot2)
+library(DT)
+library(tibble)
+library(forcats)
 ```
 
 ```{r setup_logs, echo=FALSE}
