@@ -33,13 +33,13 @@ process SCORE_REPORT {
     run_ancestry = params.run_ancestry ? true : false
     """
     cp $projectDir/assets/report/report.qmd .
+    export DENO_DIR=\$(mktemp -d)
+    export XDG_CACHE_HOME=\$(mktemp -d)
 
     echo $workflow.commandLine > command.txt
     echo "keep_multiallelic: $params.keep_multiallelic" > params.txt
     echo "keep_ambiguous   : $params.keep_ambiguous"    >> params.txt
     echo "min_overlap      : $params.min_overlap"       >> params.txt
-
-    export XDG_CACHE_HOME=\$(mktemp -d)
     
     quarto render report.qmd -M "self-contained:true" \
         -P score_path:$scorefile \
@@ -52,6 +52,5 @@ process SCORE_REPORT {
         R: \$(echo \$(R --version 2>&1) | head -n 1 | cut -f 3 -d ' ')
     END_VERSIONS
     """
-    // XDG_CACHE_HOME note: https://github.com/quarto-dev/quarto-cli/issues/4594#issuecomment-1619177667
 }
 

@@ -7,8 +7,6 @@ RUN apt-get update \
     && apt-get install -y procps zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /.cache/quarto
-
 RUN conda install -c conda-forge r-renv
 
 COPY renv.lock .
