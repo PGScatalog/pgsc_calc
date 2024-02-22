@@ -4,7 +4,7 @@ process FRAPOSA_PCA {
     label 'fraposa' // controls conda, docker, + singularity options
 
     tag "reference"
-    cache "deep"
+    storeDir "${workDir.resolve()}/fraposa/reference/${target_geno.baseName}/"
 
     conda "${task.ext.conda}"
 
