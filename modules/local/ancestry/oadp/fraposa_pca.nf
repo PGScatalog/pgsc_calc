@@ -5,7 +5,7 @@ process FRAPOSA_PCA {
 
     tag "reference"
     // permanently derive a PCA for each reference - sampleset combination
-    storeDir "${workDir.resolve()}/fraposa/${ref_geno.baseName}/${targetmeta.id}/"
+    storeDir "${workDir.resolve()}/ancestry/fraposa/${params.target_build}/${ref_geno.baseName}/${targetmeta.id}/"
 
     conda "${task.ext.conda}"
 

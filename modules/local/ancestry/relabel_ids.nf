@@ -4,7 +4,7 @@ process RELABEL_IDS {
     label 'pgscatalog_utils' // controls conda, docker, + singularity options
 
     tag "$meta.id $meta.effect_type $target_format"
-    storeDir { refgeno.name != 'NO_FILE' ?  "${workDir.resolve()}/relabel/${refgeno.baseName}/${meta.id}/" : false }
+    storeDir { refgeno.name != 'NO_FILE' ?  "${workDir.resolve()}/ancestry/relabel/${refgeno.baseName}/${meta.id}/" : false }
 
     conda "${task.ext.conda}"
 

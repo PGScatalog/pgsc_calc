@@ -4,7 +4,7 @@ process FRAPOSA_PROJECT {
     label 'fraposa' // controls conda, docker, + singularity options
 
     tag "${target_geno.baseName.tokenize('_')[1]}"
-    storeDir "${workDir.resolve()}/fraposa/${params.target_build}/${target_geno.baseName}/${split_fam}"
+    storeDir "${workDir.resolve()}/ancestry/fraposa/${params.target_build}/${target_geno.baseName}/${split_fam.baseName}"
 
     conda "${task.ext.conda}"
 

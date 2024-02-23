@@ -5,6 +5,7 @@ process PLINK2_MAKEBED {
     label "plink2" // controls conda, docker, + singularity options
 
     tag "$meta.id chromosome"
+    storeDir "${workDir.resolve()}/ancestry/bed/${geno.baseName}/"
 
     conda "${task.ext.conda}"
 
