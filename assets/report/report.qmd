@@ -66,7 +66,8 @@ cat command.txt | fold -w 80 -s | awk -F ' ' 'NR==1 { print "$", $0} NR>1 { prin
 ## Scoring file summary
 
 ```{r load_scorefiles}
-json_scorefiles <- read_json(params$log_scorefiles, simplifyVector=TRUE) 
+json_list <- jsonlite::fromJSON(params$log_scorefiles, simplifyVector = FALSE)
+json_scorefiles <- unlist(json_list, recursive=FALSE)
 
 link_traits <- function(trait_efo, mapped) {
   if (length(trait_efo) == 0) {
