@@ -63,7 +63,7 @@ workflow APPLY_SCORE {
             .set { ch_scorefile_relabel_input }
 
         // relabel scoring file ids to match reference format
-        RELABEL_SCOREFILE_IDS ( ch_scorefile_relabel_input )
+        RELABEL_SCOREFILE_IDS ( ch_scorefile_relabel_input, Channel.value([[:], file("$projectDir/assets/NO_FILE")]) )
 
         RELABEL_SCOREFILE_IDS.out.relabelled
             .transpose()
@@ -85,7 +85,7 @@ workflow APPLY_SCORE {
             .set { ch_afreq }
 
         // map afreq IDs from reference -> target
-        RELABEL_AFREQ_IDS ( ch_afreq )
+        RELABEL_AFREQ_IDS ( ch_afreq, Channel.value([[:], file("$projectDir/assets/NO_FILE")]) )
         ref_afreq = RELABEL_AFREQ_IDS.out.relabelled
     }
 

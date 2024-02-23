@@ -169,7 +169,9 @@ workflow ANCESTRY_PROJECT {
         .buffer(size: 3)
         .set { ch_thinned_target }
 
-    RELABEL_IDS( ch_thinned_target )
+    // BE CAREFUL: assuming ch_thinned_target contains all chromosomes in one file
+    // need to reconfigure ch_ref.geno to be a value channel if this changes
+    RELABEL_IDS( ch_thinned_target, ch_ref.geno )
     ch_versions = ch_versions.mix(RELABEL_IDS.out.versions.first())
 
     RELABEL_IDS.out.relabelled
