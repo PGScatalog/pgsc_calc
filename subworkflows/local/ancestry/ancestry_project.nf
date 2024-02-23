@@ -223,8 +223,7 @@ workflow ANCESTRY_PROJECT {
         .combine(ch_split_targets, by: 0)
         .set { ch_fraposa_target }
 
-    // do PCA on reference genomes...
-    FRAPOSA_PCA( ch_fraposa_ref.map { it.flatten() } )
+    FRAPOSA_PCA( ch_fraposa_ref.map { it.flatten() }, geno )
     ch_versions = ch_versions.mix(FRAPOSA_PCA.out.versions.first())
 
     // ... and project split target genomes
