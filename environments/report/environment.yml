@@ -11,3 +11,4 @@ dependencies:
   - r-DT
   - r-tibble
   - r-forcats
+  - r-readr
