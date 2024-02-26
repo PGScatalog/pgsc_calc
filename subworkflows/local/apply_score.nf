@@ -20,10 +20,20 @@ workflow APPLY_SCORE {
     main:
     ch_versions = Channel.empty()
 
-    scorefiles
-        .flatMap { annotate_scorefiles(it) }
-        .dump(tag: 'final_scorefiles', pretty: true)
-        .set { annotated_scorefiles }
+    scorefiles.map{ it ->
+        m = it.first().clone()
+        f = it.last()
+        def n = 0
+        f.withReader {
+            String line = it.readLine()
+            n = line.split("\t").length - 2 // ID, effect_allele
+        }
+        m.n_scores = n
+        return [m, f]
+    }.view()
+//        .flatMap { annotate_scorefiles(it) }
+//        .dump(tag: 'final_scorefiles', pretty: true)
+//        .set { annotated_scorefiles }
 
     geno
         .mix(pheno, variants)
@@ -63,6 +73,7 @@ workflow APPLY_SCORE {
             .set { ch_scorefile_relabel_input }
 
         // relabel scoring file ids to match reference format
+        // using a value channel 
         RELABEL_SCOREFILE_IDS ( ch_scorefile_relabel_input, Channel.value([[:], file("$projectDir/assets/NO_FILE")]) )
 
         RELABEL_SCOREFILE_IDS.out.relabelled
@@ -90,36 +101,36 @@ workflow APPLY_SCORE {
     }
 
     // intersect genomic data with split scoring files -------------------------
-    ch_genomes.target
-        .map { annotate_genomic(it) } // add n_samples
-        .dump( tag: 'final_genomes', pretty: true)
-        .cross ( annotated_scorefiles ) { m, it -> [m.id, m.chrom] }
-        .map { it.flatten() }
-        .mix( ch_apply_ref ) // add reference genomes!
-        .combine( ref_afreq.map { it.last() } ) // add allelic frequencies
-        .dump(tag: 'ready_to_score', pretty: true)
-        .set { ch_apply }
+    // ch_genomes.target
+    //     .map { annotate_genomic(it) } // add n_samples
+    //     .dump( tag: 'final_genomes', pretty: true)
+    //     .cross ( annotated_scorefiles ) { m, it -> [m.id, m.chrom] }
+    //     .map { it.flatten() }
+    //     .mix( ch_apply_ref ) // add reference genomes!
+    //     .combine( ref_afreq.map { it.last() } ) // add allelic frequencies
+    //     .dump(tag: 'ready_to_score', pretty: true)
+    //     .set { ch_apply }
 
-    PLINK2_SCORE ( ch_apply )
-    ch_versions = ch_versions.mix(PLINK2_SCORE.out.versions.first())
+    // PLINK2_SCORE ( ch_apply )
+    // ch_versions = ch_versions.mix(PLINK2_SCORE.out.versions.first())
 
     // [ [meta], [list, of, score, paths] ]
-    PLINK2_SCORE.out.scores
-        .collect()
-        .map { [ it.first(), it.tail().findAll { !(it instanceof LinkedHashMap) }]}
-        .set { ch_scores }
+    // PLINK2_SCORE.out.scores
+    //     .collect()
+    //     .map { [ it.first(), it.tail().findAll { !(it instanceof LinkedHashMap) }]}
+    //     .set { ch_scores }
 
-    SCORE_AGGREGATE ( ch_scores )
-    ch_versions = ch_versions.mix(SCORE_AGGREGATE.out.versions)
+    // SCORE_AGGREGATE ( ch_scores )
+    // ch_versions = ch_versions.mix(SCORE_AGGREGATE.out.versions)
 
-    // aggregated score output from this subworkflow is mandatory
-    def aggregate_fail = true
-    SCORE_AGGREGATE.out.scores.subscribe onNext: { aggregate_fail = false },
-      onComplete: { aggregate_error(aggregate_fail) }
+    // // aggregated score output from this subworkflow is mandatory
+    // def aggregate_fail = true
+    // SCORE_AGGREGATE.out.scores.subscribe onNext: { aggregate_fail = false },
+    //   onComplete: { aggregate_error(aggregate_fail) }
 
     emit:
     versions = ch_versions
-    scores = SCORE_AGGREGATE.out.scores
+    scores = Channel.empty() //SCORE_AGGREGATE.out.scores
 }
 
 def aggregate_error(boolean fail) {

@@ -5,7 +5,6 @@ process MATCH_VARIANTS {
 
     // first element of tag must be sampleset
     tag "$meta.id chromosome $meta.chrom"
-    scratch (workflow.containerEngine == 'singularity')
     errorStrategy 'finish'
 
     conda "${task.ext.conda}"

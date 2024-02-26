@@ -6,7 +6,6 @@ process MATCH_COMBINE {
 
     // first element of tag must be sampleset
     tag "$meta.id"
-    scratch (workflow.containerEngine == 'singularity')
 
     conda "${task.ext.conda}"
 
@@ -19,7 +18,7 @@ process MATCH_COMBINE {
     tuple val(meta), path('???.ipc.zst'), path(scorefile), path(shared)
 
     output:
-    tuple val(scoremeta), path("*.scorefile.gz"), emit: scorefile
+    tuple val(scoremeta), path("*.scorefile"), emit: scorefile
     path "*_summary.csv"                        , emit: summary
     path "*_log.csv.gz"                         , emit: db
     path "versions.yml"                         ,  emit: versions
@@ -57,6 +56,7 @@ process MATCH_COMBINE {
         $combined_output \
         -v
 
+    gunzip *.scorefile.gz
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
         pgscatalog_utils: \$(echo \$(python -c 'import pgscatalog_utils; print(pgscatalog_utils.__version__)'))
