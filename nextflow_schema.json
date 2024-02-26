@@ -55,7 +55,7 @@
                 "genotypes_cache": {
                     "type": "string",
                     "default": "None",
-                    "description": "Path to a directory that can store relabelled genotypes (and the reference panel intersections and PCA with --run_ancestry) to speed up -resume commands",
+                    "description": "Path to a directory that can store relabelled genotypes (and the reference panel intersections and PCA with --run_ancestry) to speed up new PGS calculations on previously harmonized samples",
                     "format": "directory-path"
                 },
                 "outdir": {
