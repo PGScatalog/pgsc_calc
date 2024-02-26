@@ -14,6 +14,7 @@ Calculating polygenic scores
    calculate_pgscatalog
    multiple
    ancestry
+   cache
 
 Making genomic data and scorefiles compatible
 ---------------------------------------------
