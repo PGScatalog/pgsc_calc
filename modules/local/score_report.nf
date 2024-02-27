@@ -33,8 +33,9 @@ process SCORE_REPORT {
     run_ancestry = params.run_ancestry ? true : false
     """
     cp $projectDir/assets/report/report.qmd .
-    export DENO_DIR=\$(mktemp -d)
-    export XDG_CACHE_HOME=\$(mktemp -d)
+    mkdir quartotempdir
+    export DENO_DIR=\$(mktemp -d --tmpdir=quartotempdir)
+    export XDG_CACHE_HOME=\$(mktemp -d --tmpdir=quartotempdir)
 
     echo $workflow.commandLine > command.txt
     echo "keep_multiallelic: $params.keep_multiallelic" > params.txt
