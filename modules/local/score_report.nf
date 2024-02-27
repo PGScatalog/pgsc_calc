@@ -16,6 +16,7 @@ process SCORE_REPORT {
     tuple val(meta), path(scorefile), path(score_log), path(match_summary), path(ancestry)
     path intersect_count
     val reference_panel_name
+    path report_path
 
     output:
     // includeInputs to correctly use $meta.id in publishDir path
@@ -25,14 +26,13 @@ process SCORE_REPORT {
     // for testing ancestry workflow
     path "pop_summary.csv", optional: true
     // normal outputs
-    path "*.html", emit: report
+    path "report.html", emit: report
     path "versions.yml", emit: versions
 
     script:
     def args = task.ext.args ?: ''
     run_ancestry = params.run_ancestry ? true : false
     """
-    cp $projectDir/assets/report/report.qmd .
     export DENO_DIR=\$(mktemp -d)
     export XDG_CACHE_HOME=\$(mktemp -d)
 
@@ -41,11 +41,12 @@ process SCORE_REPORT {
     echo "keep_ambiguous   : $params.keep_ambiguous"    >> params.txt
     echo "min_overlap      : $params.min_overlap"       >> params.txt
     
-    quarto render report.qmd -M "self-contained:true" \
+    quarto render $report_path -M "self-contained:true" \
         -P score_path:$scorefile \
         -P sampleset:$meta.id \
         -P run_ancestry:$run_ancestry \
-        -P reference_panel_name:$reference_panel_name
+        -P reference_panel_name:$reference_panel_name \
+        -o report.html
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
