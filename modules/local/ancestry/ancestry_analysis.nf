@@ -21,7 +21,6 @@ process ANCESTRY_ANALYSIS {
 
     script:
     """
-    # TODO: --ref_pcs is a horrible hack to select the first duplicate
     ancestry_analysis -d $meta.target_id \
         -r reference \
         --psam $ref_psam \

@@ -5,8 +5,9 @@ process FRAPOSA_PCA {
 
     tag "reference"
     // permanently derive a PCA for each reference - sampleset combination
-    def baseDir = ( params.genotypes_cache ? "$params.genotypes_cache" : "${workDir.resolve()}" )
-    storeDir "${baseDir}/ancestry/fraposa/${params.target_build}/${ref_geno.baseName}/${targetmeta.id}/"
+    
+    cachedir = params.genotypes_cache ? file(params.genotypes_cache) : workDir
+    storeDir cachedir / "ancestry" / "fraposa_pca"
 
     conda "${task.ext.conda}"
 
@@ -20,9 +21,10 @@ process FRAPOSA_PCA {
     tuple val(targetmeta), path(target_geno)
 
     output:
-    path "*.{dat,pcs}", emit: pca
+    path "${output}*.{dat,pcs}", emit: pca
     path "versions.yml", emit: versions
 
+    output = "${params.target_build}_${meta.id}_${meta.chrom}"
     script:
     """
     fraposa ${ref_geno.baseName} \

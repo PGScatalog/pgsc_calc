@@ -241,8 +241,8 @@ workflow PGSCCALC {
     // - intersect counts
     // optional inputs need different names to prevent collisions during stage in
     optional_intersect_count = file(projectDir / "assets" / "NO_FILE_INTERSECT_COUNT", checkIfExists: true)
-    ref_afreq = Channel.fromPath(optional_input)
-    intersect_count = Channel.fromPath(optional_intersect_count)
+    ref_afreq = Channel.value([[:], optional_input])
+    intersect_count = Channel.fromPath(optional_intersect_count, checkIfExists: true)
 
     if (run_ancestry_assign) {
         intersection = Channel.empty()
