@@ -26,3 +26,6 @@ RUN install2.r --error --skipinstalled -n 4 \
 RUN wget https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-${TARGETARCH}.deb && \
     dpkg -i quarto-${QUARTO_VERSION}-linux-${TARGETARCH}.deb && \
     rm quarto-${QUARTO_VERSION}-linux-${TARGETARCH}.deb
+
+ENV XDG_CACHE_HOME=/tmp/quarto_cache_home
+ENV XDG_DATA_HOME=/tmp/quarto_data_home
