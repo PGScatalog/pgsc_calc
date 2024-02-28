@@ -12,9 +12,8 @@
         - "effect_allele"
         - "other_allele"
         - "effect_weight"
-        - "effect_type"
     - path: output/combine/versions.yml
       contains:
-        - "pgscatalog_utils: 0.4.2"
+        - "pgscatalog_utils: 0.5.2"
     
 

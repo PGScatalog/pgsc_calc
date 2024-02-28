@@ -5,6 +5,7 @@ process PLINK2_ORIENT {
     label "plink2" // controls conda, docker, + singularity options
 
     tag "$meta.id"
+    storeDir "${workDir.resolve()}/ancestry/oriented/${geno.baseName}/"
 
     conda "${task.ext.conda}"
 

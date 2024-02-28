@@ -4,7 +4,9 @@ process FRAPOSA_PCA {
     label 'fraposa' // controls conda, docker, + singularity options
 
     tag "reference"
-    cache "deep"
+    // permanently derive a PCA for each reference - sampleset combination
+    def baseDir = ( params.genotypes_cache ? "$params.genotypes_cache" : "${workDir.resolve()}" )
+    storeDir "${baseDir}/ancestry/fraposa/${params.target_build}/${ref_geno.baseName}/${targetmeta.id}/"
 
     conda "${task.ext.conda}"
 
@@ -15,6 +17,7 @@ process FRAPOSA_PCA {
 
     input:
     tuple val(meta), path(ref_geno), path(ref_pheno), path(ref_variants)
+    tuple val(targetmeta), path(target_geno)
 
     output:
     path "*.{dat,pcs}", emit: pca

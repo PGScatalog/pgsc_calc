@@ -57,12 +57,8 @@ pgsc_calc:
         -profile <docker/singularity/conda> \
         --input samplesheet.csv \
         --pgs_id PGS001229 \
-        --parallel \
         -c my_custom.config
 
-.. note:: Using the ``parallel`` parameter enables parallel score calculation,
-          which is a RAM and I/O intensive process. It's disabled by default to
-          prevent laptops with 16GB RAM crashing on smaller datasets.
 
 High performance computing cluster
 ----------------------------------
@@ -125,7 +121,6 @@ instead:
         -profile singularity \
         --input samplesheet.csv \
         --pgs_id PGS001229 \
-        --parallel \
         -c my_custom.config
 
 .. note:: The name of the nextflow and singularity modules will be different in

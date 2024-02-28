@@ -11,7 +11,7 @@ process INTERSECT_THINNED {
     label 'plink2' // controls conda, docker, + singularity options
 
     tag "$meta.id"
-    storeDir "$workDir/thinned_intersection/${params.target_build}/${meta.id}"
+    storeDir "${workDir.resolve()}/ancestry/thinned_intersection/${params.target_build}/${meta.id}"
 
     conda "${task.ext.conda}"
 
