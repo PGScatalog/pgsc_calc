@@ -19,3 +19,5 @@ nextflow <https://www.nextflow.io/blog/2019/demystifying-nextflow-resume.html>`_
 `work` directory and is more often used for restarting the pipeline when a specific step has failed
 (e.g. for exceeding memory limits).
 
+.. warning:: Always use a new cache directory for different samplesets, as redundant names may clash across runs. 
+
