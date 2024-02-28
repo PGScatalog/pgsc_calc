@@ -145,6 +145,12 @@ if (params.platform) {
 workflow PGSCCALC {
     ch_versions = Channel.empty()
 
+    // some workflows require an optional input
+    // let's make one, and reuse it where possible
+    // see https://nextflow-io.github.io/patterns/optional-input/ which explains this odd implementation pattern
+    // these dummy files need to exist for cloud executors to work OK
+    optional_input = file(projectDir / "assets" / "NO_FILE", checkIfExists: true)
+
     //
     // SUBWORKFLOW: Create reference database for ancestry inference
     //
@@ -193,7 +199,7 @@ workflow PGSCCALC {
         // flatten the score channel
         ch_scorefiles = ch_scores.collect()
         // chain files are optional input
-        Channel.fromPath("$projectDir/assets/NO_FILE", checkIfExists: false).set { chain_files }
+        Channel.fromPath(optional_input).set { chain_files }
         if (params.hg19_chain && params.hg38_chain) {
             Channel.fromPath(params.hg19_chain, checkIfExists: true)
                 .mix(Channel.fromPath(params.hg38_chain, checkIfExists: true))
@@ -230,9 +236,13 @@ workflow PGSCCALC {
     // SUBWORKFLOW: Run ancestry projection
     //
 
-    // reference allelic frequencies are optional inputs to scoring subworkflow
-    ref_afreq = Channel.fromPath(file('NO_FILE'))
-    intersect_count = Channel.fromPath(file('NO_FILE_INTERSECT_COUNT'))
+    // this process has two optional inputs:
+    // - reference allelic frequencies 
+    // - intersect counts
+    // optional inputs need different names to prevent collisions during stage in
+    optional_intersect_count = file(projectDir / "assets" / "NO_FILE_INTERSECT_COUNT", checkIfExists: true)
+    ref_afreq = Channel.value([[:], optional_input])
+    intersect_count = Channel.fromPath(optional_intersect_count, checkIfExists: true)
 
     if (run_ancestry_assign) {
         intersection = Channel.empty()
@@ -268,7 +278,7 @@ workflow PGSCCALC {
             // intersected variants ( across ref & target ) are an optional input
             intersection = ANCESTRY_PROJECT.out.intersection
         } else {
-            dummy_input = Channel.of(file('NO_FILE')) // dummy file that doesn't exist
+            dummy_input = Channel.of(optional_input) // dummy file that doesn't exist
             // associate each sampleset with the dummy file
             MAKE_COMPATIBLE.out.geno.map {
                 meta = it[0].clone()

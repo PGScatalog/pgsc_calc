@@ -6,7 +6,6 @@ process MATCH_COMBINE {
 
     // first element of tag must be sampleset
     tag "$meta.id"
-    scratch (workflow.containerEngine == 'singularity')
 
     conda "${task.ext.conda}"
 

@@ -3,7 +3,7 @@ process EXTRACT_DATABASE {
     label 'process_low'
     label 'zstd' // controls conda, docker, + singularity options
 
-    storeDir "${workDir.resolve()}/ref_extracted/"
+    storeDir workDir / "ancestry" / "ref_extracted"
 
     conda "${task.ext.conda}"
 

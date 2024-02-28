@@ -4,8 +4,9 @@ process INTERSECT_VARIANTS {
     label 'zstd' // controls conda, docker, + singularity options
 
     tag "$meta.id chromosome $meta.chrom"
-    def baseDir = ( params.genotypes_cache ? "$params.genotypes_cache" : "${workDir.resolve()}" )
-    storeDir "${baseDir}/intersected/${params.target_build}/$meta.id/$meta.chrom"
+
+    cachedir = params.genotypes_cache ? file(params.genotypes_cache) : workDir
+    storeDir cachedir / "ancestry" / "intersected"
 
     conda "${task.ext.conda}"
 
@@ -19,7 +20,7 @@ process INTERSECT_VARIANTS {
         path(ref_geno), path(ref_pheno), path(ref_variants)
 
     output:
-    tuple val(id), path("${meta.id}_${meta.chrom}_matched.txt.gz"), emit: intersection
+    tuple val(id), path("${output}.txt.gz"), emit: intersection
     path "intersect_counts_*.txt", emit: intersect_count
     path "versions.yml", emit: versions
 
@@ -27,6 +28,7 @@ process INTERSECT_VARIANTS {
     def mem_mb = task.memory.toMega() // plink is greedy
     def file_format = meta.is_pfile ? 'pvar' : 'bim'
     id = meta.subMap('id', 'build', 'n_chrom', 'chrom')
+    output = "${meta.id}_${meta.chrom}_matched"
     """
     intersect_variants.sh <(zstdcat $ref_variants) \
         <(zstdcat $variants) \
@@ -37,7 +39,7 @@ process INTERSECT_VARIANTS {
         echo "ERROR: No variants in intersection"
         exit 1
     else
-        mv matched_variants.txt ${meta.id}_${meta.chrom}_matched.txt
+        mv matched_variants.txt ${output}.txt
         gzip *_variants.txt *_matched.txt
     fi
 

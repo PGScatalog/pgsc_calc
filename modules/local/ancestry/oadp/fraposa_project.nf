@@ -5,8 +5,8 @@ process FRAPOSA_PROJECT {
 
     tag "${target_geno.baseName.tokenize('_')[1]}"
     
-    def baseDir = ( params.genotypes_cache ? "$params.genotypes_cache" : "${workDir.resolve()}" )
-    storeDir "${baseDir}/ancestry/fraposa/${params.target_build}/${target_geno.baseName}/${split_fam.baseName}"
+    cachedir = params.genotypes_cache ? file(params.genotypes_cache) : workDir
+    storeDir cachedir / "ancestry" / "fraposa" / "project"
 
     conda "${task.ext.conda}"
 
@@ -21,12 +21,13 @@ process FRAPOSA_PROJECT {
         path(pca)
 
     output:
-    tuple val(oadp_meta), path("GRCh3?_${target_id}_*.pcs"), emit: pca
+    tuple val(oadp_meta), path("${output}.pcs"), emit: pca
     path "versions.yml", emit: versions
 
     script:
     target_id = target_geno.baseName.tokenize('_')[1]
     oadp_meta = ['target_id':target_id]
+    output = "${params.target_build}_${target_id}_${split_fam}"
     """
     fraposa ${ref_geno.baseName} \
         --method $params.projection_method \

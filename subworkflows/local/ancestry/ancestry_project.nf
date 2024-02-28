@@ -179,7 +179,7 @@ workflow ANCESTRY_PROJECT {
         .filter{ it instanceof Path && it.getName().contains('ALL') }
         .set { ch_ref_relabelled_variants }
 
-    target_extract = Channel.of(file('NO_FILE')) // optional input for PLINK2_MAKEBED
+    target_extract = Channel.of(file(projectDir / "assets" / "NO_FILE")) // optional input for PLINK2_MAKEBED
 
     // [meta, pgen, psam, relabelled pvar, optional_input]
     INTERSECT_THINNED.out.geno
