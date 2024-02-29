@@ -27,7 +27,7 @@ process FRAPOSA_PROJECT {
     script:
     target_id = target_geno.baseName.tokenize('_')[1]
     oadp_meta = ['target_id':target_id]
-    output = "${params.target_build}_${target_id}_${split_fam}"
+    output = "${target_geno.baseName}_${split_fam}"
     """
     fraposa ${ref_geno.baseName} \
         --method $params.projection_method \
