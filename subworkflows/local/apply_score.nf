@@ -63,7 +63,7 @@ workflow APPLY_SCORE {
             .set { ch_scorefile_relabel_input }
 
         // relabel scoring file ids to match reference format
-        RELABEL_SCOREFILE_IDS ( ch_scorefile_relabel_input )
+        RELABEL_SCOREFILE_IDS ( ch_scorefile_relabel_input, Channel.value([[:], file(projectDir / "assets" / "NO_FILE", checkIfExists: true)]) )
 
         RELABEL_SCOREFILE_IDS.out.relabelled
             .transpose()
@@ -85,7 +85,7 @@ workflow APPLY_SCORE {
             .set { ch_afreq }
 
         // map afreq IDs from reference -> target
-        RELABEL_AFREQ_IDS ( ch_afreq )
+        RELABEL_AFREQ_IDS ( ch_afreq, Channel.value([[:], file(projectDir / "assets" / "NO_FILE", checkIfExists: true)]) )
         ref_afreq = RELABEL_AFREQ_IDS.out.relabelled
     }
 
@@ -154,7 +154,7 @@ def annotate_scorefiles(ArrayList scorefiles) {
             // dominant, 1 recessive). scorefile looks like:
             //     variant ID | effect allele | weight 1 | ... | weight_n
             // one weight is mandatory, extra weight columns are optional
-            scoremeta.n_scores = count_scores(it.last())
+            scoremeta.n_scores = count_scores(it.last().newInputStream())
 
             // file name structure: {dataset}_{chr}_{effect}_{split}.scorefile -
             // {dataset} is only used to disambiguate files, not for scoremeta
@@ -193,10 +193,10 @@ def annotate_genomic(ArrayList target) {
     return [meta, paths]
 }
 
-def count_scores(Path f) {
+def count_scores(InputStream f) {
     // count number of calculated scores in a gzipped plink .scorefile
     // try-with-resources block automatically closes streams
-    try (buffered = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(f.toFile()))))) {
+    try (buffered = new BufferedReader(new InputStreamReader(new GZIPInputStream(f)))) {
         n_extra_cols = 2 // ID, effect_allele
         n_scores = buffered.readLine().split("\t").length - n_extra_cols
         assert n_scores > 0 : "Counting scores failed, please check scoring file"

@@ -6,6 +6,8 @@ process PLINK2_MAKEBED {
 
     tag "$meta.id chromosome"
 
+    storeDir workDir / "ancestry" / "bed"
+
     conda "${task.ext.conda}"
 
     container "${ workflow.containerEngine == 'singularity' &&
@@ -18,10 +20,10 @@ process PLINK2_MAKEBED {
     tuple val(meta), path(geno), path(pheno), path(variants), path(pruned)
 
     output:
-    tuple val(meta), path("*.bed"), emit: geno
-    tuple val(meta), path("*.bim"), emit: variants
-    tuple val(meta), path("*.fam"), emit: pheno
-    tuple val(meta), path("splitfam*"), emit: splits, optional: true
+    tuple val(meta), path("${output}.bed"), emit: geno
+    tuple val(meta), path("${output}.bim"), emit: variants
+    tuple val(meta), path("${output}.fam"), emit: pheno
+    tuple val(meta), path("${split_output}*"), emit: splits, optional: true
     path "versions.yml"           , emit: versions
 
     script:
@@ -32,7 +34,8 @@ process PLINK2_MAKEBED {
     def extract = pruned.name != 'NO_FILE' ? "--extract $pruned" : ''
     def extracted = pruned.name != 'NO_FILE' ? "_extracted" : ''
     def prefix = task.ext.suffix ? "${meta.id}${task.ext.suffix}_" : "${meta.id}_"
-
+    output = "${params.target_build}_${prefix}${meta.chrom}${extracted}"
+    split_output = "${meta.id}_splitfam"
     """
     # use explicit flag because pfile prefix might be different
     plink2 \
@@ -44,11 +47,11 @@ process PLINK2_MAKEBED {
         --pvar $variants \
         --make-bed \
         $extract \
-        --out ${params.target_build}_${prefix}${meta.chrom}${extracted}
+        --out ${output}
 
     if [ $meta.id != 'reference' ]
     then
-        split -l 50000 <(grep -v '#' $pheno) splitfam
+        split -l 50000 <(grep -v '#' $pheno) ${split_output}
     fi
 
     cat <<-END_VERSIONS > versions.yml

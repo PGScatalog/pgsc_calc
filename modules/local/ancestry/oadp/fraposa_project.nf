@@ -4,7 +4,9 @@ process FRAPOSA_PROJECT {
     label 'fraposa' // controls conda, docker, + singularity options
 
     tag "${target_geno.baseName.tokenize('_')[1]}"
-    storeDir "$workDir/fraposa/${params.target_build}/${target_geno.baseName}/${split_fam}"
+    
+    cachedir = params.genotypes_cache ? file(params.genotypes_cache) : workDir
+    storeDir cachedir / "ancestry" / "fraposa" / "project"
 
     conda "${task.ext.conda}"
 
@@ -19,12 +21,13 @@ process FRAPOSA_PROJECT {
         path(pca)
 
     output:
-    tuple val(oadp_meta), path("GRCh3?_${target_id}_*.pcs"), emit: pca
+    tuple val(oadp_meta), path("${output}.pcs"), emit: pca
     path "versions.yml", emit: versions
 
     script:
     target_id = target_geno.baseName.tokenize('_')[1]
     oadp_meta = ['target_id':target_id]
+    output = "${target_geno.baseName}_${split_fam}"
     """
     fraposa ${ref_geno.baseName} \
         --method $params.projection_method \

@@ -169,7 +169,9 @@ workflow ANCESTRY_PROJECT {
         .buffer(size: 3)
         .set { ch_thinned_target }
 
-    RELABEL_IDS( ch_thinned_target )
+    // BE CAREFUL: assuming ch_thinned_target contains all chromosomes in one file
+    // need to reconfigure ch_ref.geno to be a value channel if this changes
+    RELABEL_IDS( ch_thinned_target, ch_ref.geno )
     ch_versions = ch_versions.mix(RELABEL_IDS.out.versions.first())
 
     RELABEL_IDS.out.relabelled
@@ -177,7 +179,7 @@ workflow ANCESTRY_PROJECT {
         .filter{ it instanceof Path && it.getName().contains('ALL') }
         .set { ch_ref_relabelled_variants }
 
-    target_extract = Channel.of(file('NO_FILE')) // optional input for PLINK2_MAKEBED
+    target_extract = Channel.of(file(projectDir / "assets" / "NO_FILE")) // optional input for PLINK2_MAKEBED
 
     // [meta, pgen, psam, relabelled pvar, optional_input]
     INTERSECT_THINNED.out.geno
@@ -223,8 +225,7 @@ workflow ANCESTRY_PROJECT {
         .combine(ch_split_targets, by: 0)
         .set { ch_fraposa_target }
 
-    // do PCA on reference genomes...
-    FRAPOSA_PCA( ch_fraposa_ref.map { it.flatten() } )
+    FRAPOSA_PCA( ch_fraposa_ref.map { it.flatten() }, geno )
     ch_versions = ch_versions.mix(FRAPOSA_PCA.out.versions.first())
 
     // ... and project split target genomes

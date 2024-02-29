@@ -6,8 +6,8 @@ process PLINK2_VCF {
 
     tag "$meta.id chromosome $meta.chrom"
 
-    storeDir ( params.genotypes_cache ? "$params.genotypes_cache/${meta.id}/${meta.build}/${meta.chrom}" :
-              "$workDir/genomes/${meta.id}/${meta.build}/${meta.chrom}/")
+    cachedir = params.genotypes_cache ? file(params.genotypes_cache) : workDir
+    storeDir cachedir / "genomes" / "recoded"
 
     conda "${task.ext.conda}"
 
@@ -20,10 +20,10 @@ process PLINK2_VCF {
     tuple val(meta), path(vcf)
 
     output:
-    tuple val(newmeta), path("${meta.build}_*.pgen"), emit: pgen
-    tuple val(newmeta), path("${meta.build}_*.psam"), emit: psam
-    tuple val(newmeta), path("${meta.build}_*.zst") , emit: pvar
-    tuple val(newmeta), path("${meta.build}_*.vmiss.gz"), emit: vmiss
+    tuple val(newmeta), path("${output}.pgen"), emit: pgen
+    tuple val(newmeta), path("${output}.psam"), emit: psam
+    tuple val(newmeta), path("${output}.pvar.zst") , emit: pvar
+    tuple val(newmeta), path("${output}.vmiss.gz"), emit: vmiss
     path "versions.yml"            , emit: versions
 
     script:
@@ -36,7 +36,8 @@ process PLINK2_VCF {
     def chrom_filter = meta.chrom == "ALL" ? "--chr 1-22, X, Y, XY" : "--chr ${meta.chrom}" // filter to canonical/stated chromosome
     newmeta = meta.clone() // copy hashmap for updating...
     newmeta.is_pfile = true // now it's converted to a pfile :)
-
+    // def limits scope to process block, so don't use it
+    output = "${meta.build}_${prefix}_${meta.chrom}_vcf"
     """
     plink2 \\
         --threads $task.cpus \\
@@ -48,9 +49,9 @@ process PLINK2_VCF {
         --vcf $vcf $dosage_options \\
         --allow-extra-chr $chrom_filter \\
         --make-pgen vzs \\
-        --out ${meta.build}_${prefix}_${meta.chrom}_vcf
+        --out ${output}
 
-    gzip *.vmiss
+    gzip ${output}.vmiss
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

@@ -68,7 +68,7 @@ workflow REPORT {
         // make NO_FILE for each sampleset to join correctly later
         ancestry_results = ancestry_results.mix(
             ch_scores.map {it[0]} // unique samplesets
-                .combine(Channel.fromPath('NO_FILE'))
+                .combine(Channel.fromPath(file(projectDir / "assets" / "NO_FILE", checkIfExists: true)))
         )
     }
 
@@ -82,7 +82,10 @@ workflow REPORT {
         .combine(log_scorefiles) // all samplesets have the same scorefile metadata
         .set { ch_report_input }
 
-    SCORE_REPORT( ch_report_input, intersect_count, reference_panel_name )
+    Channel.fromPath(file(projectDir / "assets" /"report" / "report.qmd", checkIfExists: true))
+        .set{report_path}
+
+    SCORE_REPORT( ch_report_input, intersect_count, reference_panel_name, report_path )
     ch_versions = ch_versions.mix(SCORE_REPORT.out.versions)
 
     // if this workflow runs, the report must be written

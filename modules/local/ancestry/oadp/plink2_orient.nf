@@ -6,6 +6,8 @@ process PLINK2_ORIENT {
 
     tag "$meta.id"
 
+    storeDir = workDir / "ancestry" / "oriented"
+
     conda "${task.ext.conda}"
 
     container "${ workflow.containerEngine == 'singularity' &&
@@ -18,9 +20,9 @@ process PLINK2_ORIENT {
     tuple val(meta), path(geno), path(pheno), path(variants), path(ref_variants)
 
     output:
-    tuple val(meta), path("*.bed"), emit: geno
-    tuple val(meta), path("*.bim"), emit: variants
-    tuple val(meta), path("*.fam"), emit: pheno
+    tuple val(meta), path("${output}.bed"), emit: geno
+    tuple val(meta), path("${output}.bim"), emit: variants
+    tuple val(meta), path("${output}.fam"), emit: pheno
     path "versions.yml"           , emit: versions
 
     script:
@@ -29,7 +31,7 @@ process PLINK2_ORIENT {
 
     // output options
     def prefix = task.ext.suffix ? "${meta.id}${task.ext.suffix}_" : "${meta.id}_"
-
+    output = "${params.target_build}_${prefix}${meta.chrom}_oriented"
     """
     plink2 \
         --threads $task.cpus \
@@ -40,7 +42,7 @@ process PLINK2_ORIENT {
         --bim $variants \
         --a1-allele $ref_variants 5 2 \
         --make-bed \
-        --out ${params.target_build}_${prefix}${meta.chrom}_oriented
+        --out $output
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

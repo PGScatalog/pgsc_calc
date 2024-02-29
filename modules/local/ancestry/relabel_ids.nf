@@ -3,7 +3,10 @@ process RELABEL_IDS {
     label 'process_medium'
     label 'pgscatalog_utils' // controls conda, docker, + singularity options
 
-    tag "$meta.id $target_format"
+    tag "$meta.id $meta.effect_type $target_format"
+
+    cachedir = workDir / "ancestry" / "relabel"
+    storeDir { refgeno.name != 'NO_FILE' ? cachedir : false }
 
     conda "${task.ext.conda}"
 
@@ -14,6 +17,7 @@ process RELABEL_IDS {
 
     input:
     tuple val(meta), path(target), path(matched)
+    tuple val(refmeta), path(refgeno) // optional, for building a storeDir
 
     output:
     tuple val(relabel_meta), path("${meta.id}*"), emit: relabelled
