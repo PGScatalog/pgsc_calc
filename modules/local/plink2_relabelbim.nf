@@ -22,7 +22,7 @@ process PLINK2_RELABELBIM {
 
     output:
     tuple val(meta), path("${output}.bed"), emit: geno
-    tuple val(meta), path("${output}.pvar.zst"), emit: variants
+    tuple val(meta), path("${output}.bim.zst"), emit: variants
     tuple val(meta), path("${output}.fam"), emit: pheno
     tuple val(meta), path("${output}.vmiss.gz"), emit: vmiss
     path "versions.yml"           , emit: versions
