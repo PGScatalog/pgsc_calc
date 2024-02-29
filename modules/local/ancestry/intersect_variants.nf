@@ -21,7 +21,7 @@ process INTERSECT_VARIANTS {
 
     output:
     tuple val(id), path("${output}.txt.gz"), emit: intersection
-    path "intersect_counts_*.txt", emit: intersect_count
+    path "intersect_counts_${meta.chrom}.txt", emit: intersect_count
     path "versions.yml", emit: versions
 
     script:
