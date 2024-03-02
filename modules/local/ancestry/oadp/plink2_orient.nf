@@ -30,8 +30,8 @@ process PLINK2_ORIENT {
     def mem_mb = task.memory.toMega() // plink is greedy
 
     // output options
-    def prefix = task.ext.suffix ? "${meta.id}${task.ext.suffix}_" : "${meta.id}_"
-    output = "${params.target_build}_${prefix}${meta.chrom}_oriented"
+    def prefix = task.ext.suffix ? "_${meta.id}${task.ext.suffix}" : "_${meta.id}"
+    output = "${params.target_build}${prefix}_oriented"
     """
     plink2 \
         --threads $task.cpus \
