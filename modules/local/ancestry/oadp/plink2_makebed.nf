@@ -33,7 +33,7 @@ process PLINK2_MAKEBED {
     // output options
     def extract = pruned.name != 'NO_FILE' ? "--extract $pruned" : ''
     def extracted = pruned.name != 'NO_FILE' ? "_extracted" : ''
-    def prefix = task.ext.suffix ? "${meta.id}${task.ext.suffix}_" : "${meta.id}_"
+    def prefix = task.ext.suffix ? "${meta.id}${task.ext.suffix}" : "${meta.id}"
     output = "${params.target_build}_${prefix}${extracted}"
     split_output = "${meta.id}_splitfam"
     """
