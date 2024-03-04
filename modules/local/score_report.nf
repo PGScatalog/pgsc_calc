@@ -33,6 +33,7 @@ process SCORE_REPORT {
     def args = task.ext.args ?: ''
     run_ancestry = params.run_ancestry ? true : false
     """
+    export TMPDIR=/tmp # tmpdir must always be writable
     echo $workflow.commandLine > command.txt
     echo "keep_multiallelic: $params.keep_multiallelic" > params.txt
     echo "keep_ambiguous   : $params.keep_ambiguous"    >> params.txt
