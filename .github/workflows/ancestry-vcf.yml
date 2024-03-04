@@ -32,11 +32,11 @@ jobs:
       - name: Check out pipeline code
         uses: actions/checkout@v3
 
-      - uses: nf-core/setup-nextflow@v1
+      - uses: nf-core/setup-nextflow@v2
 
       - name: Restore docker images
         id: restore-docker
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@v4
         with:
           path: ${{ runner.temp }}/docker
           key: ${{ inputs.container-cache-key }}
@@ -48,7 +48,7 @@ jobs:
           find ${{ runner.temp }}/docker/ -name '*.tar' -exec sh -c 'docker load < {}' \;
 
       - name: Restore reference data
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@v4
         with:
           path: |
             ${{ env.ANCESTRY_TARGET_DIR }}/GRCh38_HAPNEST_TARGET_ALL.pgen
@@ -99,11 +99,11 @@ jobs:
       - name: Check out pipeline code
         uses: actions/checkout@v3
 
-      - uses: nf-core/setup-nextflow@v1
+      - uses: nf-core/setup-nextflow@v2
 
       - name: Restore singularity setup
         id: restore-singularity-setup
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: /opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64
           key: ${{ runner.os }}-singularity-${{ env.SINGULARITY_VERSION }}
@@ -115,13 +115,13 @@ jobs:
 
       - name: Restore singularity container images
         id: restore-singularity
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.NXF_SINGULARITY_CACHEDIR }}
           key: ${{ inputs.container-cache-key }}
 
       - name: Restore reference data
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@v4
         with:
           path: |
             ${{ env.ANCESTRY_TARGET_DIR }}/GRCh38_HAPNEST_TARGET_ALL.pgen

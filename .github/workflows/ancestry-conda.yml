@@ -24,7 +24,7 @@ jobs:
           echo "ANCESTRY_TARGET_DIR=$RUNNER_TEMP" >> $GITHUB_ENV
 
       - name: Restore reference data
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@v4
         with:
           path: |
             ${{ env.ANCESTRY_TARGET_DIR }}/GRCh38_HAPNEST_TARGET_ALL.pgen

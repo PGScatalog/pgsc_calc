@@ -33,13 +33,13 @@ jobs:
         run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
         id: extract_branch
         
-      - uses: nf-core/setup-nextflow@v1
+      - uses: nf-core/setup-nextflow@v2
         with:
           version: ${{ matrix.nxf_ver }}
 
       - name: Restore docker images
         id: restore-docker
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@v4
         with:
           path: ${{ runner.temp }}/docker
           key: ${{ inputs.cache-key }}
@@ -70,13 +70,13 @@ jobs:
         run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
         id: extract_branch
       
-      - uses: nf-core/setup-nextflow@v1
+      - uses: nf-core/setup-nextflow@v2
         with:
           version: ${{ matrix.nxf_ver }}
 
       - name: Restore singularity setup
         id: restore-singularity-setup
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: /opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64
           key: ${{ runner.os }}-singularity-${{ env.SINGULARITY_VERSION }}
@@ -88,7 +88,7 @@ jobs:
 
       - name: Restore singularity container images
         id: restore-singularity
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.NXF_SINGULARITY_CACHEDIR }}
           key: ${{ inputs.cache-key }}

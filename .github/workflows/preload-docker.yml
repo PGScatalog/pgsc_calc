@@ -22,7 +22,7 @@ jobs:
 
       - name: Save docker
         id: cache-docker
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ runner.temp }}/docker
           key: docker-${{ github.sha }}
