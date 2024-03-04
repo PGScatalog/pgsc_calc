@@ -5,7 +5,9 @@ process RELABEL_IDS {
 
     tag "$meta.id $meta.effect_type $target_format"
 
-    cachedir = workDir / "ancestry" / "relabel"
+    cachedir = params.genotypes_cache ? file(params.genotypes_cache) : workDir
+    cachedir = cachedir / "ancestry" / "relabel"
+
     storeDir { refgeno.name != 'NO_FILE' ? cachedir : false }
 
     conda "${task.ext.conda}"
