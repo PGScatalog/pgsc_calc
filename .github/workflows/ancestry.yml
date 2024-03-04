@@ -30,7 +30,7 @@ jobs:
           echo "ANCESTRY_TARGET_DIR=$RUNNER_TEMP" >> $GITHUB_ENV
       
       - name: Check out pipeline code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - uses: nf-core/setup-nextflow@v2
 
@@ -59,7 +59,7 @@ jobs:
           fail-on-cache-miss: true
 
       - name: Set up test requirements
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: '3.10'
           cache: 'pip'
@@ -91,7 +91,7 @@ jobs:
           echo "ANCESTRY_TARGET_DIR=$RUNNER_TEMP" >> $GITHUB_ENV
       
       - name: Check out pipeline code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - uses: nf-core/setup-nextflow@v2
 
@@ -126,7 +126,7 @@ jobs:
           fail-on-cache-miss: true
           
       - name: Set up test requirements
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: '3.10'
           cache: 'pip'
