@@ -25,7 +25,7 @@ process FRAPOSA_PCA {
     path "versions.yml", emit: versions
 
     script:
-    output = "${params.target_build}_${meta.id}_${meta.chrom}"
+    output = "${params.target_build}_${meta.id}"
     """
     fraposa ${ref_geno.baseName} \
         --method $params.projection_method \
