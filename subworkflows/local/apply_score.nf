@@ -3,7 +3,8 @@
 //
 import java.util.zip.GZIPInputStream
 
-include { RELABEL_IDS as RELABEL_SCOREFILE_IDS; RELABEL_IDS as RELABEL_AFREQ_IDS } from '../../modules/local/ancestry/relabel_ids'
+include { RELABEL_SCOREFILES } from '../../modules/local/ancestry/relabel_scorefiles'
+include { RELABEL_AFREQ } from '../../modules/local/ancestry/relabel_afreq'
 include { PLINK2_SCORE }    from '../../modules/local/plink2_score'
 include { SCORE_AGGREGATE } from '../../modules/local/score_aggregate'
 include { SCORE_REPORT    } from '../../modules/local/score_report'
@@ -63,9 +64,9 @@ workflow APPLY_SCORE {
             .set { ch_scorefile_relabel_input }
 
         // relabel scoring file ids to match reference format
-        RELABEL_SCOREFILE_IDS ( ch_scorefile_relabel_input, Channel.value([[:], file(projectDir / "assets" / "NO_FILE", checkIfExists: true)]) )
+        RELABEL_SCOREFILES ( ch_scorefile_relabel_input )
 
-        RELABEL_SCOREFILE_IDS.out.relabelled
+        RELABEL_SCOREFILES.out.relabelled
             .transpose()
             .map { annotate_chrom(it) }
             .map { tuple(it.first().subMap('chrom'), it) }
@@ -85,8 +86,8 @@ workflow APPLY_SCORE {
             .set { ch_afreq }
 
         // map afreq IDs from reference -> target
-        RELABEL_AFREQ_IDS ( ch_afreq, Channel.value([[:], file(projectDir / "assets" / "NO_FILE", checkIfExists: true)]) )
-        ref_afreq = RELABEL_AFREQ_IDS.out.relabelled
+        RELABEL_AFREQ ( ch_afreq )
+        ref_afreq = RELABEL_AFREQ.out.relabelled
     }
 
     // intersect genomic data with split scoring files -------------------------

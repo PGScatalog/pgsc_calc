@@ -5,10 +5,8 @@ process RELABEL_IDS {
 
     tag "$meta.id $meta.effect_type $target_format"
 
-    cachedir = params.genotypes_cache ? file(params.genotypes_cache) : workDir
-    cachedir = cachedir / "ancestry" / "relabel"
-
-    storeDir { refgeno.name != 'NO_FILE' ? cachedir : false }
+    basedir = params.genotypes_cache ? file(params.genotypes_cache) : workDir
+    storeDir basedir / "ancestry" / "relabel" / "variants"
 
     conda "${task.ext.conda}"
 
@@ -19,10 +17,9 @@ process RELABEL_IDS {
 
     input:
     tuple val(meta), path(target), path(matched)
-    tuple val(refmeta), path(refgeno) // optional, for building a storeDir
 
     output:
-    tuple val(relabel_meta), path("${meta.id}*"), emit: relabelled
+    tuple val(relabel_meta), path("${output}"), emit: relabelled
     path "versions.yml", emit: versions
 
     script:
@@ -31,6 +28,7 @@ process RELABEL_IDS {
     output_mode = "--split --combined" // always output split and combined data to make life easier
     col_from = "ID_TARGET"
     col_to = "ID_REF"
+    output = "${meta.id}.${target_format}*"
 
     if (target_format == "afreq") {
         col_from = "ID_REF"
