@@ -448,23 +448,19 @@ for(current_pgs in uscores_plot){
 ```{r, echo = FALSE, message=FALSE, warning=FALSE, eval=!params$run_ancestry}
 scores %>%
   ungroup() %>%
-  select(IID, sampleset, ends_with("SUM")) %>%
-  group_by(IID, sampleset) %>%
-  tidyr::pivot_longer(cols = -group_cols()) %>%
-  ungroup() %>%
-  filter(name != "DENOM_SUM") %>%
-  mutate(name = ifelse(
-    stringr::str_detect(name, "^PGS"),
-    stringr::str_extract(name, "^PGS[0-9]{6}"),
-    name)) %>%
-  group_by(sampleset, name) -> long_scores
+  select(IID, sampleset, PGS, SUM) %>%
+  mutate(PGS = ifelse(
+    stringr::str_detect(PGS, "^PGS"),
+    stringr::str_extract(PGS, "^PGS[0-9]{6}"),
+    PGS)) %>%
+  group_by(sampleset, PGS) -> long_scores
 group_keys(long_scores) %>%
   slice(1:6) -> score_keys
 long_scores %>%
   inner_join(score_keys) %>%
-  ggplot(aes(x = value, fill = sampleset)) +
+  ggplot(aes(x = SUM, fill = sampleset)) +
       geom_density(alpha = 0.3) +
-      facet_wrap(~name, ncol = 2, scales = "free") +
+      facet_wrap(~PGS, ncol = 2, scales = "free") +
       theme_bw() +
       labs(x = "PGS (SUM)", y = "Density", title = "PGS Distribution(s)")
 ```
