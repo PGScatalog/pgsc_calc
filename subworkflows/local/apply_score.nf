@@ -91,11 +91,15 @@ workflow APPLY_SCORE {
     }
 
     // intersect genomic data with split scoring files -------------------------
+    annotated_scorefiles
+        .map { tuple(it.first().subMap('id', 'chrom'), it) }
+        .set { ch_target_scorefile }
+
     ch_genomes.target
         .map { annotate_genomic(it) } // add n_samples
-        .dump( tag: 'final_genomes', pretty: true)
-        .cross ( annotated_scorefiles ) { m, it -> [m.id, m.chrom] }
-        .map { it.flatten() }
+        .map { tuple( it.first().subMap('id', 'chrom'), it ) }
+        .combine( ch_target_scorefile, by: 0 )
+        .map { it.tail().flatten() }
         .mix( ch_apply_ref ) // add reference genomes!
         .combine( ref_afreq.map { it.last() } ) // add allelic frequencies
         .dump(tag: 'ready_to_score', pretty: true)
