@@ -21,6 +21,7 @@ process PLINK2_SCORE {
     output:
     tuple val(meta), path("${output}.{sscore,sscore.zst}"), emit: scores  // optional compression
     path "${output}.sscore.vars", emit: vars_scored
+    path "${output}.log", emit: log
     path "versions.yml", emit: versions
 
     script:
