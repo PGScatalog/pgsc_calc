@@ -25,7 +25,7 @@ workflow APPLY_SCORE {
         .flatMap { annotate_scorefiles(it) }
         .dump(tag: 'final_scorefiles', pretty: true)
         .set { annotated_scorefiles }
-
+    
     geno
         .mix(pheno, variants)
         .groupTuple(size: 3, sort: true) // sorting is important for annotate_genomic
@@ -109,9 +109,10 @@ workflow APPLY_SCORE {
     ch_versions = ch_versions.mix(PLINK2_SCORE.out.versions.first())
 
     // [ [meta], [list, of, score, paths] ]
+    // subMap ID to keep cache stable across runs
     PLINK2_SCORE.out.scores
         .collect()
-        .map { [ it.first(), it.tail().findAll { !(it instanceof LinkedHashMap) }]}
+        .map { [ it.first().subMap("id"), it.tail().findAll { !(it instanceof LinkedHashMap) }]}
         .set { ch_scores }
 
     SCORE_AGGREGATE ( ch_scores )
