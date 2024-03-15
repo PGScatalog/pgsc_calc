@@ -109,11 +109,11 @@ workflow APPLY_SCORE {
     ch_versions = ch_versions.mix(PLINK2_SCORE.out.versions.first())
 
     // double check that each scoring file got a calculation result
-    scorefile_chroms = annotated_scorefiles.map{ it.first().subMap("chrom") }
-    scored_chroms = PLINK2_SCORE.out.scores.map{ it.first().subMap("chrom")}
-    // don't do anything with the result, but do error loudly because score calculations will be affected, e.g. : 
-    // scorefile chroms: Channel.of('1', '2', '2')
-    // scored chroms: Channel.of('1')
+    scorefile_chroms = annotated_scorefiles.map{ it.first().subMap("chrom", "n", "effect_type") }
+    // take unique calculated scores only because scoring files get used for both reference and sampleset 
+    // so there can be twice as many calculated scores
+    scored_chroms = PLINK2_SCORE.out.scores.map{ it.first().subMap("chrom", "n", "effect_type")}.unique()
+    // don't do anything with the result, but do error loudly because score calculations will be affected 
     scorefile_chroms.join(scored_chroms, failOnMismatch: true)
 
     // [ [meta], [list, of, score, paths] ]
