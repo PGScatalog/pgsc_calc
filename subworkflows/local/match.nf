@@ -45,7 +45,7 @@ workflow MATCH {
     // only meta.chrom is checked to see if it's set to 'ALL' or not
     // but using chrom values directly in meta map breaks cache because chrom order can differ across runs
     ch_matches.meta.first().map { it -> 
-        def split = it.chrom == "ALL"
+        def split = it.chrom != "ALL"
         return [split:split, id: it.id]
     }.set { combine_meta }
 
