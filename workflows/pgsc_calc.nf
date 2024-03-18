@@ -281,7 +281,7 @@ workflow PGSCCALC {
             dummy_input = Channel.of(optional_input) // dummy file that doesn't exist
             // associate each sampleset with the dummy file
             MAKE_COMPATIBLE.out.geno.map {
-                meta = it[0].clone()
+                def meta = [:].plus(it[0])
                 meta = meta.subMap(['id'])
                 // one dummy file for groupTuple() size in match subworkflow
                 meta.n_chrom = 1
