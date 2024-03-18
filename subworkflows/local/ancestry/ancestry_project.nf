@@ -52,7 +52,7 @@ workflow ANCESTRY_PROJECT {
     ch_versions = ch_versions.mix(EXTRACT_DATABASE.out.versions.first())
 
     ch_db.map {
-        meta = it.first().clone()
+        def meta = [:].plus(it.first())
         meta.is_pfile = true
         meta.id = 'reference'
         meta.chrom = 'ALL'
@@ -119,7 +119,7 @@ workflow ANCESTRY_PROJECT {
 
     FILTER_VARIANTS.out.ref
         .map {
-            m = it.first().clone()
+            def m = [:].plus(it.first())
             m.id = 'reference'
             m.chrom = 'ALL'
             m.is_pfile = true
