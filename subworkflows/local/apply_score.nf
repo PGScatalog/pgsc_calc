@@ -154,9 +154,9 @@ def annotate_scorefiles(ArrayList scorefiles) {
     // the input meta map only contains keys 'id' (dataset ID) and 'is_vcf'
 
     // firstly, need to associate the scoremeta map with each individual scorefile
-    scoremeta = scorefiles.head()
-    scorefile_paths = scorefiles.tail().flatten()
-    return [[scoremeta], scorefile_paths].combinations()
+    def m = scorefiles.head()
+    def scorefile_paths = scorefiles.tail().flatten()
+    return [[m], scorefile_paths].combinations()
         // now annotate
         .collect {
             def scoremeta = [:]
@@ -190,15 +190,14 @@ def annotate_genomic(ArrayList target) {
     // OUTPUT:
     // [[meta], [pgen_path, psam_path, pvar_path]]
     // where meta map has been annotated with n_samples
-    // cloning is important or original instance will also be edited
 
-    meta = target.first().clone()
+    def meta = [:].plus(target.first()) 
     meta.id = meta.id.toString()
     meta.chrom = meta.chrom.toString()
 
-    paths = target.last()
-    sample = paths.collect { it ==~ /.*fam$|.*psam$/ }
-    psam = paths[sample.indexOf(true)]
+    def paths = target.last()
+    def sample = paths.collect { it ==~ /.*fam$|.*psam$/ }
+    def psam = paths[sample.indexOf(true)]
 
     def n = -1 // skip header
     psam.eachLine { n++ }
@@ -211,17 +210,16 @@ def count_scores(InputStream f) {
     // count number of calculated scores in a gzipped plink .scorefile
     // try-with-resources block automatically closes streams
     try (buffered = new BufferedReader(new InputStreamReader(new GZIPInputStream(f)))) {
-        n_extra_cols = 2 // ID, effect_allele
-        n_scores = buffered.readLine().split("\t").length - n_extra_cols
+        def n_extra_cols = 2 // ID, effect_allele
+        def n_scores = buffered.readLine().split("\t").length - n_extra_cols
         assert n_scores > 0 : "Counting scores failed, please check scoring file"
         return n_scores
     }
 }
 
-// TODO: turn this into a utility function
 def annotate_chrom(ArrayList it) {
     // extract chrom from filename prefix and add to hashmap
-    meta = it.first().clone()
+    def meta = [:].plus(it.first())
     meta.chrom = it.last().getBaseName().tokenize('_')[1]
     return [meta, it.last()]
 }
