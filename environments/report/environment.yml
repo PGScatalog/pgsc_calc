@@ -12,3 +12,4 @@ dependencies:
   - r-tibble
   - r-forcats
   - r-readr
+  - quarto=1.4.550
