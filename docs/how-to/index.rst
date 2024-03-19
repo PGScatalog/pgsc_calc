@@ -52,3 +52,11 @@ Working with complex datasets
 
    copygenomes
    yaml
+
+Other
+-----
+
+.. toctree::
+   :maxdepth: 1
+
+   version
