@@ -35,6 +35,7 @@ process SCORE_REPORT {
     """
     export TMPDIR=\$(mktemp -d --tmpdir=.) # tmpdir must always be writable for quarto
     echo $workflow.commandLine > command.txt
+    
     echo "keep_multiallelic: $params.keep_multiallelic" > params.txt
     echo "keep_ambiguous   : $params.keep_ambiguous"    >> params.txt
     echo "min_overlap      : $params.min_overlap"       >> params.txt
@@ -44,6 +45,7 @@ process SCORE_REPORT {
         -P sampleset:$meta.id \
         -P run_ancestry:$run_ancestry \
         -P reference_panel_name:$reference_panel_name \
+        -P version:$workflow.manifest.version \
         -o report.html
 
     cat <<-END_VERSIONS > versions.yml
