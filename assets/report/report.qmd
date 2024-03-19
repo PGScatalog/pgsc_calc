@@ -1,6 +1,6 @@
 ---
 title: PGS Catalog Calculator (`pgsc_calc`) report
-author: PGS Catalog team
+author: PGS Catalog Calculator (`pgsc_calc`)
 date: today
 title-block-banner: "#383434"
 toc: true
