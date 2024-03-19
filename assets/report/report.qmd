@@ -1,6 +1,6 @@
 ---
 title: PGS Catalog Calculator (`pgsc_calc`) report
-author: PGS Catalog team
+author: PGS Catalog Calculator (`pgsc_calc`)
 date: today
 title-block-banner: "#383434"
 toc: true
@@ -16,6 +16,7 @@ params:
   sampleset: ""
   run_ancestry: false
   reference_panel_name: ""
+  version: ""
 css: logo.css
 ---
 
@@ -55,11 +56,19 @@ log_df <- Reduce(dplyr::bind_rows, lapply(log_paths, read_log))
 log_df$sampleset <- gsub("_", " ", log_df$sampleset)  # page breaking issues
 ```
 
-# Pipeline command
+# Workflow metadata
+
+## Command
 
 ```{bash}
 cat command.txt | fold -w 80 -s | awk -F ' ' 'NR==1 { print "$", $0} NR>1 { print "    " $0}' | sed 's/$/\\/' | sed '$ s/.$//' 
 ```
+
+## Version
+
+```{r, echo=FALSE}
+message(params$version)
+``` 
 
 # Scoring file metadata
 
