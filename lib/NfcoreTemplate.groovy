@@ -3,6 +3,8 @@
 //
 
 import org.yaml.snakeyaml.Yaml
+import groovy.json.JsonOutput
+import nextflow.extension.FilesEx
 
 class NfcoreTemplate {
 
@@ -30,6 +32,25 @@ class NfcoreTemplate {
                     "   (3) Using your own local custom config e.g. `-c /path/to/your/custom.config`\n\n" +
                     "Please refer to the quick start section and usage docs for the pipeline.\n "
         }
+    }
+
+    //
+    // Generate version string
+    //
+    public static String version(workflow) {
+        String version_string = ""
+
+        if (workflow.manifest.version) {
+            def prefix_v = workflow.manifest.version[0] != 'v' ? 'v' : ''
+            version_string += "${prefix_v}${workflow.manifest.version}"
+        }
+
+        if (workflow.commitId) {
+            def git_shortsha = workflow.commitId.substring(0, 7)
+            version_string += "-g${git_shortsha}"
+        }
+
+        return version_string
     }
 
     //
@@ -61,7 +82,7 @@ class NfcoreTemplate {
         misc_fields['Nextflow Compile Timestamp'] = workflow.nextflow.timestamp
 
         def email_fields = [:]
-        email_fields['version']      = workflow.manifest.version
+        email_fields['version']      = NfcoreTemplate.version(workflow)
         email_fields['runName']      = workflow.runName
         email_fields['success']      = workflow.success
         email_fields['dateComplete'] = workflow.complete
@@ -109,7 +130,7 @@ class NfcoreTemplate {
         def email_html    = html_template.toString()
 
         // Render the sendmail template
-        def max_multiqc_email_size = params.max_multiqc_email_size as nextflow.util.MemoryUnit
+        def max_multiqc_email_size = (params.containsKey('max_multiqc_email_size') ? params.max_multiqc_email_size : 0) as nextflow.util.MemoryUnit
         def smail_fields           = [ email: email_address, subject: subject, email_txt: email_txt, email_html: email_html, projectDir: "$projectDir", mqcFile: mqc_report, mqcMaxSize: max_multiqc_email_size.toBytes() ]
         def sf                     = new File("$projectDir/assets/sendmail_template.txt")
         def sendmail_template      = engine.createTemplate(sf).make(smail_fields)
@@ -121,12 +142,14 @@ class NfcoreTemplate {
             try {
                 if (params.plaintext_email) { throw GroovyException('Send plaintext e-mail, not HTML') }
                 // Try to send HTML e-mail using sendmail
+                def sendmail_tf = new File(workflow.launchDir.toString(), ".sendmail_tmp.html")
+                sendmail_tf.withWriter { w -> w << sendmail_html }
                 [ 'sendmail', '-t' ].execute() << sendmail_html
                 log.info "-${colors.purple}[$workflow.manifest.name]${colors.green} Sent summary e-mail to $email_address (sendmail)-"
             } catch (all) {
                 // Catch failures and try with plaintext
                 def mail_cmd = [ 'mail', '-s', subject, '--content-type=text/html', email_address ]
-                if ( mqc_report.size() <= max_multiqc_email_size.toBytes() ) {
+                if ( mqc_report != null && mqc_report.size() <= max_multiqc_email_size.toBytes() ) {
                     mail_cmd += [ '-A', mqc_report ]
                 }
                 mail_cmd.execute() << email_html
@@ -135,14 +158,88 @@ class NfcoreTemplate {
         }
 
         // Write summary e-mail HTML to a file
-        def output_d = new File("${params.outdir}/pipeline_info/")
-        if (!output_d.exists()) {
-            output_d.mkdirs()
-        }
-        def output_hf = new File(output_d, "pipeline_report.html")
+        def output_hf = new File(workflow.launchDir.toString(), ".pipeline_report.html")
         output_hf.withWriter { w -> w << email_html }
-        def output_tf = new File(output_d, "pipeline_report.txt")
+        FilesEx.copyTo(output_hf.toPath(), "${params.outdir}/pipeline_info/pipeline_report.html");
+        output_hf.delete()
+
+        // Write summary e-mail TXT to a file
+        def output_tf = new File(workflow.launchDir.toString(), ".pipeline_report.txt")
         output_tf.withWriter { w -> w << email_txt }
+        FilesEx.copyTo(output_tf.toPath(), "${params.outdir}/pipeline_info/pipeline_report.txt");
+        output_tf.delete()
+    }
+
+    //
+    // Construct and send a notification to a web server as JSON
+    // e.g. Microsoft Teams and Slack
+    //
+    public static void IM_notification(workflow, params, summary_params, projectDir, log) {
+        def hook_url = params.hook_url
+
+        def summary = [:]
+        for (group in summary_params.keySet()) {
+            summary << summary_params[group]
+        }
+
+        def misc_fields = [:]
+        misc_fields['start']                                = workflow.start
+        misc_fields['complete']                             = workflow.complete
+        misc_fields['scriptfile']                           = workflow.scriptFile
+        misc_fields['scriptid']                             = workflow.scriptId
+        if (workflow.repository) misc_fields['repository']  = workflow.repository
+        if (workflow.commitId)   misc_fields['commitid']    = workflow.commitId
+        if (workflow.revision)   misc_fields['revision']    = workflow.revision
+        misc_fields['nxf_version']                          = workflow.nextflow.version
+        misc_fields['nxf_build']                            = workflow.nextflow.build
+        misc_fields['nxf_timestamp']                        = workflow.nextflow.timestamp
+
+        def msg_fields = [:]
+        msg_fields['version']      = NfcoreTemplate.version(workflow)
+        msg_fields['runName']      = workflow.runName
+        msg_fields['success']      = workflow.success
+        msg_fields['dateComplete'] = workflow.complete
+        msg_fields['duration']     = workflow.duration
+        msg_fields['exitStatus']   = workflow.exitStatus
+        msg_fields['errorMessage'] = (workflow.errorMessage ?: 'None')
+        msg_fields['errorReport']  = (workflow.errorReport ?: 'None')
+        msg_fields['commandLine']  = workflow.commandLine.replaceFirst(/ +--hook_url +[^ ]+/, "")
+        msg_fields['projectDir']   = workflow.projectDir
+        msg_fields['summary']      = summary << misc_fields
+
+        // Render the JSON template
+        def engine       = new groovy.text.GStringTemplateEngine()
+        // Different JSON depending on the service provider
+        // Defaults to "Adaptive Cards" (https://adaptivecards.io), except Slack which has its own format
+        def json_path     = hook_url.contains("hooks.slack.com") ? "slackreport.json" : "adaptivecard.json"
+        def hf            = new File("$projectDir/assets/${json_path}")
+        def json_template = engine.createTemplate(hf).make(msg_fields)
+        def json_message  = json_template.toString()
+
+        // POST
+        def post = new URL(hook_url).openConnection();
+        post.setRequestMethod("POST")
+        post.setDoOutput(true)
+        post.setRequestProperty("Content-Type", "application/json")
+        post.getOutputStream().write(json_message.getBytes("UTF-8"));
+        def postRC = post.getResponseCode();
+        if (! postRC.equals(200)) {
+            log.warn(post.getErrorStream().getText());
+        }
+    }
+
+    //
+    // Dump pipeline parameters in a json file
+    //
+    public static void dump_parameters(workflow, params) {
+        def timestamp  = new java.util.Date().format( 'yyyy-MM-dd_HH-mm-ss')
+        def filename   = "params_${timestamp}.json"
+        def temp_pf    = new File(workflow.launchDir.toString(), ".${filename}")
+        def jsonStr    = JsonOutput.toJson(params)
+        temp_pf.text   = JsonOutput.prettyPrint(jsonStr)
+
+        FilesEx.copyTo(temp_pf.toPath(), "${params.outdir}/pipeline_info/params_${timestamp}.json")
+        temp_pf.delete()
     }
 
     //
@@ -154,7 +251,7 @@ class NfcoreTemplate {
             if (workflow.stats.ignoredCount == 0) {
                 log.info "-${colors.purple}[$workflow.manifest.name]${colors.green} Pipeline completed successfully${colors.reset}-"
             } else {
-                log.info "-${colors.purple}[$workflow.manifest.name]${colors.red} Pipeline completed successfully, but with errored process(es) ${colors.reset}-"
+                log.info "-${colors.purple}[$workflow.manifest.name]${colors.yellow} Pipeline completed successfully, but with errored process(es) ${colors.reset}-"
             }
         } else {
             log.info "-${colors.purple}[$workflow.manifest.name]${colors.red} Pipeline completed with errors${colors.reset}-"
@@ -242,10 +339,11 @@ class NfcoreTemplate {
     //
     public static String logo(workflow, monochrome_logs) {
         Map colors = logColours(monochrome_logs)
+        String workflow_version = NfcoreTemplate.version(workflow)
         String.format(
             """\n
             ${dashedLine(monochrome_logs)}
-            ${colors.purple}  ${workflow.manifest.name} v${workflow.manifest.version}${colors.reset}
+            ${colors.purple}  ${workflow.manifest.name} ${workflow_version}${colors.reset}
             ${dashedLine(monochrome_logs)}
             """.stripIndent()
         )

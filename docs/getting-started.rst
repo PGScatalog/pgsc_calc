@@ -194,4 +194,8 @@ requirements to run on these smaller datasets are:
 For information on how to run the pipelines on larger datasets/computers/job-schedulers,
 see :ref:`big job`.
 
+If you are running the pipeline multiple times on the same dataset (e.g. different sets of
+PGS) you can speed the pipeline up by cacheing the genotype harmonization and ancestry steps,
+see :ref:`cache`.
+
 If you are using an newer Mac computer with an M-series chip, see :ref:`arm`.

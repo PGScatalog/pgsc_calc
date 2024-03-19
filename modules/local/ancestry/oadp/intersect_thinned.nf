@@ -11,7 +11,9 @@ process INTERSECT_THINNED {
     label 'plink2' // controls conda, docker, + singularity options
 
     tag "$meta.id"
-    storeDir "$workDir/thinned_intersection/${params.target_build}/${meta.id}"
+
+    cachedir = params.genotypes_cache ? file(params.genotypes_cache) : workDir
+    storeDir cachedir / "ancestry" / "thinned_intersections"
 
     conda "${task.ext.conda}"
 
@@ -24,10 +26,10 @@ process INTERSECT_THINNED {
     tuple val(meta), path(matched), path(pruned), val(geno_meta), path(genomes)
 
     output:
-    path("*_thinned.txt.gz"), emit: match_thinned
-    tuple val(geno_meta), path("*_extracted.pgen"), emit: geno
-    tuple val(geno_meta), path("*_extracted.pvar.gz"), emit: variants
-    tuple val(geno_meta), path("*_extracted.psam"), emit: pheno
+    path("${thin_output}.txt.gz"), emit: match_thinned
+    tuple val(geno_meta), path("${output}.pgen"), emit: geno
+    tuple val(geno_meta), path("${output}.pvar.gz"), emit: variants
+    tuple val(geno_meta), path("${output}.psam"), emit: pheno
     path "versions.yml"           , emit: versions
 
     script:
@@ -37,6 +39,8 @@ process INTERSECT_THINNED {
     // input options
     def input = (geno_meta.is_pfile) ? '--pfile' : '--bfile'
 
+    output = "${params.target_build}_${meta.id}_ALL_extracted"
+    thin_output = "${meta.id}_ALL_matched_thinned"
     """
     # 1) intersect thinned variants --------------------------------------------
 

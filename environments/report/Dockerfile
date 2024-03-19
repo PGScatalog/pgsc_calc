@@ -1,16 +1,31 @@
-ARG QUARTO_VERSION=1.3.433
+FROM rocker/r-ver:4
 
-FROM r-base:4.3.0
-
-ARG QUARTO_VERSION
+ARG QUARTO_VERSION=1.4.550
 ARG TARGETARCH
+
+RUN apt-get update \
+    && apt-get install -y procps wget zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/* 
+    
+# note: amd64 will get binary packages and install very fast
+# https://rocker-project.org/use/extending.html#install-binary-packages
+RUN install2.r --error --skipinstalled -n 4 \
+    jsonlite \
+    dplyr \
+    tidyr \
+    stringr \
+    purrr \
+    ggplot2 \
+    DT \
+    tibble \
+    forcats \
+    readr \
+    && rm -rf /tmp/downloaded_packages \
+    && strip /usr/local/lib/R/site-library/*/libs/*.so
 
 RUN wget https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-${TARGETARCH}.deb && \
     dpkg -i quarto-${QUARTO_VERSION}-linux-${TARGETARCH}.deb && \
     rm quarto-${QUARTO_VERSION}-linux-${TARGETARCH}.deb
-    
-RUN R -e 'install.packages(c("DT", "data.table", "purrr", "jsonlite", "dplyr", "ggplot2", "tidyr", "forcats", "readr", "R.utils"), clean=TRUE)'
 
-RUN apt-get update \
-    && apt-get install -y procps \
-    && rm -rf /var/lib/apt/lists/*
+ENV XDG_CACHE_HOME=/tmp/quarto_cache_home
+ENV XDG_DATA_HOME=/tmp/quarto_data_home

@@ -2,16 +2,14 @@ name: report
 channels:
   - conda-forge
   - defaults
-dependencies:
+dependencies: 
+  - r-jsonlite
   - r-dplyr
-  - r-dt
   - r-tidyr
+  - r-purrr
   - r-ggplot2
+  - r-DT
+  - r-tibble
   - r-forcats
   - r-readr
-  - r-purrr
-  - r-jsonlite
-  - r-data.table
-  - quarto=1.3.433
-  - r-rmarkdown
-  - r-r.utils
+  - quarto=1.4.550

@@ -14,6 +14,7 @@ Calculating polygenic scores
    calculate_pgscatalog
    multiple
    ancestry
+   cache
 
 Making genomic data and scorefiles compatible
 ---------------------------------------------
@@ -42,7 +43,6 @@ Working in different environments
    bigjob
    arm
    offline
-   mount
 
 Working with complex datasets
 -----------------------------
@@ -52,3 +52,11 @@ Working with complex datasets
 
    copygenomes
    yaml
+
+Other
+-----
+
+.. toctree::
+   :maxdepth: 1
+
+   version

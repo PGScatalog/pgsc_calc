@@ -5,7 +5,6 @@
     - subworkflow
     - fast
   files:
-    - path: output/samplesheet/out.json
     - path: output/combine/scorefiles.txt.gz
     - path: output/plink2/GRCh37_cineca_22.pgen
     - path: output/plink2/GRCh37_cineca_22.pvar.zst

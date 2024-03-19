@@ -6,8 +6,8 @@ process PLINK2_RELABELPVAR {
 
     tag "$meta.id chromosome $meta.chrom"
 
-    storeDir ( params.genotypes_cache ? "$params.genotypes_cache/${meta.id}/${meta.build}/${meta.chrom}" :
-              "$workDir/genomes/${meta.id}/${meta.build}/${meta.chrom}/")
+    cachedir = params.genotypes_cache ? file(params.genotypes_cache) : workDir
+    storeDir cachedir / "genomes" / "relabelled"
 
     conda "${task.ext.conda}"
 
@@ -21,10 +21,10 @@ process PLINK2_RELABELPVAR {
     tuple val(meta), path(geno), path(pheno), path(variants)
 
     output:
-    tuple val(meta), path("${meta.build}_*.pgen"), emit: geno
-    tuple val(meta), path("${meta.build}_*.pvar.zst") , emit: variants
-    tuple val(meta), path("${meta.build}_*.psam"), emit: pheno
-    tuple val(meta), path("*.vmiss.gz"), emit: vmiss
+    tuple val(meta), path("${output}.pgen"), emit: geno
+    tuple val(meta), path("${output}.pvar.zst") , emit: variants
+    tuple val(meta), path("${output}.psam"), emit: pheno
+    tuple val(meta), path("${output}.vmiss.gz"), emit: vmiss
     path "versions.yml"            , emit: versions
 
     when:
@@ -38,7 +38,8 @@ process PLINK2_RELABELPVAR {
     def mem_mb = task.memory.toMega() // plink is greedy
     // if dropping multiallelic variants, set a generic ID that won't match
     def set_ma_missing = params.keep_multiallelic ? '' : '--var-id-multi @:#'
-
+    // def limits scope to process block, so don't use it
+    output = "${meta.build}_${prefix}_${meta.chrom}"
     """
     plink2 \\
         --threads $task.cpus \\
@@ -49,13 +50,13 @@ process PLINK2_RELABELPVAR {
         $set_ma_missing \\
         --pfile ${geno.baseName} $compressed \\
         --make-just-pvar zs \\
-        --out ${meta.build}_${prefix}_${meta.chrom}
+        --out $output
 
     # cross platform (mac, linux) method of preserving symlinks
-    cp -a $geno ${meta.build}_${prefix}_${meta.chrom}.pgen
-    cp -a $pheno ${meta.build}_${prefix}_${meta.chrom}.psam
+    cp -a $geno ${output}.pgen
+    cp -a $pheno ${output}.psam
    
-    gzip *.vmiss
+    gzip ${output}.vmiss
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

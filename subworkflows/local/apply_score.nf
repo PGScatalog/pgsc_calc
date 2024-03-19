@@ -3,7 +3,8 @@
 //
 import java.util.zip.GZIPInputStream
 
-include { RELABEL_IDS as RELABEL_SCOREFILE_IDS; RELABEL_IDS as RELABEL_AFREQ_IDS } from '../../modules/local/ancestry/relabel_ids'
+include { RELABEL_SCOREFILES } from '../../modules/local/ancestry/relabel_scorefiles'
+include { RELABEL_AFREQ } from '../../modules/local/ancestry/relabel_afreq'
 include { PLINK2_SCORE }    from '../../modules/local/plink2_score'
 include { SCORE_AGGREGATE } from '../../modules/local/score_aggregate'
 include { SCORE_REPORT    } from '../../modules/local/score_report'
@@ -24,7 +25,7 @@ workflow APPLY_SCORE {
         .flatMap { annotate_scorefiles(it) }
         .dump(tag: 'final_scorefiles', pretty: true)
         .set { annotated_scorefiles }
-
+    
     geno
         .mix(pheno, variants)
         .groupTuple(size: 3, sort: true) // sorting is important for annotate_genomic
@@ -63,9 +64,9 @@ workflow APPLY_SCORE {
             .set { ch_scorefile_relabel_input }
 
         // relabel scoring file ids to match reference format
-        RELABEL_SCOREFILE_IDS ( ch_scorefile_relabel_input )
+        RELABEL_SCOREFILES ( ch_scorefile_relabel_input )
 
-        RELABEL_SCOREFILE_IDS.out.relabelled
+        RELABEL_SCOREFILES.out.relabelled
             .transpose()
             .map { annotate_chrom(it) }
             .map { tuple(it.first().subMap('chrom'), it) }
@@ -85,16 +86,20 @@ workflow APPLY_SCORE {
             .set { ch_afreq }
 
         // map afreq IDs from reference -> target
-        RELABEL_AFREQ_IDS ( ch_afreq )
-        ref_afreq = RELABEL_AFREQ_IDS.out.relabelled
+        RELABEL_AFREQ ( ch_afreq )
+        ref_afreq = RELABEL_AFREQ.out.relabelled
     }
 
     // intersect genomic data with split scoring files -------------------------
+    annotated_scorefiles
+        .map { tuple(it.first().subMap('id', 'chrom'), it) }
+        .set { ch_target_scorefile }
+
     ch_genomes.target
         .map { annotate_genomic(it) } // add n_samples
-        .dump( tag: 'final_genomes', pretty: true)
-        .cross ( annotated_scorefiles ) { m, it -> [m.id, m.chrom] }
-        .map { it.flatten() }
+        .map { tuple( it.first().subMap('id', 'chrom'), it ) }
+        .combine( ch_target_scorefile, by: 0 )
+        .map { it.tail().flatten() }
         .mix( ch_apply_ref ) // add reference genomes!
         .combine( ref_afreq.map { it.last() } ) // add allelic frequencies
         .dump(tag: 'ready_to_score', pretty: true)
@@ -103,10 +108,19 @@ workflow APPLY_SCORE {
     PLINK2_SCORE ( ch_apply )
     ch_versions = ch_versions.mix(PLINK2_SCORE.out.versions.first())
 
+    // double check that each scoring file got a calculation result
+    scorefile_chroms = annotated_scorefiles.map{ it.first().subMap("chrom", "n", "effect_type") }
+    // take unique calculated scores only because scoring files get used for both reference and sampleset 
+    // so there can be twice as many calculated scores
+    scored_chroms = PLINK2_SCORE.out.scores.map{ it.first().subMap("chrom", "n", "effect_type")}.unique()
+    // don't do anything with the result, but do error loudly because score calculations will be affected 
+    scorefile_chroms.join(scored_chroms, failOnMismatch: true)
+
     // [ [meta], [list, of, score, paths] ]
+    // subMap ID to keep cache stable across runs
     PLINK2_SCORE.out.scores
         .collect()
-        .map { [ it.first(), it.tail().findAll { !(it instanceof LinkedHashMap) }]}
+        .map { [ it.first().subMap("id"), it.tail().findAll { !(it instanceof LinkedHashMap) }]}
         .set { ch_scores }
 
     SCORE_AGGREGATE ( ch_scores )
@@ -140,9 +154,9 @@ def annotate_scorefiles(ArrayList scorefiles) {
     // the input meta map only contains keys 'id' (dataset ID) and 'is_vcf'
 
     // firstly, need to associate the scoremeta map with each individual scorefile
-    scoremeta = scorefiles.head()
-    scorefile_paths = scorefiles.tail().flatten()
-    return [[scoremeta], scorefile_paths].combinations()
+    def m = scorefiles.head()
+    def scorefile_paths = scorefiles.tail().flatten()
+    return [[m], scorefile_paths].combinations()
         // now annotate
         .collect {
             def scoremeta = [:]
@@ -154,7 +168,7 @@ def annotate_scorefiles(ArrayList scorefiles) {
             // dominant, 1 recessive). scorefile looks like:
             //     variant ID | effect allele | weight 1 | ... | weight_n
             // one weight is mandatory, extra weight columns are optional
-            scoremeta.n_scores = count_scores(it.last())
+            scoremeta.n_scores = count_scores(it.last().newInputStream())
 
             // file name structure: {dataset}_{chr}_{effect}_{split}.scorefile -
             // {dataset} is only used to disambiguate files, not for scoremeta
@@ -176,15 +190,14 @@ def annotate_genomic(ArrayList target) {
     // OUTPUT:
     // [[meta], [pgen_path, psam_path, pvar_path]]
     // where meta map has been annotated with n_samples
-    // cloning is important or original instance will also be edited
 
-    meta = target.first().clone()
+    def meta = [:].plus(target.first()) 
     meta.id = meta.id.toString()
     meta.chrom = meta.chrom.toString()
 
-    paths = target.last()
-    sample = paths.collect { it ==~ /.*fam$|.*psam$/ }
-    psam = paths[sample.indexOf(true)]
+    def paths = target.last()
+    def sample = paths.collect { it ==~ /.*fam$|.*psam$/ }
+    def psam = paths[sample.indexOf(true)]
 
     def n = -1 // skip header
     psam.eachLine { n++ }
@@ -193,21 +206,20 @@ def annotate_genomic(ArrayList target) {
     return [meta, paths]
 }
 
-def count_scores(Path f) {
+def count_scores(InputStream f) {
     // count number of calculated scores in a gzipped plink .scorefile
     // try-with-resources block automatically closes streams
-    try (buffered = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(f.toFile()))))) {
-        n_extra_cols = 2 // ID, effect_allele
-        n_scores = buffered.readLine().split("\t").length - n_extra_cols
+    try (buffered = new BufferedReader(new InputStreamReader(new GZIPInputStream(f)))) {
+        def n_extra_cols = 2 // ID, effect_allele
+        def n_scores = buffered.readLine().split("\t").length - n_extra_cols
         assert n_scores > 0 : "Counting scores failed, please check scoring file"
         return n_scores
     }
 }
 
-// TODO: turn this into a utility function
 def annotate_chrom(ArrayList it) {
     // extract chrom from filename prefix and add to hashmap
-    meta = it.first().clone()
+    def meta = [:].plus(it.first())
     meta.chrom = it.last().getBaseName().tokenize('_')[1]
     return [meta, it.last()]
 }

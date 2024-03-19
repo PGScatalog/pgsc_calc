@@ -1,6 +1,6 @@
 ---
 title: PGS Catalog Calculator (`pgsc_calc`) report
-author: PGS Catalog team
+author: PGS Catalog Calculator (`pgsc_calc`)
 date: today
 title-block-banner: "#383434"
 toc: true
@@ -16,11 +16,12 @@ params:
   sampleset: ""
   run_ancestry: false
   reference_panel_name: ""
+  version: ""
 css: logo.css
 ---
 
 ::: {.callout-note}
-See the online [documentation](https://pgsc-calc.readthedocs.io/en/latest/output.html#report) for additional
+See the online [documentation](https://pgsc-calc.readthedocs.io/en/latest/explanation/output.html) for additional
 explanation of the terms and data presented in this report.
 :::
 
@@ -28,8 +29,13 @@ explanation of the terms and data presented in this report.
 library(jsonlite)
 library(dplyr)
 library(tidyr)
+library(stringr)
+library(purrr)
 library(ggplot2)
-library(data.table)
+library(DT)
+library(tibble)
+library(forcats)
+library(readr)
 ```
 
 ```{r setup_logs, echo=FALSE}
@@ -50,18 +56,27 @@ log_df <- Reduce(dplyr::bind_rows, lapply(log_paths, read_log))
 log_df$sampleset <- gsub("_", " ", log_df$sampleset)  # page breaking issues
 ```
 
-# Pipeline command
+# Workflow metadata
+
+## Command
 
 ```{bash}
 cat command.txt | fold -w 80 -s | awk -F ' ' 'NR==1 { print "$", $0} NR>1 { print "    " $0}' | sed 's/$/\\/' | sed '$ s/.$//' 
 ```
+
+## Version
+
+```{r, echo=FALSE}
+message(params$version)
+``` 
 
 # Scoring file metadata
 
 ## Scoring file summary
 
 ```{r load_scorefiles}
-json_scorefiles <- read_json(params$log_scorefiles, simplifyVector=TRUE) 
+json_list <- jsonlite::fromJSON(params$log_scorefiles, simplifyVector = FALSE)
+json_scorefiles <- unlist(json_list, recursive=FALSE)
 
 link_traits <- function(trait_efo, mapped) {
   if (length(trait_efo) == 0) {
@@ -367,34 +382,14 @@ pop_summary %>%
 
 # Scores
 
-```{r, echo = FALSE, message = FALSE, eval=!params$run_ancestry}
-# problem: aggregated_scores.txt.gz  has a different structure to the ancestry outputs
-# solution: pivot the table in the report, but fix in pgscatalog_utils in a future release
-# problem: big scores can take a lot of memory
-# use data.table as a temporary solution to pivoting datasets
-scores <- data.table::fread(params$score_path)
-n_scores <- sum(grepl("*_SUM$", colnames(scores)))
-n_samples <- nrow(scores)
-
-id_cols <- c("sampleset", "IID")
-melted_scores <- data.table::melt(scores, id.vars=id_cols, measure.vars=patterns(SUM="*_SUM$", DENOM="DENOM", AVG="*_AVG$"), variable.name = "PGS")
-
-# annoying fix for scores getting converted to a factor level integer
-# fixed in data.table 1.14.9 but not released yet
-score_names <- sub("_.*", "", colnames(scores)[grepl("_SUM$", colnames(scores))])
-setattr(melted_scores$PGS, "levels", score_names)
-data.table::fwrite(melted_scores, params$score_path, sep="\t", compress="gzip")
-```
-
-```{r, echo = FALSE, message = FALSE, eval=params$run_ancestry}
+```{r, echo = FALSE, message = FALSE}
 scores <- readr::read_tsv(params$score_path) 
 n_scores <- length(unique(scores$PGS))
 n_samples <- length(unique(scores$IID))
 print(n_samples)
 ```
 
-
-```{asis, echo = any(table(scores$sampleset) < 50)}
+```{asis, echo = any(table(scores$sampleset) < 50) && !params$run_ancestry}
 
 ::: {.callout-important title="Warning: small sampleset size (n < 50) detected"}
 * plink2 uses allele frequency data to [mean impute](https://www.cog-genomics.org/plink/2.0/score) the dosages of missing genotypes
@@ -462,23 +457,19 @@ for(current_pgs in uscores_plot){
 ```{r, echo = FALSE, message=FALSE, warning=FALSE, eval=!params$run_ancestry}
 scores %>%
   ungroup() %>%
-  select(IID, sampleset, ends_with("SUM")) %>%
-  group_by(IID, sampleset) %>%
-  tidyr::pivot_longer(cols = -group_cols()) %>%
-  ungroup() %>%
-  filter(name != "DENOM_SUM") %>%
-  mutate(name = ifelse(
-    stringr::str_detect(name, "^PGS"),
-    stringr::str_extract(name, "^PGS[0-9]{6}"),
-    name)) %>%
-  group_by(sampleset, name) -> long_scores
+  select(IID, sampleset, PGS, SUM) %>%
+  mutate(PGS = ifelse(
+    stringr::str_detect(PGS, "^PGS"),
+    stringr::str_extract(PGS, "^PGS[0-9]{6}"),
+    PGS)) %>%
+  group_by(sampleset, PGS) -> long_scores
 group_keys(long_scores) %>%
   slice(1:6) -> score_keys
 long_scores %>%
   inner_join(score_keys) %>%
-  ggplot(aes(x = value, fill = sampleset)) +
+  ggplot(aes(x = SUM, fill = sampleset)) +
       geom_density(alpha = 0.3) +
-      facet_wrap(~name, ncol = 2, scales = "free") +
+      facet_wrap(~PGS, ncol = 2, scales = "free") +
       theme_bw() +
       labs(x = "PGS (SUM)", y = "Density", title = "PGS Distribution(s)")
 ```
@@ -504,3 +495,30 @@ For scores from the PGS Catalog, please remember to cite the original publicatio
 > PGS Catalog Calculator (in development). PGS Catalog Team. `https://github.com/PGScatalog/pgsc_calc`
 
 > Lambert et al. (2021) The Polygenic Score Catalog as an open database for reproducibility and systematic evaluation. Nature Genetics. 53:420–425 doi:10.1038/s41588-021-00783-5.
+
+## Score licenses
+
+::: {.callout-tip}
+* Scores deposited in the PGS Catalog may have specific license terms
+* It's important to follow the license terms when you reuse scoring files
+* Please check below for a summary of license terms
+* License terms for custom scoring files aren't reported here, please check how the creators of the scoring file licensed their data
+:::
+
+```{r}
+# as of 2023-12-12 only non-default licenses are recorded in the scoring file header
+default_ebi_terms <- "PGS obtained from the Catalog should be cited appropriately, and used in accordance with any licensing restrictions set by the authors. See EBI Terms of Use (https://www.ebi.ac.uk/about/terms-of-use/) for additional details."
+
+tibble::tibble(json = json_scorefiles) %>%
+  mutate(pgs_id = purrr::map_chr(json, ~ extract_chr_handle_null(.x, "pgs_id")),
+         license_text = purrr::map_chr(json, ~ extract_chr_handle_null(.x, "license"))) %>%
+  mutate(license_text = ifelse(license_text == "", default_ebi_terms, license_text)) %>%
+  # display license terms for files in the PGS Catalog only (with a PGS ID)
+  filter(startsWith(pgs_id, "PGS")) %>%
+  select(-json) %>%
+  DT::datatable(., colnames = c(
+      "PGS ID" = "pgs_id",
+      "License text" = "license_text"
+    ))
+```
+

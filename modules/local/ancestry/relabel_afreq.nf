@@ -1,4 +1,4 @@
-process RELABEL_IDS {
+process RELABEL_AFREQ {
     // labels are defined in conf/modules.config
     label 'process_medium'
     label 'pgscatalog_utils' // controls conda, docker, + singularity options
@@ -6,7 +6,7 @@ process RELABEL_IDS {
     tag "$meta.id $meta.effect_type $target_format"
 
     basedir = params.genotypes_cache ? file(params.genotypes_cache) : workDir
-    storeDir basedir / "ancestry" / "relabel" / "variants"
+    storeDir basedir / "ancestry" / "relabel" / "afreq"
 
     conda "${task.ext.conda}"
 

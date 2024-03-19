@@ -15,7 +15,7 @@ process SCORE_AGGREGATE {
     tuple val(meta), path(scorefiles)
 
     output:
-    tuple val(scoremeta), path("*.txt.gz"), emit: scores
+    tuple val(scoremeta), path("aggregated_scores.txt.gz"), emit: scores
     path "versions.yml", emit: versions
 
     script:

@@ -52,7 +52,7 @@ workflow ANCESTRY_PROJECT {
     ch_versions = ch_versions.mix(EXTRACT_DATABASE.out.versions.first())
 
     ch_db.map {
-        meta = it.first().clone()
+        def meta = [:].plus(it.first())
         meta.is_pfile = true
         meta.id = 'reference'
         meta.chrom = 'ALL'
@@ -119,7 +119,7 @@ workflow ANCESTRY_PROJECT {
 
     FILTER_VARIANTS.out.ref
         .map {
-            m = it.first().clone()
+            def m = [:].plus(it.first())
             m.id = 'reference'
             m.chrom = 'ALL'
             m.is_pfile = true
@@ -177,7 +177,7 @@ workflow ANCESTRY_PROJECT {
         .filter{ it instanceof Path && it.getName().contains('ALL') }
         .set { ch_ref_relabelled_variants }
 
-    target_extract = Channel.of(file('NO_FILE')) // optional input for PLINK2_MAKEBED
+    target_extract = Channel.of(file(projectDir / "assets" / "NO_FILE")) // optional input for PLINK2_MAKEBED
 
     // [meta, pgen, psam, relabelled pvar, optional_input]
     INTERSECT_THINNED.out.geno
@@ -223,8 +223,7 @@ workflow ANCESTRY_PROJECT {
         .combine(ch_split_targets, by: 0)
         .set { ch_fraposa_target }
 
-    // do PCA on reference genomes...
-    FRAPOSA_PCA( ch_fraposa_ref.map { it.flatten() } )
+    FRAPOSA_PCA( ch_fraposa_ref.map { it.flatten() }, geno )
     ch_versions = ch_versions.mix(FRAPOSA_PCA.out.versions.first())
 
     // ... and project split target genomes

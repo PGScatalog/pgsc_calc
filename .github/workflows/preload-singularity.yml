@@ -15,11 +15,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out pipeline code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Cache singularity setup
         id: cache-singularity-setup
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: /opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64
           key: ${{ runner.os }}-singularity-${{ env.SINGULARITY_VERSION }}
@@ -44,7 +44,7 @@ jobs:
 
       - name: Cache singularity images
         id: cache-singularity-pull
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.NXF_SINGULARITY_CACHEDIR }}
           key: singularity-${{ github.sha }}

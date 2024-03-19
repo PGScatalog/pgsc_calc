@@ -8,6 +8,39 @@ will only occur in major versions with changes noted in this changelog.
 
 .. _`semantic versioning`: https://semver.org/
 
+pgsc_calc v2.0.0-alpha.5 (2024-03-05)
+-------------------------------------
+
+Improvements:
+
+* Automatically mount directories inside singularity containers without setting any configuration
+* Improve permanent caching of ancestry processes with --genotypes_cache parameter
+* resync with nf-core framework
+* Refactor combine_scorefiles
+
+Bug fixes:
+
+* Fix semantic storeDir definitions causing problems cloud execution (google batch)
+* Fix missing DENOM values with multiple custom scoring files (score calculation not affected)
+* Fix liftover failing silently with custom scoring files (thanks Brooke!)
+
+Misc:
+
+* Move aggregation step out of report
+
+pgsc_calc v2.0.0-alpha.4 (2023-12-05)
+-------------------------------------
+
+Improvements:
+
+* Give a more helpful error message when there's no valid variant matches found
+
+Bug fixes:
+
+* Fix retrying downloads from PGS Catalog
+* Fix numeric sample identifiers breaking ancestry analysis
+* Check for chr prefix in samplesheets and error 
+
 pgsc_calc v2.0.0-alpha.3 (2023-10-02)
 -------------------------------------
 

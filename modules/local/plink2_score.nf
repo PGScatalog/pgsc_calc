@@ -19,10 +19,10 @@ process PLINK2_SCORE {
     tuple val(meta), path(geno), path(pheno), path(variants), val(scoremeta), path(scorefile), path(ref_afreq)
 
     output:
-    tuple val(meta), path("*.{sscore,sscore.zst}"), emit: scores  // optional compression
-    path "*.sscore.vars", emit: vars_scored
+    tuple val(outmeta), path("${output}.{sscore,sscore.zst}"), emit: scores  // optional compression
+    path "${output}.sscore.vars", emit: vars_scored
+    path "${output}.log", emit: log
     path "versions.yml", emit: versions
-    path "*.log"       , emit: log
 
     script:
     def args = task.ext.args ?: ''
@@ -49,6 +49,8 @@ process PLINK2_SCORE {
     def recessive = (scoremeta.effect_type == 'recessive') ? ' recessive ' : ''
     def dominant = (scoremeta.effect_type == 'dominant') ? ' dominant ' : ''
     args2 = [args2, cols, 'list-variants', no_imputation, recessive, dominant, error_on_freq_calc].join(' ')
+    outmeta = meta + ["n": scoremeta.n, "effect_type": scoremeta.effect_type]
+    output = "${meta.id}_${meta.chrom}_${scoremeta.effect_type}_${scoremeta.n}"
 
     // speed up the calculation by only considering scoring-file variants for allele frequency calculation (--extract)
     if (scoremeta.n_scores.toInteger() == 1)
@@ -62,7 +64,7 @@ process PLINK2_SCORE {
             $args \
             --score $scorefile $args2 \
             $input ${geno.baseName} \
-            --out ${meta.id}_${meta.chrom}_${scoremeta.effect_type}_${scoremeta.n}
+            --out ${output}
 
         cat <<-END_VERSIONS > versions.yml
         ${task.process.tokenize(':').last()}:
@@ -81,7 +83,7 @@ process PLINK2_SCORE {
             --score $scorefile $args2 \
             --score-col-nums 3-$maxcol \
             $input ${geno.baseName} \
-            --out ${meta.id}_${meta.chrom}_${scoremeta.effect_type}_${scoremeta.n}
+            --out ${output}
 
         cat <<-END_VERSIONS > versions.yml
         ${task.process.tokenize(':').last()}:

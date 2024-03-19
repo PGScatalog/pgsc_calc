@@ -76,7 +76,7 @@ workflow BOOTSTRAP_ANCESTRY {
 def drop_meta_keys(ArrayList it) {
     // input: [[meta hashmap], [file1, file2, file3]]
     // cloning is important when modifying the hashmap
-    m = it.first().clone()
+    def m = [:].plus(it.first())
     // dropping keys simplifies joining with build specific reference data
     m.remove('type')
     m.remove('is_pfile')

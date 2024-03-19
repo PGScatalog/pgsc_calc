@@ -42,9 +42,14 @@ workflow MATCH {
         }
         .set { ch_intersection_grouped }
 
-    // grab first() meta object for MATCH_COMBINE
     // only meta.chrom is checked to see if it's set to 'ALL' or not
-    ch_matches.meta.first()
+    // but using chrom values directly in meta map breaks cache because chrom order can differ across runs
+    ch_matches.meta.first().map { it -> 
+        def split = it.chrom != "ALL"
+        return [split:split, id: it.id]
+    }.set { combine_meta }
+
+    combine_meta
         .concat( ch_matches.matches.collect() )
         .concat( scorefile )
         .concat( ch_intersection_grouped.intersections.collect() )
