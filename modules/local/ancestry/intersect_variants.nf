@@ -16,7 +16,7 @@ process INTERSECT_VARIANTS {
         "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
-    tuple val(meta), path(geno), path(pheno), path(variants), path(vmiss),
+    tuple val(meta), path(geno), path(pheno), path(variants), path(vmiss), path(afreq),
         path(ref_geno), path(ref_pheno), path(ref_variants)
 
     output:

@@ -18,6 +18,7 @@ workflow ANCESTRY_PROJECT {
     pheno
     variants
     vmiss
+    afreq
     reference
     target_build
 
