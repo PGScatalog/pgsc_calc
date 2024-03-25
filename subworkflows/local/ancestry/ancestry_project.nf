@@ -73,9 +73,10 @@ workflow ANCESTRY_PROJECT {
 
     ch_genomes
         .join(vmiss, failOnMismatch: true)
+        .join(afreq, failOnMismatch: true)
         .combine( ch_db.map{ it.tail() } ) // (drop hashmap)
         .flatten()
-        .buffer(size: 8)
+        .buffer(size: 9)
         .set { ch_ref_combined }
 
     INTERSECT_VARIANTS ( ch_ref_combined )
