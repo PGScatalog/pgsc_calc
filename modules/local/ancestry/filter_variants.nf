@@ -33,8 +33,8 @@ process FILTER_VARIANTS {
     """
     # 1. Get QC'd variant set & unrelated samples from REFERENCE data for PCA --
 
-    # ((IS_MA_REF == FALSE) && (IS_MA_TARGET == FALSE)) && (((IS_INDEL == FALSE) && (STRANDAMB == FALSE)) || ((IS_INDEL == TRUE) && (SAME_REF == TRUE)))
-    awk '(((\$6 == 0) && (\$9 == 0)) && (((\$4 == 0) && (\$5 == 0)) || ((\$4 == 1) && (\$10 == 1)))) {print \$2}' <(zcat $shared) | gzip -c > shared.txt.gz
+    # PCA_ELIGIBLE == "True"
+    awk '(\$12 == "True") {print \$2}' <(zcat $shared) | gzip -c > shared.txt.gz
 
     plink2 \
             --threads $task.cpus \
