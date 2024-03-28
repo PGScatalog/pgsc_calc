@@ -1,7 +1,7 @@
 process INTERSECT_VARIANTS {
     // labels are defined in conf/modules.config
     label 'process_high_memory'
-    label 'zstd' // controls conda, docker, + singularity options
+    label 'pygscatalog' // controls conda, docker, + singularity options
 
     tag "$meta.id chromosome $meta.chrom"
 
@@ -16,7 +16,7 @@ process INTERSECT_VARIANTS {
         "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
-    tuple val(meta), path(geno), path(pheno), path(variants), path(vmiss),
+    tuple val(meta), path(geno), path(pheno), path(variants), path(vmiss), path(afreq),
         path(ref_geno), path(ref_pheno), path(ref_variants)
 
     output:
@@ -30,9 +30,10 @@ process INTERSECT_VARIANTS {
     id = meta.subMap('id', 'build', 'n_chrom', 'chrom')
     output = "${meta.id}_${meta.chrom}_matched"
     """
-    intersect_variants.sh <(zstdcat $ref_variants) \
-        <(zstdcat $variants) \
-        $file_format $meta.chrom
+    pgscatalog-intersect --ref $ref_variants \
+        --target $variants \
+        --chrom $meta.chrom \
+        --outdir . -v
 
     if [ \$(wc -l < matched_variants.txt) -eq 1 ]
     then

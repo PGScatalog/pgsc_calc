@@ -25,6 +25,7 @@ process PLINK2_RELABELPVAR {
     tuple val(meta), path("${output}.pvar.zst") , emit: variants
     tuple val(meta), path("${output}.psam"), emit: pheno
     tuple val(meta), path("${output}.vmiss.gz"), emit: vmiss
+    tuple val(meta), path("${output}.afreq.gz"), emit: afreq
     path "versions.yml"            , emit: versions
 
     when:
@@ -44,6 +45,7 @@ process PLINK2_RELABELPVAR {
     plink2 \\
         --threads $task.cpus \\
         --memory $mem_mb \\
+        --freq \\
         --missing vcols=fmissdosage,fmiss \\
         $args \\
         --set-all-var-ids '@:#:\$r:\$a' \\
@@ -57,6 +59,7 @@ process PLINK2_RELABELPVAR {
     cp -a $pheno ${output}.psam
    
     gzip ${output}.vmiss
+    gzip ${output}.afreq
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

@@ -255,6 +255,7 @@ workflow PGSCCALC {
             MAKE_COMPATIBLE.out.pheno,
             MAKE_COMPATIBLE.out.variants,
             MAKE_COMPATIBLE.out.vmiss,
+            MAKE_COMPATIBLE.out.afreq,
             ch_reference,
             params.target_build
         )

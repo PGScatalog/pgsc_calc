@@ -24,6 +24,7 @@ process PLINK2_VCF {
     tuple val(newmeta), path("${output}.psam"), emit: psam
     tuple val(newmeta), path("${output}.pvar.zst") , emit: pvar
     tuple val(newmeta), path("${output}.vmiss.gz"), emit: vmiss
+    tuple val(meta), path("${output}.afreq.gz"), emit: afreq
     path "versions.yml"            , emit: versions
 
     script:
@@ -44,6 +45,7 @@ process PLINK2_VCF {
         --memory $mem_mb \\
         --set-all-var-ids '@:#:\$r:\$a' \\
         $set_ma_missing \\
+        --freq \\
         --missing vcols=fmissdosage,fmiss \\
         $args \\
         --vcf $vcf $dosage_options \\
@@ -52,6 +54,7 @@ process PLINK2_VCF {
         --out ${output}
 
     gzip ${output}.vmiss
+    gzip ${output}.afreq
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
