@@ -33,7 +33,7 @@ process INTERSECT_VARIANTS {
     pgscatalog-intersect --ref $ref_variants \
         --target $variants \
         --chrom $meta.chrom \
-        --outdir .
+        --outdir . -v
 
     if [ \$(wc -l < matched_variants.txt) -eq 1 ]
     then
