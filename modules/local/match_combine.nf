@@ -34,7 +34,7 @@ process MATCH_COMBINE {
     // filter match candidates to intersect with reference:
     // omit multi-allelic variants in reference because these will cause errors with relabelling!...
     // ... unclear whether we should remove them from target with '&& ($9 == 0') as well?
-    def filter_mode = shared.name != 'NO_FILE' ? "--filter_IDs <(awk '(\$6 == 0) {print \$7}' <(zcat $shared))" : ''
+    def filter_mode = shared.name != 'NO_FILE' ? "--filter_IDs <(awk '(\$6 == \"False\") {print \$7}' <(zcat $shared))" : ''
     scoremeta = [:]
     scoremeta.id = "$meta.id"
 
