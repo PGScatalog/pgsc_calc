@@ -1,6 +1,6 @@
 process INTERSECT_VARIANTS {
     // labels are defined in conf/modules.config
-    label 'process_high_memory'
+    label 'process_low'
     label 'pygscatalog' // controls conda, docker, + singularity options
 
     tag "$meta.id chromosome $meta.chrom"
@@ -35,13 +35,14 @@ process INTERSECT_VARIANTS {
         --chrom $meta.chrom \
         --outdir . -v
 
-    if [ \$(wc -l < matched_variants.txt) -eq 1 ]
+    n_matched=\$(sed -n '3p' intersect_counts_${meta.chrom}.txt)
+
+    if [ \$n_matched == "0" ]
     then
         echo "ERROR: No variants in intersection"
         exit 1
     else
-        mv matched_variants.txt ${output}.txt
-        gzip *_variants.txt *_matched.txt
+        mv matched_variants.txt.gz ${output}.txt.gz
     fi
 
     cat <<-END_VERSIONS > versions.yml
