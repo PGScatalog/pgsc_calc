@@ -34,7 +34,7 @@ process FILTER_VARIANTS {
     # 1. Get QC'd variant set & unrelated samples from REFERENCE data for PCA --
 
     # PCA_ELIGIBLE == "True"
-    awk '(\$13 == "True") {print \$2}' <(zcat $shared) | gzip -c > shared.txt.gz
+    awk '(\$13 ~ /^True/) {print \$2}' <(zcat $shared) | gzip -c > shared.txt.gz
 
     plink2 \
             --threads $task.cpus \
