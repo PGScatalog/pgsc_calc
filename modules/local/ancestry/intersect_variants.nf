@@ -33,6 +33,8 @@ process INTERSECT_VARIANTS {
     pgscatalog-intersect --ref $ref_variants \
         --target $variants \
         --chrom $meta.chrom \
+        --maf_target 0.1 \
+        --geno_miss 0.1 \
         --outdir . -v
 
     n_matched=\$(sed -n '3p' intersect_counts_${meta.chrom}.txt)
