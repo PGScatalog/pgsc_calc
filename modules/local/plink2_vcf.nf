@@ -37,7 +37,7 @@ process PLINK2_VCF {
     newmeta = meta.clone() // copy hashmap for updating...
     newmeta.is_pfile = true // now it's converted to a pfile :)
     // def limits scope to process block, so don't use it
-    output = "${meta.build}_${prefix}_${meta.chrom}_vcf"
+    output = "${meta.build}_${prefix}_${meta.chrom}"
     """
     plink2 \\
         --threads $task.cpus \\
