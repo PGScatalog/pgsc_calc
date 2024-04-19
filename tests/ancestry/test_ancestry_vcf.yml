@@ -35,4 +35,13 @@
       must_not_contain:
         - "no-mean-imputation"
         - "error-on-freq-calc"
+    - path: output/test/score/test_pgs.txt.gz
+      contains:
+        - "IID"
+        - "PGS"
+        - "SUM"
+        - "percentile_MostSimilarPop"
+        - "Z_MostSimilarPop"
+        - "Z_norm1"
+        - "Z_norm2"
 
