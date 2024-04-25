@@ -59,4 +59,4 @@ Other
 .. toctree::
    :maxdepth: 1
 
-   version
+   change_version
