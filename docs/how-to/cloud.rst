@@ -54,6 +54,37 @@ Once your samplesheet is ready, you can use it with nextflow:
 
 .. note:: ``gs://`` is for Google Cloud Storage. Check the Nextflow documentation for other `supported cloud storage systems and URIs <https://www.nextflow.io/docs/latest/amazons3.html>`_
 
+Multiple chromosomes example
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Just add elements to the list, each object correponds to a new row in the CSV samplesheet:
+
+.. code-block:: json
+
+    [
+        {
+            "pheno": "gs://bucket/data/chr1_phase3.vcf.gz",
+            "vcf_import_dosage": false,
+            "variants": "gs://bucket/data/chr1_phase3.vcf.gz",
+            "geno": "gs://bucket/data/chr1_phase3.vcf.gz",
+            "sampleset": "test",
+            "chrom": "1",
+            "format": "bfile"
+        },
+        {
+            "pheno": "gs://bucket/data/chr2_phase3.vcf.gz",
+            "vcf_import_dosage": false,
+            "variants": "gs://bucket/data/chr2_phase3.vcf.gz",
+            "geno": "gs://bucket/data/chr2_phase3.vcf.gz",
+            "sampleset": "test",
+            "chrom": "2",
+            "format": "bfile"
+        }        
+    ]
+
+.. warning:: If you forget to include every chromosome in the JSON array then score calculation might fail 
+    
+    
 Why do I need to use JSON?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
