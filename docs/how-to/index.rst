@@ -43,6 +43,7 @@ Working in different environments
    bigjob
    arm
    offline
+   cloud
 
 Working with complex datasets
 -----------------------------
