@@ -84,6 +84,7 @@ way. To do this, set up a spreadsheet that looks like:
 
 See :ref:`setup samplesheet` for more details.
 
+.. note:: If your genomes are in cloud storage CSV samplesheets aren't supported. Instead check :ref:`cloud`
 
 2. Select scoring files
 ~~~~~~~~~~~~~~~~~~~~~~~
