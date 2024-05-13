@@ -56,7 +56,7 @@ reference panel and scoring files, a summary of the computed genetic ancestry da
 the distribution of scores in your dataset(s) as a density plot. Some of the sections are only displayed with
 ``--run_ancestry``, but we show them all here for reference.
 
-The fist section of the report reproduces the nextflow command, and scoring file metadata (imported from the PGS Catalog
+The first section of the report reproduces the nextflow command, and scoring file metadata (imported from the PGS Catalog
 for each PGS ID) describing the scoring files that were applied to your sampleset(s):
 
 .. figure:: screenshots/Report_1_Header.png
