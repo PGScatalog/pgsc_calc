@@ -24,31 +24,33 @@ process COMBINE_SCOREFILES {
 
     if (params.liftover)
         """
-        combine_scorefiles -s $raw_scores \
+        pgscatalog-combine -s $raw_scores \
             --liftover \
             -t $params.target_build \
             -o scorefiles.txt.gz \
             -l log_scorefiles.json \
             -c \$PWD \
             -m $params.min_lift \
+            -v \
             $args
 
         cat <<-END_VERSIONS > versions.yml
         ${task.process.tokenize(':').last()}:
-            pgscatalog_utils: \$(echo \$(python -c 'import pgscatalog_utils; print(pgscatalog_utils.__version__)'))
+            pgscatalog.core: \$(echo \$(python -c 'import pgscatalog.core; print(pgscatalog.core.__version__)'))
         END_VERSIONS
         """
     else
         """
-        combine_scorefiles -s $raw_scores \
+        pgscatalog-combine -s $raw_scores \
             -t $params.target_build \
             -o scorefiles.txt.gz \
             -l log_scorefiles.json \
+            -v \
             $args
 
         cat <<-END_VERSIONS > versions.yml
         ${task.process.tokenize(':').last()}:
-            pgscatalog_utils: \$(echo \$(python -c 'import pgscatalog_utils; print(pgscatalog_utils.__version__)'))
+            pgscatalog.core: \$(echo \$(python -c 'import pgscatalog.core; print(pgscatalog.core.__version__)'))
         END_VERSIONS
         """
 }

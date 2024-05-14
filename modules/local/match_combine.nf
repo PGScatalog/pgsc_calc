@@ -41,12 +41,11 @@ process MATCH_COMBINE {
     """
     export POLARS_MAX_THREADS=$task.cpus
 
-    combine_matches \
+    pgscatalog-matchmerge \
         $args \
         --dataset $meta.id \
         --scorefile $scorefile \
         --matches *.ipc.zst \
-        -n $task.cpus \
         --min_overlap $params.min_overlap \
         $ambig \
         $multi \
@@ -58,7 +57,7 @@ process MATCH_COMBINE {
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
-        pgscatalog_utils: \$(echo \$(python -c 'import pgscatalog_utils; print(pgscatalog_utils.__version__)'))
+        pgscatalog.match: \$(echo \$(python -c 'import pgscatalog.match; print(pgscatalog.match.__version__)'))
     END_VERSIONS
     """
 }
