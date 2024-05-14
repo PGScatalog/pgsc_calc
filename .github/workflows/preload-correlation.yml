@@ -22,6 +22,12 @@ jobs:
             ${{ env.CORRELATION_DIR }}/correlation37.pgen
             ${{ env.CORRELATION_DIR }}/correlation37.psam
             ${{ env.CORRELATION_DIR }}/correlation37.pvar.zst
+            ${{ env.CORRELATION_DIR }}/PGS000018_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000027_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000137_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000727_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000728_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000729_hmPOS_GRCh37.txt.gz            
           key: correlation
           
       - name: Download reference data

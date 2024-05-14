@@ -1,4 +1,4 @@
-name: Run ancestry test with singularity or docker profiles
+name: Run correlation test with singularity or docker profiles
 
 on:
   workflow_call:
@@ -53,6 +53,12 @@ jobs:
             ${{ env.CORRELATION_DIR }}/correlation37.pgen
             ${{ env.CORRELATION_DIR }}/correlation37.psam
             ${{ env.CORRELATION_DIR }}/correlation37.pvar.zst
+            ${{ env.CORRELATION_DIR }}/PGS000018_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000027_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000137_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000727_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000728_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000729_hmPOS_GRCh37.txt.gz            
           key: ${{ inputs.correlation-cache-key }}
           fail-on-cache-miss: true
 
@@ -118,6 +124,12 @@ jobs:
             ${{ env.CORRELATION_DIR }}/correlation37.pgen
             ${{ env.CORRELATION_DIR }}/correlation37.psam
             ${{ env.CORRELATION_DIR }}/correlation37.pvar.zst
+            ${{ env.CORRELATION_DIR }}/PGS000018_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000027_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000137_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000727_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000728_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000729_hmPOS_GRCh37.txt.gz
           key: ${{ inputs.correlation-cache-key }}
           fail-on-cache-miss: true
 
@@ -129,7 +141,7 @@ jobs:
           
       - run: pip install -r ${{ github.workspace }}/tests/requirements.txt
 
-      - name: Run ancestry test
+      - name: Run correlation test
         run: TMPDIR=~ PROFILE=singularity pytest --kwdof --symlink --git-aware --wt 2 --tag "test score correlation"
         env:
           TMPDIR: ${{ runner.temp }}

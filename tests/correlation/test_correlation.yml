@@ -9,7 +9,7 @@
     nextflow run main.nf -c ./tests/config/nextflow.config \
       --input samplesheet.csv \
       --target_build GRCh37 \
-      --pgs_id PGS000018,PGS000027,PGS000039,PGS000137,PGS000727,PGS000728,PGS000729
+      --scorefile "${CORRELATION_DIR}/PGS000018_hmPOS_GRCh37*"
     "
   tags:
     - correlation
