@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Set environment variables
         run: |
-          echo "CORRELATIOND_DIR=$RUNNER_TEMP" >> $GITHUB_ENV
+          echo "CORRELATION_DIR=$RUNNER_TEMP" >> $GITHUB_ENV
 
       - name: Cache reference data
         id: cache-ref
@@ -27,6 +27,6 @@ jobs:
       - name: Download reference data
         if: steps.cache-ref.outputs.cache-hit != 'true'        
         run: |
-          wget -qnc -P $CORRELATION_DIR http://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/correlation.tar.zst
+          wget -qnc -P $CORRELATION_DIR https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/correlation.tar.zst
           tar -xf $CORRELATION_DIR/correlation.tar.zst -C $CORRELATION_DIR
           
