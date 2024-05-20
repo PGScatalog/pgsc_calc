@@ -25,6 +25,7 @@ process PLINK2_RELABELBIM {
     tuple val(meta), path("${output}.bim.zst", includeInputs: false), emit: variants
     tuple val(meta), path("${output}.fam", includeInputs: true), emit: pheno
     tuple val(meta), path("${output}.vmiss.gz"), emit: vmiss
+    tuple val(meta), path("${output}.afreq.gz"), emit: afreq
     path "versions.yml"           , emit: versions
 
     when:
@@ -45,6 +46,7 @@ process PLINK2_RELABELBIM {
         --threads $task.cpus \\
         --memory $mem_mb \\
         --missing vcols=fmissdosage,fmiss \\
+        --freq \\
         $args \\
         --set-all-var-ids '@:#:\$r:\$a' \\
         $set_ma_missing \\
@@ -57,7 +59,7 @@ process PLINK2_RELABELBIM {
     cp -a $geno ${output}.bed || true
     cp -a $pheno ${output}.fam || true
 
-    gzip ${output}.vmiss
+    gzip ${output}.vmiss ${output}.afreq
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

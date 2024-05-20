@@ -24,6 +24,7 @@ process PLINK2_VCF {
     tuple val(newmeta), path("${output}.psam"), emit: psam
     tuple val(newmeta), path("${output}.pvar.zst") , emit: pvar
     tuple val(newmeta), path("${output}.vmiss.gz"), emit: vmiss
+    tuple val(meta), path("${output}.afreq.gz"), emit: afreq
     path "versions.yml"            , emit: versions
 
     script:
@@ -45,6 +46,7 @@ process PLINK2_VCF {
         --set-all-var-ids '@:#:\$r:\$a' \\
         $set_ma_missing \\
         --missing vcols=fmissdosage,fmiss \\
+        --freq \\
         $args \\
         --vcf $vcf $dosage_options \\
         --allow-extra-chr $chrom_filter \\

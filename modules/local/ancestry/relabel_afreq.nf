@@ -36,14 +36,15 @@ process RELABEL_AFREQ {
         output_mode = "--combined"
     }
     """
-    relabel_ids --maps $matched \
+    pgscatalog-relabel --maps $matched \
         --col_from $col_from \
         --col_to $col_to \
         --target_file $target \
         --target_col ID \
         --dataset ${meta.id}.${target_format} \
         --verbose \
-        $output_mode
+        $output_mode \
+        --outdir \$PWD
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
