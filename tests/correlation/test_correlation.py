@@ -23,7 +23,10 @@ def test_correlation(workflow_dir: pathlib.Path):
     ref_scores = pd.merge(ref_df, pgsc_df, on=["PGS", "IID"], how="left")
     
     merged_scores = pd.merge(ref_scores, calculated_df, on=["PGS", "IID"], how="left")
-    merged_scores.to_csv(workflow_dir / "output" / "correlations.csv")
+    merged_scores.to_csv(workflow_dir / "output" / "score_table.csv")
+
+    correlations = merged_scores[["CALC_SUM", "REF_INDEPENDENT_SUM", "REF_CALC_SUM"]].corr()
+    correlations.to_csv(workflow_dir / "output"/ "correlations.csv")
     
-    for index, row in merged_scores[["CALC_SUM", "REF_INDEPENDENT_SUM", "REF_CALC_SUM"]].corr().iterrows():
+    for index, row in correlations.iterrows():
         assert all(row > 0.999), f"Bad correlation for {index}"
