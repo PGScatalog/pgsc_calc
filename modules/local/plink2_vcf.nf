@@ -53,7 +53,7 @@ process PLINK2_VCF {
         --make-pgen vzs \\
         --out ${output}
 
-    gzip ${output}.vmiss
+    gzip ${output}.vmiss ${output}.afreq
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
