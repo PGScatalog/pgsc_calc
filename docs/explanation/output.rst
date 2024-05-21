@@ -38,14 +38,40 @@ If you have run the pipeline **without** using ancestry information the followin
     commands; however, the calculation of the PGS is based on the full precision of the effect_weight value in the
     scoring file.
 
-If you have run the pipeline **using ancestry information** (``--run_ancesty``) the following columns may be present
-depending on the ancestry adjustments that were run (see :ref:`norm` for more details):
+``--run_ancestry``-specific outputs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you have run the pipeline **using ancestry information** (``--run_ancestry``) the following columns may be present
+in the ``[sampleset]_pgs.txt.gz`` file depending on the ancestry adjustments that were run (see :ref:`norm` for
+more details):
 
 - ``percentile_MostSimilarPop``: PGS reported as a percentile of the distribution for the Most Similar Population
 - ``Z_MostSimilarPop``: PGS reported as a Z-score in reference to the mean/sd of the Most Similar Population
 - ``Z_norm1``: PGS adjusted to have mean 0 across ancestry groups (result of regressing *PGS ~ PCs*)
 - ``Z_norm2``: PGS adjusted to have mean 0 and unit variance across ancestry groups (result of regressing
   *resid(PGS)^2 ~ PCs*)
+
+A second gzipped-text space-delimited text file called ``[sampleset]_popsimilarity.txt.gz`` will also be output,
+describing the analysis of the target samples in relation to the reference panel and ancestry labels. The file has the
+following headers:
+
+- ``sampleset``: the name of the input sampleset, or ``reference`` for the panel.
+- ``IID``: the identifier of each sample within the dataset.
+- ``[PC1 ... PCN]``: The projection of the sample within the PCA space defined by the reference panel. There will be as
+  many PC columns as there are PCs calculated (default: 10).
+- ``Unrelated``: True/False flag for whether the reference panel sample is part of the unrelated subset of individuals
+  used for calculating PGS adjustments.
+- ``RF_P_[POP LABEL]`` or ``Mahalanobis_P_[POP LABEL]``: Probability that this sample's PCA projection is consistent
+  with the PCA location of the specified population label defined using either a RandomForest classifier (``RF``,
+  default) or the Chi-square derived probability from a Mahalanobis distance (``Mahalanobis``).
+- ``MostSimilarPop``: Population label with the highest probability across ``RF_P_[POP LABEL]``
+  or ``Mahalanobis_P_[POP LABEL]`` columns.
+- ``MostSimilarPop_LowConfidence``: Whether the probability is below the default QC threshold for the population
+  comparison method.
+- ``REFERENCE``: True/False flag for whether the sample is from the reference panel.
+- ``SuperPop``: Population label from the reference panel used to assign the ``MostSimilarPop`` labels and PGS
+  distributions for empirical adjustments.
+
 
 Report
 ~~~~~~
