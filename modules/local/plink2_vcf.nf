@@ -45,6 +45,7 @@ process PLINK2_VCF {
         --memory $mem_mb \\
         --set-all-var-ids '@:#:\$r:\$a' \\
         $set_ma_missing \\
+        --freq \\
         --missing vcols=fmissdosage,fmiss \\
         --freq \\
         $args \\
@@ -53,7 +54,8 @@ process PLINK2_VCF {
         --make-pgen vzs \\
         --out ${output}
 
-    gzip ${output}.vmiss ${output}.afreq
+    gzip ${output}.vmiss
+    gzip ${output}.afreq
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

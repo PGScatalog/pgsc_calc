@@ -30,13 +30,23 @@ process INTERSECT_VARIANTS {
     id = meta.subMap('id', 'build', 'n_chrom', 'chrom')
     output = "${meta.id}_${meta.chrom}_matched"
     """
-    pgscatalog-intersect --reference $ref_variants \
-      --target $variants \
-      --chrom $meta.chrom \
-      --outdir \$PWD \
-      --verbose
+    pgscatalog-intersect --ref $ref_variants \
+        --target $variants \
+        --chrom $meta.chrom \
+        --maf_target 0.1 \
+        --geno_miss 0.1 \
+        --outdir . \
+        -v
 
-    mv matched_variants.txt.gz ${output}.txt.gz
+    n_matched=\$(sed -n '3p' intersect_counts_${meta.chrom}.txt)
+
+    if [ \$n_matched == "0" ]
+    then
+        echo "ERROR: No variants in intersection"
+        exit 1
+    else
+        mv matched_variants.txt.gz ${output}.txt.gz
+    fi
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

@@ -45,6 +45,7 @@ process PLINK2_RELABELPVAR {
     plink2 \\
         --threads $task.cpus \\
         --memory $mem_mb \\
+        --freq \\
         --missing vcols=fmissdosage,fmiss \\
         --freq \\
         $args \\
@@ -59,7 +60,8 @@ process PLINK2_RELABELPVAR {
     cp -a $geno ${output}.pgen || true
     cp -a $pheno ${output}.psam || true
    
-    gzip ${output}.vmiss ${output}.afreq
+    gzip ${output}.vmiss
+    gzip ${output}.afreq
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

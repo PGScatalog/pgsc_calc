@@ -45,6 +45,7 @@ process PLINK2_RELABELBIM {
     plink2 \\
         --threads $task.cpus \\
         --memory $mem_mb \\
+        --freq \\
         --missing vcols=fmissdosage,fmiss \\
         --freq \\
         $args \\
