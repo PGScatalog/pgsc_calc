@@ -47,7 +47,6 @@ process PLINK2_RELABELBIM {
         --memory $mem_mb \\
         --freq \\
         --missing vcols=fmissdosage,fmiss \\
-        --freq \\
         $args \\
         --set-all-var-ids '@:#:\$r:\$a' \\
         $set_ma_missing \\

@@ -47,7 +47,6 @@ process PLINK2_VCF {
         $set_ma_missing \\
         --freq \\
         --missing vcols=fmissdosage,fmiss \\
-        --freq \\
         $args \\
         --vcf $vcf $dosage_options \\
         --allow-extra-chr $chrom_filter \\
