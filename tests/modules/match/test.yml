@@ -1,4 +1,3 @@
-# IPC files aren't published so can't test
 - name: test match module
   command: nextflow run ./tests/modules/match -entry testmatch -c ./tests/config/nextflow.config
   tags:
@@ -8,7 +7,8 @@
   files:
     - path: output/test/match/versions.yml
       contains:
-        - "pgscatalog_utils: 0.5.2"
+        - "pgscatalog.match: 0.1.1"
+# can't test IPC output (not published)        
 
 - name: test match combine module
   command: nextflow run ./tests/modules/match -entry testmatchcombine -c ./tests/config/nextflow.config
@@ -18,17 +18,13 @@
     - combine
     - fast
   files:
-    - path: output/combine/versions.yml
+    - path: output/test/match/versions.yml
       contains:
-        - "pgscatalog_utils: 0.5.2"
-    - path: output/combine/scorefiles.txt.gz
+        - "pgscatalog.match: 0.1.1"
+    - path: output/test/match/test_ALL_additive_0.scorefile.gz           
       contains:
+        - "PGS001229"     
+        - "ID"
         - "effect_allele"
-        - "PGS001229"
-    - path: output/combine/log_scorefiles.json
-      contains:
-        - "chr_name"
-        - "chr_position"
-        - "effect_allele"
-        - "other_allele"
-        - "effect_weight"
+    - path: output/test/match/test_summary.csv
+    - path: output/test/match/test_log.csv.gz

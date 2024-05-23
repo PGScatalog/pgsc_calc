@@ -43,6 +43,7 @@ Working in different environments
    bigjob
    arm
    offline
+   cloud
 
 Working with complex datasets
 -----------------------------
@@ -59,4 +60,4 @@ Other
 .. toctree::
    :maxdepth: 1
 
-   version
+   change_version

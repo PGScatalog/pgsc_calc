@@ -5,6 +5,7 @@
 - name: test ancestry projection and scoring
   command: >
     bash -c "
+    set -euxo pipefail;
     sed \"s|ANCESTRY_TARGET_DIR|$ANCESTRY_TARGET_DIR|\" tests/ancestry/samplesheet.csv > samplesheet.csv;
     nextflow run main.nf -c ./tests/config/nextflow.config \
       --input samplesheet.csv \
@@ -34,4 +35,12 @@
       must_not_contain:
         - "no-mean-imputation"
         - "error-on-freq-calc"
+    - path: output/test/score/test_pgs.txt.gz
+      contains:
+        - "IID"
+        - "PGS"
+        - "SUM"
+        - "percentile_MostSimilarPop"
+        - "Z_MostSimilarPop"
+        - "Z_norm1"
       

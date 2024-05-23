@@ -9,10 +9,10 @@ include { MATCH_COMBINE }  from '../../../modules/local/match_combine'
 
 workflow testmatch {
     // test a single score (one effect weight)
-    bim = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.bim')
-    bed = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.bed')
-    fam = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.fam')
-    scorefile = Channel.fromPath('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/PGS001229_22.txt')
+    bim = file("assets/examples/target_genomes/cineca_synthetic_subset.bim", checkIfExists: true)
+    bed = file("assets/examples/target_genomes/cineca_synthetic_subset.bed", checkIfExists: true)
+    fam = file("assets/examples/target_genomes/cineca_synthetic_subset.fam", checkIfExists: true)
+    scorefile = Channel.fromPath("assets/examples/scorefiles/PGS001229_22.txt", checkIfExists: true)
 
     Channel.fromPath('NO_FILE', checkIfExists: false).set { chain_files }
 

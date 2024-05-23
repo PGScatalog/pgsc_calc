@@ -6,7 +6,8 @@
 - name: test ancestry projection and scoring with VCF input
   command: >
     bash -c "
-    sed \"s|ANCESTRY_TARGET_DIR|$ANCESTRY_TARGET_DIR|\" tests/ancestry/samplesheet.csv > samplesheet.csv;
+    set -euxo pipefail;
+    sed \"s|ANCESTRY_TARGET_DIR|$ANCESTRY_TARGET_DIR|\" tests/ancestry/samplesheet_vcf.csv > samplesheet.csv;
     nextflow run main.nf -c ./tests/config/nextflow.config \
       --input samplesheet.csv \
       --run_ancestry $ANCESTRY_REF_DIR/GRCh38_HAPNEST_reference.tar.zst \
@@ -35,4 +36,13 @@
       must_not_contain:
         - "no-mean-imputation"
         - "error-on-freq-calc"
+    - path: output/test/score/test_pgs.txt.gz
+      contains:
+        - "IID"
+        - "PGS"
+        - "SUM"
+        - "percentile_MostSimilarPop"
+        - "Z_MostSimilarPop"
+        - "Z_norm1"
+        - "Z_norm2"
 

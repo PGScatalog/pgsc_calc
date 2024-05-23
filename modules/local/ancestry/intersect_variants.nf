@@ -1,7 +1,7 @@
 process INTERSECT_VARIANTS {
     // labels are defined in conf/modules.config
-    label 'process_low'
-    label 'pygscatalog' // controls conda, docker, + singularity options
+    label 'process_single'
+    label 'pgscatalog_utils' // controls conda, docker, + singularity options
 
     tag "$meta.id chromosome $meta.chrom"
 
@@ -35,7 +35,8 @@ process INTERSECT_VARIANTS {
         --chrom $meta.chrom \
         --maf_target 0.1 \
         --geno_miss 0.1 \
-        --outdir . -v
+        --outdir . \
+        -v
 
     n_matched=\$(sed -n '3p' intersect_counts_${meta.chrom}.txt)
 
@@ -49,7 +50,7 @@ process INTERSECT_VARIANTS {
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
-        zstd: \$(zstd -V | grep -Eo 'v[0-9]\\.[0-9]\\.[0-9]+' )
+        pgscatalog.match: \$(echo \$(python -c 'import pgscatalog.match; print(pgscatalog.match.__version__)'))
     END_VERSIONS
     """
 }

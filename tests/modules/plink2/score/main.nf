@@ -7,10 +7,10 @@ include { PLINK2_SCORE } from '../../../../modules/local/plink2_score.nf'
 
 workflow testscore {
     // test a single score (one effect weight)
-    bim = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.bim')
-    bed = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.bed')
-    fam = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.fam')
-    scorefile = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/test.scorefile')
+    bim = file("assets/examples/target_genomes/cineca_synthetic_subset.bim", checkIfExists: true)
+    bed = file("assets/examples/target_genomes/cineca_synthetic_subset.bed", checkIfExists: true)
+    fam = file("assets/examples/target_genomes/cineca_synthetic_subset.fam", checkIfExists: true)
+    scorefile = file("assets/examples/scorefiles/test.scorefile", checkIfExists: true)    
     afreq = file('NO_FILE')
 
     def meta = [id: 'test', is_bfile: true, n_samples: 100]
@@ -31,10 +31,10 @@ workflow testscore {
 
 workflow testsmallscore {
     // test a single score with a small dataset declared in metadata (n < 50)
-    bim = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.bim')
-    bed = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.bed')
-    fam = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.fam')
-    scorefile = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/test.scorefile')
+    bim = file("assets/examples/target_genomes/cineca_synthetic_subset.bim", checkIfExists: true)
+    bed = file("assets/examples/target_genomes/cineca_synthetic_subset.bed", checkIfExists: true)
+    fam = file("assets/examples/target_genomes/cineca_synthetic_subset.fam", checkIfExists: true)
+    scorefile = file("assets/examples/scorefiles/test.scorefile", checkIfExists: true)
     afreq = file('NO_FILE')
 
     def meta = [id: 'test', is_bfile: true, n_samples: 1]
@@ -55,10 +55,10 @@ workflow testsmallscore {
 
 workflow testmultiscore {
     // test a scoring file with multiple effect weights
-    scorefile = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/multiscore.scorefile')
-    bim = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.bim')
-    bed = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.bed')
-    fam = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.fam')
+    bim = file("assets/examples/target_genomes/cineca_synthetic_subset.bim", checkIfExists: true)
+    bed = file("assets/examples/target_genomes/cineca_synthetic_subset.bed", checkIfExists: true)
+    fam = file("assets/examples/target_genomes/cineca_synthetic_subset.fam", checkIfExists: true)
+    scorefile = file("assets/examples/scorefiles/multiscore.txt", checkIfExists: true)
     afreq = file('NO_FILE')
 
     def meta = [id: 'test', is_bfile: true, n_samples: 100]
@@ -80,10 +80,10 @@ workflow testmultiscore {
 
 workflow testsmallmultiscore {
     // test a scoring file with multiple effect weights and a small (n<50) sample size (set in metadata)
-    scorefile = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/multiscore.scorefile')
-    bim = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.bim')
-    bed = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.bed')
-    fam = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.fam')
+    bim = file("assets/examples/target_genomes/cineca_synthetic_subset.bim", checkIfExists: true)
+    bed = file("assets/examples/target_genomes/cineca_synthetic_subset.bed", checkIfExists: true)
+    fam = file("assets/examples/target_genomes/cineca_synthetic_subset.fam", checkIfExists: true)
+    scorefile = file("assets/examples/scorefiles/multiscore.txt", checkIfExists: true)
     afreq = file('NO_FILE')
 
     def meta = [id: 'test', is_bfile: true, n_samples: 1]
@@ -105,10 +105,10 @@ workflow testsmallmultiscore {
 
 workflow testmultiscorefail {
     // use a scoring file with one effect weight, but set multiple scores in scoremeta
-    scorefile = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/test.scorefile')
-    bim = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.bim')
-    bed = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.bed')
-    fam = file('https://gitlab.ebi.ac.uk/nebfield/test-datasets/-/raw/master/pgsc_calc/cineca_synthetic_subset.fam')
+    bim = file("assets/examples/target_genomes/cineca_synthetic_subset.bim", checkIfExists: true)
+    bed = file("assets/examples/target_genomes/cineca_synthetic_subset.bed", checkIfExists: true)
+    fam = file("assets/examples/target_genomes/cineca_synthetic_subset.fam", checkIfExists: true)
+    scorefile = file("assets/examples/scorefiles/test.scorefile", checkIfExists: true)
     optional_allelic_freq = file('NO_FILE')
 
     def meta = [id: 'test', is_bfile: true, n_samples: 100]
