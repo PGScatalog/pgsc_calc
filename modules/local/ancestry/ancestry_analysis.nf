@@ -21,7 +21,7 @@ process ANCESTRY_ANALYSIS {
 
     script:
     """
-    ancestry_analysis -d $meta.target_id \
+    pgscatalog-ancestry-adjust -d $meta.target_id \
         -r reference \
         --psam $ref_psam \
         --ref_pcs ref_pcs/1.pcs \

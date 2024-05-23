@@ -6,6 +6,7 @@
 - name: test ancestry projection and scoring with VCF input
   command: >
     bash -c "
+    set -euxo pipefail;
     sed \"s|ANCESTRY_TARGET_DIR|$ANCESTRY_TARGET_DIR|\" tests/ancestry/samplesheet_vcf.csv > samplesheet.csv;
     nextflow run main.nf -c ./tests/config/nextflow.config \
       --input samplesheet.csv \

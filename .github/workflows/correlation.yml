@@ -1,4 +1,4 @@
-name: Run ancestry test with singularity or docker profiles with VCF input
+name: Run correlation test with singularity or docker profiles
 
 on:
   workflow_call:
@@ -6,7 +6,7 @@ on:
       container-cache-key:
         type: string
         required: true
-      ancestry-cache-key:
+      correlation-cache-key:
         type: string
         required: true
       docker:
@@ -17,7 +17,7 @@ on:
 env:
   NXF_SINGULARITY_CACHEDIR: ${{ github.workspace }}/singularity
   SINGULARITY_VERSION: 3.8.3
-  
+
 jobs:
   docker:
     if: ${{ inputs.docker }}
@@ -26,8 +26,7 @@ jobs:
     steps:
       - name: Set environment variables
         run: |
-          echo "ANCESTRY_REF_DIR=$RUNNER_TEMP" >> $GITHUB_ENV
-          echo "ANCESTRY_TARGET_DIR=$RUNNER_TEMP" >> $GITHUB_ENV
+          echo "CORRELATION_DIR=$RUNNER_TEMP" >> $GITHUB_ENV
       
       - name: Check out pipeline code
         uses: actions/checkout@v4
@@ -51,18 +50,17 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: |
-            ${{ env.ANCESTRY_TARGET_DIR }}/GRCh38_HAPNEST_TARGET_ALL.pgen
-            ${{ env.ANCESTRY_TARGET_DIR }}/GRCh38_HAPNEST_TARGET_ALL.psam
-            ${{ env.ANCESTRY_TARGET_DIR }}/GRCh38_HAPNEST_TARGET_ALL.pvar.zst
-            ${{ env.ANCESTRY_REF_DIR }}/GRCh38_HAPNEST_reference.tar.zst
-          key: ${{ inputs.ancestry-cache-key }}
+            ${{ env.CORRELATION_DIR }}/correlation37.pgen
+            ${{ env.CORRELATION_DIR }}/correlation37.psam
+            ${{ env.CORRELATION_DIR }}/correlation37.pvar.zst
+            ${{ env.CORRELATION_DIR }}/PGS000018_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000027_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000137_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000727_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000728_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000729_hmPOS_GRCh37.txt.gz            
+          key: ${{ inputs.correlation-cache-key }}
           fail-on-cache-miss: true
-
-      - name: Install plink2 to recode
-        run: sudo apt-get install -y plink2
-
-      - name: Recode VCF
-        run: plink2 --pfile ${ANCESTRY_TARGET_DIR}/GRCh38_HAPNEST_TARGET_ALL vzs --export vcf bgz --out ${ANCESTRY_TARGET_DIR}/GRCh38_HAPNEST_TARGET_ALL
 
       - name: Set up test requirements
         uses: actions/setup-python@v5
@@ -72,8 +70,8 @@ jobs:
           
       - run: pip install -r ${{ github.workspace }}/tests/requirements.txt
 
-      - name: Run ancestry test
-        run: TMPDIR=~ PROFILE=docker pytest --kwdof --symlink --git-aware --wt 2 --tag "ancestry vcf" --ignore tests/bin
+      - name: Run correlation test
+        run: TMPDIR=~ PROFILE=docker pytest --kwdof --symlink --git-aware --wt 2 --tag "test score correlation"
 
       - name: Upload logs on failure
         if: failure()
@@ -93,8 +91,7 @@ jobs:
     steps:
       - name: Set environment variables
         run: |
-          echo "ANCESTRY_REF_DIR=$RUNNER_TEMP" >> $GITHUB_ENV
-          echo "ANCESTRY_TARGET_DIR=$RUNNER_TEMP" >> $GITHUB_ENV
+          echo "CORRELATION_DIR=$RUNNER_TEMP" >> $GITHUB_ENV
       
       - name: Check out pipeline code
         uses: actions/checkout@v4
@@ -124,18 +121,17 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: |
-            ${{ env.ANCESTRY_TARGET_DIR }}/GRCh38_HAPNEST_TARGET_ALL.pgen
-            ${{ env.ANCESTRY_TARGET_DIR }}/GRCh38_HAPNEST_TARGET_ALL.psam
-            ${{ env.ANCESTRY_TARGET_DIR }}/GRCh38_HAPNEST_TARGET_ALL.pvar.zst
-            ${{ env.ANCESTRY_REF_DIR }}/GRCh38_HAPNEST_reference.tar.zst
-          key: ${{ inputs.ancestry-cache-key }}
+            ${{ env.CORRELATION_DIR }}/correlation37.pgen
+            ${{ env.CORRELATION_DIR }}/correlation37.psam
+            ${{ env.CORRELATION_DIR }}/correlation37.pvar.zst
+            ${{ env.CORRELATION_DIR }}/PGS000018_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000027_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000137_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000727_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000728_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000729_hmPOS_GRCh37.txt.gz
+          key: ${{ inputs.correlation-cache-key }}
           fail-on-cache-miss: true
-
-      - name: Install plink2 to recode
-        run: sudo apt-get install -y plink2
-
-      - name: Recode VCF
-        run: plink2 --pfile ${ANCESTRY_TARGET_DIR}/GRCh38_HAPNEST_TARGET_ALL vzs --export vcf bgz --out ${ANCESTRY_TARGET_DIR}/GRCh38_HAPNEST_TARGET_ALL
 
       - name: Set up test requirements
         uses: actions/setup-python@v5
@@ -145,5 +141,18 @@ jobs:
           
       - run: pip install -r ${{ github.workspace }}/tests/requirements.txt
 
-      - name: Run ancestry test
-        run: TMPDIR=~ PROFILE=singularity pytest --kwdof --symlink --git-aware --wt 2 --tag "ancestry vcf" --ignore tests/bin
+      - name: Run correlation test
+        run: TMPDIR=~ PROFILE=singularity pytest --kwdof --symlink --git-aware --wt 2 --tag "test score correlation"
+        env:
+          TMPDIR: ${{ runner.temp }}
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: logs-singularity-ancestry
+          path: |
+            /home/runner/pytest_workflow_*/*/.nextflow.log
+            /home/runner/pytest_workflow_*/*/log.out
+            /home/runner/pytest_workflow_*/*/log.err
+            /home/runner/pytest_workflow_*/*/output/*

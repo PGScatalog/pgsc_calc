@@ -28,17 +28,18 @@ process DOWNLOAD_SCOREFILES {
     def efo_direct = params.efo_direct ? '-e' : ''
 
     """
-    download_scorefiles $accession_args \
+    pgscatalog-download $accession_args \
         $traits_args \
         $publication_args \
         $efo_direct \
         -b $build \
-        -o \$PWD -v \
+        -o \$PWD \
+        -v \
         -c pgsc_calc/$workflow.manifest.version
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
-        pgscatalog_utils: \$(echo \$(python -c 'import pgscatalog_utils; print(pgscatalog_utils.__version__)'))
+        pgscatalog.core: \$(echo \$(python -c 'import pgscatalog.core; print(pgscatalog.core.__version__)'))
     END_VERSIONS
     """
 }

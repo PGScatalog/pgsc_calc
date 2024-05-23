@@ -10,4 +10,4 @@
     - path: output/plink2/GRCh37_test_22.pvar.zst
     - path: output/plink2/versions.yml
       contains:
-        - "plink2: 2.00a3.3"
+        - "plink2: 2.00a5.10"

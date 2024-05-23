@@ -1,0 +1,38 @@
+name: Preload correlation data
+
+on:
+  workflow_call:
+    outputs:
+      cache-key:
+        value: correlation
+  
+jobs:
+  preload_correlation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set environment variables
+        run: |
+          echo "CORRELATION_DIR=$RUNNER_TEMP" >> $GITHUB_ENV
+
+      - name: Cache reference data
+        id: cache-ref
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.CORRELATION_DIR }}/correlation37.pgen
+            ${{ env.CORRELATION_DIR }}/correlation37.psam
+            ${{ env.CORRELATION_DIR }}/correlation37.pvar.zst
+            ${{ env.CORRELATION_DIR }}/PGS000018_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000027_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000137_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000727_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000728_hmPOS_GRCh37.txt.gz
+            ${{ env.CORRELATION_DIR }}/PGS000729_hmPOS_GRCh37.txt.gz            
+          key: correlation
+          
+      - name: Download reference data
+        if: steps.cache-ref.outputs.cache-hit != 'true'        
+        run: |
+          wget -qnc -P $CORRELATION_DIR https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/correlation.tar.zst
+          tar -xf $CORRELATION_DIR/correlation.tar.zst -C $CORRELATION_DIR
+          

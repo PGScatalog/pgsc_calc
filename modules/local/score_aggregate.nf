@@ -21,11 +21,11 @@ process SCORE_AGGREGATE {
     script:
     scoremeta = meta.subMap('id')
     """
-    aggregate_scores -s $scorefiles -o . -v
+    pgscatalog-aggregate -s $scorefiles -o . -v --no-split
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
-        pgscatalog_utils: \$(echo \$(python -c 'import pgscatalog_utils; print(pgscatalog_utils.__version__)'))
+        pgscatalog.calc: \$(echo \$(python -c 'import pgscatalog.calc; print(pgscatalog.calc.__version__)'))
     END_VERSIONS
     """
 }
