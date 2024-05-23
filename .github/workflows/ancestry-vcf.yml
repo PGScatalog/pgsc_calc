@@ -84,7 +84,6 @@ jobs:
             /home/runner/pytest_workflow_*/*/.nextflow.log
             /home/runner/pytest_workflow_*/*/log.out
             /home/runner/pytest_workflow_*/*/log.err
-            /home/runner/pytest_workflow_*/*/output/*
             
   singularity:
     if: ${{ inputs.singularity }}
@@ -147,3 +146,13 @@ jobs:
 
       - name: Run ancestry test
         run: TMPDIR=~ PROFILE=singularity pytest --kwdof --symlink --git-aware --wt 2 --tag "ancestry vcf" --ignore tests/bin
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: logs-singularity-ancestry
+          path: |
+            /home/runner/pytest_workflow_*/*/.nextflow.log
+            /home/runner/pytest_workflow_*/*/log.out
+            /home/runner/pytest_workflow_*/*/log.err        
