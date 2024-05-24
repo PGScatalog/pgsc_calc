@@ -11,6 +11,8 @@ will only occur in major versions with changes noted in this changelog.
 pgsc_calc v2.0.0-alpha.6 (2024-05-24)
 -------------------------------------
 
+Please note the minimum required nextflow version has been updated to v23.10.0, released in October 2023.
+
 Improvements
 
 * Migrate our custom python tools to new https://github.com/PGScatalog/pygscatalog packages
