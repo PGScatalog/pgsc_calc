@@ -40,6 +40,18 @@ And optionally:
 
 See documentation for a list of planned [features under development](https://pgsc-calc.readthedocs.io/en/latest/index.html#Features-under-development).
 
+### PGS applications and libraries
+
+`pgsc_calc` uses applications and libraries internally developed at the PGS Catalog, which can do helpful things like:
+
+* Query the PGS Catalog to bulk download scoring files in a specific genome build
+* Match variants from scoring files to target variants
+* Adjust calculated PGS in the context of genetic ancestry
+
+If you want to write Python code to work with PGS, [check out the `pygscatalog` repository to learn more](https://github.com/PGScatalog/pygscatalog).
+
+If you want a simpler way of working with PGS, ignore this section and continue below to learn more about `pgsc_calc`.
+
 ## Quick start
 
 1. Install
