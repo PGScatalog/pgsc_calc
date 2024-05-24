@@ -44,7 +44,7 @@ See documentation for a list of planned [features under development](https://pgs
 
 1. Install
 [`Nextflow`](https://www.nextflow.io/docs/latest/getstarted.html#installation)
-(`>=22.10.0`)
+(`>=23.10.0`)
 
 2. Install [`Docker`](https://docs.docker.com/engine/installation/) or
 [`Singularity (v3.8.3 minimum)`](https://www.sylabs.io/guides/3.0/user-guide/)
