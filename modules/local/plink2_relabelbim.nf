@@ -21,10 +21,11 @@ process PLINK2_RELABELBIM {
     tuple val(meta), path(geno), path(variants), path(pheno)
 
     output:
-    tuple val(meta), path("${output}.bed"), emit: geno
-    tuple val(meta), path("${output}.bim.zst"), emit: variants
-    tuple val(meta), path("${output}.fam"), emit: pheno
+    tuple val(meta), path("${output}.bed", includeInputs: true), emit: geno
+    tuple val(meta), path("${output}.bim.zst", includeInputs: false), emit: variants
+    tuple val(meta), path("${output}.fam", includeInputs: true), emit: pheno
     tuple val(meta), path("${output}.vmiss.gz"), emit: vmiss
+    tuple val(meta), path("${output}.afreq.gz"), emit: afreq
     path "versions.yml"           , emit: versions
 
     when:
@@ -44,6 +45,7 @@ process PLINK2_RELABELBIM {
     plink2 \\
         --threads $task.cpus \\
         --memory $mem_mb \\
+        --freq \\
         --missing vcols=fmissdosage,fmiss \\
         $args \\
         --set-all-var-ids '@:#:\$r:\$a' \\
@@ -52,10 +54,12 @@ process PLINK2_RELABELBIM {
         --make-just-bim zs \\
         --out ${output}
 
-    # cross platform (mac, linux) method of preserving symlinks
-    cp -a $geno ${output}.bed
-    cp -a $pheno ${output}.fam
-    gzip ${output}.vmiss
+    # -a: cross platform (mac, linux) method of preserving symlinks
+    # || true: if file exists, ignore error, will be handled by includeInputs
+    cp -a $geno ${output}.bed || true
+    cp -a $pheno ${output}.fam || true
+
+    gzip ${output}.vmiss ${output}.afreq
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

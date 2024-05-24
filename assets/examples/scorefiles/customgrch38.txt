@@ -1,4 +1,5 @@
 #pgs_name=test
+#pgs_id=custom
 #trait_reported=test
 #genome_build=GRCh38
 chr_name	chr_position	effect_allele	other_allele	effect_weight

@@ -1,6 +1,6 @@
 name: pgscatalog_utils
 dependencies:
-- python=3.10
+- python=3.11
 - pip
 - pip:
-    - pgscatalog_utils==0.5.2
+    - pgscatalog_utils==1.0.2

@@ -12,6 +12,15 @@
     - path: output/plink2/GRCh37_cineca_22.psam
     - path: output/plink2/cineca_22_additive_0.sscore.vars
     - path: output/score/aggregated_scores.txt.gz
+      contains:
+        - "IID"
+        - "PGS"
+        - "SUM"
+      must_not_contain:
+        - "percentile_MostSimilarPop"
+        - "Z_MostSimilarPop"
+        - "Z_norm1"
+
 
 - name: test perfect apply score
   command: nextflow run main.nf --only_score -c ./tests/config/nextflow.config --scorefile ./tests/subworkflows/perfect.txt 

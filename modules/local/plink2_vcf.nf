@@ -24,6 +24,7 @@ process PLINK2_VCF {
     tuple val(newmeta), path("${output}.psam"), emit: psam
     tuple val(newmeta), path("${output}.pvar.zst") , emit: pvar
     tuple val(newmeta), path("${output}.vmiss.gz"), emit: vmiss
+    tuple val(newmeta), path("${output}.afreq.gz"), emit: afreq
     path "versions.yml"            , emit: versions
 
     script:
@@ -37,13 +38,14 @@ process PLINK2_VCF {
     newmeta = meta.clone() // copy hashmap for updating...
     newmeta.is_pfile = true // now it's converted to a pfile :)
     // def limits scope to process block, so don't use it
-    output = "${meta.build}_${prefix}_${meta.chrom}_vcf"
+    output = "${meta.build}_${prefix}_${meta.chrom}"
     """
     plink2 \\
         --threads $task.cpus \\
         --memory $mem_mb \\
         --set-all-var-ids '@:#:\$r:\$a' \\
         $set_ma_missing \\
+        --freq \\
         --missing vcols=fmissdosage,fmiss \\
         $args \\
         --vcf $vcf $dosage_options \\
@@ -52,6 +54,7 @@ process PLINK2_VCF {
         --out ${output}
 
     gzip ${output}.vmiss
+    gzip ${output}.afreq
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

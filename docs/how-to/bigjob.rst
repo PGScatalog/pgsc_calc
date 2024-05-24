@@ -143,17 +143,3 @@ each process in the workflow. The nextflow driver requires up to 4GB of RAM
 .. _`HPC users`: https://www.nextflow.io/blog/2021/5_tips_for_hpc_users.html
 .. _`a nextflow profile`: https://github.com/nf-core/configs
 
-
-Other environments
-------------------
-
-Nextflow also supports submitting jobs platforms like:
-
-- Google cloud (https://www.nextflow.io/docs/latest/google.html)
-- Azure cloud (https://www.nextflow.io/docs/latest/azure.html)
-- Amazon cloud (https://www.nextflow.io/docs/latest/aws.html)
-- Kubernetes (https://www.nextflow.io/docs/latest/kubernetes.html)
-  
-Check the `nextflow documentation`_ for configuration specifics.
-
-.. _`nextflow documentation`: https://nextflow.io/docs/latest/

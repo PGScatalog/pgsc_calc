@@ -21,10 +21,11 @@ process PLINK2_RELABELPVAR {
     tuple val(meta), path(geno), path(pheno), path(variants)
 
     output:
-    tuple val(meta), path("${output}.pgen"), emit: geno
-    tuple val(meta), path("${output}.pvar.zst") , emit: variants
-    tuple val(meta), path("${output}.psam"), emit: pheno
+    tuple val(meta), path("${output}.pgen", includeInputs: true), emit: geno
+    tuple val(meta), path("${output}.pvar.zst", includeInputs: false) , emit: variants
+    tuple val(meta), path("${output}.psam", includeInputs: true), emit: pheno
     tuple val(meta), path("${output}.vmiss.gz"), emit: vmiss
+    tuple val(meta), path("${output}.afreq.gz"), emit: afreq
     path "versions.yml"            , emit: versions
 
     when:
@@ -44,6 +45,7 @@ process PLINK2_RELABELPVAR {
     plink2 \\
         --threads $task.cpus \\
         --memory $mem_mb \\
+        --freq \\
         --missing vcols=fmissdosage,fmiss \\
         $args \\
         --set-all-var-ids '@:#:\$r:\$a' \\
@@ -52,11 +54,13 @@ process PLINK2_RELABELPVAR {
         --make-just-pvar zs \\
         --out $output
 
-    # cross platform (mac, linux) method of preserving symlinks
-    cp -a $geno ${output}.pgen
-    cp -a $pheno ${output}.psam
+    # -a: cross platform (mac, linux) method of preserving symlinks
+    # || true: if file exists, ignore error, will be handled by includeInputs
+    cp -a $geno ${output}.pgen || true
+    cp -a $pheno ${output}.psam || true
    
     gzip ${output}.vmiss
+    gzip ${output}.afreq
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

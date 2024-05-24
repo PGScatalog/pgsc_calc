@@ -9,7 +9,9 @@ different file formats, directories, and split vs. unsplit by chromosome).
 
 .. warning:: The format of samplesheets changed in v2.0.0 to better accommodate
              additional file formats in the future
-             
+
+.. note:: If your genomes are in cloud storage CSV samplesheets aren't supported. Instead check :ref:`cloud`
+          
 Samplesheet
 -----------
 

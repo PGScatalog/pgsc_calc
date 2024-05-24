@@ -10,3 +10,4 @@ testing*
 assets/report/renv/
 assets/report/report.Rproj
 .Rprofile
+tests/.venv/

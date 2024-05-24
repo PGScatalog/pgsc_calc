@@ -26,6 +26,7 @@ minimal header in the following format:
 Header::
 
     #pgs_name=metaGRS_CAD
+    #pgs_name=metaGRS_CAD    
     #trait_reported=Coronary artery disease
     #genome_build=GRCh37
 
@@ -56,6 +57,7 @@ Variant-information:
      - T
      - 1.82417e-02
 
+.. tip:: If you're having trouble getting your scorefile working, see :download:`the example we use in our automatic tests <../../assets/examples/scorefiles/customgrch37.txt>`
 
 Save the file as ``scorefile.txt``. The file should be in tab separated values
 (TSV) format. Column names are defined in the PGS Catalog `scoring file format v2.0`_,

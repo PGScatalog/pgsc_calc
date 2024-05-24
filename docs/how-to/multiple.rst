@@ -43,6 +43,9 @@ directory ``my_custom_scores/``:
 
     --scorefile "my_custom_scores/*.txt"
 
+
+.. tip:: Don't forget the quote marks ``"`` around the path
+
 Assuming your scorefiles all have a ``.txt`` extension. This will match **all**
 files ending with ``.txt``, so be careful not to include other text files that
 may match the pattern.

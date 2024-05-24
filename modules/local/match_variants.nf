@@ -18,7 +18,7 @@ process MATCH_VARIANTS {
     tuple val(meta), path(pvar), path(scorefile)
 
     output:
-    tuple val(meta), path("matches/*.ipc.zst"), emit: matches
+    tuple val(meta), path("*.ipc.zst"), emit: matches
     path "versions.yml", emit: versions
 
     script:
@@ -33,7 +33,7 @@ process MATCH_VARIANTS {
     """
     export POLARS_MAX_THREADS=$task.cpus
 
-    match_variants \
+    pgscatalog-match \
         $args \
         --dataset ${meta.id} \
         --scorefile $scorefile \
@@ -44,12 +44,11 @@ process MATCH_VARIANTS {
         $multi \
         $fast \
         --outdir \$PWD \
-        -n $task.cpus \
         -v
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
-        pgscatalog_utils: \$(echo \$(python -c 'import pgscatalog_utils; print(pgscatalog_utils.__version__)'))
+        pgscatalog.match: \$(echo \$(python -c 'import pgscatalog.match; print(pgscatalog.match.__version__)'))
     END_VERSIONS
     """
 }

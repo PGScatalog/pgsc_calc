@@ -1,4 +1,5 @@
 #pgs_name=testlift
+#pgs_id=custom
 #trait_reported=test
 #genome_build=GRCh37
 chr_name	chr_position	effect_allele	other_allele	effect_weight
