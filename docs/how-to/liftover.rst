@@ -33,6 +33,8 @@ your custom scoring file to set the genome build:
 
 Valid genome builds are GRCh37 and GRCh38.
 
+.. tip:: If you're having trouble getting your scorefile working, see :download:`the example we use in our automatic tests <../../assets/examples/scorefiles/customgrch38.txt>`
+    
 Once your scores have valid headers, the pipeline can automatically liftover
 scoring files to match your input data if you set the following additional
 parameters at runtime:

@@ -8,6 +8,38 @@ will only occur in major versions with changes noted in this changelog.
 
 .. _`semantic versioning`: https://semver.org/
 
+pgsc_calc v2.0.0-alpha.6 (2024-05-24)
+-------------------------------------
+
+Improvements
+
+* Migrate our custom python tools to new https://github.com/PGScatalog/pygscatalog packages
+
+  * Reference / target intersection now considers allelic frequency and variant missingness to determine PCA eligibility
+
+  * Downloads from PGS Catalog should be faster (async)
+
+  * Package CLI and libraries `are now documented <https://pygscatalog.readthedocs.io/en/latest/?badge=latest>`_
+
+* Update plink version to alpha 5.10 final 
+
+* Add docs describing cloud execution 
+
+* Add correlation test comparing calculated scores against known good scores
+
+* When matching variants, matching logs are now written before scorefiles to improve debugging UX
+
+* Improvements to PCA quality (ensuring low missingness and suitable MAF for PCA-eligble variants in target samples).
+
+  *  This could allow us to implement MAF/missingness filters for scoring file variants in the future. 
+
+Bug fixes
+
+* Fix ancestry adjustment with VCFs
+* Fix support for scoring files that only have one effect type column 
+* Fix adjusting PGS with zero variance (skip them) 
+* Check for reserved characters in sampleset names
+
 pgsc_calc v2.0.0-alpha.5 (2024-03-19)
 -------------------------------------
 
