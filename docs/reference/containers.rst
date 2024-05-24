@@ -23,7 +23,7 @@ Minimum required software:
     * Used to work with target genomes and to calculate scores
 * `pyyaml`_
     * Used to collect and report software versions used across the pipeline
-* `pgscatalog_utils`_
+* `pgscatalog-utils`_
     * A collection of useful tools for working with PGS Catalog data
 * report
     * Contains publishing tools to produce the summary report
@@ -39,7 +39,7 @@ Ancestry assignment software:
 
 .. _`plink2 2.00a3.3`: https://www.cog-genomics.org/plink/2.0/
 .. _`pyyaml`: https://pypi.org/project/PyYAML/
-.. _`pgscatalog_utils`: https://github.com/PGScatalog/pgscatalog_utils
+.. _`pgscatalog-utils`: https://github.com/PGScatalog/pygscatalog
 .. _`fraposa_pgsc`: https://github.com/PGScatalog/fraposa_pgsc
 .. _`zstd`: https://github.com/facebook/zstd
 
