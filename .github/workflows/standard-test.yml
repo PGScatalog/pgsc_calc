@@ -62,7 +62,7 @@ jobs:
       matrix:
         test_profile: ["test"]
         profile: ["singularity"]
-        nxf_ver: ['22.30.0', 'latest']
+        nxf_ver: ['23.10.0', 'latest']
 
     steps:
       - name: Extract branch name
