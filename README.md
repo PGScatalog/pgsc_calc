@@ -97,16 +97,12 @@ Wu) and PGS Catalog teams (Samuel Lambert, Laurent Gil).
 The adaptation of the codebase, nextflow implementation, and PGS Catalog features
 are written by Benjamin Wingfield, Samuel Lambert, Laurent Gil with additional input
 from Aoife McMahon (EBI). Development of new features, testing, and code review
-is ongoing including Inouye lab members (Rodrigo Canovas, Scott Ritchie) and others. A
-manuscript describing the tool is *in preparation*. In the meantime if you use the
-tool we ask you to cite the repo and the paper describing the PGS Catalog
-resource:
+is ongoing including Inouye lab members (Rodrigo Canovas, Scott Ritchie) and others. If 
+you use the tool we ask you to cite our paper describing software and updated PGS Catalog resource:
 
-- >PGS Catalog Calculator _(in preparation)_. PGS Catalog
-  Team. [https://github.com/PGScatalog/pgsc_calc](https://github.com/PGScatalog/pgsc_calc)
-- >Lambert _et al._ (2021) The Polygenic Score Catalog as an open database for
-reproducibility and systematic evaluation.  Nature Genetics. 53:420–425
-doi:[10.1038/s41588-021-00783-5](https://doi.org/10.1038/s41588-021-00783-5).
+- >Lambert, Wingfield _et al._ (2024) The Polygenic Score Catalog: new functionality
+  and tools to enable FAIR research.  medRxiv.
+  doi:[10.1101/2024.05.29.24307783](https://doi.org/10.1101/2024.05.29.24307783).
 
 This pipeline is distrubuted under an [Apache License](LICENSE) amd uses code and 
 infrastructure developed and maintained by the [nf-core](https://nf-co.re) community 
