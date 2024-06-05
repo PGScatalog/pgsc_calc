@@ -486,13 +486,13 @@ stringr::str_glue("{params$sampleset}/score/{params$sampleset}_pgs.txt.gz")
 stringr::str_glue("{params$sampleset}/score/aggregated_scores.txt.gz")
 ```
 
-# Citations
-
-::: {.callout-important}
-For scores from the PGS Catalog, please remember to cite the original publications from which they came (these are listed in the metadata table.) 
-:::
+# Citation
 
 > Lambert, Wingfield, et al. (2024) The Polygenic Score Catalog: new functionality and tools to enable FAIR research. medRxiv. doi:[10.1101/2024.05.29.24307783](https://doi.org/10.1101/2024.05.29.24307783).
+
+::: {.callout-important}
+For scores from the PGS Catalog, please remember to cite the original publications from which they came (these are listed in the metadata table).
+:::
 
 ## Score licenses
 
