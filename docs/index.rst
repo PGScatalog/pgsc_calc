@@ -170,8 +170,6 @@ you use in your analyses, and the underlying data/software tools described in th
 
 .. _citations file: https://github.com/PGScatalog/pgsc_calc/blob/master/CITATIONS.md
 .. _10.1101/2024.05.29.24307783: https://doi.org/10.1101/2024.05.29.24307783
-.. [0] A preprint is in preparation, calculated scores have been tested with test data and for consistency with other
-   tools on UK Biobank since `v1.1.0`
 
 
 License Information
