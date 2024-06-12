@@ -13,9 +13,9 @@ You might also see some scoring files in the report are coloured red, and are ex
 
 By default pgsc_calc will continue calculating if at least one score passes the **match rate threshold**, which is controlled by the ``--min_overlap`` parameter.
 
-The default parameter is 0.75. This was chosen because in our experience the matching procedure will match very well or very badly. 
+The default parameter is 0.75, this was chosen because on our experiences applying PGS to new cohorts where most scores will score better than this threshold. 
 
-If things go badly, it's typically because a problem with input data (target genomes or scoring files).
+If scores match your target genome poorly it's typically because a problem with input data (target genomes or scoring files).
 
 What is matching?
 -----------------
@@ -24,38 +24,32 @@ The calculator carefully checks that variants (rows) in a scoring file are prese
 
 The matching procedure `is described in the preprint supplement <https://www.medrxiv.org/content/10.1101/2024.05.29.24307783v1.supplementary-material>`_. 
 
-It's really important that the calculator can find the variants described in the scoring files in your target genomes.
-
-The matching procedure never makes any changes to target genome data. 
+The matching procedure never makes any changes to target genome data and only seeks to match variants in the scoring file to the genome.  
 
 Adjusting ``--min_overlap`` is a bad idea 
 ------------------------------------------
 
-The aim of the PGS Catalog Calculator is to faithfully reuse scores submitted by authors to the PGS Catalog on new target genomes. 
+The aim of the PGS Catalog Calculator is to faithfully recalculate scores submitted by authors to the PGS Catalog on new target genomes. 
 
 If few variants in a published scoring file are present in a target genome, then the calculated score isn't a good representation of the original published score. 
 
-When you evaluate the predictive performance of the score it's less likely to reproduce the metrics reported in the PGS Catalog too.
+When you evaluate the predictive performance of a score with low match rates it will be less likely to reproduce the metrics reported in the PGS Catalog.
 
-If you reduce ``--min_overlap`` then the calculator will output scores calculated with the remaining variants, **but these scores are not representative of the original data submitted to the PGS Catalog.**
+If you reduce ``--min_overlap`` then the calculator will output scores calculated with the remaining variants, **but these scores may not be representative of the original data submitted to the PGS Catalog.**
 
 Are your target genomes imputed? Are they WGS?
 ----------------------------------------------
 
-The calculator assumes that variants were called from an imputed SNP array to increase variant density.
+The calculator assumes that target genotyping data were called from a limited number of markers on a genotyping array and imputed using a larger reference panel to increase variant density.
 
-WGS data are not natively supported by the calculator. However, it's `possible to create compatible gVCFs from WGS data. <https://github.com/PGScatalog/pgsc_calc/discussions/123#discussioncomment-6469422>`_
+WGS data are not natively supported by the calculator (as homozygous REF sites are excluded from the variant sites). However, it's `possible to create compatible gVCFs from WGS data. <https://github.com/PGScatalog/pgsc_calc/discussions/123#discussioncomment-6469422>`_
 
 In the future we plan to improve support for WGS.
 
 Did you set the correct genome build?
 -------------------------------------
 
-The calculator will automatically grab scoring files in the correct genome build from the PGS Catalog. 
-
-We first match variants by looking at genomic coordinates, which can differ across genome builds. 
-
-If you're using custom scoring files, did you remember to enable liftover?
+The calculator will automatically grab scoring files in the correct genome build from the PGS Catalog. If match rates are low it may be because you have specified the wrong genome build. If you're using custom scoring files and the match rate is low it is possible that the `--liftover` command may have been omitted. 
 
 I'm still getting match rate errors. How do I figure out what's wrong?
 ----------------------------------------------------------------------
