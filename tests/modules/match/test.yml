@@ -7,7 +7,7 @@
   files:
     - path: output/test/match/versions.yml
       contains:
-        - "pgscatalog.match: 0.1.1"
+        - "pgscatalog.match: 0.2.0"
 # can't test IPC output (not published)        
 
 - name: test match combine module
@@ -20,7 +20,7 @@
   files:
     - path: output/test/match/versions.yml
       contains:
-        - "pgscatalog.match: 0.1.1"
+        - "pgscatalog.match: 0.2.0"
     - path: output/test/match/test_ALL_additive_0.scorefile.gz           
       contains:
         - "PGS001229"     
