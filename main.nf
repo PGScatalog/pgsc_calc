@@ -15,13 +15,13 @@ nextflow.enable.dsl = 2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
+include { paramsHelp } from 'plugin/nf-schema'
+
 // Print help message if needed
 if (params.help) {
-    def logo = NfcoreTemplate.logo(workflow, params.monochrome_logs)
-    def citation = '\n' + WorkflowMain.citation(workflow) + '\n'
-    def String command = '\n' + "\$ nextflow run ${workflow.manifest.name} -profile test,docker" + '\n'
-    log.info logo + command + citation + NfcoreTemplate.dashedLine(params.monochrome_logs)
-    System.exit(0)
+    log.info paramsHelp("nextflow run pgscatalog/pgsc_calc --input input_file.csv")
+    log.info "See https://pgsc-calc.readthedocs.io/en/latest/getting-started.html for more help"
+    exit 0
 }
 
 WorkflowMain.initialise(workflow, params, log, args)
