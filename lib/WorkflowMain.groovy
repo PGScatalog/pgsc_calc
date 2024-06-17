@@ -12,11 +12,12 @@ class WorkflowMain {
     public static String citation(workflow) {
         return "If you use ${workflow.manifest.name} for your analysis please cite:\n\n" +
             "* The Polygenic Score Catalog\n" +
+            "  https://doi.org/10.1101/2024.05.29.24307783\n" + 
             "  https://doi.org/10.1038/s41588-021-00783-5\n\n" +
             "* The nf-core framework\n" +
             "  https://doi.org/10.1038/s41587-020-0439-x\n\n" +
             "* Software dependencies\n" +
-            "  https://github.com/${workflow.manifest.name}/blob/master/CITATIONS.md"
+            "  https://github.com/${workflow.manifest.name}/blob/main/CITATIONS.md"
     }
 
 

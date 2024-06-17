@@ -7,9 +7,10 @@ pgsc_calc has been deployed on secure platforms like Trusted Research
 Environments (TREs). Running pgsc_calc is a little bit more difficult in this
 case. The basic set up approach is to:
 
-1. Download containers 
-2. Download reference data
-3. Download scoring files 
+1. Set up Nextflow
+2. Download containers 
+3. Download reference data
+4. Download scoring files 
 
 And transfer everything to your offline environment.  
 
@@ -21,6 +22,41 @@ everything working correctly. Please feel free to `open a discussion on Github`_
 if you are having problems and we'll try our best to help you.
 
 .. _open a discussion on Github: https://github.com/PGScatalog/pgsc_calc/discussions
+
+Set up Nextflow
+----------------
+
+From the Nextflow documentation for `offline usage <https://www.nextflow.io/docs/latest/plugins.html#offline-usage>`_:
+
+1. Run the test profile of the calculator with ``nextflow run pgscatalog/pgsc_calc -r test,<docker/singularity/conda>``
+
+.. tip::
+  
+  It doesn't matter if the profile you use on your computer with internet access is different to the profile you use in the airlocked environment. 
+  
+  The important thing is that Nextflow automatically configures itself using an internet connection. 
+
+2. Transfer the Nextflow binary and ``$NXF_HOME/.nextflow`` directory to your airlocked environment 
+
+.. tip::
+
+  ``$NXF_HOME`` is ``$HOME`` by default, so the directory is probably ``~/.nextflow``
+
+.. warning::
+
+  Make sure to transfer the Nextflow binary even if the airlocked environment already has Nextflow installed. It's important that the Nextflow versions match across both environments.
+
+3. Remember to always set the environment variable ``NXF_OFFLINE='true'`` in the offline environment
+
+
+.. tip::
+
+    You shouldn't need to:
+
+    1. Edit any Nextflow configuration files
+    2. Manually download any plugins 
+
+    Unless you want to use a special plugin in the airlocked environment 
 
 Preload container images
 ------------------------

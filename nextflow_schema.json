@@ -1,10 +1,10 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/pgscatalog/pgsc_calc/master/nextflow_schema.json",
   "title": "pgscatalog/pgsc_calc pipeline parameters",
   "description": "This pipeline applies scoring files from the PGS Catalog to target set(s) of genotyped samples",
   "type": "object",
-  "definitions": {
+  "defs": {
     "input_output_options": {
       "title": "Input/output options",
       "type": "object",
@@ -31,11 +31,13 @@
         },
         "pgs_id": {
           "type": "string",
-          "description": "A comma separated list of PGS score IDs, e.g. PGS000802"
+          "description": "A comma separated list of PGS score IDs, e.g. PGS000802",
+          "pattern": "PGS[0-9]{6}"
         },
         "pgp_id": {
           "type": "string",
-          "description": "A comma separated list of PGS Catalog publications, e.g. PGP000001"
+          "description": "A comma separated list of PGS Catalog publications, e.g. PGP000001",
+          "pattern": "PGP[0-9]{6}"
         },
         "trait_efo": {
           "type": "string",
@@ -58,7 +60,8 @@
           "type": "string",
           "description": "Path to the output directory where the results will be saved.",
           "fa_icon": "fas fa-folder-open",
-          "format": "directory-path"
+          "format": "directory-path",
+          "default": "results"
         },
         "email": {
           "type": "string",
@@ -255,10 +258,6 @@
           "type": "boolean",
           "description": "Keep matches of scoring file variants to strand ambiguous variants (e.g. A/T and C/G SNPs) in the target dataset. This assumes the scoring file and target dataset report variants on the same strand."
         },
-        "fast_match": {
-          "type": "boolean",
-          "description": "Enable fast matching, which significantly increases RAM usage (32GB minimum recommended)"
-        },
         "min_overlap": {
           "type": "number",
           "default": 0.75,
@@ -353,38 +352,31 @@
           "description": "Do not use coloured log outputs.",
           "fa_icon": "fas fa-palette",
           "hidden": true
-        },
-        "validate_params": {
-          "type": "boolean",
-          "description": "Boolean whether to validate parameters against the schema at runtime",
-          "default": true,
-          "fa_icon": "fas fa-check-square",
-          "hidden": true
         }
       }
     }
   },
   "allOf": [
     {
-      "$ref": "#/definitions/input_output_options"
+      "$ref": "#/defs/input_output_options"
     },
     {
-      "$ref": "#/definitions/ancestry_options"
+      "$ref": "#/defs/ancestry_options"
     },
     {
-      "$ref": "#/definitions/reference_options"
+      "$ref": "#/defs/reference_options"
     },
     {
-      "$ref": "#/definitions/compatibility_options"
+      "$ref": "#/defs/compatibility_options"
     },
     {
-      "$ref": "#/definitions/matching_options"
+      "$ref": "#/defs/matching_options"
     },
     {
-      "$ref": "#/definitions/max_job_request_options"
+      "$ref": "#/defs/max_job_request_options"
     },
     {
-      "$ref": "#/definitions/generic_options"
+      "$ref": "#/defs/generic_options"
     }
   ],
   "properties": {
@@ -442,15 +434,6 @@
     },
     "config_profile_url": {
       "type": "string"
-    },
-    "validationFailUnrecognisedParams": {
-      "type": "boolean"
-    },
-    "validationLenientMode": {
-      "type": "boolean"
-    },
-    "validationShowHiddenParams": {
-      "type": "boolean"
     }
   }
 }

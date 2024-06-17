@@ -23,7 +23,6 @@ process MATCH_VARIANTS {
 
     script:
     def args = task.ext.args                ?: ''
-    def fast = params.fast_match            ? '--fast'              : ''
     def ambig = params.keep_ambiguous       ? '--keep_ambiguous'    : ''
     def multi = params.keep_multiallelic    ? '--keep_multiallelic' : ''
     def match_chrom = meta.chrom.contains("ALL") ? '' : "--chrom $meta.chrom"
@@ -42,7 +41,6 @@ process MATCH_VARIANTS {
         $match_chrom \
         $ambig \
         $multi \
-        $fast \
         --outdir \$PWD \
         -v
 
