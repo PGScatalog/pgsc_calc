@@ -44,7 +44,7 @@ From the Nextflow documentation for `offline usage <https://www.nextflow.io/docs
 
 .. warning::
 
-  Make sure the transfer the Nextflow binary even if the airlocked environment already has Nextflow installed. It's important that the versions match across both environments.
+  Make sure to transfer the Nextflow binary even if the airlocked environment already has Nextflow installed. It's important that the Nextflow versions match across both environments.
 
 3. Remember to always set the environment variable ``NXF_OFFLINE='true'`` in the offline environment
 
