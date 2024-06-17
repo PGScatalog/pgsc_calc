@@ -33,7 +33,7 @@ process FRAPOSA_PCA {
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:
-        fraposa: TODO
+        fraposa_pgsc: \$(echo \$(python -c 'import fraposa_pgsc; print(fraposa_pgsc.__version__)'))
     END_VERSIONS
     """
 }
