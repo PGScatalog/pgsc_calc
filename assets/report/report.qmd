@@ -486,15 +486,13 @@ stringr::str_glue("{params$sampleset}/score/{params$sampleset}_pgs.txt.gz")
 stringr::str_glue("{params$sampleset}/score/aggregated_scores.txt.gz")
 ```
 
-# Citations
+# Citation
+
+> Lambert, Wingfield, et al. (2024) The Polygenic Score Catalog: new functionality and tools to enable FAIR research. medRxiv. doi:[10.1101/2024.05.29.24307783](https://doi.org/10.1101/2024.05.29.24307783).
 
 ::: {.callout-important}
-For scores from the PGS Catalog, please remember to cite the original publications from which they came (these are listed in the metadata table.) 
+For scores from the PGS Catalog, please remember to cite the original publications from which they came (these are listed in the metadata table).
 :::
-
-> PGS Catalog Calculator (in development). PGS Catalog Team. `https://github.com/PGScatalog/pgsc_calc`
-
-> Lambert et al. (2021) The Polygenic Score Catalog as an open database for reproducibility and systematic evaluation. Nature Genetics. 53:420–425 doi:10.1038/s41588-021-00783-5.
 
 ## Score licenses
 
