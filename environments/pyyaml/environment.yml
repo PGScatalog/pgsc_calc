@@ -1,6 +1,7 @@
 name: pyyaml
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
 dependencies:
-- python=3.10
-- pip
-- pip:
-    - pyyaml==6.0
+- pyyaml=6.0.1
