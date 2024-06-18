@@ -11,7 +11,7 @@
       - "5297845"
     - path: output/combine/versions.yml      
       contains:
-        - "pgscatalog.core: 0.2.0"
+        - "pgscatalog.core: 0.2.1"
 
 - name: test input check subworkflow with liftover 37to38
   command: nextflow run main.nf --only_input --scorefile ./assets/examples/scorefiles/customgrch37.txt --liftover --target_build GRCh38 -c ./tests/config/nextflow.config --hg19_chain https://hgdownload.cse.ucsc.edu/goldenpath/hg19/liftOver/hg19ToHg38.over.chain.gz --hg38_chain https://hgdownload.soe.ucsc.edu/goldenPath/hg38/liftOver/hg38ToHg19.over.chain.gz
@@ -26,4 +26,4 @@
       - "5237785"
     - path: output/combine/versions.yml
       contains:
-        - "pgscatalog.core: 0.2.0"
+        - "pgscatalog.core: 0.2.1"
