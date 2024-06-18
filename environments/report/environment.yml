@@ -1,6 +1,7 @@
 name: report
 channels:
   - conda-forge
+  - bioconda
   - defaults
 dependencies: 
   - r-jsonlite

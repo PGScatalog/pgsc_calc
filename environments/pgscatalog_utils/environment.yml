@@ -1,6 +1,9 @@
-name: pgscatalog_utils
+name: pgscatalog-utils
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
 dependencies:
-- python=3.11
-- pip
-- pip:
-    - pgscatalog_utils==1.0.2
+- pgscatalog.match=0.2.1
+- pgscatalog.calc=0.2.1
+- pgscatalog.core=0.2.1
