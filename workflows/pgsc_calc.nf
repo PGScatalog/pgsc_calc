@@ -17,7 +17,8 @@ log.info logo + paramsSummaryLog(workflow) + citation
 WorkflowPgscCalc.initialise(params, log)
 
 // new approach to validating parameters
-validateParameters()
+// TODO: this causes a weird file error in some environments, disable for now
+// validateParameters()
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
