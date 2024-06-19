@@ -177,7 +177,7 @@ class SamplesheetParser {
         def n_bad_name = samplesets.count { it == "reference" | it.contains("_") }
 
         if (n_bad_name != 0) {
-            Nextflow.error("Reserved sampleset name detected. Please don't call your sampleset 'reference'")
+            Nextflow.error("Reserved sampleset name/character detected. DO NOT call your sampleset 'reference' or use underscores ('_') in the name.")
         }
     }
 
