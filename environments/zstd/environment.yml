@@ -2,6 +2,5 @@ name: zstd
 channels:
   - conda-forge
   - bioconda
-  - defaults
 dependencies:
 - zstd=1.4.8

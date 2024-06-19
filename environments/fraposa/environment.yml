@@ -2,6 +2,5 @@ name: fraposa-pgsc
 channels:
   - conda-forge
   - bioconda
-  - defaults
 dependencies:
 - fraposa-pgsc=0.1.1
