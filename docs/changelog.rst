@@ -8,6 +8,40 @@ will only occur in major versions with changes noted in this changelog.
 
 .. _`semantic versioning`: https://semver.org/
 
+pgsc_calc v2.0.0-beta (2024-06-19)
+-------------------------------------
+
+Graduating to beta with the release of `our preprint <https://www.medrxiv.org/content/10.1101/2024.05.29.24307783v1>`_ 🎉
+
+Improvements
+
+* https://github.com/PGScatalog/pygscatalog/pull/23 
+
+* https://github.com/PGScatalog/pygscatalog/pull/22
+
+* https://github.com/PGScatalog/pgsc_calc/pull/311
+
+* Publish dependencies to Bioconda to improve conda profile UX
+
+  * https://anaconda.org/bioconda/fraposa-pgsc
+
+  * https://anaconda.org/bioconda/pgscatalog.core
+
+  * https://anaconda.org/bioconda/pgscatalog.match
+
+  * https://anaconda.org/bioconda/pgscatalog.calc
+
+Bug fixes 
+
+* Fix for https://github.com/PGScatalog/pygscatalog/issues/21
+
+* Closes  https://github.com/PGScatalog/pgsc_calc/pull/301
+
+* Specify modules explicitly to fix  https://github.com/PGScatalog/pgsc_calc/pull/312  
+
+* Fix bim input to `pgscatalog-aggregate`  https://github.com/PGScatalog/pgsc_calc/pull/319
+
+
 pgsc_calc v2.0.0-alpha.6 (2024-05-24)
 -------------------------------------
 
