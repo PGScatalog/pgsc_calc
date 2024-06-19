@@ -1,6 +1,6 @@
-name: fraposa
+name: fraposa-pgsc
+channels:
+  - conda-forge
+  - bioconda
 dependencies:
-- python=3.10
-- pip
-- pip:
-    - fraposa-pgsc==0.1.0
+- fraposa-pgsc=0.1.1

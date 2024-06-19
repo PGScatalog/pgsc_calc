@@ -4,7 +4,8 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { paramsSummaryLog; paramsSummaryMap } from 'plugin/nf-validation'
+include { validateParameters; paramsSummaryLog; paramsSummaryMap } from 'plugin/nf-schema'
+
 
 def logo = NfcoreTemplate.logo(workflow, params.monochrome_logs)
 def citation = '\n' + WorkflowMain.citation(workflow) + '\n'
@@ -14,6 +15,10 @@ def summary_params = paramsSummaryMap(workflow)
 log.info logo + paramsSummaryLog(workflow) + citation
 
 WorkflowPgscCalc.initialise(params, log)
+
+// new approach to validating parameters
+// TODO: this causes a weird file error in some environments, disable for now
+// validateParameters()
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -122,19 +127,6 @@ include { ANCESTRY_PROJECT  } from '../subworkflows/local/ancestry/ancestry_proj
 include { APPLY_SCORE          } from '../subworkflows/local/apply_score'
 include { REPORT               } from '../subworkflows/local/report'
 include { DUMPSOFTWAREVERSIONS } from '../modules/local/dumpsoftwareversions'
-
-
-/*
-========================================================================================
-    DEPRECATION WARNINGS
-========================================================================================
-*/
-
-if (params.platform) {
-    System.err.println "--platform has been deprecated to match nf-core framework"
-    System.err.println "Please use -profile docker,arm instead"
-    System.exit(1)
-}
 
 /*
 ========================================================================================
