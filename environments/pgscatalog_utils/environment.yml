@@ -3,6 +3,4 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-- pgscatalog.match=0.2.1
-- pgscatalog.calc=0.2.1
-- pgscatalog.core=0.2.1
+- pgscatalog.utils=1.1.2
