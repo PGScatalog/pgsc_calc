@@ -168,7 +168,7 @@ class SamplesheetParser {
         def samplesets = rows.collect { row -> row.sampleset }
         def n_samplesets = samplesets.toSet().size()
         if (n_samplesets > 1) {
-            Nextflow.error("${n_samplesets} missing chromosomes detected! Maximum is 1. Check your samplesheet.")
+            Nextflow.error("${n_samplesets} samplesets detected! Maximum is 1. Check your samplesheet.")
         }
     }
 
