@@ -168,7 +168,7 @@ class SamplesheetParser {
         def samplesets = rows.collect { row -> row.sampleset }
         def n_samplesets = samplesets.toSet().size()
         if (n_samplesets > 1) {
-            Nextflow.error("${n_samplesets} missing chromosomes detected! Maximum is 1. Check your samplesheet.")
+            Nextflow.error("${n_samplesets} samplesets detected! Maximum is 1. Check your samplesheet.")
         }
     }
 
@@ -177,7 +177,7 @@ class SamplesheetParser {
         def n_bad_name = samplesets.count { it == "reference" | it.contains("_") }
 
         if (n_bad_name != 0) {
-            Nextflow.error("Reserved sampleset name detected. Please don't call your sampleset 'reference'")
+            Nextflow.error("Reserved sampleset name/character detected. DO NOT call your sampleset 'reference' or use underscores ('_') in the name.")
         }
     }
 
