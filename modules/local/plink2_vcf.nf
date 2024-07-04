@@ -50,7 +50,7 @@ process PLINK2_VCF {
         $args \\
         --vcf $vcf $dosage_options \\
         --allow-extra-chr $chrom_filter \\
-        --make-pgen vzs \\
+        --make-pgen vzs pvar-cols="-xheader,-maybequal,-maybefilter,-maybeinfo,-maybecm" \\
         --out ${output}
 
     gzip ${output}.vmiss

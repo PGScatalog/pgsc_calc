@@ -51,7 +51,7 @@ process PLINK2_RELABELPVAR {
         --set-all-var-ids '@:#:\$r:\$a' \\
         $set_ma_missing \\
         --pfile ${geno.baseName} $compressed \\
-        --make-just-pvar zs \\
+        --make-just-pvar zs cols="-xheader,-maybequal,-maybefilter,-maybeinfo,-maybecm" \\
         --out $output
 
     # -a: cross platform (mac, linux) method of preserving symlinks
