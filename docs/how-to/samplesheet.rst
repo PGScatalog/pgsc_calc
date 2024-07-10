@@ -61,12 +61,11 @@ There are four mandatory columns:
 Notes
 ~~~~~
 
-.. note:: Multiple samplesheet rows are typically only needed if:
-          
-          - The target genomes are split to have a one file per chromosome
-          - You're working with multiple cohorts simultaneously 
+.. danger:: Always include every target genome chromosome in your samplesheet unless you're certain that missing chromosomes aren't in the scoring files 
 
-.. danger:: All samplesets have to be in the same genome build (either GRCh37 or
+.. note:: Multiple samplesheet rows are typically only needed if the target genomes are split to have a one file per chromosome
+
+.. danger:: All target genome files have to be in the same genome build (either GRCh37 or
     GRCh38) which is specified using the ``--target_build [GRCh3#]``
     command. All scoring files are downloaded or mapped to match the specified
     genome build, no liftover/re-mapping of the genotyping data is performed
@@ -90,10 +89,7 @@ There is one optional column:
   imputation tools (Michigan or TopMed Imputation Servers) that output dosages for the
   ALT allele(s): to extract these data users should enter ``DS`` in this column.
 
-An example of a samplesheet with two VCF datasets where you'd like to import
-different genotypes from each is below:
-
-.. list-table:: Example samplesheet with genotype field set
+.. list-table:: Example samplesheet with genotype field set to hard-calls (default)
    :header-rows: 1
 
    * - sampleset
@@ -106,6 +102,15 @@ different genotypes from each is below:
      - 22
      - vcf
      - ``GT``
+
+.. list-table:: Example samplesheet with genotype field set to dosage
+   :header-rows: 1
+
+   * - sampleset
+     - path_prefix
+     - chrom
+     - format 
+     - vcf_genotype_field       
    * - cineca_imputed
      - path/to/vcf_imputed
      - 22
