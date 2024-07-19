@@ -48,11 +48,11 @@ process PLINK2_MAKEBED {
         --pvar $variants \
         --make-bed \
         $extract \
-        --out ${output}
+        --out ${output} \
 
     if [ $meta.id != 'reference' ]
     then
-        split -l 50000 <(grep -v '#' $pheno) ${split_output}
+        split -l 50000 ${output}.fam ${split_output}
     fi
 
     cat <<-END_VERSIONS > versions.yml
