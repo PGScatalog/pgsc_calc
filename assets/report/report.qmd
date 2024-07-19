@@ -443,7 +443,7 @@ uscores_plot <- uscores[1:min(length(uscores), 6)] # plot max 6 PGS
 
 # Plot multiple adjustment methods at once per PGS
 for(current_pgs in uscores_plot){
-  long_scores <- scores %>% select(!percentile_MostSimilarPop) %>% filter(PGS == current_pgs) %>% gather(Method, score, -sampleset, -IID, -PGS)
+  long_scores <- scores %>% select(!percentile_MostSimilarPop) %>% filter(PGS == current_pgs) %>% gather(Method, score, -sampleset, -FID, -IID, -PGS)
   long_scores %>%
   ggplot(aes(x = score, fill = sampleset)) +
     geom_density(alpha = 0.3) +
