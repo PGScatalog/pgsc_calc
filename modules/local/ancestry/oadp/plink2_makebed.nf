@@ -48,7 +48,7 @@ process PLINK2_MAKEBED {
         --pvar $variants \
         --make-bed \
         $extract \
-        --out ${output} \
+        --out ${output}
 
     if [ $meta.id != 'reference' ]
     then
