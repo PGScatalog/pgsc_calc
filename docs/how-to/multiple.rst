@@ -133,7 +133,7 @@ Congratulations, you've now calculated multiple scores in parallel!
           combine scores in the PGS Catalog with your own custom scores
 
 After the workflow executes successfully, the calculated scores and a summary
-report should be available in the ``results/make/`` directory by default. If
+report should be available in the ``results/`` directory by default. If
 you're interested in more information, see :ref:`interpret`.
 
 If the workflow didn't execute successfully, have a look at the
