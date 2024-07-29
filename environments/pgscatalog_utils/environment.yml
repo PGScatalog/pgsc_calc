@@ -3,4 +3,4 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-- pgscatalog-utils=1.1.2
+- pgscatalog-utils=1.2.0

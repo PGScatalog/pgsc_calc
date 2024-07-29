@@ -3,4 +3,4 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-- fraposa-pgsc=0.1.1
+- fraposa-pgsc=1.0.0

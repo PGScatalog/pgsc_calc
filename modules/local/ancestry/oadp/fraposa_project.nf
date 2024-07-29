@@ -33,7 +33,7 @@ process FRAPOSA_PROJECT {
         --method $params.projection_method \
         --dim_ref 10 \
         --stu_filepref ${target_geno.baseName} \
-        --stu_filt_iid <(cut -f1 $split_fam) \
+        --stu_filt_iid $split_fam \
         --out ${target_geno.baseName}_${split_fam}
 
     cat <<-END_VERSIONS > versions.yml
