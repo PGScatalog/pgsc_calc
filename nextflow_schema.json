@@ -166,13 +166,15 @@
           "default": true,
           "description": "Load allelic frequencies from reference panel when scoring target genomes"
         },
-        "pca_maf_target": {
+        "maf_target": {
           "type": "number",
-          "default": 0.1
+          "default": 0.1,
+          "description": "Minimum MAF threshold in TARGET samples for variants to be included in the PCA."
         },
-        "pca_geno_miss": {
+        "geno_miss_target": {
           "type": "number",
-          "default": 0.1
+          "default": 0.1,
+          "description": "Maximum genotype missingness threshold in TARGET samples for variants to be included in the PCA."
         }
       },
       "required": [
