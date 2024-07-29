@@ -33,8 +33,8 @@ process INTERSECT_VARIANTS {
     pgscatalog-intersect --ref $ref_variants \
         --target $variants \
         --chrom $meta.chrom \
-        --maf_target 0.1 \
-        --geno_miss 0.1 \
+        --maf_target $params.maf_target \
+        --geno_miss $params.geno_miss_target \
         --outdir . \
         -v
 
