@@ -1,33 +1,49 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "https://raw.githubusercontent.com/pgscatalog/pgsc_calc/master/nextflow_schema.json",
   "title": "pgscatalog/pgsc_calc pipeline parameters",
-  "description": "This pipeline applies scoring files from the PGS Catalog to target set(s) of genotyped samples",
+  "description": "The Polygenic Score Catalog Calculator is a nextflow pipeline for polygenic score calculation",
   "type": "object",
-  "defs": {
+  "definitions": {
     "input_output_options": {
       "title": "Input/output options",
       "type": "object",
       "fa_icon": "fas fa-terminal",
       "description": "Define where the pipeline should find input data and save output data.",
+      "required": ["input", "outdir"],
       "properties": {
         "input": {
           "type": "string",
-          "description": "Path to input samplesheet",
-          "format": "file-path"
+          "format": "file-path",
+          "exists": true,
+          "pattern": "^\\S+\\.(csv|json)$",
+          "description": "Path to comma-separated file containing information about the samples in the experiment.",
+          "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row.",
+          "fa_icon": "fas fa-file-csv"
+        },
+        "outdir": {
+          "type": "string",
+          "format": "directory-path",
+          "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
+          "fa_icon": "fas fa-folder-open",
+          "default": "results"
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address for completion summary.",
+          "fa_icon": "fas fa-envelope",
+          "help_text": "Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to specify this on the command line for every run.",
+          "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$"
         },
         "format": {
           "type": "string",
           "default": "csv",
-          "fa_icon": "fas fa-cog",
-          "description": "Format of input samplesheet",
-          "enum": ["csv", "json"]
+          "enum": ["csv", "json"],
+          "description": "What format is the samplesheet in? (csv/json)"
         },
         "scorefile": {
           "type": "string",
-          "description": "Path to a scoring file in PGS Catalog format. Multiple scorefiles can be specified using wildcards (e.g., ``--scorefile \"path/to/scores/*.txt\"``)",
-          "fa_icon": "fas fa-file-alt",
-          "format": "file-path"
+          "description": "Path to a scoring file in PGS Catalog format. Multiple scorefiles can be specified using wildcards (e.g., ``--scorefile \\\"path/to/scores/*.txt\\\"``)"
         },
         "pgs_id": {
           "type": "string",
@@ -55,35 +71,68 @@
           "type": "string",
           "description": "Path to a directory that can store relabelled genotypes (and the reference panel intersections and PCA with --run_ancestry) to speed up new PGS calculations on previously harmonized samples",
           "format": "directory-path"
-        },
-        "outdir": {
+        }
+      }
+    },
+    "compatibility_options": {
+      "title": "Compatibility options",
+      "type": "object",
+      "description": "Define parameters that control how scoring files and target genomes are made compatible with each other",
+      "default": "",
+      "properties": {
+        "target_build": {
           "type": "string",
-          "description": "Path to the output directory where the results will be saved.",
-          "fa_icon": "fas fa-folder-open",
-          "format": "directory-path",
-          "default": "results"
+          "description": "Genome build of target genomes",
+          "enum": ["GRCh37", "GRCh38"]
         },
-        "email": {
-          "type": "string",
-          "description": "Email address for completion summary.",
-          "fa_icon": "fas fa-envelope",
-          "help_text": "Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to specify this on the command line for every run.",
-          "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$"
+        "liftover": {
+          "type": "boolean",
+          "description": "Lift scoring files to match your target genomes. Requires build information in the header of the scoring files."
+        },
+        "min_lift": {
+          "type": "number",
+          "default": 0.95,
+          "description": "Minimum proportion of variants required to successfully remap a scoring file to a different genome build.",
+          "minimum": 0,
+          "maximum": 1
         }
       },
-      "required": ["input", "format"]
+      "required": ["target_build"]
     },
-    "ancestry_options": {
-      "title": "Ancestry options",
+    "new_group_4": {
+      "title": "New Group 4",
       "type": "object",
-      "description": "",
+      "description": "Define how variants are matched across scoring files and target genomes.",
+      "default": "",
+      "properties": {
+        "keep_multiallelic": {
+          "type": "boolean",
+          "description": "Allow matches of scoring file variants to multiallelic variants in the target dataset"
+        },
+        "keep_ambiguous": {
+          "type": "boolean",
+          "description": "Keep matches of scoring file variants to strand ambiguous variants (e.g. A/T and C/G SNPs) in the target dataset. This assumes the scoring file and target dataset report variants on the same strand."
+        },
+        "min_overlap": {
+          "type": "number",
+          "default": 0.75,
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Minimum proportion of variants present in both the score file and input target genomic data"
+        }
+      }
+    },
+    "genetic_ancestry_options": {
+      "title": "Genetic ancestry options",
+      "type": "object",
+      "description": "Parameters used to control genetic ancestry similarity analysis",
       "default": "",
       "properties": {
         "projection_method": {
           "type": "string",
           "default": "oadp",
-          "enum": ["oadp", "sp", "adp"],
-          "description": "The method for PCA prediction. oadp: most accurate. adp: accurate but slow. sp: fast but inaccurate."
+          "description": "The method for PCA prediction. oadp: most accurate. adp: accurate but slow. sp: fast but inaccurate.",
+          "enum": ["oadp", "sp", "adp"]
         },
         "ancestry_method": {
           "type": "string",
@@ -104,8 +153,8 @@
         "normalization_method": {
           "type": "string",
           "default": "empirical mean mean+var",
-          "description": "Method used for normalisation of genetic ancestry",
-          "enum": ["empirical", "mean", "mean+var", "empirical mean mean+var"]
+          "enum": ["empirical", "mean", "mean+var", "empirical mean mean+var"],
+          "description": "Method used for normalisation of genetic ancestry"
         },
         "n_normalization": {
           "type": "integer",
@@ -116,6 +165,14 @@
           "type": "boolean",
           "default": true,
           "description": "Load allelic frequencies from reference panel when scoring target genomes"
+        },
+        "pca_maf_target": {
+          "type": "number",
+          "default": 0.1
+        },
+        "pca_geno_miss": {
+          "type": "number",
+          "default": 0.1
         }
       },
       "required": [
@@ -125,7 +182,9 @@
         "n_popcomp",
         "normalization_method",
         "n_normalization",
-        "load_afreq"
+        "load_afreq",
+        "pca_maf_target",
+        "pca_geno_miss"
       ]
     },
     "reference_options": {
@@ -136,12 +195,13 @@
       "properties": {
         "run_ancestry": {
           "type": "string",
-          "format": "file-path",
-          "description": "Path to reference database. Must be set if --ref_samplesheet is not set."
+          "description": "Path to reference database. Must be set if --ref_samplesheet is not set.",
+          "format": "file-path"
         },
         "ref_samplesheet": {
           "type": "string",
-          "description": "Path to a samplesheet that describes the structure of reference data. Must be set if --ref isn't set."
+          "description": "Path to a samplesheet that describes the structure of reference data. Must be set if --ref isn't set.",
+          "format": "file-path"
         },
         "hg19_chain": {
           "type": "string",
@@ -153,6 +213,7 @@
         "hg38_chain": {
           "type": "string",
           "description": "Path to a UCSC chain file for converting from hg38 to hg19.  Needed if lifting over a custom scoring file.",
+          "pattern": ".*chain.gz$",
           "format": "file-path",
           "mimetype": "application/gzip"
         },
@@ -166,16 +227,16 @@
         "mind_ref": {
           "type": "number",
           "default": 0.1,
-          "description": "Exclude samples with missing call frequencies greater than a threshold (in reference genomes)",
           "minimum": 0,
-          "maximum": 1
+          "maximum": 1,
+          "description": "Exclude samples with missing call frequencies greater than a threshold (in reference genomes)"
         },
         "maf_ref": {
           "type": "number",
           "default": 0.05,
-          "description": "Exclude variants with allele frequency lower than a threshold (in reference genomes)",
           "minimum": 0,
-          "maximum": 1
+          "maximum": 1,
+          "description": "Exclude variants with allele frequency lower than a threshold (in reference genomes)"
         },
         "hwe_ref": {
           "type": "number",
@@ -191,83 +252,113 @@
         },
         "ld_grch37": {
           "type": "string",
+          "default": "/Users/bwingfield/Documents/projects/pgsc_calc/assets/ancestry/high-LD-regions-hg19-GRCh37.txt",
           "description": "Path to a file that contains areas of high linkage disequilibrium in the reference data (build GRCh37).",
           "format": "file-path",
           "mimetype": "text/plain"
         },
         "ld_grch38": {
           "type": "string",
+          "default": "/Users/bwingfield/Documents/projects/pgsc_calc/assets/ancestry/high-LD-regions-hg38-GRCh38.txt",
           "description": "Path to a file that contains areas of high linkage disequilibrium in the reference data (build GRCh38).",
           "format": "file-path",
           "mimetype": "text/plain"
         },
         "ref_format_version": {
           "type": "string",
-          "default": "v0.1"
+          "default": "v0.1",
+          "description": "Version of the default reference database"
         },
         "ancestry_checksums": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "geno_ref",
-        "mind_ref",
-        "maf_ref",
-        "hwe_ref",
-        "indep_pairwise_ref",
-        "ld_grch37",
-        "ld_grch38"
-      ]
-    },
-    "compatibility_options": {
-      "title": "Compatibility options",
-      "type": "object",
-      "description": "Define parameters that control how scoring files and target genomes are made compatible with each other",
-      "default": "",
-      "properties": {
-        "target_build": {
           "type": "string",
-          "enum": ["GRCh37", "GRCh38"],
-          "description": "Genome build of target genomes"
-        },
-        "liftover": {
-          "type": "boolean",
-          "description": "Lift scoring files to match your target genomes. Requires build information in the header of the scoring files."
-        },
-        "min_lift": {
-          "type": "number",
-          "default": 0.95,
-          "description": "Minimum proportion of variants required to successfully remap a scoring file to a different genome build",
-          "minimum": 0,
-          "maximum": 1
+          "description": "Used to validate files in the reference database when built"
         }
-      },
-      "required": ["target_build"]
+      }
     },
-    "matching_options": {
-      "title": "Matching options",
+    "developer_options": {
+      "title": "Developer options",
       "type": "object",
-      "description": "Define how variants are matched across scoring files and target genomes",
+      "description": "Control subworkflow execution, useful for debugging",
       "default": "",
       "properties": {
-        "keep_multiallelic": {
+        "only_bootstrap": {
           "type": "boolean",
-          "description": "Allow matches of scoring file variants to multiallelic variants in the target dataset"
+          "hidden": true
         },
-        "keep_ambiguous": {
+        "only_input": {
           "type": "boolean",
-          "description": "Keep matches of scoring file variants to strand ambiguous variants (e.g. A/T and C/G SNPs) in the target dataset. This assumes the scoring file and target dataset report variants on the same strand."
+          "hidden": true
         },
-        "min_overlap": {
-          "type": "number",
-          "default": 0.75,
-          "description": "Minimum proportion of variants present in both the score file and input target genomic data",
-          "fa_icon": "fas fa-cog",
-          "minimum": 0,
-          "maximum": 1
+        "only_compatible": {
+          "type": "boolean",
+          "hidden": true
+        },
+        "only_match": {
+          "type": "boolean",
+          "hidden": true
+        },
+        "only_projection": {
+          "type": "boolean",
+          "hidden": true
+        },
+        "only_score": {
+          "type": "boolean",
+          "hidden": true
+        },
+        "skip_ancestry": {
+          "type": "boolean",
+          "default": true,
+          "hidden": true
         }
-      },
-      "fa_icon": "fas fa-user-cog"
+      }
+    },
+    "institutional_config_options": {
+      "title": "Institutional config options",
+      "type": "object",
+      "fa_icon": "fas fa-university",
+      "description": "Parameters used to describe centralised config profiles. These should not be edited.",
+      "help_text": "The centralised nf-core configuration profiles use a handful of pipeline parameters to describe themselves. This information is then printed to the Nextflow log when you run a pipeline. You should not need to change these values when you run a pipeline.",
+      "properties": {
+        "custom_config_version": {
+          "type": "string",
+          "description": "Git commit id for Institutional configs.",
+          "default": "master",
+          "hidden": true,
+          "fa_icon": "fas fa-users-cog"
+        },
+        "custom_config_base": {
+          "type": "string",
+          "description": "Base directory for Institutional configs.",
+          "default": "https://raw.githubusercontent.com/nf-core/configs/master",
+          "hidden": true,
+          "help_text": "If you're running offline, Nextflow will not be able to fetch the institutional config files from the internet. If you don't need them, then this is not a problem. If you do need them, you should download the files from the repo and tell Nextflow where to find them with this parameter.",
+          "fa_icon": "fas fa-users-cog"
+        },
+        "config_profile_name": {
+          "type": "string",
+          "description": "Institutional config name.",
+          "hidden": true,
+          "fa_icon": "fas fa-users-cog"
+        },
+        "config_profile_description": {
+          "type": "string",
+          "description": "Institutional config description.",
+          "hidden": true,
+          "fa_icon": "fas fa-users-cog"
+        },
+        "config_profile_contact": {
+          "type": "string",
+          "description": "Institutional config contact information.",
+          "hidden": true,
+          "fa_icon": "fas fa-users-cog"
+        },
+        "config_profile_url": {
+          "type": "string",
+          "description": "Institutional config URL link.",
+          "hidden": true,
+          "fa_icon": "fas fa-users-cog"
+        }
+      }
     },
     "max_job_request_options": {
       "title": "Max job request options",
@@ -298,7 +389,7 @@
           "description": "Maximum amount of time that can be requested for any single job.",
           "default": "240.h",
           "fa_icon": "far fa-clock",
-          "pattern": "^(\\d+\\.?\\s*(s|m|h|day)\\s*)+$",
+          "pattern": "^(\\d+\\.?\\s*(s|m|h|d|day)\\s*)+$",
           "hidden": true,
           "help_text": "Use to set an upper-limit for the time requirement for each process. Should be a string in the format integer-unit e.g. `--max_time '2.h'`"
         }
@@ -314,6 +405,12 @@
         "help": {
           "type": "boolean",
           "description": "Display help text.",
+          "fa_icon": "fas fa-question-circle",
+          "hidden": true
+        },
+        "version": {
+          "type": "boolean",
+          "description": "Display version and exit.",
           "fa_icon": "fas fa-question-circle",
           "hidden": true
         },
@@ -352,88 +449,44 @@
           "description": "Do not use coloured log outputs.",
           "fa_icon": "fas fa-palette",
           "hidden": true
+        },
+        "hook_url": {
+          "type": "string",
+          "description": "Incoming hook URL for messaging service",
+          "fa_icon": "fas fa-people-group",
+          "help_text": "Incoming hook URL for messaging service. Currently, MS Teams and Slack are supported.",
+          "hidden": true
         }
       }
     }
   },
   "allOf": [
     {
-      "$ref": "#/defs/input_output_options"
+      "$ref": "#/definitions/input_output_options"
     },
     {
-      "$ref": "#/defs/ancestry_options"
+      "$ref": "#/definitions/compatibility_options"
     },
     {
-      "$ref": "#/defs/reference_options"
+      "$ref": "#/definitions/new_group_4"
     },
     {
-      "$ref": "#/defs/compatibility_options"
+      "$ref": "#/definitions/genetic_ancestry_options"
     },
     {
-      "$ref": "#/defs/matching_options"
+      "$ref": "#/definitions/reference_options"
     },
     {
-      "$ref": "#/defs/max_job_request_options"
+      "$ref": "#/definitions/developer_options"
     },
     {
-      "$ref": "#/defs/generic_options"
+      "$ref": "#/definitions/institutional_config_options"
+    },
+    {
+      "$ref": "#/definitions/max_job_request_options"
+    },
+    {
+      "$ref": "#/definitions/generic_options"
     }
-  ],
-  "properties": {
-    "only_bootstrap": {
-      "type": "boolean",
-      "hidden": true
-    },
-    "only_input": {
-      "type": "boolean",
-      "hidden": true
-    },
-    "only_compatible": {
-      "type": "boolean",
-      "hidden": true
-    },
-    "only_match": {
-      "type": "boolean",
-      "hidden": true
-    },
-    "only_projection": {
-      "type": "boolean",
-      "hidden": true
-    },
-    "only_score": {
-      "type": "boolean",
-      "hidden": true
-    },
-    "skip_ancestry": {
-      "type": "boolean",
-      "default": true,
-      "hidden": true
-    },
-    "hook_url": {
-      "type": "string"
-    },
-    "version": {
-      "type": "boolean"
-    },
-    "config_profile_name": {
-      "type": "string"
-    },
-    "config_profile_description": {
-      "type": "string"
-    },
-    "custom_config_version": {
-      "type": "string",
-      "default": "master"
-    },
-    "custom_config_base": {
-      "type": "string",
-      "default": "https://raw.githubusercontent.com/nf-core/configs/master"
-    },
-    "config_profile_contact": {
-      "type": "string"
-    },
-    "config_profile_url": {
-      "type": "string"
-    }
-  }
+  ]
 }
