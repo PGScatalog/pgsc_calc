@@ -16,6 +16,9 @@
         - "IID"
         - "PGS"
         - "SUM"
+    - path: output/score/versions.yml
+      contains:
+        - "pgscatalog.calc: 0.2.2"
       must_not_contain:
         - "percentile_MostSimilarPop"
         - "Z_MostSimilarPop"
