@@ -26,7 +26,7 @@
           "format": "directory-path",
           "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
           "fa_icon": "fas fa-folder-open",
-          "default": "results"
+          "default": "results/"
         },
         "email": {
           "type": "string",
@@ -99,8 +99,8 @@
       },
       "required": ["target_build"]
     },
-    "new_group_4": {
-      "title": "New Group 4",
+    "matching_options": {
+      "title": "Matching options",
       "type": "object",
       "description": "Define how variants are matched across scoring files and target genomes.",
       "default": "",
@@ -474,7 +474,7 @@
       "$ref": "#/definitions/compatibility_options"
     },
     {
-      "$ref": "#/definitions/new_group_4"
+      "$ref": "#/definitions/matching_options"
     },
     {
       "$ref": "#/definitions/genetic_ancestry_options"
