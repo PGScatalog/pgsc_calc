@@ -2,6 +2,7 @@ name: report
 channels:
   - conda-forge
   - bioconda
+  - nodefaults  
 dependencies: 
   - r-jsonlite
   - r-dplyr
