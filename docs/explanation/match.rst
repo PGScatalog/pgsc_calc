@@ -37,6 +37,8 @@ When you evaluate the predictive performance of a score with low match rates it 
 
 If you reduce ``--min_overlap`` then the calculator will output scores calculated with the remaining variants, **but these scores may not be representative of the original data submitted to the PGS Catalog.**
 
+.. _wgs:
+
 Are your target genomes imputed? Are they WGS?
 ----------------------------------------------
 
@@ -49,7 +51,7 @@ In the future we plan to improve support for WGS.
 Did you set the correct genome build?
 -------------------------------------
 
-The calculator will automatically grab scoring files in the correct genome build from the PGS Catalog. If match rates are low it may be because you have specified the wrong genome build. If you're using custom scoring files and the match rate is low it is possible that the `--liftover` command may have been omitted. 
+The calculator will automatically grab scoring files in the correct genome build from the PGS Catalog. If match rates are low it may be because you have specified the wrong genome build. If you're using custom scoring files and the match rate is low it is possible that the ``--liftover`` command may have been omitted. 
 
 I'm still getting match rate errors. How do I figure out what's wrong?
 ----------------------------------------------------------------------

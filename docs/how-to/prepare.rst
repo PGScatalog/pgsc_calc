@@ -52,6 +52,8 @@ VCF from WGS
 See https://github.com/PGScatalog/pgsc_calc/discussions/123 for discussion about tools
 to convert the VCF files into ones suitable for calculating PGS.
 
+If you input WGS data to the calculator without following the steps above then you will probably encounter match rate errors. For more information, see: :ref:`wgs`
+
 
 ``plink`` binary fileset (bfile)
 --------------------------------

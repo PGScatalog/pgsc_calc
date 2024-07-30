@@ -54,7 +54,7 @@ The workflow relies on open source scientific software, including:
 A full description of included software is described in :ref:`containers`.
 
 .. _PLINK 2: https://www.cog-genomics.org/plink/2.0/
-.. _PGS Catalog Utilities: https://github.com/PGScatalog/pgscatalog_utils
+.. _PGS Catalog Utilities: https://github.com/PGScatalog/pygscatalog
 .. _FRAPOSA: https://github.com/PGScatalog/fraposa_pgsc
 
 
@@ -120,7 +120,10 @@ Documentation
 Changelog
 ---------
 
-The :doc:`Changelog page<changelog>` describes fixes and enhancements for each version.
+The `Changelog page`_ describes fixes and enhancements for each version.
+
+.. _`Changelog page`: https://github.com/PGScatalog/pgsc_calc/releases
+
 
 Features under development
 --------------------------

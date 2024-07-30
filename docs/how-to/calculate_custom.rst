@@ -26,7 +26,7 @@ minimal header in the following format:
 Header::
 
     #pgs_name=metaGRS_CAD
-    #pgs_name=metaGRS_CAD    
+    #pgs_id=metaGRS_CAD    
     #trait_reported=Coronary artery disease
     #genome_build=GRCh37
 

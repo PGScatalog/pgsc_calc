@@ -127,8 +127,12 @@ panel too. See :ref:`norm`.
 Download scoring files
 ----------------------
 
-It's best to manually download scoring files from the PGS Catalog in the correct
-genome build. Using PGS001229 as an example:
+.. tip:: Use our CLI application ``pgscatalog-download`` to `download multiple scoring`_ files in parallel and the correct genome build
+
+.. _download multiple scoring: https://pygscatalog.readthedocs.io/en/latest/how-to/guides/download.html
+
+You'll need to preload scoring files in the correct genome build.
+Using PGS001229 as an example:
 
 https://ftp.ebi.ac.uk/pub/databases/spot/pgs/scores/PGS001229/ScoringFiles/
 
