@@ -1,7 +1,7 @@
-name: zstd
+name: plink2
 channels:
   - conda-forge
   - bioconda
   - nodefaults  
-dependencies:
-  - zstd=1.4.8
+dependencies: 
+  - plink2==2.00a5.10
