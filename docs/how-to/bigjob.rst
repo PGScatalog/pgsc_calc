@@ -74,43 +74,132 @@ limits.
 .. warning:: You'll probably want to use ``-profile singularity`` on a HPC. The
           pipeline requires Singularity v3.7 minimum.
    
-However, in general you will have to adjust the ``executor`` options and job resource
-allocations (e.g. ``process_low``). Here's an example for an LSF cluster:
+Here's an example configuration running about 100 scores in parallel
+on UK Biobank with a SLURM cluster:
 
 .. code-block:: text
 
     process {
-        queue = 'short'
-        clusterOptions = ''
-        scratch = true
+        errorStrategy = 'retry'
+        maxRetries = 3
+        maxErrors = '-1'
+        executor = 'slurm'
 
-        withLabel:process_low {
-            cpus   = 2
-            memory = 8.GB
-            time   = 1.h
+        withName: 'DOWNLOAD_SCOREFILES' {
+          cpus = 1
+          memory = { 1.GB * task.attempt }
+          time = { 1.hour * task.attempt }
         }
-        withLabel:process_medium {
-            cpus   = 8
-            memory = 64.GB
-            time   = 4.h
+
+        withName: 'COMBINE_SCOREFILES' {
+          cpus = 1
+          memory = { 8.GB * task.attempt }
+          time = { 2.hour * task.attempt }
+        }
+
+        withName: 'PLINK2_MAKEBED' {
+          cpus = 2
+          memory = { 8.GB * task.attempt }
+          time = { 1.hour * task.attempt }
+        }
+
+        withName: 'RELABEL_IDS' {
+          cpus = 1
+          memory = { 16.GB * task.attempt }
+          time = { 1.hour * task.attempt }
+        }
+
+        withName: 'PLINK2_ORIENT' {
+          cpus = 2
+          memory = { 8.GB * task.attempt }
+          time = { 1.hour * task.attempt }
+        }
+
+        withName: 'DUMPSOFTWAREVERSIONS' {
+          cpus = 1
+          memory = { 1.GB * task.attempt }
+          time = { 1.hour * task.attempt }
+        }
+
+        withName: 'ANCESTRY_ANALYSIS' {
+          cpus = { 1 * task.attempt }
+          memory = { 8.GB * task.attempt }
+          time = { 1.hour * task.attempt }
+        }
+
+        withName: 'SCORE_REPORT' {
+          cpus = 2
+          memory = { 8.GB * task.attempt }
+          time = { 1.hour * task.attempt }
+        }
+
+        withName: 'EXTRACT_DATABASE' {
+          cpus = 1
+          memory = { 8.GB * task.attempt }
+          time = { 1.hour * task.attempt }
+        }
+
+        withName: 'PLINK2_RELABELPVAR' {
+          cpus = 2
+          memory = { 16.GB * task.attempt }
+          time = { 2.hour * task.attempt }
+        }
+
+        withName: 'INTERSECT_VARIANTS' {
+          cpus = 2
+          memory = { 8.GB * task.attempt }
+          time = { 1.hour * task.attempt }
+        }
+
+        withName: 'MATCH_VARIANTS' {
+          cpus = 2
+          memory = { 32.GB * task.attempt }
+          time = { 6.hour * task.attempt }
+        }
+
+        withName: 'FILTER_VARIANTS' {
+          cpus = 2
+          memory = { 16.GB * task.attempt }
+          time = { 1.hour * task.attempt }
+        }
+
+        withName: 'MATCH_COMBINE' {
+          cpus = 4
+          memory = { 64.GB * task.attempt }
+          time = { 6.hour * task.attempt }
+        }
+
+        withName: 'FRAPOSA_PCA' {
+          cpus = 2
+          memory = { 8.GB * task.attempt }
+          time = { 1.hour * task.attempt }
+        }
+
+        withName: 'PLINK2_SCORE' {
+          cpus = 2
+          memory = { 8.GB * task.attempt }
+          time = { 12.hour * task.attempt }
+        }
+
+        withName: 'SCORE_AGGREGATE' {
+          cpus = 2
+          memory = { 16.GB * task.attempt }
+          time = { 4.hour * task.attempt }
         }
     }
 
-    executor {
-        name = 'lsf'
-        jobName = { "$task.hash" }
-    } 
-
-In SLURM, queue is equivalent to a partition. Specific cluster parameters can be
-provided by modifying ``clusterOptions``. You should change ``cpus``,
-``memory``, and ``time`` to match the amount of resources used. Assuming the
-configuration file you set up is saved as ``my_custom.config`` in your current
-working directory, you're ready to run pgsc_calc. Instead of running nextflow
-directly on the shell, save a bash script (``run_pgscalc.sh``) to a file
-instead:
+Assuming the configuration file you set up is saved as
+``my_custom.config`` in your current working directory, you're ready
+to run pgsc_calc. Instead of running nextflow directly on the shell,
+save a bash script (``run_pgscalc.sh``) to a file instead:
 
 .. code-block:: bash
-                
+
+    #SBATCH -J ukbiobank_pgs
+    #SBATCH -c 1
+    #SBATCH -t 24:00:00
+    #SBATCH --mem=2G
+    
     export NXF_ANSI_LOG=false
     export NXF_OPTS="-Xms500M -Xmx2G" 
     
@@ -126,20 +215,23 @@ instead:
 .. note:: The name of the nextflow and singularity modules will be different in
           your local environment
 
-          .. warning:: Make sure to copy input data to fast storage, and run the pipeline
-            on the same fast storage area. You might include these steps in your
-            bash script. Ask your sysadmin for help if you're not sure what this
-            means.
+.. warning:: Make sure to copy input data to fast storage, and run the
+            pipeline on the same fast storage area. You might include
+            these steps in your bash script. Ask your sysadmin for
+            help if you're not sure what this means.
           
 .. code-block:: console
             
-    $ bsub -M 2GB -q short -o output.txt < run_pgscalc.sh
-
+    $ sbatch run_pgsc_calc.sh
+    
 This will submit a nextflow driver job, which will submit additional jobs for
-each process in the workflow. The nextflow driver requires up to 4GB of RAM
-(bsub's ``-M`` parameter) and 2 CPUs to use (see a guide for `HPC users`_ here).
+each process in the workflow. The nextflow driver requires up to 4GB of RAM and 2 CPUs to use (see a guide for `HPC users`_ here).
 
-.. _`LSF and PBS`: https://nextflow.io/docs/latest/executor.html#slurm
 .. _`HPC users`: https://www.nextflow.io/blog/2021/5_tips_for_hpc_users.html
 .. _`a nextflow profile`: https://github.com/nf-core/configs
 
+
+Cloud deployments
+-----------------
+
+We've deployed the calculator to Google Cloud Batch but some :doc:`special configuration is required<cloud>`.

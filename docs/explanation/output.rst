@@ -23,6 +23,7 @@ Calculated scores are stored in a gzipped-text space-delimted text file called
 seperate row (``length = n_samples*n_pgs``), and there will be at least four columns with the following headers:
 
 - ``sampleset``: the name of the input sampleset, or ``reference`` for the panel.
+- ``FID``: the family identifier of each sample within the dataset (may be the same as IID).
 - ``IID``: the identifier of each sample within the dataset.
 - ``PGS``: the accession ID of the PGS being reported.
 - ``SUM``: reports the weighted sum of *effect_allele* dosages multiplied by their *effect_weight*
@@ -56,6 +57,7 @@ describing the analysis of the target samples in relation to the reference panel
 following headers:
 
 - ``sampleset``: the name of the input sampleset, or ``reference`` for the panel.
+- ``FID``: the family identifier of each sample within the dataset (may be the same as IID).
 - ``IID``: the identifier of each sample within the dataset.
 - ``[PC1 ... PCN]``: The projection of the sample within the PCA space defined by the reference panel. There will be as
   many PC columns as there are PCs calculated (default: 10).

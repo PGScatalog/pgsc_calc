@@ -130,7 +130,15 @@ how-to guide), and has the following steps:
         for variant-level QC (SNPs in Hardy–Weinberg equilibrium [p > 1e-04] that are bi-allelic and non-ambiguous,
         with low missingness [<10%], and minor allele frequency [MAF > 5%]) and sample-quality (missingness <10%).
         LD-pruning is then applied to the variants and sample passing these checks (r\ :sup:`2` threshold = 0.05), excluding
-        complex regions with high LD (e.g. MHC). These methods are implemented in the ``FILTER_VARIANTS`` module.
+        complex regions with high LD (e.g. MHC). These methods are implemented in the ``FILTER_VARIANTS`` module, and
+        the default settings can be changed (see :doc:`schema (Reference options) <params>`).
+
+        1.  **Additional variant filters on TARGET samples**: in ``v2.0.0-beta`` we introduced the ability to filter
+            target sample variants using minimum MAF [default 10%] and maximum genotype missingness [default 10%] to
+            improve PCA robustness when using imputed genotype data (see :doc:`schema (Ancestry options) <params>`).
+            *Note: these parameters may need to be adjusted depending on your input data (currently optimized for large
+            cohorts like UKB), for individual samples we recommend the MAF filter to be lowered (``--pca_maf_target 0``)
+            to ensure homozygous reference calls are included.*
 
     2.  **PCA**: the LD-pruned variants of the unrelated samples passing QC are then used to define the PCA space of the
         reference panel (default: 10 PCs) using `FRAPOSA`_ (Fast and Robust Ancestry Prediction by using Online singular

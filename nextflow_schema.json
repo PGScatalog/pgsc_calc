@@ -99,8 +99,8 @@
       },
       "required": ["target_build"]
     },
-    "new_group_4": {
-      "title": "New Group 4",
+    "matching_options": {
+      "title": "Matching options",
       "type": "object",
       "description": "Define how variants are matched across scoring files and target genomes.",
       "default": "",
@@ -125,7 +125,7 @@
     "genetic_ancestry_options": {
       "title": "Genetic ancestry options",
       "type": "object",
-      "description": "Parameters used to control genetic ancestry similarity analysis",
+      "description": "Parameters used to control genetic ancestry similarity analysis on TARGET samples and variants included in PCA",
       "default": "",
       "properties": {
         "projection_method": {
@@ -168,11 +168,17 @@
         },
         "pca_maf_target": {
           "type": "number",
-          "default": 0.1
+          "default": 0.1,
+          "description": "Minimum MAF threshold in TARGET samples for variants to be included in the PCA.",
+          "minimum": 0,
+          "maximum": 1
         },
-        "pca_geno_miss": {
+        "pca_geno_miss_target": {
           "type": "number",
-          "default": 0.1
+          "default": 0.1,
+          "description": "Maximum genotype missingness threshold in TARGET samples for variants to be included in the PCA.",
+          "minimum": 0,
+          "maximum": 1
         }
       },
       "required": [
@@ -184,13 +190,13 @@
         "n_normalization",
         "load_afreq",
         "pca_maf_target",
-        "pca_geno_miss"
+        "pca_geno_miss_target"
       ]
     },
     "reference_options": {
       "title": "Reference options",
       "type": "object",
-      "description": "Define how reference genomes are defined and processed",
+      "description": "Define how genomes and variants in REFERENCE panel are defined and processed for PCA",
       "default": "",
       "properties": {
         "run_ancestry": {
@@ -220,7 +226,7 @@
         "geno_ref": {
           "type": "number",
           "default": 0.1,
-          "description": "Exclude variants with missing call frequencies greater than a threshold (in reference genomes)",
+          "description": "Exclude VARIANTS with percentage of missing genotype calls greater than a threshold (in reference genomes)",
           "minimum": 0,
           "maximum": 1
         },
@@ -229,14 +235,14 @@
           "default": 0.1,
           "minimum": 0,
           "maximum": 1,
-          "description": "Exclude samples with missing call frequencies greater than a threshold (in reference genomes)"
+          "description": "Exclude SAMPLES with percentage of missing genotype calls greater than a threshold (in reference genomes)"
         },
         "maf_ref": {
           "type": "number",
           "default": 0.05,
           "minimum": 0,
           "maximum": 1,
-          "description": "Exclude variants with allele frequency lower than a threshold (in reference genomes)"
+          "description": "Exclude variants with minor allele frequency (MAF) lower than a threshold (in reference genomes)"
         },
         "hwe_ref": {
           "type": "number",
@@ -468,7 +474,7 @@
       "$ref": "#/definitions/compatibility_options"
     },
     {
-      "$ref": "#/definitions/new_group_4"
+      "$ref": "#/definitions/matching_options"
     },
     {
       "$ref": "#/definitions/genetic_ancestry_options"

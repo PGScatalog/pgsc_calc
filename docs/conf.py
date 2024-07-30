@@ -22,7 +22,7 @@ import subprocess
 
 project = 'Polygenic Score (PGS) Catalog Calculator'
 copyright = 'Polygenic Score (PGS) Catalog team (licensed under Apache License V2)'
-# author = 'Polygenic Score (PGS) Catalog team'
+author = 'Polygenic Score (PGS) Catalog team'
 
 
 # -- General configuration ---------------------------------------------------
