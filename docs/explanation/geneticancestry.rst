@@ -134,11 +134,9 @@ how-to guide), and has the following steps:
         the default settings can be changed (see :doc:`schema (Reference options) <params>`).
 
         1.  **Additional variant filters on TARGET samples**: in ``v2.0.0-beta`` we introduced the ability to filter
-            target sample variants using minimum MAF [default 10%] and maximum genotype missingness [default 10%] to
+            target sample variants using a maximum genotype missingness [default 10%] and/or minimum MAF [default 0%] to
             improve PCA robustness when using imputed genotype data (see :doc:`schema (Ancestry options) <params>`).
-            *Note: these parameters may need to be adjusted depending on your input data (currently optimized for large
-            cohorts like UKB), for individual samples we recommend the MAF filter to be lowered (``--pca_maf_target 0``)
-            to ensure homozygous reference calls are included.*
+            *Note: these parameters may need to be adjusted depending on your input data.*
 
     2.  **PCA**: the LD-pruned variants of the unrelated samples passing QC are then used to define the PCA space of the
         reference panel (default: 10 PCs) using `FRAPOSA`_ (Fast and Robust Ancestry Prediction by using Online singular

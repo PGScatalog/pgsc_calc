@@ -172,7 +172,7 @@
         },
         "pca_maf_target": {
           "type": "number",
-          "default": 0.1,
+          "default": 0,
           "description": "Minimum MAF threshold in TARGET samples for variants to be included in the PCA.",
           "minimum": 0,
           "maximum": 1
