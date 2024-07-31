@@ -19,7 +19,7 @@ def test_aggregated_scores(workflow_dir):
 
     assert not df.isnull().any().any(), "Missing values in aggregated scores"
 
-    cols = ["sampleset", "IID", "PGS", "SUM", "DENOM", "AVG"]
+    cols = ["sampleset", "FID", "IID", "PGS", "SUM", "DENOM", "AVG"]
     assert cols == list(df.columns), "Missing columns"
     assert (
         len(

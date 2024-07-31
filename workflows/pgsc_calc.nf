@@ -170,7 +170,16 @@ workflow PGSCCALC {
     // make sure accessions look sensible before querying PGS Catalog
     def pgs_id = WorkflowPgscCalc.prepareAccessions(params.pgs_id, "pgs_id")
     def pgp_id = WorkflowPgscCalc.prepareAccessions(params.pgp_id, "pgp_id")
-    def trait_efo = WorkflowPgscCalc.prepareAccessions(params.trait_efo, "trait_efo")
+    
+    // temporarily handle parameter synonym (--trait_efo -> --efo_id) 
+    def traits = [params.trait_efo, params.efo_id].findAll { it != null }.join(",")
+    
+    if (params.trait_efo) {
+        println "WARNING: --trait_efo is deprecated and will be removed in a future release, please use --efo_id"
+    }
+
+    def trait_efo = WorkflowPgscCalc.prepareAccessions(traits, "trait_efo")
+    
     def accessions = pgs_id + pgp_id + trait_efo
 
     if (!accessions.every { it.value == "" }) {

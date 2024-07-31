@@ -2,6 +2,6 @@ name: pyyaml
 channels:
   - conda-forge
   - bioconda
-  - defaults
+  - nodefaults
 dependencies:
-- pyyaml=6.0.1
+  - pyyaml=6.0.1
