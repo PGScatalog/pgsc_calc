@@ -55,9 +55,13 @@
           "description": "A comma separated list of PGS Catalog publications, e.g. PGP000001",
           "pattern": "PGP[0-9]{6}"
         },
-        "trait_efo": {
+        "efo_id": {
           "type": "string",
           "description": "A comma separated list of PGS Catalog EFO traits, e.g. EFO_0004214"
+        },
+        "trait_efo": {
+          "type": "string",
+          "description": "DEPRECATED: A comma separated list of PGS Catalog EFO traits, e.g. EFO_0004214"
         },
         "efo_direct": {
           "type": "boolean",
