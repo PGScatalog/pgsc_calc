@@ -51,7 +51,7 @@ parameter:
 
 .. code-block:: console
 
-    --efi_id EFO_0001645
+    --efo_id EFO_0001645
 
 Multiple traits can be set by using a comma separated list.
 
