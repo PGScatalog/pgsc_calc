@@ -46,12 +46,12 @@ Traits
 ~~~~~~
 
 If you would like to calculate every polygenic score in the Catalog for a
-`trait`_, like `coronary artery disease`_, then you can use the ``--trait_efo``
+`trait`_, like `coronary artery disease`_, then you can use the ``--efo_id``
 parameter:
 
 .. code-block:: console
 
-    --trait_efo EFO_0001645
+    --efi_id EFO_0001645
 
 Multiple traits can be set by using a comma separated list.
 
@@ -85,7 +85,7 @@ Multiple traits can be set by using a comma separated list.
         -profile <docker/singularity/conda> \    
         --input samplesheet.csv \
         --pgs_id PGS001229 \
-        --trait_efo EFO_0001645 \
+        --efo_id EFO_0001645 \
         --pgp_id PGP000001
 
 .. note:: For more details about calculating multiple scores, see :ref:`multiple` 
