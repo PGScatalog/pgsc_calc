@@ -11,8 +11,8 @@ class WorkflowPgscCalc {
     // Check and validate parameters
     //
     public static void initialise(params, log) {
-        if (![params.scorefile, params.pgs_id, params.trait_efo, params.pgp_id].any()) {
-            Nextflow.error " ERROR: You didn't set any scores to use! Please set --scorefile, --pgs_id, --trait_efo, or --pgp_id"
+        if (![params.scorefile, params.pgs_id, params.trait_efo, params.efo_id, params.pgp_id].any()) {
+            Nextflow.error " ERROR: You didn't set any scores to use! Please set --scorefile, --pgs_id, --efo_id, or --pgp_id"
         }
 
         if (!params.target_build) {
