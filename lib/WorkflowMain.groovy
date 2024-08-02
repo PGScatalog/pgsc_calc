@@ -76,8 +76,8 @@ class WorkflowMain {
         if (profile.contains("test")) {
             def test_warn = """
                 | INFO: The test profile is used to install the workflow and verify the software is working correctly on your system.
-                | INFO: Test input data and results are not biologically meaningful. They are only useful as examples. Attempting to use scoring files from the PGS Catalog with the test profile won't work. Please use your own data.                
-            """
+                | INFO: Test input data and results are are only useful as examples of outputs, and are not biologically meaningful.
+            """        
             log.info test_warn.stripMargin().stripIndent()
         }
 
