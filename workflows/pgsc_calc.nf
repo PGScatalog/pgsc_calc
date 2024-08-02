@@ -111,6 +111,12 @@ if (!run_ancestry_assign && !run_ancestry_adjust) {
     run_ancestry_bootstrap = false
 }
 
+if (workflow.profile.contains("test")) {
+    if (params.run_ancestry) {
+        error "ERROR: The test profile isn't compatible with --run_ancestry. Please use real data."
+    }
+}
+
 /*
 ========================================================================================
     IMPORT LOCAL MODULES/SUBWORKFLOWS
