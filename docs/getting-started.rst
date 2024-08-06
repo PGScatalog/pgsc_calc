@@ -166,12 +166,14 @@ Congratulations, you've now (`hopefully`) calculated some scores!
 After the workflow executes successfully, the calculated scores and a summary
 report should be available in the ``results/score/`` directory in your current
 working directory (``$PWD``) by default. If you're interested in more
-information, see :ref:`interpret`.
+information, see :ref:`interpret`. **Note**: *when interpreting results users should ensure
+that the samples used for calculation were not used for PGS development (see `Wray et al. (2013)`_).*
 
 If the workflow didn't execute successfully, have a look at the
 :ref:`troubleshoot` section. Remember to replace ``<docker/singularity/conda>``
 with the software you have installed on your computer.
 
+.. _Wray et al. (2013): https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4096801/
          
 4. Next steps & advanced usage
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
