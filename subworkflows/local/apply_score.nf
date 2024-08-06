@@ -138,8 +138,7 @@ workflow APPLY_SCORE {
 
 def aggregate_error(boolean fail) {
     if (fail) {
-        log.error "ERROR: No scores calculated!"
-        System.exit(1)
+        error "ERROR: No scores calculated!"
     }
 }
 

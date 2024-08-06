@@ -103,7 +103,6 @@ def annotate_sampleset(it) {
 
 def report_error(boolean fail) {
     if (fail) {
-        log.error "ERROR: No results report written!"
-        System.exit(1)
+        error "ERROR: No results report written!"
     }
 }

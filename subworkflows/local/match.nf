@@ -73,7 +73,6 @@ workflow MATCH {
 
 def combine_error(boolean fail) {
     if (fail) {
-        log.error "ERROR: Matching subworkflow failed"
-        System.exit(1)
+        error "ERROR: Matching subworkflow failed"
     }
 }

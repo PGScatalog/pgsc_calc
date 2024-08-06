@@ -273,7 +273,6 @@ workflow ANCESTRY_PROJECT {
 
 def projection_error(boolean fail) {
     if (fail) {
-        log.error "ERROR: Projection subworkflow failed"
-        System.exit(1)
+        error "ERROR: Projection subworkflow failed"
     }
 }
