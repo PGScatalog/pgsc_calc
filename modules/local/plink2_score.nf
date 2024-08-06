@@ -64,7 +64,7 @@ process PLINK2_SCORE {
             $input ${geno.baseName} \
             --out ${output}
 
-        n_missing=\$(comm -3 <(zcat $scorefile | tail -n +2 | cut -f 1 | sort) <(sort ${output}.sscore.vars) | wc -l | tr -d ' ')
+        n_missing=\$(comm -3 <(zcat --quiet $scorefile | tail -n +2 | cut -f 1 | sort) <(sort ${output}.sscore.vars) | wc -l | tr -d ' ')
 
         if [ \$n_missing -gt 0 ]
         then
@@ -93,7 +93,7 @@ process PLINK2_SCORE {
             $input ${geno.baseName} \
             --out ${output}
 
-        n_missing=\$(comm -3 <(zcat $scorefile | tail -n +2 | cut -f 1 | sort) <(sort ${output}.sscore.vars) | wc -l | tr -d ' ')
+        n_missing=\$(comm -3 <(zcat --quiet $scorefile | tail -n +2 | cut -f 1 | sort) <(sort ${output}.sscore.vars) | wc -l | tr -d ' ')
 
         if [ \$n_missing -gt 0 ]
         then
