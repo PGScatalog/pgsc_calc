@@ -60,6 +60,11 @@ The two groups of methods (empirical and continuous PCA-based) use these data an
     with genetic ancestry.** Data is for the normalization of PGS000018 (metaGRS_CAD) in 1000 Genomes,
     when applying ``pgsc_calc --run_ancestry`` to data from the Human Genome Diversity Project (HGDP) data.
 
+.. note:: It is important to note that adjusting the PGS distributions by ancestry does not solve differences of
+    PGS performance that are observed across genetic ancestry groups. The methods implemented within the calculator
+    ensure that the Z-score distributions in individuals of differing genetic ancestries will be more comparable
+    (equal mean and/or variance); however, the effect size (e.g. beta, odds/hazard ratio) of being in the tail of
+    a distribution of a PGS may still differ across ancestry groups.
 
 Empirical methods
 ~~~~~~~~~~~~~~~~~
