@@ -3,7 +3,6 @@ process PLINK2_SCORE {
     // labels are defined in conf/modules.config
     label 'process_low'
     label 'process_long'
-    label 'error_retry'
     label 'plink2' // controls conda, docker, + singularity options
 
     tag "$meta.id chromosome $meta.chrom effect type $scoremeta.effect_type $scoremeta.n"
@@ -66,6 +65,16 @@ process PLINK2_SCORE {
             $input ${geno.baseName} \
             --out ${output}
 
+        n_missing=\$(comm -3 <(zcat $scorefile | tail -n +2 | cut -f 1 | sort) <(sort ${scorefile.simpleName}.sscore.vars) | wc -l | tr -d ' ')
+
+        if [ \$n_missing -gt 0 ]
+        then
+          echo "ERROR: \$n_missing variant(s) missing from final calculated score!"
+          exit 1
+        else
+          echo "INFO: Input variants match variants used for calculation"
+        fi
+
         cat <<-END_VERSIONS > versions.yml
         ${task.process.tokenize(':').last()}:
             plink2: \$(plink2 --version 2>&1 | sed 's/^PLINK v//; s/ 64.*\$//' )
@@ -84,6 +93,16 @@ process PLINK2_SCORE {
             --score-col-nums 3-$maxcol \
             $input ${geno.baseName} \
             --out ${output}
+
+        n_missing=\$(comm -3 <(zcat $scorefile | tail -n +2 | cut -f 1 | sort) <(sort ${scorefile.simpleName}.sscore.vars) | wc -l | tr -d ' ')
+
+        if [ \$n_missing -gt 0 ]
+        then
+          echo "ERROR: \$n_missing variant(s) missing from final calculated score!"
+          exit 1
+        else
+          echo "INFO: Input variants match variants used for calculation"
+        fi
 
         cat <<-END_VERSIONS > versions.yml
         ${task.process.tokenize(':').last()}:
