@@ -39,6 +39,11 @@ If you have run the pipeline **without** using ancestry information the followin
     commands; however, the calculation of the PGS is based on the full precision of the effect_weight value in the
     scoring file.
 
+.. warning:: Users should take note of whether the input samples were used in the development of the PGS being
+    scored as this can lead to inflated estimate of PGS performance (see `Wray et al. (2013)`_ for discussion).
+
+.. _Wray et al. (2013): https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4096801/
+
 ``--run_ancestry``-specific outputs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
