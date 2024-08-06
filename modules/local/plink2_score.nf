@@ -50,7 +50,6 @@ process PLINK2_SCORE {
     args2 = [args2, cols, 'list-variants', no_imputation, recessive, dominant, error_on_freq_calc].join(' ')
     outmeta = meta + ["n": scoremeta.n, "effect_type": scoremeta.effect_type]
     output = "${meta.id}_${meta.chrom}_${scoremeta.effect_type}_${scoremeta.n}"
-
     // speed up the calculation by only considering scoring-file variants for allele frequency calculation (--extract)
     if (scoremeta.n_scores.toInteger() == 1)
         """
@@ -65,14 +64,14 @@ process PLINK2_SCORE {
             $input ${geno.baseName} \
             --out ${output}
 
-        n_missing=\$(comm -3 <(zcat $scorefile | tail -n +2 | cut -f 1 | sort) <(sort ${scorefile.simpleName}.sscore.vars) | wc -l | tr -d ' ')
+        n_missing=\$(comm -3 <(zcat $scorefile | tail -n +2 | cut -f 1 | sort) <(sort ${output}.sscore.vars) | wc -l | tr -d ' ')
 
         if [ \$n_missing -gt 0 ]
         then
           echo "ERROR: \$n_missing variant(s) missing from final calculated score!"
           exit 1
         else
-          echo "INFO: Input variants match variants used for calculation"
+          echo "INFO: Scoring file variants match listed variants in sscore.vars"
         fi
 
         cat <<-END_VERSIONS > versions.yml
@@ -94,14 +93,14 @@ process PLINK2_SCORE {
             $input ${geno.baseName} \
             --out ${output}
 
-        n_missing=\$(comm -3 <(zcat $scorefile | tail -n +2 | cut -f 1 | sort) <(sort ${scorefile.simpleName}.sscore.vars) | wc -l | tr -d ' ')
+        n_missing=\$(comm -3 <(zcat $scorefile | tail -n +2 | cut -f 1 | sort) <(sort ${output}.sscore.vars) | wc -l | tr -d ' ')
 
         if [ \$n_missing -gt 0 ]
         then
           echo "ERROR: \$n_missing variant(s) missing from final calculated score!"
           exit 1
         else
-          echo "INFO: Input variants match variants used for calculation"
+          echo "INFO: Scoring file variants match listed variants in sscore.vars"
         fi
 
         cat <<-END_VERSIONS > versions.yml
