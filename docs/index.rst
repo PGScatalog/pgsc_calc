@@ -130,10 +130,8 @@ Features under development
 
 These are some of the fetures and improvements we're planning for the ``pgsc_calc``:
 
-- Improved population reference panels (merged 1000 Genomes & Human Genome Diversity Project (HGDP) for use
-  within the pipeline
 - Further optimizations to the PCA & ancestry similarity analysis steps focused on improving automatic QC
-- Performance improvments to make ``pgsc_calc`` work with 1000s of scoring files in paralell (e.g. integration
+- Performance improvements to make ``pgsc_calc`` work with 1000s of scoring files in paralell (e.g. integration
   with `OmicsPred`_)
 
 .. _OmicsPred: https://www.omicspred.org
