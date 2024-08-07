@@ -8,6 +8,8 @@ on:
       - main
       - ci
   pull_request:
+    paths-ignore:
+      - 'docs/**'    
     branches:
       - dev
       - main
