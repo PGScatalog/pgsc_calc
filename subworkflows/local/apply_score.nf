@@ -126,20 +126,9 @@ workflow APPLY_SCORE {
     SCORE_AGGREGATE ( ch_scores )
     ch_versions = ch_versions.mix(SCORE_AGGREGATE.out.versions)
 
-    // aggregated score output from this subworkflow is mandatory
-    def aggregate_fail = true
-    SCORE_AGGREGATE.out.scores.subscribe onNext: { aggregate_fail = false },
-      onComplete: { aggregate_error(aggregate_fail) }
-
     emit:
     versions = ch_versions
     scores = SCORE_AGGREGATE.out.scores
-}
-
-def aggregate_error(boolean fail) {
-    if (fail) {
-        error "ERROR: No scores calculated!"
-    }
 }
 
 def annotate_scorefiles(ArrayList scorefiles) {

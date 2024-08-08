@@ -253,11 +253,6 @@ workflow ANCESTRY_PROJECT {
         .groupTuple()
         .set { ch_projections }
 
-    // projections are a mandatory output of the subworkflow
-    def project_fail = true
-    FRAPOSA_PROJECT.out.pca.subscribe onNext: { project_fail = false },
-        onComplete: { projection_error(project_fail) }
-
     emit:
     intersection = INTERSECT_VARIANTS.out.intersection
     intersect_count = INTERSECT_VARIANTS.out.intersect_count.collect()
@@ -269,10 +264,4 @@ workflow ANCESTRY_PROJECT {
     ref_afreq = FILTER_VARIANTS.out.afreq
     versions = ch_versions
 
-}
-
-def projection_error(boolean fail) {
-    if (fail) {
-        error "ERROR: Projection subworkflow failed"
-    }
 }
