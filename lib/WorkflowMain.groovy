@@ -73,5 +73,13 @@ class WorkflowMain {
         if (args[0]) {
             log.warn "nf-core pipelines do not accept positional arguments. The positional argument `${args[0]}` has been detected.\n      Hint: A common mistake is to provide multiple values to `-profile` separated by spaces. Please use commas to separate profiles instead,e.g., `-profile docker,test`."
         }
+        if (profile.contains("test")) {
+            def test_warn = """
+                | INFO: The test profile is used to install the workflow and verify the software is working correctly on your system.
+                | INFO: Test input data and results are are only useful as examples of outputs, and are not biologically meaningful.
+            """        
+            log.info test_warn.stripMargin().stripIndent()
+        }
+
     }
 }

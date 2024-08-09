@@ -3,7 +3,6 @@ process PLINK2_SCORE {
     // labels are defined in conf/modules.config
     label 'process_low'
     label 'process_long'
-    label 'error_retry'
     label 'plink2' // controls conda, docker, + singularity options
 
     tag "$meta.id chromosome $meta.chrom effect type $scoremeta.effect_type $scoremeta.n"
@@ -51,7 +50,6 @@ process PLINK2_SCORE {
     args2 = [args2, cols, 'list-variants', no_imputation, recessive, dominant, error_on_freq_calc].join(' ')
     outmeta = meta + ["n": scoremeta.n, "effect_type": scoremeta.effect_type]
     output = "${meta.id}_${meta.chrom}_${scoremeta.effect_type}_${scoremeta.n}"
-
     // speed up the calculation by only considering scoring-file variants for allele frequency calculation (--extract)
     if (scoremeta.n_scores.toInteger() == 1)
         """
@@ -65,6 +63,16 @@ process PLINK2_SCORE {
             --score $scorefile $args2 \
             $input ${geno.baseName} \
             --out ${output}
+
+        n_missing=\$(comm -3 <(zcat --force $scorefile | tail -n +2 | cut -f 1 | sort) <(sort ${output}.sscore.vars) | wc -l | tr -d ' ')
+
+        if [ \$n_missing -gt 0 ]
+        then
+          echo "ERROR: \$n_missing variant(s) missing from final calculated score!"
+          exit 1
+        else
+          echo "INFO: Scoring file variants match listed variants in sscore.vars"
+        fi
 
         cat <<-END_VERSIONS > versions.yml
         ${task.process.tokenize(':').last()}:
@@ -84,6 +92,16 @@ process PLINK2_SCORE {
             --score-col-nums 3-$maxcol \
             $input ${geno.baseName} \
             --out ${output}
+
+        n_missing=\$(comm -3 <(zcat --force $scorefile | tail -n +2 | cut -f 1 | sort) <(sort ${output}.sscore.vars) | wc -l | tr -d ' ')
+
+        if [ \$n_missing -gt 0 ]
+        then
+          echo "ERROR: \$n_missing variant(s) missing from final calculated score!"
+          exit 1
+        else
+          echo "INFO: Scoring file variants match listed variants in sscore.vars"
+        fi
 
         cat <<-END_VERSIONS > versions.yml
         ${task.process.tokenize(':').last()}:

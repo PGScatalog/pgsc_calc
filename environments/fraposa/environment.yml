@@ -4,4 +4,4 @@ channels:
   - bioconda
   - nodefaults  
 dependencies:
-  - fraposa-pgsc=1.0.0
+  - fraposa-pgsc=1.0.2

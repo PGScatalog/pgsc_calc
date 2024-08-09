@@ -88,22 +88,10 @@ workflow REPORT {
     SCORE_REPORT( ch_report_input, intersect_count, reference_panel_name, report_path )
     ch_versions = ch_versions.mix(SCORE_REPORT.out.versions)
 
-    // if this workflow runs, the report must be written
-    report_fail = true
-    SCORE_REPORT.out.report.subscribe onNext: { report_fail = false },
-        onComplete: { report_error(report_fail) }
-
     emit:
     versions = ch_versions
 }
 
 def annotate_sampleset(it) {
     [['id': it.getName().tokenize('_')[0]], it]
-}
-
-def report_error(boolean fail) {
-    if (fail) {
-        log.error "ERROR: No results report written!"
-        System.exit(1)
-    }
 }

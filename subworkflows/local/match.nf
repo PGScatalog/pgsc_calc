@@ -60,20 +60,8 @@ workflow MATCH {
      MATCH_COMBINE ( ch_match_combine_input )
      ch_versions = ch_versions.mix(MATCH_COMBINE.out.versions)
 
-    // mandatory output of match subworkflow
-    def combine_fail = true
-    MATCH_COMBINE.out.scorefile.subscribe onNext: { combine_fail = false },
-        onComplete: { combine_error(combine_fail) }
-
     emit:
     scorefiles = MATCH_COMBINE.out.scorefile
     db         = MATCH_COMBINE.out.summary
     versions   = ch_versions
-}
-
-def combine_error(boolean fail) {
-    if (fail) {
-        log.error "ERROR: Matching subworkflow failed"
-        System.exit(1)
-    }
 }
