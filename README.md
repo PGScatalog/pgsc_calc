@@ -18,6 +18,10 @@ and/or user-defined PGS/PRS.
 
 ## Pipeline summary
 
+> [!IMPORTANT]  
+> * Whole genome sequencing (WGS) data [are not currently supported by the calculator](https://pgsc-calc.readthedocs.io/en/latest/explanation/match.html#are-your-target-genomes-imputed-are-they-wgs)
+> * It’s possible to [create compatible gVCFs from WGS data](https://github.com/PGScatalog/pgsc_calc/discussions/123#discussioncomment-6469422). We plan to improve support for WGS data in the near future.
+
 <p align="center">
   <img width="80%" src="https://github.com/PGScatalog/pgsc_calc/assets/11425618/f766b28c-0f75-4344-abf3-3463946e36cc">
 </p>
