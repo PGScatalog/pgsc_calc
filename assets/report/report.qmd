@@ -36,6 +36,10 @@ library(DT)
 library(tibble)
 library(forcats)
 library(readr)
+
+# prevent plots with small sample sets
+MINIMUM_N_SAMPLES <- 50
+LOW_SAMPLE_SIZE <- TRUE
 ```
 
 ```{r setup_logs, echo=FALSE}
@@ -62,6 +66,14 @@ log_df$sampleset <- gsub("_", " ", log_df$sampleset)  # page breaking issues
 
 ```{bash}
 cat command.txt | fold -w 80 -s | awk -F ' ' 'NR==1 { print "$", $0} NR>1 { print "    " $0}' | sed 's/$/\\/' | sed '$ s/.$//' 
+```
+
+```{asis, echo = grepl("-profile test", readLines("command.txt"))}
+:::{.callout-tip}
+* If you're using the test profile, this report and these results are not biologically meaningful 
+* The test profile is only used to check that all software is installed and working correctly 
+* If you're reading this message, then that means everything is OK and you're ready to use your own data!
+:::
 ```
 
 ## Version
@@ -386,10 +398,15 @@ pop_summary %>%
 scores <- readr::read_tsv(params$score_path) 
 n_scores <- length(unique(scores$PGS))
 n_samples <- length(unique(scores$IID))
-print(n_samples)
+if (n_samples < MINIMUM_N_SAMPLES) {
+  LOW_SAMPLE_SIZE <- TRUE
+} else {
+  LOW_SAMPLE_SIZE <- FALSE
+}
 ```
 
-```{asis, echo = any(table(scores$sampleset) < 50) && !params$run_ancestry}
+
+```{asis, echo = (LOW_SAMPLE_SIZE && !params$run_ancestry)}
 
 ::: {.callout-important title="Warning: small sampleset size (n < 50) detected"}
 * plink2 uses allele frequency data to [mean impute](https://www.cog-genomics.org/plink/2.0/score) the dosages of missing genotypes
@@ -397,7 +414,7 @@ print(n_samples)
 * With a small sample size, the resulting score sums may be inconsistent between samples
 * The average `([scorename]_AVG)` may be more applicable as it calculates an average weighting over all genotypes present
 
-In the future mean-imputation will be supported in small samplesets using ancestry-matched reference samplesets to ensure consistent calculation of score sums (e.g. 1000G Genomes).
+It's recommended to use `--run_ancestry` with small samplesets to ensure consistent calculation of score sums (e.g. 1000G Genomes).
 :::
 
 ```
@@ -419,24 +436,21 @@ In the future mean-imputation will be supported in small samplesets using ancest
 
 ### Score data 
 
-#### Score extract
-
-::: {.callout-note}
-Below is a summary of the aggregated scores, which might be useful for debugging. See here for an explanation of [plink2](https://www.cog-genomics.org/plink/2.0/formats#sscore) column names
-:::
-
-```{r, echo = FALSE}
-scores %>%
-  tibble::as_tibble(.)
-```
-
 #### Density plot(s)
 
+```{asis, echo = !LOW_SAMPLE_SIZE}
 ::: {.callout-note}
 The summary density plots show up to six scoring files
 :::
+```
 
-```{r density_ancestry, echo=FALSE, message=FALSE, warning=FALSE, eval=params$run_ancestry}
+```{asis, echo = LOW_SAMPLE_SIZE}
+::: {.callout-warning}
+Density plots are disabled for low sample sizes
+:::
+```
+
+```{r density_ancestry, echo=FALSE, message=FALSE, warning=FALSE, eval=(!LOW_SAMPLE_SIZE & params$run_ancestry)}
 # Select which PGS to plot
 uscores <- unique(scores$PGS)
 uscores_plot <- uscores[1:min(length(uscores), 6)] # plot max 6 PGS
@@ -454,7 +468,7 @@ for(current_pgs in uscores_plot){
 }
 ```
 
-```{r, echo = FALSE, message=FALSE, warning=FALSE, eval=!params$run_ancestry}
+```{r, echo = FALSE, message=FALSE, warning=FALSE, eval=(!LOW_SAMPLE_SIZE & !params$run_ancestry)}
 scores %>%
   ungroup() %>%
   select(IID, sampleset, PGS, SUM) %>%
@@ -488,7 +502,9 @@ stringr::str_glue("{params$sampleset}/score/aggregated_scores.txt.gz")
 
 # Citation
 
-> Lambert, Wingfield, et al. (2024) The Polygenic Score Catalog: new functionality and tools to enable FAIR research. medRxiv. doi:[10.1101/2024.05.29.24307783](https://doi.org/10.1101/2024.05.29.24307783).
+> Samuel A. Lambert, Benjamin Wingfield, Joel T. Gibson, Laurent Gil, Santhi Ramachandran, Florent Yvon, Shirin Saverimuttu, Emily Tinsley, Elizabeth Lewis, Scott C. Ritchie, Jingqin Wu, Rodrigo Canovas, Aoife McMahon, Laura W. Harris, Helen Parkinson, Michael Inouye.
+Enhancing the Polygenic Score Catalog with tools for score calculation and ancestry normalization.
+Nature Genetics | doi: [10.1038/s41588-024-01937-x](https://doi.org/10.1038/s41588-024-01937-x)
 
 ::: {.callout-important}
 For scores from the PGS Catalog, please remember to cite the original publications from which they came (these are listed in the metadata table).
