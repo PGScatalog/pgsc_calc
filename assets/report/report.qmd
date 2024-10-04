@@ -504,7 +504,7 @@ stringr::str_glue("{params$sampleset}/score/aggregated_scores.txt.gz")
 
 > Samuel A. Lambert, Benjamin Wingfield, Joel T. Gibson, Laurent Gil, Santhi Ramachandran, Florent Yvon, Shirin Saverimuttu, Emily Tinsley, Elizabeth Lewis, Scott C. Ritchie, Jingqin Wu, Rodrigo Canovas, Aoife McMahon, Laura W. Harris, Helen Parkinson, Michael Inouye.
 Enhancing the Polygenic Score Catalog with tools for score calculation and ancestry normalization.
-Nature Genetics | doi: [10.1038/s41588-024-01937-x](https://doi.org/10.1038/s41588-024-01937-x)
+Nature Genetics (2024) | doi: [10.1038/s41588-024-01937-x](https://doi.org/10.1038/s41588-024-01937-x)
 
 ::: {.callout-important}
 For scores from the PGS Catalog, please remember to cite the original publications from which they came (these are listed in the metadata table).
