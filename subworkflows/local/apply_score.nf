@@ -123,7 +123,20 @@ workflow APPLY_SCORE {
         .map { [ it.first().subMap("id"), it.tail().findAll { !(it instanceof LinkedHashMap) }]}
         .set { ch_scores }
 
-    SCORE_AGGREGATE ( ch_scores )
+    // pgscatalog-aggregate --verify_variants notes:
+    // Checks that variant IDs in the scorefiles match the IDs of scored variants perfectly
+    // Just dump all of the supporting files into the same directory: don't do any fancy joins
+    PLINK2_SCORE.out.vars_scored
+        .collect()
+        .set { ch_vars_scored }
+
+    ch_target_scorefile.flatMap { it.last() }
+        .filter(Path)
+        .collect()
+        .set{ ch_scorefile_verify }
+
+    SCORE_AGGREGATE ( ch_scores, ch_vars_scored, ch_scorefile_verify )
+    
     ch_versions = ch_versions.mix(SCORE_AGGREGATE.out.versions)
 
     emit:
