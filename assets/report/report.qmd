@@ -158,23 +158,33 @@ tibble(
 :::{.column-body-outset}
 
 ```{r, echo=FALSE}
+tooltip_text <- c(
+  "Polygenic Score ID" = "Unique identifier for the polygenic score.",
+  "Publication" = "Reference publication for the score.",
+  "Traits" = "Traits associated with the score.",
+  "Number of variants" = "Total number of genetic variants (defined in the header)",
+  "Genome build" = "The genome assembly version used.",
+  "Complex alleles present?" = "Describes if complex non-SNP alleles included in the scoring file, e.g. APOE/HLA. These variants are excluded from the PGS calculation in the current version",
+  "Effect types compatible?" = "Describes if the scoring file is compatible with the Calculator. Scores with dosage-specific weights are removed."
+)
+
 DT::datatable(
   scorefile_metadata,
   rownames = FALSE,
   escape = FALSE,
-  colnames = c(
-    "Polygenic Score ID" = "pgs_id",
-    "Publication" = "pgp_id",
-    "Traits" = "trait_display",
-    "Number of variants" = "n_variants",
-    "Genome build" = "genome_build",
-    "Complex alleles present?" = "has_complex_alleles",
-    "Effect types compatible?" = "compatible_effect_type"
+  colnames = setNames(
+    paste0('<span title="', tooltip_text, '">', names(tooltip_text), '</span>'), 
+    NULL
   ),
   extensions = 'Buttons',
   options = list(dom = 'Bfrtip',
                  buttons = c('csv'))
-)
+) %>%
+    DT::formatStyle('has_complex_alleles', 
+                  backgroundColor = DT::styleEqual(c(FALSE, TRUE), c('#a6dba0', '#c2a5cf'))) %>% 
+    DT::formatStyle('compatible_effect_type', 
+                  backgroundColor = DT::styleEqual(c(FALSE, TRUE), c('#c2a5cf', '#a6dba0')))
+
 ```
 
 :::
@@ -182,18 +192,15 @@ DT::datatable(
 ```{asis, echo = any(!scorefile_metadata$compatible_effect_type)}
 ::: {.callout-warning title="Incompatible effect types detected"}
 * Some scoring files contain variants with dosage dependent effect weights (for example, [PGS002253](https://www.pgscatalog.org/score/PGS002253/))
-* Scoring files like this are not supported by the PGS Catalog Calculator
-  * Scoring files with non-additive effect types are skipped and not processed
-  * Variants with recessive or dominant effect types are supported
+* Scores with dosage-specific weights are removed from calculation 
+* Scores that contain variants with recessive, dominant, or additive effect types are supported
 :::
 ```
 
 ```{asis, echo = any(scorefile_metadata$has_complex_alleles)}
 ::: {.callout-warning title="Complex alleles detected"}
 * Some scoring files contain complex alleles (e.g. APOE / HLA / CYP)
-* It's important to preprocess your genomes correctly to include complex alleles
-    * e.g. using SNP2HLA to include HLA alleles
-* If you don't do this then it's unlikely that complex alleles will be matched. This means that these variants won't contribute to the final calculated PGS.
+* These variants are excluded from the PGS calculation in the current version
 * Please check [Appendix A - Curation of PGS including complex alleles](https://www.pgscatalog.org/docs/curation) for more detailed information
 :::
 ```
