@@ -16,7 +16,7 @@ process SCORE_REPORT {
     tuple val(meta), path(scorefile), path(score_log), path(match_summary), path(ancestry)
     path intersect_count
     val reference_panel_name
-    path report_path
+    path(report_path, arity: '4') // 4 files expected: report, css, background image x2
 
     output:
     // includeInputs to correctly use $meta.id in publishDir path
@@ -40,7 +40,7 @@ process SCORE_REPORT {
     echo "keep_ambiguous   : $params.keep_ambiguous"    >> params.txt
     echo "min_overlap      : $params.min_overlap"       >> params.txt
     
-    quarto render $report_path -M "self-contained:true" \
+    quarto render report.qmd -M "self-contained:true" \
         -P score_path:$scorefile \
         -P sampleset:$meta.id \
         -P run_ancestry:$run_ancestry \

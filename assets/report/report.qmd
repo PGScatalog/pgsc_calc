@@ -88,7 +88,6 @@ message(params$version)
 
 ```{r load_scorefiles}
 json_list <- jsonlite::fromJSON(params$log_scorefiles, simplifyVector = FALSE)
-json_scorefiles <- unlist(json_list, recursive=FALSE)
 
 link_traits <- function(trait_efo, mapped) {
   if (length(trait_efo) == 0) {
@@ -99,12 +98,12 @@ link_traits <- function(trait_efo, mapped) {
 }
 
 extract_traits <- function(x) {
-  trait_efo <- purrr::map(json_scorefiles, ~ extract_chr_handle_null(.x, "trait_efo"))
-  mapped <- purrr::map(json_scorefiles, ~ extract_chr_handle_null(.x, "trait_mapped"))
+  trait_efo <- purrr::map(x, ~ extract_chr_handle_null(.x$header, "trait_efo"))
+  mapped <- purrr::map(x, ~ extract_chr_handle_null(.x$header, "trait_mapped"))
   trait_display <- purrr::map2(trait_efo, mapped, link_traits)
   mapped_trait_links <- purrr::map_chr(trait_display, ~ paste(.x, collapse = "<br />"))
-  reported_traits <- purrr::map(json_scorefiles, ~ extract_chr_handle_null(.x, "trait_reported"))
-  purrr::map2(reported_traits, mapped_trait_links, ~ {
+  reported_traits <- purrr::map(x, ~ extract_chr_handle_null(.x, "trait_reported"))
+  purrr::map2_chr(reported_traits, mapped_trait_links, ~ {
     stringr::str_glue("<u>Reported trait:</u> {.x} <br /> <u>Mapped trait(s):</u> {.y}")
   })
 }
@@ -133,21 +132,18 @@ annotate_genome_build <- function(original_build, harmonised_build) {
   return(stringr::str_glue("<u>Original build:</u> {original_build} <br /> <u>Harmonised build:</u> {harmonised_build}"))
 }
 
-tibble::tibble(json = json_scorefiles) %>%
-  # extract fields from json list
-  mutate(pgs_id = purrr::map_chr(json, ~ extract_chr_handle_null(.x, "pgs_id")),
-         pgs_name = purrr::map_chr(json, ~ extract_chr_handle_null(.x, "pgs_name")),
-         pgp_id = purrr::map_chr(json, ~ extract_chr_handle_null(.x, "pgp_id")),
-         citation = purrr::map_chr(json, ~ extract_chr_handle_null(.x, "citation")),
-         # trait_efo = purrr::map_chr(json, ~ extract_chr_handle_null(.x, "trait_efo")),
-         # trait_reported = purrr::map_chr(json, ~ extract_chr_handle_null(.x, "trait_reported")),
-         # trait_mapped = purrr::map_chr(json, ~ extract_chr_handle_null(.x, "trait_mapped")),
-         trait_display = extract_traits(.),
-         genome_build = purrr::map_chr(json, ~ extract_chr_handle_null(.x, "genome_build")),
-         harmonised_build = purrr::map_chr(json, ~ extract_chr_handle_null(.x, "HmPOS_build")),
-         n_variants = purrr::map_chr(json, ~ .x$variants_number),
-         accession = stringr::str_replace_all(names(json), "_", " ")
-         ) %>%
+# extract fields from json list
+tibble(
+  pgs_id = map_chr(json_list, "pgs_id"),
+  pgs_name = map_chr(json_list, ~ extract_chr_handle_null(.x$header, "pgs_name")),
+  pgp_id = map_chr(json_list, ~ extract_chr_handle_null(.x$header, "pgp_id")),
+  citation = map_chr(json_list, ~ extract_chr_handle_null(.x$header, "citation")),
+  trait_display = extract_traits(json_list),
+  genome_build = purrr::map_chr(json_list, ~ extract_chr_handle_null(.x$header, "genome_build")),
+  harmonised_build = purrr::map_chr(json_list, ~ extract_chr_handle_null(.x$header, "HmPOS_build")),
+  n_variants = purrr::map_chr(json_list, ~ extract_chr_handle_null(.x$header, "variants_number")),
+  compatible_effect_type = map_lgl(json_list, "compatible_effect_type"),
+  has_complex_alleles = map_lgl(json_list, "has_complex_alleles")) %>%
   # add links to pgs catalog identifiers
   mutate(pgs_id = purrr::map_chr(pgs_id, ~ link_pgscatalog(.x, "score")),
          pgp_id = purrr::map_chr(pgp_id, ~ link_pgscatalog(.x, "publication"))) %>%
@@ -156,7 +152,7 @@ tibble::tibble(json = json_scorefiles) %>%
          pgs_id = purrr::map2_chr(pgs_id, pgs_name, ~ add_note(.x, .y)),
          genome_build = purrr::map2_chr(genome_build, harmonised_build, ~ annotate_genome_build(.x, .y))) %>% 
   # pick columns
-  select(accession, pgs_id, pgp_id, trait_display, n_variants, genome_build) -> scorefile_metadata
+  select(pgs_id, pgp_id, trait_display, n_variants, genome_build, has_complex_alleles, compatible_effect_type) -> scorefile_metadata
 ```
 
 :::{.column-body-outset}
@@ -167,12 +163,13 @@ DT::datatable(
   rownames = FALSE,
   escape = FALSE,
   colnames = c(
-    "Scoring file" = "accession",
     "Polygenic Score ID" = "pgs_id",
     "Publication" = "pgp_id",
     "Traits" = "trait_display",
     "Number of variants" = "n_variants",
-    "Genome build" = "genome_build"
+    "Genome build" = "genome_build",
+    "Complex alleles present?" = "has_complex_alleles",
+    "Effect types compatible?" = "compatible_effect_type"
   ),
   extensions = 'Buttons',
   options = list(dom = 'Bfrtip',
@@ -181,6 +178,25 @@ DT::datatable(
 ```
 
 :::
+
+```{asis, echo = any(!scorefile_metadata$compatible_effect_type)}
+::: {.callout-warning title="Incompatible effect types detected"}
+* Some scoring files contain variants with dosage dependent effect weights (for example, [PGS002253](https://www.pgscatalog.org/score/PGS002253/))
+* Scoring files like this are not supported by the PGS Catalog Calculator
+  * Scoring files with non-additive effect types are skipped and not processed
+  * Variants with recessive or dominant effect types are supported
+:::
+```
+
+```{asis, echo = any(scorefile_metadata$has_complex_alleles)}
+::: {.callout-warning title="Complex alleles detected"}
+* Some scoring files contain complex alleles (e.g. APOE / HLA / CYP)
+* It's important to preprocess your genomes correctly to include complex alleles
+    * e.g. using SNP2HLA to include HLA alleles
+* If you don't do this then it's unlikely that complex alleles will be matched. This means that these variants won't contribute to the final calculated PGS.
+* Please check [PGS Catalog Curation Guidelines - Appendix A – Special Cases](https://www.pgscatalog.org/docs/curation) for more detailed information
+:::
+```
 
 # Variant matching 
 
@@ -523,13 +539,12 @@ For scores from the PGS Catalog, please remember to cite the original publicatio
 # as of 2023-12-12 only non-default licenses are recorded in the scoring file header
 default_ebi_terms <- "PGS obtained from the Catalog should be cited appropriately, and used in accordance with any licensing restrictions set by the authors. See EBI Terms of Use (https://www.ebi.ac.uk/about/terms-of-use/) for additional details."
 
-tibble::tibble(json = json_scorefiles) %>%
-  mutate(pgs_id = purrr::map_chr(json, ~ extract_chr_handle_null(.x, "pgs_id")),
-         license_text = purrr::map_chr(json, ~ extract_chr_handle_null(.x, "license"))) %>%
+tibble(
+    pgs_id = map_chr(json_list, "pgs_id"),
+    license_text = map_chr(json_list, ~ extract_chr_handle_null(.x$header, "license"))) %>%
   mutate(license_text = ifelse(license_text == "", default_ebi_terms, license_text)) %>%
   # display license terms for files in the PGS Catalog only (with a PGS ID)
   filter(startsWith(pgs_id, "PGS")) %>%
-  select(-json) %>%
   DT::datatable(., colnames = c(
       "PGS ID" = "pgs_id",
       "License text" = "license_text"
