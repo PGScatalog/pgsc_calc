@@ -194,7 +194,7 @@ DT::datatable(
 * It's important to preprocess your genomes correctly to include complex alleles
     * e.g. using SNP2HLA to include HLA alleles
 * If you don't do this then it's unlikely that complex alleles will be matched. This means that these variants won't contribute to the final calculated PGS.
-* Please check [PGS Catalog Curation Guidelines - Appendix A – Special Cases](https://www.pgscatalog.org/docs/curation) for more detailed information
+* Please check [Appendix A - Curation of PGS including complex alleles](https://www.pgscatalog.org/docs/curation) for more detailed information
 :::
 ```
 
