@@ -12,7 +12,9 @@ process SCORE_AGGREGATE {
         "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
-    tuple val(meta), path(scorefiles)
+    tuple val(meta), path(scorefiles) // calculated polygenic scores
+    path(scorefile_vars) // PGS scoring file
+    path(scored_vars) // variants _actually used_ to calculate scores
 
     output:
     tuple val(scoremeta), path("aggregated_scores.txt.gz"), emit: scores
@@ -21,7 +23,9 @@ process SCORE_AGGREGATE {
     script:
     scoremeta = meta.subMap('id')
     """
-    pgscatalog-aggregate -s $scorefiles -o . -v --no-split
+    # variants are always verified, so that variants in the scoring files
+    # overlap perfectly with the scored variants
+    pgscatalog-aggregate -s $scorefiles -o . -v --no-split --verify_variants
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process.tokenize(':').last()}:

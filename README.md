@@ -104,9 +104,9 @@ from Aoife McMahon (EBI). Development of new features, testing, and code review
 is ongoing including Inouye lab members (Rodrigo Canovas, Scott Ritchie) and others. If 
 you use the tool we ask you to cite our paper describing software and updated PGS Catalog resource:
 
-- >Lambert, Wingfield _et al._ (2024) The Polygenic Score Catalog: new functionality
-  and tools to enable FAIR research.  medRxiv.
-  doi:[10.1101/2024.05.29.24307783](https://doi.org/10.1101/2024.05.29.24307783).
+- >Lambert, Wingfield _et al._ (2024) Enhancing the Polygenic Score Catalog with tools for score 
+  calculation and ancestry normalization. Nature Genetics.
+  doi:[10.1038/s41588-024-01937-x](https://doi.org/10.1038/s41588-024-01937-x).
 
 This pipeline is distrubuted under an [Apache License](LICENSE) amd uses code and 
 infrastructure developed and maintained by the [nf-core](https://nf-co.re) community 

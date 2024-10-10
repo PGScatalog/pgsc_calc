@@ -164,13 +164,13 @@ Citations
 
 If you use ``pgscatalog/pgsc_calc`` in your analysis, please cite:
 
-    Lambert, Wingfield, `et al.` (2024) The Polygenic Score Catalog: new functionality and tools to enable FAIR research. medRxiv. doi:`10.1101/2024.05.29.24307783`_.
+    Lambert, Wingfield, `et al.` (2024) Enhancing the Polygenic Score Catalog with tools for score calculation and ancestry normalization. Nature Genetics. doi:`10.1038/s41588-024-01937-x`_.
 
 In addition, please remember to cite the primary publications for any PGS Catalog scores
 you use in your analyses, and the underlying data/software tools described in the `citations file`_.
 
 .. _citations file: https://github.com/PGScatalog/pgsc_calc/blob/master/CITATIONS.md
-.. _10.1101/2024.05.29.24307783: https://doi.org/10.1101/2024.05.29.24307783
+.. _10.1038/s41588-024-01937-x: https://doi.org/10.1038/s41588-024-01937-x
 
 
 License Information
