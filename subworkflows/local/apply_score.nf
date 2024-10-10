@@ -125,7 +125,7 @@ workflow APPLY_SCORE {
 
     // pgscatalog-aggregate --verify_variants notes:
     // Checks that variant IDs in the scorefiles match the IDs of scored variants perfectly
-    // Just dump all of the supporting files into the same directory: don't do any fancy joins
+    // Just dump all of the supporting files into the same directory: don't do any fancy channel manipulation
     PLINK2_SCORE.out.vars_scored
         .collect()
         .set { ch_vars_scored }
@@ -133,10 +133,22 @@ workflow APPLY_SCORE {
     ch_target_scorefile.flatMap { it.last() }
         .filter(Path)
         .collect()
-        .set{ ch_scorefile_verify }
+        .set{ ch_target_scorefile_flat }
 
-    SCORE_AGGREGATE ( ch_scores, ch_vars_scored, ch_scorefile_verify )
+    // note, for the calculated score:
+    // reference_ALL_additive_0.sscore.zst (ch_scores)
+    // --verify_variants expects the following files in the same directory
+    // reference_ALL_additive_0.sscore.vars (ch_vars_scored)
+    // reference_ALL_additive_0.scorefile.gz (ch_verify_scorefiles)
+
+    ch_apply_ref.flatMap { it.last() }
+        .filter(Path)
+        .mix( ch_target_scorefile_flat )
+        .collect()
+        .set{ ch_verify_scorefiles }
     
+    SCORE_AGGREGATE ( ch_scores, ch_vars_scored, ch_verify_scorefiles )
+
     ch_versions = ch_versions.mix(SCORE_AGGREGATE.out.versions)
 
     emit:
