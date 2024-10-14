@@ -27,15 +27,19 @@ class SamplesheetParser {
     }
 
     def parseJSON(json) {
-        // note: we don't check for file existence here 
+        // note: we don't check for file existence here
         // relative paths won't work, because the JSON object doesn't use path_prefix
-        def parsed = json.subMap("chrom", "vcf_import_dosage", "n_chrom", "format") 
+        def parsed = json.subMap("chrom", "vcf_import_dosage", "n_chrom", "format")
         parsed.id = json.sampleset
         parsed = parsed + getFlagMap(json)
         parsed.build = this.target_build
         parsed.chrom = truncateChrom(json)
 
-        return [parsed, [json.geno, json.variants, json.pheno]]
+        if (parsed.is_vcf) {
+          return [parsed, [json.geno]]
+        } else {
+          return [parsed, [json.geno, json.variants, json.pheno]]
+        }
     }
 
     def verifySamplesheet(rows) {
@@ -192,4 +196,3 @@ class SamplesheetParser {
     }
 
 }
-

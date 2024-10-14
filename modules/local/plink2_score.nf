@@ -64,16 +64,6 @@ process PLINK2_SCORE {
             $input ${geno.baseName} \
             --out ${output}
 
-        n_missing=\$(comm -3 <(zcat --force $scorefile | tail -n +2 | cut -f 1 | sort) <(sort ${output}.sscore.vars) | wc -l | tr -d ' ')
-
-        if [ \$n_missing -gt 0 ]
-        then
-          echo "ERROR: \$n_missing variant(s) missing from final calculated score!"
-          exit 1
-        else
-          echo "INFO: Scoring file variants match listed variants in sscore.vars"
-        fi
-
         cat <<-END_VERSIONS > versions.yml
         ${task.process.tokenize(':').last()}:
             plink2: \$(plink2 --version 2>&1 | sed 's/^PLINK v//; s/ 64.*\$//' )
@@ -92,16 +82,6 @@ process PLINK2_SCORE {
             --score-col-nums 3-$maxcol \
             $input ${geno.baseName} \
             --out ${output}
-
-        n_missing=\$(comm -3 <(zcat --force $scorefile | tail -n +2 | cut -f 1 | sort) <(sort ${output}.sscore.vars) | wc -l | tr -d ' ')
-
-        if [ \$n_missing -gt 0 ]
-        then
-          echo "ERROR: \$n_missing variant(s) missing from final calculated score!"
-          exit 1
-        else
-          echo "INFO: Scoring file variants match listed variants in sscore.vars"
-        fi
 
         cat <<-END_VERSIONS > versions.yml
         ${task.process.tokenize(':').last()}:

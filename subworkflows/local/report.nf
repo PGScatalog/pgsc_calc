@@ -82,8 +82,12 @@ workflow REPORT {
         .combine(log_scorefiles) // all samplesets have the same scorefile metadata
         .set { ch_report_input }
 
-    Channel.fromPath(file(projectDir / "assets" /"report" / "report.qmd", checkIfExists: true))
-        .set{report_path}
+    Channel.fromPath([file(projectDir / "assets" /"report" / "report.qmd", checkIfExists: true),
+        file(projectDir / "assets" /"report" / "logo.css", checkIfExists: true),
+        file(projectDir / "assets" /"report" / "PGS_Logo.png", checkIfExists: true),
+        file(projectDir / "assets" /"report" / "pgs_header_background.png", checkIfExists: true)])
+      .collect()
+      .set{ report_path }
 
     SCORE_REPORT( ch_report_input, intersect_count, reference_panel_name, report_path )
     ch_versions = ch_versions.mix(SCORE_REPORT.out.versions)
