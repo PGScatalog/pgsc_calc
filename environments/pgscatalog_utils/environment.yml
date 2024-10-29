@@ -4,4 +4,6 @@ channels:
   - bioconda
   - nodefaults  
 dependencies:
-  - pgscatalog-utils=1.4.3
+  - pgscatalog.core=0.3.3
+  - pgscatalog.match=0.3.3
+  - pgscatalog.calc=0.3.0
