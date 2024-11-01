@@ -117,6 +117,10 @@ if (workflow.profile.contains("test")) {
     }
 }
 
+if (params.parallel) {
+  log.info "INFO: --parallel parameter is deprecated: jobs are automatically parallelised by default"
+}
+
 /*
 ========================================================================================
     IMPORT LOCAL MODULES/SUBWORKFLOWS

@@ -14,4 +14,4 @@
         - "effect_weight"
     - path: output/combine/versions.yml
       contains:
-        - "pgscatalog.core: 0.2.2"
+        - "pgscatalog.core: 0.3.3"

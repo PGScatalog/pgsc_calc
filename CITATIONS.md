@@ -1,6 +1,6 @@
 # PGScatalog/pgsc_calc: Citations
 
-> Lambert, Wingfield _et al._ (2024) The Polygenic Score Catalog: new functionality and tools to enable FAIR research. medRxiv. doi:[10.1101/2024.05.29.24307783](https://doi.org/10.1101/2024.05.29.24307783).
+> Lambert, Wingfield _et al._ (2024) Enhancing the Polygenic Score Catalog with tools for score calculation and ancestry normalization. Nature Genetics. doi:[10.1038/s41588-024-01937-x](https://doi.org/10.1038/s41588-024-01937-x).
   
 ## [nf-core](https://pubmed.ncbi.nlm.nih.gov/32055031/)
 
@@ -13,11 +13,11 @@
 ## Pipeline tools
 
 * [PGS Catalog API](https://pubmed.ncbi.nlm.nih.gov/33692568/)
-    > Lambert SA, Gil L, Jupp S, Ritchie SC, Xu Y, Buniello A, McMahon A, Abraham G, Chapman M, Parkinson H, Danesh J. The Polygenic Score Catalog as an open database for reproducibility and systematic evaluation. Nature Genetics. 2021 Apr;53(4):420-5. doi: 10.1038/s41588-021-00783-5. PubMed PMID: 33692568.
+    > Lambert, Wingfield _et al._ (2024) Enhancing the Polygenic Score Catalog with tools for score calculation and ancestry normalization. Nature Genetics. doi:[10.1038/s41588-024-01937-x](https://doi.org/10.1038/s41588-024-01937-x).
 
 * [pygscatalog](https://github.com/PGScatalog/pygscatalog)
 
-    > Lambert, Wingfield _et al._ (2024) The Polygenic Score Catalog: new functionality and tools to enable FAIR research. medRxiv. doi:[10.1101/2024.05.29.24307783](https://doi.org/10.1101/2024.05.29.24307783).
+    > Lambert, Wingfield _et al._ (2024) Enhancing the Polygenic Score Catalog with tools for score calculation and ancestry normalization. Nature Genetics. doi:[10.1038/s41588-024-01937-x](https://doi.org/10.1038/s41588-024-01937-x).
     
 * [PLINK 2](https://pubmed.ncbi.nlm.nih.gov/25722852/)
     > Chang CC, Chow CC, Tellier LC, Vattikuti S, Purcell SM, Lee JJ. Second-generation PLINK: rising to the challenge of larger and richer datasets. Gigascience. 2015 Dec 1;4(1):s13742-015. doi: 10.1186/s13742-015-0047-8. PubMed PMID: 25722852. PubMed Central PMCID: PMC4342193.

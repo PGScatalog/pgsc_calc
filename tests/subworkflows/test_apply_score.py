@@ -42,7 +42,7 @@ def test_processed_variants(workflow_dir):
     """Make sure n_lines in scorefile == --score XXX variants processed in log"""
     # find directories with scoring file variants in them
     scoring_variants = [
-        pathlib.Path(x)
+        pathlib.Path(workflow_dir / x)
         for x in glob.glob("work/**/**/*.sscore.vars", root_dir=workflow_dir)
     ]
     not_symlinks = [not x.is_symlink() for x in scoring_variants]

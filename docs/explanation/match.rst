@@ -22,7 +22,7 @@ What is matching?
 
 The calculator carefully checks that variants (rows) in a scoring file are present in your target genomes.
 
-The matching procedure `is described in the preprint supplement <https://www.medrxiv.org/content/10.1101/2024.05.29.24307783v1.supplementary-material>`_. 
+The matching procedure `is described in supplement of our recent publication <https://www.nature.com/articles/s41588-024-01937-x#Sec6>`_.
 
 The matching procedure never makes any changes to target genome data and only seeks to match variants in the scoring file to the genome.  
 

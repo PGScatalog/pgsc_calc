@@ -79,114 +79,135 @@ on UK Biobank with a SLURM cluster:
 
 .. code-block:: text
 
-    process {
-        errorStrategy = 'retry'
-        maxRetries = 3
-        maxErrors = '-1'
-        executor = 'slurm'
+  process {
+    errorStrategy = 'retry'
+    maxRetries = 3
+    maxErrors = '-1'
+    executor = 'slurm'
 
-        withName: 'DOWNLOAD_SCOREFILES' {
-          cpus = 1
-          memory = { 1.GB * task.attempt }
-          time = { 1.hour * task.attempt }
-        }
-
-        withName: 'COMBINE_SCOREFILES' {
-          cpus = 1
-          memory = { 8.GB * task.attempt }
-          time = { 2.hour * task.attempt }
-        }
-
-        withName: 'PLINK2_MAKEBED' {
-          cpus = 2
-          memory = { 8.GB * task.attempt }
-          time = { 1.hour * task.attempt }
-        }
-
-        withName: 'RELABEL_IDS' {
-          cpus = 1
-          memory = { 16.GB * task.attempt }
-          time = { 1.hour * task.attempt }
-        }
-
-        withName: 'PLINK2_ORIENT' {
-          cpus = 2
-          memory = { 8.GB * task.attempt }
-          time = { 1.hour * task.attempt }
-        }
-
-        withName: 'DUMPSOFTWAREVERSIONS' {
-          cpus = 1
-          memory = { 1.GB * task.attempt }
-          time = { 1.hour * task.attempt }
-        }
-
-        withName: 'ANCESTRY_ANALYSIS' {
-          cpus = { 1 * task.attempt }
-          memory = { 8.GB * task.attempt }
-          time = { 1.hour * task.attempt }
-        }
-
-        withName: 'SCORE_REPORT' {
-          cpus = 2
-          memory = { 8.GB * task.attempt }
-          time = { 1.hour * task.attempt }
-        }
-
-        withName: 'EXTRACT_DATABASE' {
-          cpus = 1
-          memory = { 8.GB * task.attempt }
-          time = { 1.hour * task.attempt }
-        }
-
-        withName: 'PLINK2_RELABELPVAR' {
-          cpus = 2
-          memory = { 16.GB * task.attempt }
-          time = { 2.hour * task.attempt }
-        }
-
-        withName: 'INTERSECT_VARIANTS' {
-          cpus = 2
-          memory = { 8.GB * task.attempt }
-          time = { 1.hour * task.attempt }
-        }
-
-        withName: 'MATCH_VARIANTS' {
-          cpus = 2
-          memory = { 32.GB * task.attempt }
-          time = { 6.hour * task.attempt }
-        }
-
-        withName: 'FILTER_VARIANTS' {
-          cpus = 2
-          memory = { 16.GB * task.attempt }
-          time = { 1.hour * task.attempt }
-        }
-
-        withName: 'MATCH_COMBINE' {
-          cpus = 4
-          memory = { 64.GB * task.attempt }
-          time = { 6.hour * task.attempt }
-        }
-
-        withName: 'FRAPOSA_PCA' {
-          cpus = 2
-          memory = { 8.GB * task.attempt }
-          time = { 1.hour * task.attempt }
-        }
-
-        withName: 'PLINK2_SCORE' {
-          cpus = 2
-          memory = { 8.GB * task.attempt }
-          time = { 12.hour * task.attempt }
-        }
-
-        withName: 'SCORE_AGGREGATE' {
-          cpus = 2
-          memory = { 16.GB * task.attempt }
-          time = { 4.hour * task.attempt }
-        }
+    withName: 'SAMPLESHEET_JSON' {
+      cpus = 1
+      memory = { 1.GB * task.attempt }
+      time = { 1.hour * task.attempt }
     }
+
+    withName: 'DOWNLOAD_SCOREFILES' {
+      cpus = 1
+      memory = { 1.GB * task.attempt }
+      time = { 1.hour * task.attempt }
+    }
+
+    withName: 'COMBINE_SCOREFILES' {
+      cpus = 1
+      memory = { 16.GB * task.attempt }
+      time = { 2.hour * task.attempt }
+    }
+
+    withName: 'PLINK2_MAKEBED' {
+      cpus = 1
+      memory = { 8.GB * task.attempt }
+      time = { 1.hour * task.attempt }
+    }
+
+    withName: 'RELABEL_IDS' {
+      cpus = 1
+      memory = { 16.GB * task.attempt }
+      time = { 1.hour * task.attempt }
+    }
+
+    withName: 'PLINK2_ORIENT' {
+      cpus = 1
+      memory = { 8.GB * task.attempt }
+      time = { 1.hour * task.attempt }
+    }
+
+    withName: 'DUMPSOFTWAREVERSIONS' {
+      cpus = 1
+      memory = { 1.GB * task.attempt }
+      time = { 1.hour * task.attempt }
+    }
+
+    withName: 'ANCESTRY_ANALYSIS' {
+      cpus = 1
+      memory = { 8.GB * task.attempt }
+      time = { 1.hour * task.attempt }
+    }
+
+    withName: 'SCORE_REPORT' {
+      cpus = 1
+      memory = { 8.GB * task.attempt }
+      time = { 1.hour * task.attempt }
+    }
+
+    withName: 'EXTRACT_DATABASE' {
+      cpus = 1
+      memory = { 8.GB * task.attempt }
+      time = { 1.hour * task.attempt }
+    }
+
+    withName: 'PLINK2_RELABELPVAR' {
+      cpus = 1
+      memory = { 16.GB * task.attempt }
+      time = { 2.hour * task.attempt }
+    }
+
+    withName: 'INTERSECT_VARIANTS' {
+      cpus = 1
+      memory = { 8.GB * task.attempt }
+      time = { 1.hour * task.attempt }
+    }
+
+    withName: 'INTERSECT_THINNED' {
+      cpus = 1
+      memory = { 8.GB * task.attempt }
+      time = { 1.hour * task.attempt }
+    }
+
+    withName: 'MATCH_VARIANTS' {
+      cpus = 2
+      memory = { 32.GB * task.attempt }
+      time = { 6.hour * task.attempt }
+    }
+
+    withName: 'FILTER_VARIANTS' {
+      cpus = 1
+      memory = { 16.GB * task.attempt }
+      time = { 1.hour * task.attempt }
+    }
+
+    withName: 'MATCH_COMBINE' {
+      cpus = 2
+      memory = { 64.GB * task.attempt }
+      time = { 6.hour * task.attempt }
+    }
+
+    withName: 'FRAPOSA_PCA' {
+      cpus = 2
+      memory = { 8.GB * task.attempt }
+      time = { 1.hour * task.attempt }
+    }
+
+    withName: 'PLINK2_SCORE' {
+      cpus = 2
+      memory = { 8.GB * task.attempt }
+      time = { 16.hour * task.attempt }
+    }
+
+    withName: 'FRAPOSA_PROJECT' {
+      cpus = 1
+      memory = { 8.GB * task.attempt }
+      time = { 1.hour * task.attempt }
+    }
+
+    withName: 'SCORE_AGGREGATE' {
+      cpus = 1
+      memory = { 16.GB * task.attempt }
+      time = { 1.hour * task.attempt }
+    }    
+  }
+
+
+.. note:: You'll want to adjust memory usage depending on the complexity of your input scoring files.  Allocating more CPUs probably won't make the workflow complete faster. 
 
 Assuming the configuration file you set up is saved as
 ``my_custom.config`` in your current working directory, you're ready
