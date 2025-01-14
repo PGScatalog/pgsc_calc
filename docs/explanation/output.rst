@@ -140,7 +140,7 @@ scores in the target and reference dataset and how it changes for difference PGS
     :width: 600
     :alt: Example PGS Catalog Report: table and density plots of score distributions
 
-    **Figure 4. Example of the** ``[sampleset]_pgs.txt.gz`` **table and plots of PGS distributions.**
+    **Figure 4. Example scores section including plots of PGS distributions.**
 
 Plots are only created in the report if 50 or more samples are present in the target genomes.
 
