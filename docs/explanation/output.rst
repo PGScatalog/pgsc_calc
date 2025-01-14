@@ -8,7 +8,7 @@ The pipeline outputs are written to a results directory (``--outdir`` default is
 ``./results/``) with the following structure:
 
 .. code-block:: console
-                
+
     results
     ├── [sampleset] (directory with results for your data)
     │   ├── match (scoring files and variant match metadata)
@@ -89,6 +89,8 @@ reference panel and scoring files, a summary of the computed genetic ancestry da
 the distribution of scores in your dataset(s) as a density plot. Some of the sections are only displayed with
 ``--run_ancestry``, but we show them all here for reference.
 
+Example reports of the :download:`the test profile <../_static/test_report.html>` and :download:`ancestry analysis <../_static/example_report.html>` are available to view.
+
 The first section of the report reproduces the nextflow command, and scoring file metadata (imported from the PGS Catalog
 for each PGS ID) describing the scoring files that were applied to your sampleset(s):
 
@@ -130,8 +132,7 @@ similar to those populations is also provided.
     populations correctly), and that the projection of individuals from the target dataset looks sensible.
 
 
-The final section shows an example of the main results dataframe that contains the sample identifiers and
-calculated PGS in the *Score extract* section. A visual display of the PGS distribution for a set of example
+The final section describes the number of scores that were calculated successfully. A visual display of the PGS distribution for a set of example
 score(s) (up to 6) is provided in the *Density plot* panel which can be helpful for looking at the distributions of the
 scores in the target and reference dataset and how it changes for difference PGS adjustment methods:
 
@@ -140,6 +141,8 @@ scores in the target and reference dataset and how it changes for difference PGS
     :alt: Example PGS Catalog Report: table and density plots of score distributions
 
     **Figure 4. Example of the** ``[sampleset]_pgs.txt.gz`` **table and plots of PGS distributions.**
+
+Plots are only created in the report if 50 or more samples are present in the target genomes.
 
 ``match/``
 ----------
