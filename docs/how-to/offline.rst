@@ -183,3 +183,8 @@ Create a batch job script::
     --target_build GRCh38
   EOF
 
+and submit it to your batch job system:
+
+.. code-block:: bash
+
+  $ sbatch pgs_job.sh
