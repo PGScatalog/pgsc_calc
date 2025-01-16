@@ -3,16 +3,16 @@
 How do I run pgsc_calc in an offline environment?
 =================================================
 
-pgsc_calc has been deployed on secure platforms like Trusted Research
-Environments (TREs).
+``pgsc_calc`` has been deployed on secure platforms like Trusted Research
+Environments (TREs), including UK Biobank and All of Us.
 
-To run pgsc_calc in an offline environment you'll need Docker or Apptainer/Singularity installed on the offline computer.
+To run ``pgsc_calc`` in an offline environment you'll need Docker or Apptainer/Singularity installed on the offline computer.
 
 On a computer with internet access you'll need to download:
 
 1. A container
 2. Scoring files that you want to run
-3. A reference panel
+3. (Optionally) Reference data
 
 And transfer these to your offline environment.
 
@@ -33,7 +33,7 @@ We also provide a `singularity image`_.
 
 .. _singularity image: https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/pgsc_calc_v2_blob.sif
 
-In this container the calculator can be run using the conda profile, because conda environments have been installed and configured.
+In this container the calculator must be run with the conda profile, because conda environments have been installed and configured for you.
 
 Docker
 ~~~~~~
@@ -105,6 +105,11 @@ Scoring files from the PGS Catalog Calculator that are downloaded using ``pgscat
 
 If you want to do ancestry-based score normalisation you'll need to download the reference
 panel too. See :ref:`norm` for more details.
+
+.. console::
+
+  $ wget https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/pgsc_HGDP+1kGP_v1.tar.zst # combined reference panel, preferred
+  $ wget https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/pgsc_1000G_v1.tar.zst # or only 1000 Genomes
 
 Running the calculator test profile in an interactive job
 ----------------------------------------------------------
