@@ -6,13 +6,13 @@ How do I run pgsc_calc in an offline environment?
 pgsc_calc has been deployed on secure platforms like Trusted Research
 Environments (TREs).
 
-To run pgsc_calc in an offline environment you'll need Docker or Singularity installed on the offline computer.
+To run pgsc_calc in an offline environment you'll need Docker or Apptainer/Singularity installed on the offline computer.
 
 On a computer with internet access you'll need to download:
 
-2. A container
+1. A container
+2. Scoring files that you want to run
 3. A reference panel
-4. Scoring files that you want to run
 
 And transfer these to your offline environment.
 
@@ -22,10 +22,10 @@ if you are having problems and we'll try our best to help you.
 
 .. _open a discussion on Github: https://github.com/PGScatalog/pgsc_calc/discussions
 
-Preload container images
+Download container image
 ------------------------
 
-We publish a special docker image that contains every dependency to `simplfy installation`_.
+We publish a special docker image that contains every dependency to `simplify installation`_.
 
 .. _simplify installation: https://hub.docker.com/repository/docker/pgscatalog/pgsc_calc/general
 
@@ -33,10 +33,12 @@ We also provide a `singularity image`_.
 
 .. _singularity image: https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/pgsc_calc_v2_blob.sif
 
+In this container the calculator can be run using the conda profile, because conda environments have been installed and configured.
+
 Docker
 ~~~~~~
 
-Pull and save the docker images to local tar files in an online environment:
+Pull and save the docker image to a tar file in an online environment:
 
 .. code-block:: bash
 
@@ -60,17 +62,6 @@ Download our singularity image.
 
 
 And transfer the directory to your offline environment.
-
-Download reference data
------------------------
-
-Some small reference data is needed to run the calculator:
-
-* --hg19_chain https://hgdownload.cse.ucsc.edu/goldenpath/hg19/liftOver/hg19ToHg38.over.chain.gz
-* --hg38_chain https://hgdownload.soe.ucsc.edu/goldenPath/hg38/liftOver/hg38ToHg19.over.chain.gz
-
-To do ancestry-based score normalisation you'll need to download the reference
-panel too. See :ref:`norm`.
 
 Download scoring files
 ----------------------
@@ -101,6 +92,19 @@ workflow using the ``--scorefile`` parameter.
 
 .. tip:: If you're using multiple scoring files you must use quotes
          e.g. ``--scorefile "path/to/scorefiles/PGS*.txt.gz"``
+
+(Optional) Download reference data
+-----------------------------------
+
+If you want to liftover a custom scoring file to a different genome build you'll need to download chain files.
+
+* ``--hg19_chain`` https://hgdownload.cse.ucsc.edu/goldenpath/hg19/liftOver/hg19ToHg38.over.chain.gz
+* ``--hg38_chain`` https://hgdownload.soe.ucsc.edu/goldenPath/hg38/liftOver/hg38ToHg19.over.chain.gz
+
+Scoring files from the PGS Catalog Calculator that are downloaded using ``pgscatalog-download`` with the ``--build`` parameter set don't need to be lifted over. They are already in the correct genome build.
+
+If you want to do ancestry-based score normalisation you'll need to download the reference
+panel too. See :ref:`norm` for more details.
 
 Running the calculator test profile in an interactive job
 ----------------------------------------------------------
