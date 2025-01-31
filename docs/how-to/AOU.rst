@@ -1,5 +1,13 @@
+.. _aou:
+
+##############################################################
 Running the PGS Catalog Calculator via the All of Us workbench
-==============================================================
+##############################################################
+
+The examples below assume you are running a Python 3 kernel in a Jupyter notebook on the All of Us workbench.
+
+1. Prepare the genetic data
+===========================
 
 Set up the environment
 ----------------------
@@ -7,31 +15,31 @@ Set up the environment
 Choose a short name for the phenotype (no spaces). This will appear in
 the output directory name.
 
-.. code:: ipython3
+.. code::
 
     # import required packages
     import os
-    
+
     # chose a phenotype name (or a unique name to label the results directory)
     os.environ['PHENOTYPE'] = ""
 
 Set up the dsub function for job submission
 -------------------------------------------
 
-.. code:: ipython3
+.. code::
 
     %%writefile ~/aou_dsub.bash
     #!/bin/bash
-    
+
     function aou_dsub () {
-    
+
       # Get a shorter username to leave more characters for the job name.
       local DSUB_USER_NAME="$(echo "${OWNER_EMAIL}" | cut -d@ -f1)"
-    
+
       # For AoU RWB projects network name is "network".
       local AOU_NETWORK=network
       local AOU_SUBNETWORK=subnetwork
-    
+
       dsub \
           --provider google-cls-v2 \
           --user-project "${GOOGLE_PROJECT}"\
@@ -46,14 +54,14 @@ Set up the dsub function for job submission
           "$@"
     }
 
-.. code:: ipython3
+.. code::
 
     with open("/home/jupyter/.bashrc", "w") as f:
         f.write("source /home/jupyter/aou_dsub.bash\n")
         f.write("export NXF_OFFLINE='true'")
 
 Create subset of the WGS data
-=============================
+-----------------------------
 
 The All of Us WGS ACAF dataset is too large to be easily used in PGS
 calculations. To overcome this, we will first extract a subset of
@@ -70,7 +78,7 @@ You can upload the custom variant file by selecting *File -> Open…* then
 clicking *Upload*. Once this has been upload to your workbench, you must
 then copy it to your workspace bucket:
 
-.. code:: ipython3
+.. code::
 
     !gsutil -u $GOOGLE_PROJECT cp ./hm3_pgsc_all_variants_hg38.tsv ${WORKSPACE_BUCKET}/variant_set/
 
@@ -83,7 +91,7 @@ This is to reduce the high costs associated with storing these large
 files. Code for deleting these files is provided at the end of this
 section.
 
-.. code:: ipython3
+.. code::
 
     !gsutil -u $GOOGLE_PROJECT -m cp gs://fc-aou-datasets-controlled/v7/wgs/short_read/snpindel/acaf_threshold_v7.1/plink_bed/* $WORKSPACE_BUCKET/acaf/
 
@@ -92,14 +100,14 @@ Set up parameter files for dsub
 
 File containing the plink2 command to run on each chromosome.
 
-.. code:: ipython3
+.. code::
 
     %%writefile subset_variants.sh
     #!/bin/bash
-    
+
     set -o errexit
     set -o nounset
-    
+
     plink2 \
           --bfile "${BUCKET}/acaf/acaf_threshold.chr${CHROM}" \
           --extract range "${BUCKET}/variant_set/hm3_pgsc_all_variants_hg38.tsv" \
@@ -109,29 +117,29 @@ File containing the plink2 command to run on each chromosome.
 
 File containing the list of chromosomes to include.
 
-.. code:: ipython3
+.. code::
 
     START = 1
     END = 22
     INCLUDE_X = True
-    
+
     all_chromosomes = ["--env CHROM\n"] + [str(n) + "\n" for n in range(START, END + 1)]
-    
+
     if INCLUDE_X:
         all_chromosomes.append("X")
-    
+
     with (open("chrom_list.tsv", "w") as file):
         file.writelines(all_chromosomes)
 
 Extract the variant subset
---------------------------
+---------------------------
 
-.. code:: bash
+.. code::
 
     %%bash --out job_ID
-    
+
     source ~/aou_dsub.bash
-    
+
     aou_dsub \
       --image biocontainer/plink2:alpha2.3_jan2020 \
       --boot-disk-size 50 \
@@ -149,12 +157,12 @@ Check the status of the job
 
 Get the job identifiers:
 
-.. code:: ipython3
+.. code::
 
     # set user name
     USER_NAME = os.getenv('OWNER_EMAIL').split('@')[0].replace('.','-')
     %env USER_NAME={USER_NAME}
-    
+
     # set job ID
     JOB_ID = job_ID.strip()
     %env JOB_ID={JOB_ID}
@@ -162,7 +170,7 @@ Get the job identifiers:
 Check status of job tasks. **NOTE:** All tasks must have successfully
 completed before attempting to run the Calculator (~30 hours).
 
-.. code:: ipython3
+.. code::
 
     !dstat \
         --provider google-cls-v2 \
@@ -178,17 +186,17 @@ Delete the original WGS files from your bucket
 This is important for reducing storage costs. You must wait until the
 variant extraction has successfully completed.
 
-.. code:: ipython3
+.. code::
 
     !gsutil -m rm -r ${WORKSPACE_BUCKET}/acaf/
 
-Download scoring files
-======================
+2. Download scoring files
+==========================
 
 Install the CLI application for downloading scoring files from the PGS
 Catalog:
 
-.. code:: ipython3
+.. code::
 
     !pip install pgscatalog-core
 
@@ -207,30 +215,30 @@ Publication IDs: ``--pgp PGP000517``
 Update this line in the following code cell with your options
 ``!pgscatalog-download <YOUR OPTIONS HERE> --build GRCh38 -o scoring_files``
 
-.. code:: ipython3
+.. code::
 
     # create new directory to store scoring files (delete previous directory if present)
     !rm -rf scoring_files
     !mkdir scoring_files
-    
+
     # download scoring files (update with your options)
     !pgscatalog-download --pgs PGS000027 --build GRCh38 -o scoring_files
-    
+
     # copy scoring files to cloud storage (delete previous directory if present)
     !gsutil -m rm -rf ${WORKSPACE_BUCKET}/scoring_files/
     !gsutil -u $GOOGLE_PROJECT -m cp ./scoring_files/* ${WORKSPACE_BUCKET}/scoring_files/
 
-Download the reference dataset (optional)
-=========================================
+3. Download the reference dataset (optional)
+============================================
 
 *(This step is only required if you want to run the calculator using the
 ancestry adjustment)*
 
-.. code:: ipython3
+.. code::
 
     # download the data
     !wget https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/pgsc_HGDP+1kGP_v1.tar.zst
-    
+
     # move the data to your home directory
     !mv ./pgsc_HGDP+1kGP_v1.tar.zst ~/
 
@@ -253,34 +261,34 @@ bucket:
 and delete session: *Ctrl + D*\  - Reattach session:
 ``screen -r pgsc_calc``\  - List running sessions: ``screen -ls``
 
-Calculate polygenic scores
-==========================
+4. Calculate polygenic scores
+==============================
 
 Create the samplesheet
 ----------------------
 
-.. code:: ipython3
+.. code::
 
     # samplesheet for AoU WGS data (ACAF threshold)
-    
+
     import json
-    
+
     BUCKET_DIR = os.environ['WORKSPACE_BUCKET']
     BUCKET_DIR = "/mnt/data/mount/gs/" + BUCKET_DIR.replace("gs://", "")
-    
+
     # select chromosomes to include
     START = 1
     END = 22
     INCLUDE_X = True
-    
+
     all_chromosomes = list(range(START, END + 1))
-    
+
     if INCLUDE_X:
         all_chromosomes.append("X")
-    
+
     # create a sample sheet entry for each chromosome
     samplesheet = []
-        
+
     for chrom in all_chromosomes:
         chrom_template = {
             'pheno': BUCKET_DIR + f'/acaf_filtered/aou_chr_{chrom}.psam',
@@ -292,17 +300,17 @@ Create the samplesheet
             'format': 'pfile'
         }
         samplesheet.append(chrom_template)
-        
+
     with open("samplesheet.json", 'w', encoding = 'utf-8') as file:
         json.dump(samplesheet, file, ensure_ascii = False, indent = 4)
-        
+
     # upload the samplesheet file to your workspace bucket
     !gsutil -u $GOOGLE_PROJECT -m cp ./samplesheet.json ${WORKSPACE_BUCKET}/pgsc_calc_files/
 
 Create the config file
 ----------------------
 
-.. code:: ipython3
+.. code::
 
     config = """
     process {
@@ -316,10 +324,10 @@ Create the config file
             time = 48.hour
         }
     }"""
-    
+
     with (open("aou.config", "w") as file):
         file.writelines(config)
-    
+
     # upload the samplesheet file to your workspace bucket
     !gsutil -u $GOOGLE_PROJECT -m cp ./aou.config ${WORKSPACE_BUCKET}/pgsc_calc_files/
 
@@ -331,14 +339,14 @@ These files will be reused in subsequent runs to speed up the pipeline
 (if you will be using the same genotype files and reference data). You
 can run this code cell again to reset the cache.
 
-.. code:: ipython3
+.. code::
 
     # create new local directory
     !rm -rf genotypes_cache
     !mkdir -p genotypes_cache
     # placeholder file so directory is non-empty
     !touch genotypes_cache/placeholder.txt
-    
+
     # replace genotype cache in workspace bucket
     !gsutil -m rm -rf ${WORKSPACE_BUCKET}/genotypes_cache/
     !gsutil -u $GOOGLE_PROJECT cp -r ./genotypes_cache ${WORKSPACE_BUCKET}/
@@ -355,14 +363,14 @@ first code cell.
 
 Create the parameter file:
 
-.. code:: ipython3
+.. code::
 
     %%writefile run_calc.sh
     #!/bin/bash
-    
+
     set -o errexit
     set -o nounset
-    
+
     nextflow run /opt/pgsc_calc/main.nf \
           -profile conda \
           --input "${BUCKET}/pgsc_calc_files/samplesheet.json" \
@@ -377,17 +385,17 @@ Create the parameter file:
           --max_memory 208.GB \
           --max_time 240.h \
           --min_overlap 0.5
-    
+
     cp -r ${CACHE_IN}/* ${CACHE_OUT}
 
 Run the calculator:
 
-.. code:: bash
+.. code::
 
     %%bash --out job_ID
-    
+
     source ~/aou_dsub.bash
-    
+
     aou_dsub \
       --image pgscatalog/pgsc_calc:v2-blob \
       --boot-disk-size 50 \
@@ -410,14 +418,14 @@ the ``--run_ancestry`` line from the first code cell.
 
 Create the parameter file:
 
-.. code:: ipython3
+.. code::
 
     %%writefile run_calc2.sh
     #!/bin/bash
-    
+
     set -o errexit
     set -o nounset
-    
+
     nextflow run /opt/pgsc_calc/main.nf \
           -profile conda \
           --input "${BUCKET}/pgsc_calc_files/samplesheet.json" \
@@ -434,12 +442,12 @@ Create the parameter file:
 
 Run the calculator:
 
-.. code:: bash
+.. code::
 
     %%bash --out job_ID
-    
+
     source ~/aou_dsub.bash
-    
+
     aou_dsub \
       --image pgscatalog/pgsc_calc:v2-blob \
       --boot-disk-size 50 \
@@ -456,19 +464,19 @@ Check the status of the job
 
 Get the job identifiers:
 
-.. code:: ipython3
+.. code::
 
     # set user name
     USER_NAME = os.getenv('OWNER_EMAIL').split('@')[0].replace('.','-')
     %env USER_NAME={USER_NAME}
-    
+
     # set job ID
     JOB_ID = job_ID.strip()
     %env JOB_ID={JOB_ID}
 
 Check status of job:
 
-.. code:: ipython3
+.. code::
 
     !dstat \
         --provider google-cls-v2 \
@@ -486,7 +494,7 @@ will be available in your workspace bucket. However, you may prefer to
 have a local copy on your researcher workbench to use in subsequent
 analyses:
 
-.. code:: ipython3
+.. code::
 
     !mkdir -p calc_results
     !gsutil -u $GOOGLE_PROJECT -m cp -r "${WORKSPACE_BUCKET}/calc_results/${PHENOTYPE}_test" ./calc_results/
@@ -507,12 +515,12 @@ Extra code
 
 Displaying a text file stored in your workspace bucket:
 
-.. code:: ipython3
+.. code::
 
     !gsutil -u $GOOGLE_PROJECT cat "PATH TO FILE. E.g. gs://fc-secure..."
 
 Copying a file from your workspace bucket to your persistent disk:
 
-.. code:: ipython3
+.. code::
 
     !gsutil -u $GOOGLE_PROJECT cp "PATH TO FILE. E.g. gs://fc-secure..." ./
