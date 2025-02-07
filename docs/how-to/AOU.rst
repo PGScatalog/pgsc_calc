@@ -21,7 +21,7 @@ the output directory name.
     import os
 
     # chose a phenotype name (or a unique name to label the results directory)
-    os.environ['PHENOTYPE'] = ""
+    os.environ['PHENOTYPE'] = "EXAMPLE"
 
 Set up the dsub function for job submission
 -------------------------------------------
@@ -66,21 +66,24 @@ Create subset of the WGS data
 The All of Us WGS ACAF dataset is too large to be easily used in PGS
 calculations. To overcome this, we will first extract a subset of
 variants using a custom list containing the most relevant genomic
-positions for PGS calculation (``hm3_pgsc_all_variants_hg38.tsv``). This
-file comprises merged data representing ~17.9 million genomic positions
-extracted from ~5,000 PGS Catalog scoring files and the HapMap3+
-dataset.
+positions for PGS calculation (``pgsc_all+hm3_variants_hg38_[DATE].txt.gz``,
+available from the `resources folder on our FTP`_). This file comprises
+merged data representing ~17.9 million genomic positions extracted from
+~5,000 PGS Catalog scoring files and the HapMap3+ dataset - the file is updated
+regularly and updates are date-stamped.
+
+.. _resources folder on our FTP: https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/
 
 Upload the custom variant list to your workspace bucket
 -------------------------------------------------------
 
-You can upload the custom variant file by selecting *File -> Open…* then
+You can upload the custom variant file (e.g. ``pgsc_all+hm3_variants_hg38_2024-11-22.txt.gz``) by selecting *File -> Open…* then
 clicking *Upload*. Once this has been upload to your workbench, you must
 then copy it to your workspace bucket:
 
 .. code::
 
-    !gsutil -u $GOOGLE_PROJECT cp ./hm3_pgsc_all_variants_hg38.tsv ${WORKSPACE_BUCKET}/variant_set/
+    !gsutil -u $GOOGLE_PROJECT cp ./pgsc_all+hm3_variants_hg38_2024-11-22.txt ${WORKSPACE_BUCKET}/variant_set/
 
 Copy the WGS files into your workspace bucket
 ---------------------------------------------
@@ -336,8 +339,7 @@ Create genotypes cache
 
 This will create a new directory to store the processed genotype files.
 These files will be reused in subsequent runs to speed up the pipeline
-(if you will be using the same genotype files and reference data). You
-can run this code cell again to reset the cache.
+(if you will be using the same genotype files and reference data).
 
 .. code::
 
@@ -351,10 +353,13 @@ can run this code cell again to reset the cache.
     !gsutil -m rm -rf ${WORKSPACE_BUCKET}/genotypes_cache/
     !gsutil -u $GOOGLE_PROJECT cp -r ./genotypes_cache ${WORKSPACE_BUCKET}/
 
+.. warning:: Run this code cell only once. Only re-run this code cell if you wish to reset the cache.
+
+
 Set up the parameter file and run the calculator
 ------------------------------------------------
 
-**OPTION 1:** New run
+**Run 1:** Fresh run of pgsc_calc that re-processes raw data
 
 You should choose this option if you are running the PGS Calculator for
 the first time (or have reset the genotypes cache). If you are not using
@@ -409,7 +414,7 @@ Run the calculator:
       --logging "${WORKSPACE_BUCKET}/dsub/logs/pgsc_calc/$(date +'%Y-%m-%d/%H-%M-%S')/pgsc_calc.log" \
       --script "run_calc.sh"
 
-**OPTION 2:** Subsequent run using cached genotypes
+**All other runs:** Subsequent runs use cached genotypes to speed up calculation
 
 You should choose this option if you have already run the PGS Calculator
 previously and the processed genotype files are still stored in the
