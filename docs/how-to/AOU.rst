@@ -6,6 +6,10 @@ Running the PGS Catalog Calculator via the All of Us workbench
 
 The examples below assume you are running a Python 3 kernel in a Jupyter notebook on the All of Us workbench.
 
+.. note:: These instructions are a work in progress and are liable to change over time. `pgsc_calc` pipeline is not
+    optimized for this cloud environment and data, we are making improvements to the software for this use case.
+
+
 1. Prepare the genetic data
 ===========================
 
@@ -504,8 +508,8 @@ analyses:
     !mkdir -p calc_results
     !gsutil -u $GOOGLE_PROJECT -m cp -r "${WORKSPACE_BUCKET}/calc_results/${PHENOTYPE}_test" ./calc_results/
 
-Citation
-========
+Citation & credits
+==================
 
 If you use the PGS Catalog Calculator in your work, please cite our most
 recent publication:
@@ -514,6 +518,9 @@ recent publication:
    Polygenic Score Catalog with tools for score calculation and ancestry
    normalization. *Nat Genet* 56, 1989–1994 (2024).
    https://doi.org/10.1038/s41588-024-01937-x
+
+Thanks to Sarah Abramowitz, Michael Levin, and colleagues at UPenn for sharing their code for running `pgsc_calc`
+in the AoU TRE which informed these instructions.
 
 Extra code
 ==========
