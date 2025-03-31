@@ -60,7 +60,7 @@ jobs:
       fail-fast: false
       matrix:
         test_profile: ["test"]
-        profile: ["singularity"]
+        profile: ["apptainer"]
         nxf_ver: ['23.10.0', 'latest']
 
     steps:
