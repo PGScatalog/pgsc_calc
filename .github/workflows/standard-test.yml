@@ -1,4 +1,4 @@
-name: Run standard test with singularity and docker profiles
+name: Run standard test with apptainer and docker profiles
 
 on:
   workflow_call:
@@ -8,14 +8,13 @@ on:
         required: true
       docker:
         type: boolean
-      singularity:
+      apptainer:
         type: boolean
 
 env:
-  NXF_SINGULARITY_CACHEDIR: ${{ github.workspace }}/singularity
-  SINGULARITY_VERSION: 3.8.3
+  NXF_APPTAINER_CACHEDIR: ${{ github.workspace }}/apptainer
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  
+
 jobs:
   docker:
     if: ${{ inputs.docker }}
@@ -32,7 +31,7 @@ jobs:
         shell: bash
         run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
         id: extract_branch
-        
+
       - uses: nf-core/setup-nextflow@v2
         with:
           version: ${{ matrix.nxf_ver }}
@@ -43,7 +42,7 @@ jobs:
         with:
           path: ${{ runner.temp }}/docker
           key: ${{ inputs.cache-key }}
-          fail-on-cache-miss: true          
+          fail-on-cache-miss: true
 
       - name: Load docker images from cache
         run: |
@@ -55,7 +54,7 @@ jobs:
           nextflow run pgscatalog/pgsc_calc -r ${{ steps.extract_branch.outputs.branch }} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
 
   singularity:
-    if: ${{ inputs.singularity }}
+    if: ${{ inputs.apptainer }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -69,28 +68,19 @@ jobs:
         shell: bash
         run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
         id: extract_branch
-      
+
       - uses: nf-core/setup-nextflow@v2
         with:
           version: ${{ matrix.nxf_ver }}
 
       - name: Restore singularity setup
-        id: restore-singularity-setup
+        uses: eWaterCycle/setup-apptainer@v2
+
+      - name: Restore apptainer container images
+        id: restore-apptainer
         uses: actions/cache@v4
         with:
-          path: /opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64
-          key: ${{ runner.os }}-singularity-${{ env.SINGULARITY_VERSION }}
-          fail-on-cache-miss: true
-
-      - name: Add singularity to path
-        run: |
-          echo "/opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64/bin" >> $GITHUB_PATH
-
-      - name: Restore singularity container images
-        id: restore-singularity
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.NXF_SINGULARITY_CACHEDIR }}
+          path: ${{ env.NXF_APPTAINER_CACHEDIR }}
           key: ${{ inputs.cache-key }}
 
       - name: Run pipeline with test data

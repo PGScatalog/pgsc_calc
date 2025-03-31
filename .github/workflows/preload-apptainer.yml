@@ -1,0 +1,34 @@
+name: Preload apptainer containers
+
+on:
+  workflow_call:
+    outputs:
+      cache-key:
+        value: apptainer-${{ github.sha }}
+
+env:
+  NXF_APPTAINER_CACHEDIR: ${{ github.workspace }}/apptainer
+
+jobs:
+  singularity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v4
+
+      - name: Setup apptainer
+        uses: eWaterCycle/setup-apptainer@v2
+
+      - name: Pull and save apptainer images
+        run: |
+          mkdir -p $NXF_APPTAINER_CACHEDIR
+          git grep 'ext.singularity*' conf/modules.config | cut -f 2 -d '=' | xargs -L 2 echo | tr -d ' ' > ${{ runner.temp }}/singularity_images.txt
+          cat ${{ runner.temp }}/singularity_images.txt | sed 's/oras:\/\///;s/https:\/\///;s/\//-/g;s/$/.img/;s/:/-/' > ${{ runner.temp }}/singularity_image_paths.txt
+          paste -d '\n' ${{ runner.temp }}/singularity_image_paths.txt ${{ runner.temp }}/singularity_images.txt | xargs -L 2 sh -c 'singularity pull --disable-cache --dir $NXF_APPTAINER_CACHEDIR $0 $1'
+
+      - name: Cache apptainer images
+        id: cache-singularity-pull
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.NXF_SINGULARITY_CACHEDIR }}
+          key: apptainer-${{ github.sha }}
