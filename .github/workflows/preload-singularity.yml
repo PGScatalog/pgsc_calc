@@ -22,7 +22,7 @@ jobs:
       - name: Pull and save apptainer images
         run: |
           mkdir -p $NXF_SINGULARITY_CACHEDIR
-          git grep 'ext.docker*' conf/modules.config | cut -f 2 -d '=' | xargs -L 2 echo | tr -d ' ' > ${{ runner.temp }}/singularity_images.txt
+          git grep 'ext.singularity*' conf/modules.config | cut -f 2 -d '=' | xargs -L 2 echo | tr -d ' ' > ${{ runner.temp }}/singularity_images.txt
           cat ${{ runner.temp }}/singularity_images.txt | sed 's/oras:\/\///;s/https:\/\///;s/\//-/g;s/$/.img/;s/:/-/' > ${{ runner.temp }}/singularity_image_paths.txt
           paste -d '\n' ${{ runner.temp }}/singularity_image_paths.txt ${{ runner.temp }}/singularity_images.txt | xargs -L 2 sh -c 'singularity pull --disable-cache --dir $NXF_SINGULARITY_CACHEDIR $0 $1'
 
