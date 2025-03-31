@@ -17,12 +17,12 @@ on:
     types: [published]
 
 jobs:
-  preload_apptainer:
-    uses: ./.github/workflows/preload-apptainer.yml
+  preload_singularity:
+    uses: ./.github/workflows/preload-singularity.yml
 
   standard_test_singularity:
-    needs: preload_apptainer
+    needs: preload_singularity
     uses: ./.github/workflows/standard-test.yml
     with:
       cache-key: ${{ needs.preload_apptainer.outputs.cache-key }}
-      apptainer: true
+      singularity: true

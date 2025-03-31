@@ -1,4 +1,4 @@
-name: Run standard test with apptainer and docker profiles
+name: Run standard test with singularity and docker profiles
 
 on:
   workflow_call:
@@ -8,11 +8,11 @@ on:
         required: true
       docker:
         type: boolean
-      apptainer:
+      singularity:
         type: boolean
 
 env:
-  NXF_APPTAINER_CACHEDIR: ${{ github.workspace }}/apptainer
+  NXF_SINGULARITY_CACHEDIR: ${{ github.workspace }}/singularity
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
@@ -54,13 +54,13 @@ jobs:
           nextflow run pgscatalog/pgsc_calc -r ${{ steps.extract_branch.outputs.branch }} -profile ${{ matrix.test_profile}},${{ matrix.profile }}
 
   singularity:
-    if: ${{ inputs.apptainer }}
+    if: ${{ inputs.singularity }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         test_profile: ["test"]
-        profile: ["apptainer"]
+        profile: ["singularity"]
         nxf_ver: ['23.10.0', 'latest']
 
     steps:
@@ -73,15 +73,17 @@ jobs:
         with:
           version: ${{ matrix.nxf_ver }}
 
-      - name: Restore singularity setup
-        uses: eWaterCycle/setup-apptainer@v2
 
-      - name: Restore apptainer container images
-        id: restore-apptainer
+      - name: Singularity install with defaults
+        uses: singularityhub/install-singularity@main
+
+      - name: Restore singularity container images
+        id: restore-singularity
         uses: actions/cache@v4
         with:
-          path: ${{ env.NXF_APPTAINER_CACHEDIR }}
+          path: ${{ env.NXF_SINGULARITY_CACHEDIR }}
           key: ${{ inputs.cache-key }}
+          fail-on-cache-miss: true
 
       - name: Run pipeline with test data
         run: |
