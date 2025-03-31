@@ -21,7 +21,7 @@ jobs:
     uses: ./.github/workflows/preload-apptainer.yml
 
   standard_test_singularity:
-    needs: preload_singularity
+    needs: preload_apptainer
     uses: ./.github/workflows/standard-test.yml
     with:
       cache-key: ${{ needs.preload_apptainer.outputs.cache-key }}
