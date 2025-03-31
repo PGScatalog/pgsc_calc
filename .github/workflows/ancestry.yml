@@ -28,7 +28,7 @@ jobs:
         run: |
           echo "ANCESTRY_REF_DIR=$RUNNER_TEMP" >> $GITHUB_ENV
           echo "ANCESTRY_TARGET_DIR=$RUNNER_TEMP" >> $GITHUB_ENV
-      
+
       - name: Check out pipeline code
         uses: actions/checkout@v4
 
@@ -63,7 +63,7 @@ jobs:
         with:
           python-version: '3.10'
           cache: 'pip'
-          
+
       - run: pip install -r ${{ github.workspace }}/tests/requirements.txt
 
       - name: Run ancestry test
@@ -78,7 +78,7 @@ jobs:
             /home/runner/pytest_workflow_*/*/.nextflow.log
             /home/runner/pytest_workflow_*/*/log.out
             /home/runner/pytest_workflow_*/*/log.err
-            
+
   singularity:
     if: ${{ inputs.singularity }}
     runs-on: ubuntu-latest
@@ -88,23 +88,14 @@ jobs:
         run: |
           echo "ANCESTRY_REF_DIR=$RUNNER_TEMP" >> $GITHUB_ENV
           echo "ANCESTRY_TARGET_DIR=$RUNNER_TEMP" >> $GITHUB_ENV
-      
+
       - name: Check out pipeline code
         uses: actions/checkout@v4
 
       - uses: nf-core/setup-nextflow@v2
 
-      - name: Restore singularity setup
-        id: restore-singularity-setup
-        uses: actions/cache@v4
-        with:
-          path: /opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64
-          key: ${{ runner.os }}-singularity-${{ env.SINGULARITY_VERSION }}
-          fail-on-cache-miss: true
-
-      - name: Add singularity to path
-        run: |
-          echo "/opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64/bin" >> $GITHUB_PATH
+      - name: Singularity install with defaults
+        uses: singularityhub/install-singularity@main
 
       - name: Restore singularity container images
         id: restore-singularity
@@ -123,20 +114,20 @@ jobs:
             ${{ env.ANCESTRY_REF_DIR }}/GRCh38_HAPNEST_reference.tar.zst
           key: ${{ inputs.ancestry-cache-key }}
           fail-on-cache-miss: true
-          
+
       - name: Set up test requirements
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
           cache: 'pip'
-          
+
       - run: pip install -r ${{ github.workspace }}/tests/requirements.txt
 
       - name: Run ancestry test
         run: TMPDIR=~ PROFILE=singularity pytest --kwdof --symlink --git-aware --wt 2 --tag "ancestry" --ignore tests/bin
         env:
           TMPDIR: ${{ runner.temp }}
-          
+
       - name: Upload logs on failure
         if: failure()
         uses: actions/upload-artifact@v4
@@ -145,4 +136,4 @@ jobs:
           path: |
             /home/runner/pytest_workflow_*/*/.nextflow.log
             /home/runner/pytest_workflow_*/*/log.out
-            /home/runner/pytest_workflow_*/*/log.err          
+            /home/runner/pytest_workflow_*/*/log.err

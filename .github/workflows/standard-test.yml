@@ -13,9 +13,8 @@ on:
 
 env:
   NXF_SINGULARITY_CACHEDIR: ${{ github.workspace }}/singularity
-  SINGULARITY_VERSION: 3.8.3
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  
+
 jobs:
   docker:
     if: ${{ inputs.docker }}
@@ -32,7 +31,7 @@ jobs:
         shell: bash
         run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
         id: extract_branch
-        
+
       - uses: nf-core/setup-nextflow@v2
         with:
           version: ${{ matrix.nxf_ver }}
@@ -43,7 +42,7 @@ jobs:
         with:
           path: ${{ runner.temp }}/docker
           key: ${{ inputs.cache-key }}
-          fail-on-cache-miss: true          
+          fail-on-cache-miss: true
 
       - name: Load docker images from cache
         run: |
@@ -69,22 +68,13 @@ jobs:
         shell: bash
         run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
         id: extract_branch
-      
+
       - uses: nf-core/setup-nextflow@v2
         with:
           version: ${{ matrix.nxf_ver }}
 
-      - name: Restore singularity setup
-        id: restore-singularity-setup
-        uses: actions/cache@v4
-        with:
-          path: /opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64
-          key: ${{ runner.os }}-singularity-${{ env.SINGULARITY_VERSION }}
-          fail-on-cache-miss: true
-
-      - name: Add singularity to path
-        run: |
-          echo "/opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64/bin" >> $GITHUB_PATH
+      - name: Singularity install with defaults
+        uses: singularityhub/install-singularity@main
 
       - name: Restore singularity container images
         id: restore-singularity
@@ -92,6 +82,7 @@ jobs:
         with:
           path: ${{ env.NXF_SINGULARITY_CACHEDIR }}
           key: ${{ inputs.cache-key }}
+          fail-on-cache-miss: true
 
       - name: Run pipeline with test data
         run: |

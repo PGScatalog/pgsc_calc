@@ -33,7 +33,7 @@ Reference database
    :maxdepth: 1
 
    database
-   
+
 Working in different environments
 ---------------------------------
 
@@ -44,6 +44,7 @@ Working in different environments
    arm
    offline
    cloud
+   AOU
 
 Working with complex datasets
 -----------------------------
