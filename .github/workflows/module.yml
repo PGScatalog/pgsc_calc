@@ -79,17 +79,8 @@ jobs:
 
       - uses: nf-core/setup-nextflow@v2
 
-      - name: Restore singularity setup
-        id: restore-singularity-setup
-        uses: actions/cache@v4
-        with:
-          path: /opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64
-          key: ${{ runner.os }}-singularity-${{ env.SINGULARITY_VERSION }}
-          fail-on-cache-miss: true
-
-      - name: Add singularity to path
-        run: |
-          echo "/opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64/bin" >> $GITHUB_PATH
+      - name: Singularity install with defaults
+        uses: singularityhub/install-singularity@main
 
       - name: Restore singularity container images
         id: restore-singularity
