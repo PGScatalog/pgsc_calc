@@ -17,7 +17,7 @@ on:
 env:
   NXF_SINGULARITY_CACHEDIR: ${{ github.workspace }}/singularity
   SINGULARITY_VERSION: 3.8.3
-  
+
 jobs:
   docker:
     if: ${{ inputs.docker }}
@@ -28,7 +28,7 @@ jobs:
         run: |
           echo "ANCESTRY_REF_DIR=$RUNNER_TEMP" >> $GITHUB_ENV
           echo "ANCESTRY_TARGET_DIR=$RUNNER_TEMP" >> $GITHUB_ENV
-      
+
       - name: Check out pipeline code
         uses: actions/checkout@v4
 
@@ -69,7 +69,7 @@ jobs:
         with:
           python-version: '3.10'
           cache: 'pip'
-          
+
       - run: pip install -r ${{ github.workspace }}/tests/requirements.txt
 
       - name: Run ancestry test
@@ -84,7 +84,7 @@ jobs:
             /home/runner/pytest_workflow_*/*/.nextflow.log
             /home/runner/pytest_workflow_*/*/log.out
             /home/runner/pytest_workflow_*/*/log.err
-            
+
   singularity:
     if: ${{ inputs.singularity }}
     runs-on: ubuntu-latest
@@ -94,23 +94,14 @@ jobs:
         run: |
           echo "ANCESTRY_REF_DIR=$RUNNER_TEMP" >> $GITHUB_ENV
           echo "ANCESTRY_TARGET_DIR=$RUNNER_TEMP" >> $GITHUB_ENV
-      
+
       - name: Check out pipeline code
         uses: actions/checkout@v4
 
       - uses: nf-core/setup-nextflow@v2
 
-      - name: Restore singularity setup
-        id: restore-singularity-setup
-        uses: actions/cache@v4
-        with:
-          path: /opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64
-          key: ${{ runner.os }}-singularity-${{ env.SINGULARITY_VERSION }}
-          fail-on-cache-miss: true
-
-      - name: Add singularity to path
-        run: |
-          echo "/opt/hostedtoolcache/singularity/${{ env.SINGULARITY_VERSION }}/x64/bin" >> $GITHUB_PATH
+      - name: Singularity install with defaults
+        uses: singularityhub/install-singularity@main
 
       - name: Restore singularity container images
         id: restore-singularity
@@ -141,7 +132,7 @@ jobs:
         with:
           python-version: '3.10'
           cache: 'pip'
-          
+
       - run: pip install -r ${{ github.workspace }}/tests/requirements.txt
 
       - name: Run ancestry test
@@ -155,4 +146,4 @@ jobs:
           path: |
             /home/runner/pytest_workflow_*/*/.nextflow.log
             /home/runner/pytest_workflow_*/*/log.out
-            /home/runner/pytest_workflow_*/*/log.err        
+            /home/runner/pytest_workflow_*/*/log.err

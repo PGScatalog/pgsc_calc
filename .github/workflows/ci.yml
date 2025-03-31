@@ -17,6 +17,9 @@ on:
     types: [published]
 
 jobs:
+  preload_ancestry:
+    uses: ./.github/workflows/preload-reference.yml
+
   preload_singularity:
     uses: ./.github/workflows/preload-singularity.yml
 
@@ -62,3 +65,19 @@ jobs:
       cache-key: ${{ needs.preload_singularity.outputs.cache-key }}
       singularity: true
       tag: ${{ matrix.tags }}
+
+  ancestry_singularity:
+    needs: [preload_ancestry, preload_singularity]
+    uses: ./.github/workflows/ancestry.yml
+    with:
+      container-cache-key: ${{ needs.preload_singularity.outputs.cache-key }}
+      ancestry-cache-key: ${{ needs.preload_ancestry.outputs.cache-key }}
+      singularity: true
+
+  ancestry_vcf_singularity:
+    needs: [preload_ancestry, preload_singularity]
+    uses: ./.github/workflows/ancestry.yml
+    with:
+      container-cache-key: ${{ needs.preload_singularity.outputs.cache-key }}
+      ancestry-cache-key: ${{ needs.preload_ancestry.outputs.cache-key }}
+      singularity: true
