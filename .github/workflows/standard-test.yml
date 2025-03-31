@@ -73,7 +73,6 @@ jobs:
         with:
           version: ${{ matrix.nxf_ver }}
 
-
       - name: Singularity install with defaults
         uses: singularityhub/install-singularity@main
 
