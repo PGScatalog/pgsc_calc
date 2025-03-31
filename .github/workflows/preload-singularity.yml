@@ -31,4 +31,4 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ env.NXF_SINGULARITY_CACHEDIR }}
-          key: apptainer-${{ github.sha }}
+          key: singularity-${{ github.sha }}
