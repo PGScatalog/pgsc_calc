@@ -3,9 +3,9 @@
 nextflow.enable.dsl = 2
 
 include { DOWNLOAD_SCOREFILES } from '../../../modules/local/download_scorefiles.nf'
-include { COMBINE_SCOREFILES } from '../../../modules/local/combine_scorefiles.nf'
+include { FORMAT_SCOREFILES } from '../../../modules/local/format_scorefiles.nf'
 
-workflow testcombine {
+workflow testformat {
 
     target_build = 'GRCh38'
     accessions = [pgs_id: 'PGS000001 PGS000002',
@@ -16,5 +16,5 @@ workflow testcombine {
 
     DOWNLOAD_SCOREFILES(accessions, target_build)
 
-    COMBINE_SCOREFILES ( DOWNLOAD_SCOREFILES.out.scorefiles, chain_files )
+    FORMAT_SCOREFILES ( DOWNLOAD_SCOREFILES.out.scorefiles, chain_files )
 }

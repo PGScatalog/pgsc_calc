@@ -1,0 +1,73 @@
+- name: test format scorefiles module
+  command: nextflow run ./tests/modules/format -entry testformat -c ./tests/config/nextflow.config --target_build GRCh38
+  tags:
+    - module
+    - format
+    - fast
+  files:
+    - path: output/format/formatted/normalised_PGS000001_hmPOS_GRCh38.txt.gz
+      contains:
+        - "chr_name"
+        - "chr_position"
+        - "effect_allele"
+        - "other_allele"
+        - "effect_weight"
+    - path: output/format/formatted/normalised_PGS000002_hmPOS_GRCh38.txt.gz
+      contains:
+        - "chr_name"
+        - "chr_position"
+        - "effect_allele"
+        - "other_allele"
+        - "effect_weight"
+    - path: output/format/formatted/normalised_PGS000003_hmPOS_GRCh38.txt.gz
+      contains:
+        - "chr_name"
+        - "chr_position"
+        - "effect_allele"
+        - "other_allele"
+        - "effect_weight"
+    - path: output/format/formatted/normalised_PGS000753_hmPOS_GRCh38.txt.gz
+      contains:
+        - "chr_name"
+        - "chr_position"
+        - "effect_allele"
+        - "other_allele"
+        - "effect_weight"
+    - path: output/format/formatted/normalised_PGS001784_hmPOS_GRCh38.txt.gz
+      contains:
+        - "chr_name"
+        - "chr_position"
+        - "effect_allele"
+        - "other_allele"
+        - "effect_weight"
+    - path: output/format/formatted/normalised_PGS002054_hmPOS_GRCh38.txt.gz
+      contains:
+        - "chr_name"
+        - "chr_position"
+        - "effect_allele"
+        - "other_allele"
+        - "effect_weight"
+    - path: output/format/formatted/normalised_PGS003429_hmPOS_GRCh38.txt.gz
+      contains:
+        - "chr_name"
+        - "chr_position"
+        - "effect_allele"
+        - "other_allele"
+        - "effect_weight"
+    - path: output/format/formatted/normalised_PGS003972_hmPOS_GRCh38.txt.gz
+      contains:
+        - "chr_name"
+        - "chr_position"
+        - "effect_allele"
+        - "other_allele"
+        - "effect_weight"
+    - path: output/format/formatted/normalised_PGS003973_hmPOS_GRCh38.txt.gz
+      contains:
+        - "chr_name"
+        - "chr_position"
+        - "effect_allele"
+        - "other_allele"
+        - "effect_weight"
+    - path: output/format/versions.yml
+      contains:
+        - "pgscatalog.core: 1.0.0"

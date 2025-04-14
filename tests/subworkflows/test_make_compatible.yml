@@ -5,7 +5,7 @@
     - subworkflow
     - fast
   files:
-    - path: output/combine/scorefiles.txt.gz
+    - path: output/format/formatted/normalised_PGS001229_22.txt
     - path: output/plink2/GRCh37_cineca_22.bim.zst
     - path: output/plink2/GRCh37_cineca_22.bed
     - path: output/plink2/GRCh37_cineca_22.fam
@@ -18,11 +18,11 @@
     - subworkflow
     - fast
   files:
-    - path: output/combine/scorefiles.txt.gz
+    - path: output/format/formatted/normalised_PGS001229_22.txt
     - path: output/plink2/GRCh37_cineca_22.pgen
     - path: output/plink2/GRCh37_cineca_22.pvar.zst
     - path: output/plink2/GRCh37_cineca_22.psam
-    - path: output/plink2/GRCh37_cineca_22.vmiss.gz      
+    - path: output/plink2/GRCh37_cineca_22.vmiss.gz
 
 - name: test make compatible subworkflow with pfile
   command: nextflow run main.nf --only_compatible -c ./tests/config/nextflow.config
@@ -31,7 +31,7 @@
     - subworkflow
     - fast
   files:
-    - path: output/combine/scorefiles.txt.gz
+    - path: output/format/formatted/normalised_PGS001229_22.txt
     - path: output/plink2/GRCh37_cineca_22.pgen
     - path: output/plink2/GRCh37_cineca_22.pvar.zst
     - path: output/plink2/GRCh37_cineca_22.psam
