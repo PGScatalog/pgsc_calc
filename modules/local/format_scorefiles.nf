@@ -1,4 +1,4 @@
-process COMBINE_SCOREFILES {
+process FORMAT_SCOREFILES {
     // labels are defined in conf/modules.config
     label 'process_medium'
     label 'pgscatalog_utils' // controls conda, docker, + singularity options
@@ -15,19 +15,21 @@ process COMBINE_SCOREFILES {
     path reference
 
     output:
-    path "scorefiles.txt.gz", emit: scorefiles
-    path "log_scorefiles.json", emit: log_scorefiles
-    path "versions.yml"     , emit: versions
+    path "formatted/normalised_*.{txt,txt.gz}", arity: "1..*", emit: scorefiles
+    path "formatted/log_scorefiles.json", arity: "1", emit: log_scorefiles
+    path "versions.yml", arity: "1", emit: versions
 
     script:
     def args = task.ext.args ?: ''
 
     if (params.liftover)
         """
-        pgscatalog-combine -s $raw_scores \
+        mkdir formatted
+
+        pgscatalog-format -s $raw_scores \
             --liftover \
             -t $params.target_build \
-            -o scorefiles.txt.gz \
+            -o formatted/ \
             -l log_scorefiles.json \
             -c \$PWD \
             -m $params.min_lift \
@@ -41,9 +43,11 @@ process COMBINE_SCOREFILES {
         """
     else
         """
-        pgscatalog-combine -s $raw_scores \
+        mkdir formatted
+
+        pgscatalog-format -s $raw_scores \
             -t $params.target_build \
-            -o scorefiles.txt.gz \
+            -o formatted/ \
             -l log_scorefiles.json \
             -v \
             $args
