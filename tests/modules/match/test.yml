@@ -7,8 +7,8 @@
   files:
     - path: output/test/match/versions.yml
       contains:
-        - "pgscatalog.match: 0.3.3"
-# can't test IPC output (not published)        
+        - "pgscatalog.match: 0.4.0"
+# can't test IPC output (not published)
 
 - name: test match combine module
   command: nextflow run ./tests/modules/match -entry testmatchcombine -c ./tests/config/nextflow.config
@@ -20,10 +20,10 @@
   files:
     - path: output/test/match/versions.yml
       contains:
-        - "pgscatalog.match: 0.3.3"
-    - path: output/test/match/test_ALL_additive_0.scorefile.gz           
+        - "pgscatalog.match: 0.4.0"
+    - path: output/test/match/test_ALL_additive_0.scorefile.gz
       contains:
-        - "PGS001229"     
+        - "PGS001229"
         - "ID"
         - "effect_allele"
     - path: output/test/match/test_summary.csv

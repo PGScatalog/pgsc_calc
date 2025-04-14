@@ -6,7 +6,7 @@
     - subworkflow
     - fast
   files:
-    - path: output/combine/scorefiles.txt.gz
+    - path: output/format/formatted/normalised_PGS001229_22.txt
     - path: output/plink2/GRCh37_cineca_22.pgen
     - path: output/plink2/GRCh37_cineca_22.pvar.zst
     - path: output/plink2/GRCh37_cineca_22.psam
@@ -26,8 +26,8 @@
 
 
 - name: test perfect apply score
-  command: nextflow run main.nf --only_score -c ./tests/config/nextflow.config --scorefile ./tests/subworkflows/perfect.txt 
+  command: nextflow run main.nf --only_score -c ./tests/config/nextflow.config --scorefile ./tests/subworkflows/perfect.txt
   tags:
     - applyscore
     - subworkflow
-    - fast    
+    - fast

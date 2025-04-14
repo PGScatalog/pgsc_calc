@@ -28,6 +28,7 @@ process FORMAT_SCOREFILES {
 
         pgscatalog-format -s $raw_scores \
             --liftover \
+            --threads $task.cpus \
             -t $params.target_build \
             -o formatted/ \
             -l log_scorefiles.json \
@@ -47,6 +48,7 @@ process FORMAT_SCOREFILES {
 
         pgscatalog-format -s $raw_scores \
             -t $params.target_build \
+            --threads $task.cpus \
             -o formatted/ \
             -l log_scorefiles.json \
             -v \
