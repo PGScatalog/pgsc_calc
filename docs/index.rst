@@ -1,5 +1,5 @@
 :orphan:
-   
+
 ``pgsc_calc``: a reproducible workflow to calculate polygenic scores
 ====================================================================
 
@@ -17,7 +17,7 @@ normalisation methods are also supported.
 Workflow summary
 ----------------
 
-.. image:: https://user-images.githubusercontent.com/11425618/257213197-f766b28c-0f75-4344-abf3-3463946e36cc.png
+.. image:: ../assets/diagrams/pgsc_calc_ancestry.png
     :width: 600
     :align: center
     :alt: `pgsc_calc` workflow diagram
@@ -98,7 +98,7 @@ The workflow should output:
     [b5/fc5b1e] process > PGSC_CALC:PGSCALC:APPLY_SCORE:SCORE_REPORT (1)                             [100%] 1 of 1 ✔
     [03/009cb6] process > PGSC_CALC:PGSCALC:DUMPSOFTWAREVERSIONS (1)                                 [100%] 1 of 1 ✔
     -[pgscatalog/pgsc_calc] Pipeline completed successfully-
-                
+
 .. note:: The ``docker`` profile option can be replaced with ``singularity`` or
           ``conda`` depending on your local environment
 
