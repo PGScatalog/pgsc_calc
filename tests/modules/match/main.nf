@@ -2,7 +2,7 @@
 
 nextflow.enable.dsl = 2
 
-include { COMBINE_SCOREFILES } from '../../../modules/local/combine_scorefiles.nf'
+include { FORMAT_SCOREFILES } from '../../../modules/local/format_scorefiles.nf'
 include { PLINK2_RELABELBIM } from '../../../modules/local/plink2_relabelbim'
 include { MATCH_VARIANTS } from '../../../modules/local/match_variants'
 include { MATCH_COMBINE }  from '../../../modules/local/match_combine'
@@ -16,9 +16,9 @@ workflow testmatch {
 
     Channel.fromPath('NO_FILE', checkIfExists: false).set { chain_files }
 
-    COMBINE_SCOREFILES ( scorefile, chain_files )
+    FORMAT_SCOREFILES ( scorefile, chain_files )
 
-    ch_scorefiles = COMBINE_SCOREFILES.out.scorefiles
+    ch_scorefiles = FORMAT_SCOREFILES.out.scorefiles.collect { [it] }
 
     def meta = [id: 'test', is_bfile: true, n_samples: 100, n_chrom: 1, chrom: 'ALL']
     def scoremeta = [n_scores: 1]

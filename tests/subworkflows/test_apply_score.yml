@@ -1,12 +1,11 @@
-# get a scores with two columns in output (test profile + PGS001229) for custom test
+# get a scores with two columns in output for custom test
 - name: test apply score subworkflow
-  command: nextflow run main.nf --only_score -c ./tests/config/nextflow.config --pgs_id PGS001229 --min_overlap 0
+  command: nextflow run main.nf --only_score -c ./tests/config/nextflow.config --pgs_id PGS001229 --min_overlap 0 --scorefile ./tests/subworkflows/perfect.txt
   tags:
     - applyscore
     - subworkflow
     - fast
   files:
-    - path: output/combine/scorefiles.txt.gz
     - path: output/plink2/GRCh37_cineca_22.pgen
     - path: output/plink2/GRCh37_cineca_22.pvar.zst
     - path: output/plink2/GRCh37_cineca_22.psam
@@ -26,8 +25,8 @@
 
 
 - name: test perfect apply score
-  command: nextflow run main.nf --only_score -c ./tests/config/nextflow.config --scorefile ./tests/subworkflows/perfect.txt 
+  command: nextflow run main.nf --only_score -c ./tests/config/nextflow.config --scorefile ./tests/subworkflows/perfect.txt
   tags:
     - applyscore
     - subworkflow
-    - fast    
+    - fast
