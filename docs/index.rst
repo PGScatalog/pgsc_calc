@@ -130,6 +130,7 @@ Features under development
 
 These are some of the fetures and improvements we're planning for the ``pgsc_calc``:
 
+- Planned (v3) will include better support for WGS data, new bgen format inputs, and better scalability for common cloud TREs (e.g. DNAnexus)
 - Further optimizations to the PCA & ancestry similarity analysis steps focused on improving automatic QC
 - Performance improvements to make ``pgsc_calc`` work with 1000s of scoring files in paralell (e.g. integration
   with `OmicsPred`_)
