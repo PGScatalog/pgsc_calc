@@ -1,7 +1,0 @@
-#pgs_name=test
-#pgs_id=custom
-#trait_reported=test
-#genome_build=GRCh38
-chr_name	chr_position	effect_allele	other_allele	effect_weight
-1	4799428	A	G	-0.0504139458332669
-1	5237785	G	A	0.040436175688854

@@ -1,0 +1,110 @@
+nextflow_process {
+    name "Test process pgsc_download"
+    script "../main.nf"
+    process "PGSC_CALC_DOWNLOAD"
+
+    test("Should download scoring file in build GRCh38") {
+        when {
+            process {
+                """
+                input[0] = Channel.from(
+                    [ pgs_id: "PGS001229", trait_efo: [], pgp_id: [] ]
+                )
+                input[1] = Channel.from("GRCh38")
+                """
+            }
+        }
+        then {
+            assertAll (
+                // it was OK!
+                { assert process.success },
+                // one process launched
+                { assert process.trace.tasks().size() == 1},
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+
+    test("Should download two scoring files in build GRCh37") {
+        when {
+            process {
+                """
+                input[0] = Channel.from(
+                    [ pgs_id: "PGS001229,PGS000822", trait_efo: [], pgp_id: [] ]
+                )
+                input[1] = Channel.from("GRCh37")
+                """
+            }
+        }
+        then {
+            assertAll (
+                { assert process.success },
+                { assert process.trace.tasks().size() == 1 },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+
+    test("Should download scoring files with publication ID") {
+        when {
+            process {
+                """
+                input[0] = Channel.from(
+                    [ pgs_id: "", trait_efo: "", pgp_id: "PGP000020" ]
+                )
+                input[1] = Channel.from("GRCh37")
+                """
+            }
+        }
+        then {
+            assertAll (
+                { assert process.success },
+                { assert process.trace.tasks().size() == 1 },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+
+
+    test("Should download scoring files with EFO term (trait)") {
+        when {
+            process {
+                """
+                input[0] = Channel.from(
+                    [ pgs_id: "", trait_efo: "", pgp_id: "EFO_0000217" ]
+                )
+                input[1] = Channel.from("GRCh37")
+                """
+            }
+        }
+        then {
+            assertAll (
+                { assert process.success },
+                { assert process.trace.tasks().size() == 1 },
+                // two scores are associated with EFO_0000217 2025-11-12
+                // (but more may be added!)
+                { assert process.out.scorefiles.get(0).size() >= 2 }
+            )
+        }
+    }
+
+    test("Test stub") {
+
+    options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = Channel.from(
+                    [ pgs_id: "PGS001229", trait_efo: [], pgp_id: [] ]
+                )
+                input[1] = Channel.from("GRCh37")
+                """
+            }
+        }
+
+        then {
+            assert process.success
+        }
+    }
+}

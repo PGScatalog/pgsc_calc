@@ -1,9 +1,0 @@
-name: pgscatalog-utils
-channels:
-  - conda-forge
-  - bioconda
-  - nodefaults
-dependencies:
-  - pgscatalog.core=1.0.0
-  - pgscatalog.match=0.4.0
-  - pgscatalog.calc=0.3.0

@@ -1,0 +1,139 @@
+nextflow_process {
+    name "Test process pgsc_calc_load"
+    script "../main.nf"
+    process "PGSC_CALC_LOAD"
+    tag "module"
+
+    test("Test load 1000G VCF PGS000315") {
+
+        when {
+            process {
+                """
+                input[0] = Channel.of(
+                    [
+                        [ sampleset: "1000G", chrom: null, file_format: "vcf", genotyping_method: "array" ],
+                        file("../../../tests/data/vcf/PGS000586_GRCh38.vcf.gz", checkIfExists: true),
+                        file("BGEN_SAMPLE_NO_FILE"),
+                        file("../../../tests/data/vcf/PGS000586_GRCh38.vcf.gz.csi", checkIfExists: true)
+                    ]
+                )
+                input[1] = Channel.fromPath("../../../tests/data/normalised_PGS000586_hmPOS_GRCh38.txt.gz", checkIfExists: true)
+                input[2] = Channel.fromPath("ZARR_ZIP_NO_FILE")
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out.versions).match() }
+            )
+        }
+    }
+
+    test("Test load 1000G bgen PGS000315") {
+        when {
+            process {
+                """
+                input[0] = Channel.of(
+                    [ [ sampleset: "1000G", chrom: null, file_format: "bgen", genotyping_method: "array" ],
+                        file("../../../tests/data/bgen/PGS000586_GRCh38.bgen", checkIfExists: true),
+                        file("../../../tests/data/bgen/PGS000586_GRCh38.sample", checkIfExists: true),
+                        file("../../../tests/data/bgen/PGS000586_GRCh38.bgen.bgi", checkIfExists: true)
+                    ]
+                )
+                input[1] = Channel.fromPath("../../../tests/data/normalised_PGS000586_hmPOS_GRCh38.txt.gz", checkIfExists: true)
+                input[2] = Channel.fromPath("ZARR_ZIP_NO_FILE")
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out.versions).match() }
+            )
+        }
+    }
+
+    test("Cached load should work") {
+        when {
+            process {
+                """
+                input[0] = Channel.of(
+                    [ [ sampleset: "1000G", chrom: null, file_format: "bgen", genotyping_method: "array" ],
+                    file("../../../tests/data/bgen/PGS000586_GRCh38.bgen", checkIfExists: true),
+                    file("../../../tests/data/bgen/PGS000586_GRCh38.sample", checkIfExists: true),
+                    file("../../../tests/data/bgen/PGS000586_GRCh38.bgen.bgi", checkIfExists: true)
+                     ]
+                )
+                input[1] = Channel.fromPath("../../../tests/data/normalised_PGS000586_hmPOS_GRCh38.txt.gz", checkIfExists: true)
+                input[2] = Channel.fromPath("../../../tests/data/genotypes.zarr.zip", checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out.versions).match()
+                }
+            )
+        }
+    }
+
+    test("Test bgen stub") {
+
+    options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = Channel.of(
+                    [ [ sampleset: "1000G", chrom: null, file_format: "bgen", genotyping_method: "array"],
+                    file("test.bgen"),
+                    file("test.bgen.sample"),
+                    file("test.bgen.bgi") ]
+                )
+                input[1] = Channel.fromPath("normalised_PGS001229_hmPOS_GRCh37.txt.gz")
+                input[2] = Channel.fromPath("ZARR_ZIP_NO_FILE")
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out.versions).match() }
+            )
+        }
+    }
+
+    test("Test vcf stub") {
+
+    options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = Channel.of(
+                    [ [ sampleset: "1000G", chrom: null, file_format: "vcf", genotyping_method: "array" ],
+                    file("test.vcf"),
+                    file("BGEN_SAMPLE_NO_FILE"),
+                    file("test.bgen.bgi") ]
+                )
+                input[1] = Channel.fromPath("normalised_PGS001229_hmPOS_GRCh37.txt.gz")
+                input[2] = Channel.fromPath("ZARR_ZIP_NO_FILE")
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out.versions).match() }
+            )
+        }
+    }
+
+}

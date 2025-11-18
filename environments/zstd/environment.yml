@@ -1,8 +1,0 @@
-name: zstd
-channels:
-  - conda-forge
-  - bioconda
-  - nodefaults  
-dependencies:
-  - zstd=1.4.8
-  - tar=1.34

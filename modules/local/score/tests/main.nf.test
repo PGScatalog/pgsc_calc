@@ -1,0 +1,48 @@
+nextflow_process {
+    name "Test process pgsc_calc_score"
+    script "../main.nf"
+    process "PGSC_CALC_SCORE"
+    tag "module"
+
+    test("Should calculate PGS000315 on 1000 genomes") {
+
+        when {
+            process {
+                """
+                input[0] = Channel.fromPath("../../../tests/data/genotypes.zarr.zip", checkIfExists: true)
+                input[1] = Channel.fromPath("../../../tests/data/normalised_PGS000586_hmPOS_GRCh38.txt.gz", checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out.versions).match()
+                }
+            )
+        }
+    }
+
+
+    test("Test stub") {
+
+    options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = Channel.fromPath(["zarr.zip", "zarr.zip"])
+                input[1] = Channel.fromPath(["scores.txt.gz"])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out.versions).match("versions") }
+            )
+        }
+    }
+}

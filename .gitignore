@@ -13,3 +13,15 @@ assets/report/report.Rproj
 tests/.venv/
 docs/.venv/
 docs/_build
+.nextflow*
+.nf-test.log
+data/
+nf-test
+.nf-test*
+results/
+test.xml
+testing*
+testing/
+work/
+null/
+.vscode/

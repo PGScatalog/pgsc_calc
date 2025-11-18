@@ -1,8 +1,0 @@
-bff1d4100c0d7687acd38ad4810a6c18  GRCh37_1000G_ALL.pgen
-1b13baa92c7d956083ced07db1759bc8  GRCh37_1000G_ALL.psam
-a3c0e11607c10d2a013e888b1a14d3ca  GRCh37_1000G_ALL.pvar.zst
-24b48deb4f561e98cb14a36a60bf9072  GRCh38_1000G_ALL.pgen
-b479dbd6ff9d3cc31592aa570d5a0b14  GRCh38_1000G_ALL.psam
-136ccfca896176602287f68764619c06  GRCh38_1000G_ALL.pvar.zst
-95360a6cf5422919866d34ff5827d71a  deg2_hg38.king.cutoff.out.id
-9b047ac7ffb14a5e2be2ee7a68a95f8a  deg2_phase3.king.cutoff.out.id

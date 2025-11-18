@@ -1,7 +1,0 @@
-name: plink2
-channels:
-  - conda-forge
-  - bioconda
-  - nodefaults  
-dependencies: 
-  - plink2==2.00a5.10

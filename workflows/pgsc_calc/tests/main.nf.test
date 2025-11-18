@@ -1,0 +1,198 @@
+nextflow_workflow {
+    name "Test score workflow"
+    script "../main.nf"
+    workflow "PGSC_CALC"
+
+    test("unified bgen should calculate") {
+        when {
+            params {
+                scorefile = "../../../tests/data/PGS000586_hmPOS_GRCh38.txt.gz"
+                target_build = "GRCh38"
+            }
+            workflow {
+                """
+                input[0] = channel.of(
+                    [ [ sampleset: "1000G", chrom: null, file_format: "bgen", genotyping_method: "array" ],
+                        file("../../../tests/data/bgen/PGS000586_GRCh38.bgen", checkIfExists: true),
+                        file("../../../tests/data/bgen/PGS000586_GRCh38.sample", checkIfExists: true),
+                    ]
+                )
+                input[1] = "GRCh38"
+                input[2] = [pgs_id: "", pgp_id: "", efo_id: ""]
+                input[3] = file("../../../tests/data/PGS000586_hmPOS_GRCh38.txt.gz", checkIfExists: true)
+                input[4] = file("NO_FILE")
+                input[5] = Channel.empty()
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(
+                    workflow.out.scores,
+                    workflow.out.summary_log,
+                    workflow.out.versions
+                ).match() }
+            )
+        }
+    }
+
+    test("unified VCF should calculate") {
+        when {
+            params {
+                scorefile = "../../../tests/data/PGS000586_hmPOS_GRCh38.txt.gz"
+                target_build = "GRCh38"
+            }
+            workflow {
+                """
+                input[0] = channel.of(
+                    [ [ sampleset: "1000G", chrom: null, file_format: "vcf", genotyping_method: "array" ],
+                        file("../../../tests/data/vcf/PGS000586_GRCh38.vcf.gz", checkIfExists: true),
+                        file("BGEN_SAMPLE_NO_FILE")
+                    ]
+                )
+                input[1] = "GRCh38"
+                input[2] = [pgs_id: "", pgp_id: "", efo_id: ""]
+                input[3] = file("../../../tests/data/PGS000586_hmPOS_GRCh38.txt.gz", checkIfExists: true)
+                input[4] = file("NO_FILE")
+                input[5] = Channel.empty()
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(
+                    workflow.out.scores,
+                    workflow.out.summary_log,
+                    workflow.out.versions
+                ).match() }
+            )
+        }
+    }
+
+
+    test("split VCF should calculate") {
+        when {
+            params {
+                scorefile = "../../../tests/data/PGS000586_hmPOS_GRCh38.txt.gz"
+                target_build = "GRCh38"
+            }
+            workflow {
+                """
+                input[0] = channel.of(
+                    [ [ sampleset: "1000G", chrom: "1", file_format: "vcf", genotyping_method: "array" ],
+                        file("../../../tests/data/vcf/split/PGS000586_GRCh38_1.vcf.gz", checkIfExists: true),
+                        null,
+                    ],
+                    [ [ sampleset: "1000G", chrom: "2", file_format: "vcf", genotyping_method: "array" ],
+                        file("../../../tests/data/vcf/split/PGS000586_GRCh38_2.vcf.gz", checkIfExists: true),
+                        null
+                    ],
+                    [ [ sampleset: "1000G", chrom: "3", file_format: "vcf", genotyping_method: "array" ],
+                        file("../../../tests/data/vcf/split/PGS000586_GRCh38_3.vcf.gz", checkIfExists: true),
+                        null
+                    ],
+                    [ [ sampleset: "1000G", chrom: "4", file_format: "vcf", genotyping_method: "array" ],
+                        file("../../../tests/data/vcf/split/PGS000586_GRCh38_4.vcf.gz", checkIfExists: true),
+                        null
+                    ],
+                    [ [ sampleset: "1000G", chrom: "5", file_format: "vcf", genotyping_method: "array" ],
+                        file("../../../tests/data/vcf/split/PGS000586_GRCh38_5.vcf.gz", checkIfExists: true),
+                        null
+                    ],
+                    [ [ sampleset: "1000G", chrom: "6", file_format: "vcf", genotyping_method: "array" ],
+                        file("../../../tests/data/vcf/split/PGS000586_GRCh38_6.vcf.gz", checkIfExists: true),
+                        null
+                    ],
+                    [ [ sampleset: "1000G", chrom: "7", file_format: "vcf", genotyping_method: "array" ],
+                        file("../../../tests/data/vcf/split/PGS000586_GRCh38_7.vcf.gz", checkIfExists: true),
+                        null
+                    ],
+                    [ [ sampleset: "1000G", chrom: "8", file_format: "vcf", genotyping_method: "array" ],
+                        file("../../../tests/data/vcf/split/PGS000586_GRCh38_8.vcf.gz", checkIfExists: true),
+                        null
+                    ],
+                    [ [ sampleset: "1000G", chrom: "9", file_format: "vcf", genotyping_method: "array" ],
+                        file("../../../tests/data/vcf/split/PGS000586_GRCh38_9.vcf.gz", checkIfExists: true),
+                        null
+                    ],
+                    [ [ sampleset: "1000G", chrom: "10", file_format: "vcf", genotyping_method: "array" ],
+                        file("../../../tests/data/vcf/split/PGS000586_GRCh38_10.vcf.gz", checkIfExists: true),
+                        null
+                    ],
+                    [ [ sampleset: "1000G", chrom: "11", file_format: "vcf", genotyping_method: "array" ],
+                        file("../../../tests/data/vcf/split/PGS000586_GRCh38_11.vcf.gz", checkIfExists: true),
+                        null
+                    ],
+                    [ [ sampleset: "1000G", chrom: "12", file_format: "vcf", genotyping_method: "array" ],
+                        file("../../../tests/data/vcf/split/PGS000586_GRCh38_12.vcf.gz", checkIfExists: true),
+                        null
+                    ],
+                    [ [ sampleset: "1000G", chrom: "13", file_format: "vcf", genotyping_method: "array" ],
+                        file("../../../tests/data/vcf/split/PGS000586_GRCh38_13.vcf.gz", checkIfExists: true),
+                        null
+                    ],
+                    [ [ sampleset: "1000G", chrom: "14", file_format: "vcf", genotyping_method: "array" ],
+                        file("../../../tests/data/vcf/split/PGS000586_GRCh38_14.vcf.gz", checkIfExists: true),
+                        null
+                    ],
+                    [ [ sampleset: "1000G", chrom: "15", file_format: "vcf", genotyping_method: "array" ],
+                        file("../../../tests/data/vcf/split/PGS000586_GRCh38_15.vcf.gz", checkIfExists: true),
+                        null
+                    ],
+                    [ [ sampleset: "1000G", chrom: "16", file_format: "vcf", genotyping_method: "array" ],
+                        file("../../../tests/data/vcf/split/PGS000586_GRCh38_16.vcf.gz", checkIfExists: true),
+                        null
+                    ],
+                    [ [ sampleset: "1000G", chrom: "17", file_format: "vcf", genotyping_method: "array" ],
+                        file("../../../tests/data/vcf/split/PGS000586_GRCh38_17.vcf.gz", checkIfExists: true),
+                        null
+                    ],
+                    [ [ sampleset: "1000G", chrom: "18", file_format: "vcf", genotyping_method: "array" ],
+                        file("../../../tests/data/vcf/split/PGS000586_GRCh38_18.vcf.gz", checkIfExists: true),
+                        null
+                    ],
+                    [ [ sampleset: "1000G", chrom: "19", file_format: "vcf", genotyping_method: "array" ],
+                        file("../../../tests/data/vcf/split/PGS000586_GRCh38_19.vcf.gz", checkIfExists: true),
+                        null
+                    ],
+                    [ [ sampleset: "1000G", chrom: "20", file_format: "vcf", genotyping_method: "array" ],
+                        file("../../../tests/data/vcf/split/PGS000586_GRCh38_20.vcf.gz", checkIfExists: true),
+                        null
+                    ],
+                    [ [ sampleset: "1000G", chrom: "21", file_format: "vcf", genotyping_method: "array" ],
+                        file("../../../tests/data/vcf/split/PGS000586_GRCh38_21.vcf.gz", checkIfExists: true),
+                        null
+                    ],
+                    [ [ sampleset: "1000G", chrom: "22", file_format: "vcf", genotyping_method: "array" ],
+                        file("../../../tests/data/vcf/split/PGS000586_GRCh38_22.vcf.gz", checkIfExists: true),
+                        null
+                    ],
+
+                )
+                input[1] = "GRCh38"
+                input[2] = [pgs_id: "", pgp_id: "", efo_id: ""]
+                input[3] = file("../../../tests/data/PGS000586_hmPOS_GRCh38.txt.gz", checkIfExists: true)
+                input[4] = file("NO_FILE")
+                input[5] = Channel.empty()
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(
+                    workflow.out.scores,
+                    workflow.out.summary_log,
+                    workflow.out.versions
+                ).match() }
+            )
+        }
+    }
+
+
+}

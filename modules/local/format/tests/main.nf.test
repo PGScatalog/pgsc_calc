@@ -1,0 +1,67 @@
+nextflow_process {
+    name "Test process pgsc_format"
+    script "../main.nf"
+    process "PGSC_CALC_FORMAT"
+    tag "module"
+
+    test("Test formatting PGS000586") {
+
+        when {
+            process {
+                """
+                input[0] = Channel.fromPath("../../../tests/data/PGS000586_hmPOS_GRCh38.txt.gz", checkIfExists: true)
+                input[1] = Channel.fromPath("NO_FILE")
+                input[2] = Channel.from("GRCh38")
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out.versions).match() }
+            )
+        }
+    }
+
+    test("Test formatting fails with bad build") {
+
+        when {
+            process {
+                """
+                input[0] = Channel.fromPath("../../../tests/data/PGS000586_hmPOS_GRCh38.txt.gz", checkIfExists: true)
+                input[1] = Channel.fromPath("NO_FILE")
+                input[2] = Channel.from("GRCh37")
+                """
+            }
+        }
+
+        then {
+            assert process.failed
+        }
+    }
+
+    test("Test stub") {
+
+    options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = Channel.fromPath("../../../tests/data/PGS000586_hmPOS_GRCh38.txt.gz", checkIfExists: true)
+                input[1] = Channel.fromPath("NO_FILE")
+                input[2] = Channel.from("GRCh37")
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out.versions).match() }
+            )
+        }
+    }
+
+}
+

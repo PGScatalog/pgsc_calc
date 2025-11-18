@@ -1,0 +1,26 @@
+{
+    "Test formatting PGS000586": {
+        "content": [
+            [
+                "versions.yml:md5,b759501275e842262c55ca4ebdf8a0cb"
+            ]
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.10.0"
+        },
+        "timestamp": "2025-11-14T15:43:07.377203"
+    },
+    "Test stub": {
+        "content": [
+            [
+                "versions.yml:md5,b759501275e842262c55ca4ebdf8a0cb"
+            ]
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.10.0"
+        },
+        "timestamp": "2025-11-14T15:43:18.630008"
+    }
+}

@@ -1,0 +1,2 @@
+sampleset,path,chrom,file_format,genotyping_method,bgen_sample_file
+1000G,tests/data/bgen/PGS000586_GRCh38.bgen,,bgen,array,tests/data/bgen/PGS000586_GRCh38.sample

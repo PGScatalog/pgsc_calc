@@ -1,0 +1,62 @@
+{
+    "Test bgen stub": {
+        "content": [
+            [
+                "versions.yml:md5,ca2b6ca2fb9419ca9b54d0eb39ee8ace"
+            ]
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.10.0"
+        },
+        "timestamp": "2025-11-18T12:04:51.235357"
+    },
+    "Test load 1000G bgen PGS000315": {
+        "content": [
+            [
+                "versions.yml:md5,ca2b6ca2fb9419ca9b54d0eb39ee8ace"
+            ]
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.10.0"
+        },
+        "timestamp": "2025-11-18T12:04:36.927945"
+    },
+    "Test vcf stub": {
+        "content": [
+            [
+                "versions.yml:md5,ca2b6ca2fb9419ca9b54d0eb39ee8ace"
+            ]
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.10.0"
+        },
+        "timestamp": "2025-11-18T12:04:57.493151"
+    },
+    "Test load 1000G VCF PGS000315": {
+        "content": [
+            [
+                "versions.yml:md5,ca2b6ca2fb9419ca9b54d0eb39ee8ace"
+            ]
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.10.0"
+        },
+        "timestamp": "2025-11-18T12:04:28.985703"
+    },
+    "Cached load should work": {
+        "content": [
+            [
+                "versions.yml:md5,ca2b6ca2fb9419ca9b54d0eb39ee8ace"
+            ]
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.10.0"
+        },
+        "timestamp": "2025-11-18T12:04:44.944923"
+    }
+}

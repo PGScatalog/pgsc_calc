@@ -7,59 +7,83 @@
 ----------------------------------------------------------------------------------------
 */
 
-nextflow.enable.dsl = 2
+/*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    IMPORT FUNCTIONS / MODULES / SUBWORKFLOWS / WORKFLOWS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
+include { samplesheetToList; validateParameters } from 'plugin/nf-schema'
+
+include { PGSC_CALC  } from './workflows/pgsc_calc'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    VALIDATE & PRINT PARAMETER SUMMARY
+    NAMED WORKFLOWS FOR PIPELINE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { paramsHelp } from 'plugin/nf-schema'
+//
+// WORKFLOW: Run main analysis pipeline depending on type of input
+//
+workflow PGSCATALOG_PGSC_CALC {
 
-// Print help message if needed
-if (params.help) {
-    log.info paramsHelp("nextflow run pgscatalog/pgsc_calc --input input_file.csv")
-    log.info "See https://pgsc-calc.readthedocs.io/en/latest/getting-started.html for more help"
-    exit 0
+    take:
+    samplesheet // channel: samplesheet read in from --input
+
+    main:
+
+    versions = channel.empty()
+
+    // validate parameters
+    validateParameters()
+
+    // validate samplesheet
+    ch_input = channel.fromList(samplesheetToList(params.input, "assets/schema_input.json"))
+
+    // check scorefiles are OK
+    if (![params.scorefile, params.pgs_id, params.efo_id, params.pgp_id].any()) {
+        error " ERROR: You didn't set any scores to use! Please set --scorefile, --pgs_id, --efo_id, or --pgp_id"
+    }
+
+    def joinParam = { p -> p?.tokenize(",")?.join(" ") ?: "" }
+    pgscatalog_accessions = [
+        pgs_id: joinParam(params.pgs_id),
+        pgp_id: joinParam(params.pgp_id),
+        efo_id: joinParam(params.efo_id)
+    ]
+
+    //
+    // WORKFLOW: Run pipeline
+    //
+    PGSC_CALC (
+        ch_input,
+        params.target_build,
+        pgscatalog_accessions,
+        params.scorefile,
+        file(params.chain_files),
+        versions
+    )
 }
-
-WorkflowMain.initialise(workflow, params, log, args)
-
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    NAMED WORKFLOW FOR PIPELINE
+    RUN MAIN WORKFLOW
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { PGSCCALC } from './workflows/pgsc_calc'
-
-//
-// WORKFLOW: Run main pgscatalog/pgsccalc analysis pipeline
-//
-workflow PGSCATALOG_PGSCCALC {
-    PGSCCALC ()
-}
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    RUN ALL WORKFLOWS
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
-
-//
-// WORKFLOW: Execute a single named workflow for the pipeline
-// See: https://github.com/nf-core/rnaseq/issues/619
-//
 workflow {
-    PGSCATALOG_PGSCCALC ()
+
+    main:
+
+    //
+    // WORKFLOW: Run main workflow
+    //
+    PGSCATALOG_PGSC_CALC (
+        params.input
+    )
 }
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     THE END
-    |\__/,|   (`\
-  _.|o o  |_   ) )
--(((---(((--------
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */

@@ -1,0 +1,89 @@
+{
+    "Should download scoring file in build GRCh38": {
+        "content": [
+            {
+                "0": [
+                    [
+                        "PGS001229_hmPOS_GRCh38.txt.gz:md5,2aaae8211cc9e97753ae2d15f4c29cfc"
+                    ]
+                ],
+                "1": [
+                    "versions.yml:md5,0037d029b7fb43e982cb72a985089279"
+                ],
+                "scorefiles": [
+                    [
+                        "PGS001229_hmPOS_GRCh38.txt.gz:md5,2aaae8211cc9e97753ae2d15f4c29cfc"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,0037d029b7fb43e982cb72a985089279"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.10.0"
+        },
+        "timestamp": "2025-11-14T11:44:27.932409"
+    },
+    "Should download two scoring files in build GRCh37": {
+        "content": [
+            {
+                "0": [
+                    [
+                        "PGS000822_hmPOS_GRCh37.txt.gz:md5,0697fb40d7fb00a1e66a72a97963e212",
+                        "PGS001229_hmPOS_GRCh37.txt.gz:md5,a6d840ee2499ac335ea4b795d5433283"
+                    ]
+                ],
+                "1": [
+                    "versions.yml:md5,0037d029b7fb43e982cb72a985089279"
+                ],
+                "scorefiles": [
+                    [
+                        "PGS000822_hmPOS_GRCh37.txt.gz:md5,0697fb40d7fb00a1e66a72a97963e212",
+                        "PGS001229_hmPOS_GRCh37.txt.gz:md5,a6d840ee2499ac335ea4b795d5433283"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,0037d029b7fb43e982cb72a985089279"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.10.0"
+        },
+        "timestamp": "2025-11-14T11:44:35.375721"
+    },
+    "Should download scoring files with publication ID": {
+        "content": [
+            {
+                "0": [
+                    [
+                        "PGS000031_hmPOS_GRCh37.txt.gz:md5,1da6d00f2f77705be68be814199f840f",
+                        "PGS000032_hmPOS_GRCh37.txt.gz:md5,77f784fc4d7d2902770548874e16ca5d",
+                        "PGS000033_hmPOS_GRCh37.txt.gz:md5,57b539cd917a2c03be02bf1d3f358165"
+                    ]
+                ],
+                "1": [
+                    "versions.yml:md5,0037d029b7fb43e982cb72a985089279"
+                ],
+                "scorefiles": [
+                    [
+                        "PGS000031_hmPOS_GRCh37.txt.gz:md5,1da6d00f2f77705be68be814199f840f",
+                        "PGS000032_hmPOS_GRCh37.txt.gz:md5,77f784fc4d7d2902770548874e16ca5d",
+                        "PGS000033_hmPOS_GRCh37.txt.gz:md5,57b539cd917a2c03be02bf1d3f358165"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,0037d029b7fb43e982cb72a985089279"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "25.10.0"
+        },
+        "timestamp": "2025-11-14T11:44:42.565309"
+    }
+}

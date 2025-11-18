@@ -1,7 +1,0 @@
-#pgs_name=testlift
-#pgs_id=custom
-#trait_reported=test
-#genome_build=GRCh37
-chr_name	chr_position	effect_allele	other_allele	effect_weight
-1	4859488	A	G	-0.0504139458332669
-1	5297845	G	A	0.040436175688854
