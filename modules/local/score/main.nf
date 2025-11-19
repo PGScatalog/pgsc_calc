@@ -9,11 +9,13 @@ process PGSC_CALC_SCORE {
     input:
     path "genotypes/zarr_???.zip", arity: '1..*' // renames input zarr files
     path "scorefiles/*"          , arity: '1.*' // put scorefiles in a directory
+    val publish_cache // bool
 
     output:
     path "scores.txt.gz"         , arity: '1', emit: "scores"
     path "summary.csv"           , arity: '1', emit: "summary_log"
     path "variant_match_logs.zip", arity: '1', emit: "logs"
+    path "genotypes.zarr.zip"    , optional: true, emit: "cache"
     path "versions.yml"          , arity: '1', emit: "versions"
 
     script:
@@ -29,6 +31,14 @@ process PGSC_CALC_SCORE {
     7z a -tzip -mx0 variant_match_logs.zip out/logs/sampleset=*
     mv out/logs/summary.csv .
     mv out/scores.txt.gz .
+
+    # create a unified cache
+
+    if $publish_cache; then
+        cd out # don't want out/ to be in the archive
+        7z a -tzip -mx0 ../genotypes.zarr.zip genotypes.zarr
+        cd ..
+    fi
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

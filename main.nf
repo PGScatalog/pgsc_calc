@@ -58,6 +58,9 @@ workflow PGSCATALOG_PGSC_CALC {
         efo_id: joinParam(params.efo_id)
     ]
 
+    // publish the genotype cache zip?
+    ch_publish_cache = channel.of(params.publish_cache)
+
     //
     // WORKFLOW: Run pipeline
     //
@@ -67,6 +70,7 @@ workflow PGSCATALOG_PGSC_CALC {
         pgscatalog_accessions,
         params.scorefile,
         file(params.chain_files),
+        ch_publish_cache,
         versions
     )
 }

@@ -58,6 +58,19 @@
           "type": "boolean",
           "fa_icon": "fas fa-cloud",
           "description": "Return only PGS tagged with exact EFO term (e.g. no PGS for child/descendant terms in the ontology)"
+        },
+        "publish_cache": {
+          "type": "boolean",
+          "default": true,
+          "description": "Publish cached genotypes in a zip file? The zip file can be used in future runs to save time.",
+          "fa_icon": "fas fa-file-archive"
+        },
+        "publish_dir_mode": {
+          "type": "string",
+          "default": "copy",
+          "enum": ["copy", "copyNoFollow", "link", "move", "relink", "symlink"],
+          "description": "The file publishing method",
+          "fa_icon": "fas fa-upload"
         }
       }
     },
@@ -197,11 +210,5 @@
     {
       "$ref": "#/$defs/generic_options"
     }
-  ],
-  "properties": {
-    "publish_dir_mode": {
-      "type": "string",
-      "default": "copy"
-    }
-  }
+  ]
 }

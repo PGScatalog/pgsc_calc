@@ -28,6 +28,7 @@ workflow PGSC_CALC {
     pgscatalog_accessions // hashmap [pgs_id: , pgp_id:, efo_id: ]
     scorefile
     ch_chain_files
+    publish_cache // bool value channel
     ch_versions
 
     main:
@@ -54,7 +55,6 @@ workflow PGSC_CALC {
         target_build
     )
     ch_versions = ch_versions.mix(PGSC_CALC_FORMAT.out.versions)
-
 
     // automatically add index files
     // it's important that index files are input to the process so they are staged correctly
@@ -90,7 +90,8 @@ workflow PGSC_CALC {
     ch_score_input = PGSC_CALC_LOAD.out.zarr_zip.collect()
     PGSC_CALC_SCORE(
         ch_score_input,
-        ch_formatted_scorefiles
+        ch_formatted_scorefiles,
+        publish_cache
     )
     ch_versions = ch_versions.mix(PGSC_CALC_SCORE.out.versions)
 
