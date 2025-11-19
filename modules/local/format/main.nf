@@ -1,5 +1,6 @@
 process PGSC_CALC_FORMAT {
     label 'process_single'
+    tag "${raw_scores}"
 
     conda "${moduleDir}/environment.yml"
     container "${workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container

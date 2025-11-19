@@ -1,6 +1,6 @@
 process PGSC_CALC_LOAD {
     label 'process_single'
-    tag "$meta.chom"
+    tag "${meta}"
 
     conda "${moduleDir}/environment.yml"
     container "${workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container
