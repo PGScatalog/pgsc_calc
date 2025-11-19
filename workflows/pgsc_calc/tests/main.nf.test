@@ -11,7 +11,7 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = channel.of(
+                input[0] = Channel.of(
                     [ [ sampleset: "1000G", chrom: null, file_format: "bgen", genotyping_method: "array" ],
                         file("../../../tests/data/bgen/PGS000586_GRCh38.bgen", checkIfExists: true),
                         file("../../../tests/data/bgen/PGS000586_GRCh38.sample", checkIfExists: true),
@@ -46,7 +46,7 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = channel.of(
+                input[0] = Channel.of(
                     [ [ sampleset: "1000G", chrom: null, file_format: "vcf", genotyping_method: "array" ],
                         file("../../../tests/data/vcf/PGS000586_GRCh38.vcf.gz", checkIfExists: true),
                         file("BGEN_SAMPLE_NO_FILE")
@@ -82,7 +82,7 @@ nextflow_workflow {
             }
             workflow {
                 """
-                input[0] = channel.of(
+                input[0] = Channel.of(
                     [ [ sampleset: "1000G", chrom: "1", file_format: "vcf", genotyping_method: "array" ],
                         file("../../../tests/data/vcf/split/PGS000586_GRCh38_1.vcf.gz", checkIfExists: true),
                         null,

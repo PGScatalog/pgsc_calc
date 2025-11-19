@@ -23,18 +23,18 @@ include { PGSC_CALC_SCORE    } from '../..//modules/local/score'
 workflow PGSC_CALC {
 
     take:
-    ch_input // channel: samplesheet read in from --input
+    ch_input // Channel: samplesheet read in from --input
     target_build
     pgscatalog_accessions // hashmap [pgs_id: , pgp_id:, efo_id: ]
     scorefile
     ch_chain_files
-    publish_cache // bool value channel
+    publish_cache // bool value Channel
     ch_versions
 
     main:
 
     // download scoring files from PGS Catalog if any accession strings are set
-    ch_scores = channel.empty()
+    ch_scores = Channel.empty()
     if ([pgscatalog_accessions.pgs_id, pgscatalog_accessions.pgp_id, pgscatalog_accessions.efo_id].every { it.value == "" }) {
         PGSC_CALC_DOWNLOAD(
             pgscatalog_accessions,
@@ -46,7 +46,12 @@ workflow PGSC_CALC {
 
     // format all scoring files into a consistent structure
     // add local scoring files, not fetched via the PGS Catalog API
-    def local_scores = scorefile ? channel.fromPath(scorefile) : channel.empty()
+    if (scorefile) {
+        local_scores = Channel.fromPath(scorefile)
+    } else {
+        local_scores = Channel.empty()
+    }
+
     ch_scores = local_scores.mix(ch_scores)
 
     PGSC_CALC_FORMAT(
@@ -77,7 +82,7 @@ workflow PGSC_CALC {
     // make value (singleton) channels for scorefiles and the cache
     // because one load process will launch for each target genome
     ch_formatted_scorefiles = PGSC_CALC_FORMAT.out.scorefiles.collect()
-    ch_zarr_zip = channel.value(file("ZARR_ZIP_NO_FILE"))
+    ch_zarr_zip = Channel.value(file("ZARR_ZIP_NO_FILE"))
 
     PGSC_CALC_LOAD(
         ch_target_with_index, // meta, path(target), path(bgen_sample), path(target_index)
@@ -96,10 +101,10 @@ workflow PGSC_CALC {
     ch_versions = ch_versions.mix(PGSC_CALC_SCORE.out.versions)
 
     emit:
-    summary_log = PGSC_CALC_SCORE.out.summary_log // channel: file(summary_log)
-    variant_match_log = PGSC_CALC_SCORE.out.logs  // channel: file(zip_archive)
-    scores = PGSC_CALC_SCORE.out.scores           // channel: file(csv.gz)
-    versions = ch_versions                        // channel: [version1, version2, ...]
+    summary_log = PGSC_CALC_SCORE.out.summary_log // Channel: file(summary_log)
+    variant_match_log = PGSC_CALC_SCORE.out.logs  // Channel: file(zip_archive)
+    scores = PGSC_CALC_SCORE.out.scores           // Channel: file(csv.gz)
+    versions = ch_versions                        // Channel: [version1, version2, ...]
 }
 
 /*

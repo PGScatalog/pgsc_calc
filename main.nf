@@ -28,11 +28,11 @@ include { PGSC_CALC  } from './workflows/pgsc_calc'
 workflow PGSCATALOG_PGSC_CALC {
 
     take:
-    samplesheet // channel: samplesheet read in from --input
+    samplesheet // Channel: samplesheet read in from --input
 
     main:
 
-    versions = channel.empty()
+    versions = Channel.empty()
 
     // validate parameters
     validateParameters()
@@ -51,7 +51,7 @@ workflow PGSCATALOG_PGSC_CALC {
     }
 
     // validate samplesheet
-    ch_input = channel.fromList(samplesheetToList(params.input, "assets/schema_input.json"))
+    ch_input = Channel.fromList(samplesheetToList(params.input, "assets/schema_input.json"))
 
     // check scorefiles are OK
     if (![params.scorefile, params.pgs_id, params.efo_id, params.pgp_id].any()) {
@@ -66,7 +66,7 @@ workflow PGSCATALOG_PGSC_CALC {
     ]
 
     // publish the genotype cache zip?
-    ch_publish_cache = channel.of(params.publish_cache)
+    ch_publish_cache = Channel.of(params.publish_cache)
 
     //
     // WORKFLOW: Run pipeline
