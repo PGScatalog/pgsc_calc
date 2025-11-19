@@ -37,6 +37,12 @@ workflow PGSCATALOG_PGSC_CALC {
     // validate parameters
     validateParameters()
 
+    // warn about the test profile
+    if (workflow.profile.contains("test")) {
+        log.info("The test profile is used to install the workflow and verify the software is working correctly on your system.")
+        log.info("Test input data and results are are only useful as examples of outputs, and are not biologically meaningful.")
+    }
+
     // validate samplesheet
     ch_input = channel.fromList(samplesheetToList(params.input, "assets/schema_input.json"))
 
