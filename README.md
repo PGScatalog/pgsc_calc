@@ -14,78 +14,105 @@
 
 ## Introduction
 
-**pgscatalog/pgsc_calc** is a bioinformatics pipeline that ...
+`pgsc_calc` is a bioinformatics best-practice analysis pipeline for calculating
+polygenic [risk] scores on samples with imputed genotypes using existing scoring
+files from the [Polygenic Score (PGS) Catalog](https://www.pgscatalog.org/)
+and/or user-defined PGS/PRS.
 
-<!-- TODO nf-core:
-   Complete this sentence with a 2-3 sentence summary of what types of data the pipeline ingests, a brief overview of the
-   major pipeline sections and the types of output it produces. You're giving an overview to someone new
-   to nf-core here, in 15-20 seconds. For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#introduction
--->
 
-<!-- TODO nf-core: Include a figure that guides the user through the major workflow steps. Many nf-core
-     workflows use the "tube map" design for that. See https://nf-co.re/docs/guidelines/graphic_design/workflow_diagrams#examples for examples.   -->
-<!-- TODO nf-core: Fill in short bullet-pointed list of the default steps in the pipeline -->
+## v3 release candidate 1 notes
 
-## Usage
+* `pgsc_calc` has always used plink2 ❤️ to calculate polygenic scores
+* We have developed a Python package [`pgscatalog.calc`](https://github.com/PGScatalog/pygscatalog/) to replace plink2 in `pgsc_calc`
+* This will make it simpler to support new ways of calculating PGS, like WGS data
+* `v3-rc1` only implements basic PGS calculation on autosomes for VCF and BGEN files
+* We plan to publish release candidates which add support for plink1/2 data, WGS data, and ancestry normalisation 
+* **Release candidates are pre-release software that may break unexpectedly in the future**
 
-> [!NOTE]
-> If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how to set-up Nextflow. Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline) with `-profile test` before running the workflow on actual data.
+## Pipeline summary 
 
-<!-- TODO nf-core: Describe the minimum required steps to execute the pipeline, e.g. how to prepare samplesheets.
-     Explain what rows and columns represent. For instance (please edit as appropriate):
+The workflow performs the following steps:
 
-First, prepare a samplesheet with your input data that looks as follows:
+* Downloading scoring files using the PGS Catalog API in a specified genome build (GRCh37 and GRCh38).
+* Reading custom scoring files (and performing a liftover if genotyping data is in a different build).
+* Automatically combines and creates scoring files for efficient parallel computation of multiple PGS
+    - Matching variants in the scoring files against variants in the target dataset (in VCF/BGEN formats)
+* Calculates PGS for all samples (linear sum of weights and dosages)
 
-`samplesheet.csv`:
+### PGS applications and libraries
 
-```csv
-sample,fastq_1,fastq_2
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
-```
+`pgsc_calc` uses applications and libraries internally developed at the PGS Catalog, which can do helpful things like:
 
-Each row represents a fastq file (single-end) or a pair of fastq files (paired end).
+* Query the PGS Catalog to bulk download scoring files in a specific genome build
+* Match variants from scoring files to target variants
+* Adjust calculated PGS in the context of genetic ancestry
 
--->
+If you want to write Python code to work with PGS, [check out the `pygscatalog` repository to learn more](https://github.com/PGScatalog/pygscatalog).
 
-Now, you can run the pipeline using:
+If you want a simpler way of working with PGS, ignore this section and continue below to learn more about `pgsc_calc`.
 
-<!-- TODO nf-core: update the following command to include all required parameters for a minimal example -->
+## Quick start
 
-```bash
-nextflow run pgscatalog/pgsc_calc \
-   -profile <docker/singularity/.../institute> \
-   --input samplesheet.csv \
-   --outdir <OUTDIR>
-```
+1. Install
+[`Nextflow`](https://www.nextflow.io/docs/latest/getstarted.html#installation)
+(`>=23.10.0`)
 
-> [!WARNING]
-> Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_; see [docs](https://nf-co.re/docs/usage/getting_started/configuration#custom-configuration-files).
+2. Install [`Docker`](https://docs.docker.com/engine/installation/) or
+[`Singularity (v3.8.3 minimum)`](https://www.sylabs.io/guides/3.0/user-guide/)
+(please only use [`Conda`](https://conda.io/miniconda.html) as a last resort)
+
+3. Download the pipeline and test it on a minimal dataset with a single command:
+
+    ```console
+    nextflow run pgscatalog/pgsc_calc -profile test,<docker/singularity/conda>
+    ```
+
+4. Start running your own analysis!
+
+    ```console
+    nextflow run pgscatalog/pgsc_calc -profile <docker/singularity/conda> --input samplesheet.csv --pgs_id PGS001229
+    ```
+
+See [getting
+started](https://pgsc-calc.readthedocs.io/en/latest/getting-started.html) for more
+details.
+
+## Documentation
+
+[Full documentation is available on Read the Docs](https://pgsc-calc.readthedocs.io/)
 
 ## Credits
 
-pgscatalog/pgsc_calc was originally written by A whole bunch of people.
+pgscatalog/pgsc_calc is developed as part of the PGS Catalog project, a
+collaboration between the University of Cambridge’s Department of Public Health
+and Primary Care (Michael Inouye, Samuel Lambert) and the European
+Bioinformatics Institute (Helen Parkinson, Laura Harris).
 
-We thank the following people for their extensive assistance in the development of this pipeline:
+The pipeline seeks to provide a standardized workflow for PGS calculation and
+ancestry inference implemented in nextflow derived from an existing set of
+tools/scripts developed by Inouye lab (Rodrigo Canovas, Scott Ritchie, Jingqin
+Wu) and PGS Catalog teams (Samuel Lambert, Laurent Gil).
 
-<!-- TODO nf-core: If applicable, make list of people who have also contributed -->
+The adaptation of the codebase, nextflow implementation, and PGS Catalog features
+are written by Benjamin Wingfield, Samuel Lambert, Laurent Gil with additional input
+from Aoife McMahon (EBI). Development of new features, testing, and code review
+is ongoing including Inouye lab members (Rodrigo Canovas, Scott Ritchie) and others. If 
+you use the tool we ask you to cite our paper describing software and updated PGS Catalog resource:
 
-## Contributions and Support
+- >Lambert, Wingfield _et al._ (2024) Enhancing the Polygenic Score Catalog with tools for score 
+  calculation and ancestry normalization. Nature Genetics.
+  doi:[10.1038/s41588-024-01937-x](https://doi.org/10.1038/s41588-024-01937-x).
 
-If you would like to contribute to this pipeline, please see the [contributing guidelines](.github/CONTRIBUTING.md).
+This pipeline is distrubuted under an [Apache License](LICENSE) amd uses code and 
+infrastructure developed and maintained by the [nf-core](https://nf-co.re) community 
+(Ewels *et al. Nature Biotech* (2020) doi:[10.1038/s41587-020-0439-x](https://doi.org/10.1038/s41587-020-0439-x)), 
+reused here under the [MIT license](https://github.com/nf-core/tools/blob/master/LICENSE).
 
-## Citations
+Additional references of open-source tools and data used in this pipeline are described in
+[`CITATIONS.md`](CITATIONS.md).
 
-<!-- TODO nf-core: Add citation for pipeline after first release. Uncomment lines below and update Zenodo doi and badge at the top of this file. -->
-<!-- If you use pgscatalog/pgsc_calc for your analysis, please cite it using the following doi: [10.5281/zenodo.XXXXXX](https://doi.org/10.5281/zenodo.XXXXXX) -->
-
-<!-- TODO nf-core: Add bibliography of tools and data used in your pipeline -->
-
-An extensive list of references for the tools used by the pipeline can be found in the [`CITATIONS.md`](CITATIONS.md) file.
-
-This pipeline uses code and infrastructure developed and maintained by the [nf-core](https://nf-co.re) community, reused here under the [MIT license](https://github.com/nf-core/tools/blob/main/LICENSE).
-
-> **The nf-core framework for community-curated bioinformatics pipelines.**
->
-> Philip Ewels, Alexander Peltzer, Sven Fillinger, Harshil Patel, Johannes Alneberg, Andreas Wilm, Maxime Ulysse Garcia, Paolo Di Tommaso & Sven Nahnsen.
->
-> _Nat Biotechnol._ 2020 Feb 13. doi: [10.1038/s41587-020-0439-x](https://dx.doi.org/10.1038/s41587-020-0439-x).
+This work has received funding from EMBL-EBI core funds, the Baker Institute,
+the University of Cambridge, Health Data Research UK (HDRUK), and the European
+Union’s Horizon 2020 research and innovation programme under grant agreement No
+101016775 INTERVENE.
+[10.1038/s41587-020-0439-x](https://dx.doi.org/10.1038/s41587-020-0439-x).
