@@ -89,7 +89,8 @@
           "type": "string",
           "default": "NO_FILE",
           "pattern": "^.*.chain.gz$|NO_FILE",
-          "format": "file-path"
+          "format": "file-path",
+          "description": "Path to liftover chain files, see https://hgdownload.cse.ucsc.edu/goldenpath/hg19/liftOver/"
         }
       },
       "fa_icon": "fas fa-dna",

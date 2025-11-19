@@ -43,6 +43,13 @@ workflow PGSCATALOG_PGSC_CALC {
         log.info("Test input data and results are are only useful as examples of outputs, and are not biologically meaningful.")
     }
 
+    // be clear about liftover
+    if (params.chain_files != "NO_FILE" & params.scorefile == null) {
+        log.warn("Chain files are never needed for PGS Catalog scoring files")
+        log.warn("Liftover is only useful for user-generated custom scoring files set by --scorefile")
+        error("Remove --chain_files parameter unless you also set --scorefile")
+    }
+
     // validate samplesheet
     ch_input = channel.fromList(samplesheetToList(params.input, "assets/schema_input.json"))
 
