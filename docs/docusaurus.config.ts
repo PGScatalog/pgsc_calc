@@ -18,7 +18,7 @@ const config: Config = {
   url: 'https://pgsc-calc.readthedocs.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/',
+  baseUrl: '/en/v3-rc1/',
 
   onBrokenLinks: 'throw',
 
