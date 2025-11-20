@@ -12,7 +12,7 @@
     IMPORT FUNCTIONS / MODULES / SUBWORKFLOWS / WORKFLOWS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { samplesheetToList; validateParameters } from 'plugin/nf-schema'
+include { samplesheetToList; validateParameters; paramsSummaryLog } from 'plugin/nf-schema'
 
 include { PGSC_CALC  } from './workflows/pgsc_calc'
 
@@ -36,6 +36,7 @@ workflow PGSCATALOG_PGSC_CALC {
 
     // validate parameters
     validateParameters()
+    log.info paramsSummaryLog(workflow)
 
     // warn about the test profile
     if (workflow.profile.contains("test")) {
