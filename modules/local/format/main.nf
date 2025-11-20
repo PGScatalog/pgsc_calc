@@ -1,5 +1,5 @@
 process PGSC_CALC_FORMAT {
-    label 'process_single'
+    label 'process_low'
     tag "${raw_scores}"
 
     conda "${moduleDir}/environment.yml"

@@ -1,5 +1,5 @@
 process PGSC_CALC_LOAD {
-    label 'process_single'
+    label 'process_low'
     tag "${meta}"
 
     conda "${moduleDir}/environment.yml"
