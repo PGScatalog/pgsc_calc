@@ -1,0 +1,12 @@
+{
+  "position": 4,
+  "label": "Tutorials",
+  "key": "unique-sidebar-item-key",
+  "collapsible": true,
+  "collapsed": false,
+  "className": "red",
+  "link": {
+    "type": "generated-index",
+    "title": "Tutorials"
+  },
+}

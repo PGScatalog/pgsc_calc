@@ -25,3 +25,5 @@ testing/
 work/
 null/
 .vscode/
+.docusaurus
+node_modules

@@ -1,0 +1,12 @@
+{
+  "position": 5,
+  "label": "Explanations",
+  "key": "unique-sidebar-item-key",
+  "collapsible": true,
+  "collapsed": false,
+  "className": "red",
+  "link": {
+    "type": "generated-index",
+    "title": "Explanations"
+  },
+}
