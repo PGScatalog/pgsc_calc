@@ -71,7 +71,7 @@ workflow PGSC_CALC {
         }
         def bgen_sample_path = switch(meta.file_format) {
             case 'bgen' -> sample_path
-            case 'vcf'  -> file('BGEN_SAMPLE_NO_FILE')
+            case 'vcf'  -> file("$projectDir/assets/optional_input/BGEN_SAMPLE_NO_FILE", checkIfExists: true)
             default     -> throw new IllegalArgumentException("Unknown file_format: ${meta.file_format}")
         }
         [meta, target_path, bgen_sample_path, file(target_path + ext, checkIfExists: true)]
@@ -82,7 +82,7 @@ workflow PGSC_CALC {
     // make value (singleton) channels for scorefiles and the cache
     // because one load process will launch for each target genome
     ch_formatted_scorefiles = PGSC_CALC_FORMAT.out.scorefiles.collect()
-    ch_zarr_zip = Channel.value(file("ZARR_ZIP_NO_FILE"))
+    ch_zarr_zip = Channel.value(file("$projectDir/assets/optional_input/ZARR_ZIP_NO_FILE", checkIfExists: true))
 
     PGSC_CALC_LOAD(
         ch_target_with_index, // meta, path(target), path(bgen_sample), path(target_index)

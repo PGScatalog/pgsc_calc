@@ -23,7 +23,7 @@ process PGSC_CALC_FORMAT {
     script:
     // add liftover argument if the chain file exists
     // (only applies to custom scoring files)
-    def liftover = chain_file.name != 'NO_FILE' ? " -c \$PWD" : ''
+    def liftover = chain_file.name != 'CHAIN_NO_FILE' ? " -c \$PWD" : ''
     """
     mkdir formatted
 
