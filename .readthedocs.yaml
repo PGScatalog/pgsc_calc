@@ -1,8 +1,8 @@
  version: 2
  build:
-   os: "ubuntu-22.04"
+   os: "ubuntu-24.04"
    tools:
-     nodejs: "18"
+     nodejs: "23"
    jobs:
      # "docs/" was created following the Docusaurus tutorial:
      # npx create-docusaurus@latest docs classic
