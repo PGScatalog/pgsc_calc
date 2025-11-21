@@ -100,13 +100,6 @@ workflow PGSC_CALC {
     )
     ch_versions = ch_versions.mix(PGSC_CALC_SCORE.out.versions)
 
-    workflow.onComplete {
-        log.info "- [pgscatalog/pgsc_calc] Pipeline completed successfully -"
-    }
-    workflow.onError {
-        log.error "Pipeline failed. Please refer to troubleshooting docs: https://pgsc-calc.readthedocs.io/en/v3-rc1/"
-    }
-
     emit:
     summary_log = PGSC_CALC_SCORE.out.summary_log // Channel: file(summary_log)
     variant_match_log = PGSC_CALC_SCORE.out.logs  // Channel: file(zip_archive)

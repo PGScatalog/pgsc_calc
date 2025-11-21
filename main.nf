@@ -103,8 +103,21 @@ workflow {
     )
 }
 
+workflow.onComplete {
+    if (workflow.success) {
+        log.info "- [pgscatalog/pgsc_calc] Pipeline completed successfully -"
+    }
+}
+
+workflow.onError {
+    log.error "Pipeline failed. Please refer to troubleshooting docs: https://pgsc-calc.readthedocs.io/en/v3-rc1/"
+}
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     THE END
+    |\__/,|   (`\
+  _.|o o  |_   ) )
+-(((---(((--------
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
