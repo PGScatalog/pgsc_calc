@@ -1,6 +1,8 @@
 process PGSC_CALC_LOAD {
-    label 'process_low'
+    label 'process_single'
     tag "${meta}"
+    // if zarr_zip is extracted it will always invalidate the standard caching mode
+    cache 'lenient'
 
     conda "${moduleDir}/environment.yml"
     container "${workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container

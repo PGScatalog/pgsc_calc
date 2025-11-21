@@ -68,6 +68,8 @@ workflow PGSCATALOG_PGSC_CALC {
 
     // publish the genotype cache zip?
     ch_publish_cache = Channel.of(params.publish_cache)
+    // a singleton value channel (reused by all loading processes)
+    ch_cache = Channel.of(file(params.genotype_cache_zip, checkIfExists: true))
 
     //
     // WORKFLOW: Run pipeline
@@ -78,6 +80,7 @@ workflow PGSCATALOG_PGSC_CALC {
         pgscatalog_accessions,
         params.scorefile,
         file(params.chain_files),
+        ch_cache,
         ch_publish_cache,
         versions
     )

@@ -64,6 +64,14 @@
           "description": "Publish cached genotypes in a zip file? The zip file can be used in future runs to save time.",
           "fa_icon": "fas fa-file-archive"
         },
+        "genotype_cache_zip": {
+          "type": "string",
+          "pattern": "\\.zip$",
+          "description": "A zip archive containing cached genotypes, published from a previous run.",
+          "format": "file-path",
+          "mimetype": "application/zip",
+          "fa_icon": "fas fa-file-archive"
+        },
         "publish_dir_mode": {
           "type": "string",
           "default": "copy",

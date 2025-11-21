@@ -28,6 +28,7 @@ workflow PGSC_CALC {
     pgscatalog_accessions // hashmap [pgs_id: , pgp_id:, efo_id: ]
     scorefile
     ch_chain_files
+    ch_cache // file(genotypes.zarr.zip) value channel
     publish_cache // bool value Channel
     ch_versions
 
@@ -82,12 +83,11 @@ workflow PGSC_CALC {
     // make value (singleton) channels for scorefiles and the cache
     // because one load process will launch for each target genome
     ch_formatted_scorefiles = PGSC_CALC_FORMAT.out.scorefiles.collect()
-    ch_zarr_zip = Channel.value(file("$projectDir/assets/optional_input/ZARR_ZIP_NO_FILE", checkIfExists: true))
 
     PGSC_CALC_LOAD(
         ch_target_with_index, // meta, path(target), path(bgen_sample), path(target_index)
         ch_formatted_scorefiles, // [scorefile_1, ..., scorefile_n]
-        ch_zarr_zip // path(zarr_zip)
+        ch_cache // path(zarr_zip)
     )
     ch_versions = ch_versions.mix(PGSC_CALC_LOAD.out.versions)
 
