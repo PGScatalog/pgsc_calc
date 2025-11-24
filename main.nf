@@ -45,7 +45,7 @@ workflow PGSCATALOG_PGSC_CALC {
     }
 
     // be clear about liftover
-    if (params.chain_files != "NO_FILE" & params.scorefile == null) {
+    if (params.chain_files != "CHAIN_NO_FILE" & params.scorefile == null) {
         log.warn("Chain files are never needed for PGS Catalog scoring files")
         log.warn("Liftover is only useful for user-generated custom scoring files set by --scorefile")
         error("Remove --chain_files parameter unless you also set --scorefile")
