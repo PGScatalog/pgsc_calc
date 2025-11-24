@@ -48,7 +48,7 @@ workflow PGSC_CALC {
     // format all scoring files into a consistent structure
     // add local scoring files, not fetched via the PGS Catalog API
     if (scorefile) {
-        local_scores = Channel.fromPath(scorefile)
+        local_scores = Channel.fromPath(scorefile, checkIfExists: true)
     } else {
         local_scores = Channel.empty()
     }
