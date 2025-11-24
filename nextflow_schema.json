@@ -66,7 +66,7 @@
         },
         "genotype_cache_zip": {
           "type": "string",
-          "pattern": "\\.zip$",
+          "pattern": ".*\\.zip$|^.*ZARR_ZIP_NO_FILE$",
           "description": "A zip archive containing cached genotypes, published from a previous run.",
           "format": "file-path",
           "mimetype": "application/zip",
@@ -94,8 +94,7 @@
         },
         "chain_files": {
           "type": "string",
-          "default": "NO_FILE",
-          "pattern": "^.*.chain.gz$|NO_FILE",
+          "pattern": "^.*.chain.gz$|CHAIN_NO_FILE",
           "format": "file-path",
           "description": "Path to liftover chain files, see https://hgdownload.cse.ucsc.edu/goldenpath/hg19/liftOver/"
         }
