@@ -36,7 +36,9 @@ workflow PGSC_CALC {
 
     // download scoring files from PGS Catalog if any accession strings are set
     ch_scores = Channel.empty()
-    if (![pgscatalog_accessions.pgs_id, pgscatalog_accessions.pgp_id, pgscatalog_accessions.efo_id].every { it.value == "" }) {
+
+    def any_pgscatalog_query = [pgscatalog_accessions.pgs_id, pgscatalog_accessions.pgp_id, pgscatalog_accessions.efo_id].every {it.value != []}
+    if (any_pgscatalog_query) {
         PGSC_CALC_DOWNLOAD(
             pgscatalog_accessions,
             target_build
