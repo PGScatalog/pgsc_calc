@@ -62,6 +62,23 @@ workflow PGSC_CALC {
     )
     ch_versions = ch_versions.mix(PGSC_CALC_FORMAT.out.versions)
 
+    // don't launch jobs for chromosomes which aren't in the scoring files
+    // first, get a set of chromosomes found in all scoring files
+    PGSC_CALC_FORMAT.out.chroms.map { it.readLines().toSet() }.set { ch_chromosomes }
+
+    // now filter target genomes to match this set
+    ch_input.combine(ch_chromosomes).filter{ meta, target_path, sample_path, validChroms ->
+        if ( meta.chrom == [] )
+            return true
+
+        // check target genome chromosome is present in scoring files
+        return meta.chrom.toString() in validChroms
+    }.map {
+        // drop validChroms from the list
+        it.removeLast()
+        return it
+    }.set { ch_filtered_input }
+
     // automatically add index files
     // it's important that index files are input to the process so they are staged correctly
     def addIndex = { meta, target_path, sample_path ->
@@ -78,7 +95,8 @@ workflow PGSC_CALC {
         [meta, target_path, bgen_sample_path, file(target_path + ext, checkIfExists: true)]
     }
 
-    ch_target_with_index = ch_input.map(addIndex)
+    ch_target_with_index = ch_filtered_input.map(addIndex)
+
 
     // make value (singleton) channels for scorefiles and the cache
     // because one load process will launch for each target genome

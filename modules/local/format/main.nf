@@ -15,6 +15,7 @@ process PGSC_CALC_FORMAT {
     output:
     path "formatted/normalised_*.{txt,txt.gz}", arity: "1..*", emit: scorefiles
     path "formatted/log_scorefiles.json", arity: "1", emit: log_scorefiles
+    path "chroms.txt", arity: "1", emit: chroms
     path "versions.yml", arity: "1", emit: versions
 
     when:
@@ -35,6 +36,9 @@ process PGSC_CALC_FORMAT {
         $liftover \
         -v
 
+    # capture chromosomes in scoring files
+    zcat formatted/normalised_* | cut -f 1 | sort | uniq | grep -v 'chr_name' > chroms.txt
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         pgscatalog.core: \$(echo \$(python -c 'import pgscatalog.core; print(pgscatalog.core.__version__)'))
@@ -45,6 +49,7 @@ process PGSC_CALC_FORMAT {
     """
     mkdir formatted
     touch formatted/normalised_PGS001229_hmPOS_GRCh38.txt.gz formatted/log_scorefiles.json
+    seq 1 22 > chroms.txt
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

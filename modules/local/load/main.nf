@@ -15,7 +15,7 @@ process PGSC_CALC_LOAD {
     path zarr_zip, arity: '1'
 
     output:
-    path "cache/genotypes.zarr.zip", arity: '1', emit: "zarr_zip"
+    path "cache/genotypes.zarr.zip", arity: '1', emit: "zarr_zip", optional: true
     path "versions.yml", emit: "versions"
 
     script:
