@@ -37,7 +37,7 @@ workflow PGSC_CALC {
     // download scoring files from PGS Catalog if any accession strings are set
     ch_scores = Channel.empty()
 
-    def any_pgscatalog_query = [pgscatalog_accessions.pgs_id, pgscatalog_accessions.pgp_id, pgscatalog_accessions.efo_id].every { it }
+    def any_pgscatalog_query = [pgscatalog_accessions.pgs_id, pgscatalog_accessions.pgp_id, pgscatalog_accessions.efo_id].any { it }
     if (any_pgscatalog_query) {
         log.info "Data requested from PGS Catalog"
         PGSC_CALC_DOWNLOAD(
@@ -58,7 +58,7 @@ workflow PGSC_CALC {
         local_scores = Channel.empty()
     }
 
-    ch_scores = local_scores.mix(ch_scores)
+    ch_scores = local_scores.mix(ch_scores).collect().dump(tag: 'scorefiles')
 
     PGSC_CALC_FORMAT(
         ch_scores,
