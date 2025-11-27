@@ -2,22 +2,20 @@
     "unified VCF should calculate": {
         "content": [
             [
-                "scores.txt.gz:md5,29f943a1f55999f719638ee6283617e7"
+                
             ],
             [
-                "summary.csv:md5,1c02f635b996051758a4f7ad9cb5aa66"
+                
             ],
             [
-                "versions.yml:md5,2f0cd6bca6137d3436724c027c712b2e",
-                "versions.yml:md5,45a404e27fec434666b64e1ee1f34542",
-                "versions.yml:md5,7069beda96562e71c8384f0a5cdf0384"
+                "versions.yml:md5,2f0cd6bca6137d3436724c027c712b2e"
             ]
         ],
         "meta": {
             "nf-test": "0.9.3",
             "nextflow": "25.10.0"
         },
-        "timestamp": "2025-11-18T17:55:11.066249"
+        "timestamp": "2025-11-27T16:39:26.933969"
     },
     "split VCF should calculate": {
         "content": [
@@ -58,26 +56,24 @@
             "nf-test": "0.9.3",
             "nextflow": "25.10.0"
         },
-        "timestamp": "2025-11-18T17:55:55.818903"
+        "timestamp": "2025-11-27T16:40:05.950261"
     },
     "unified bgen should calculate": {
         "content": [
             [
-                "scores.txt.gz:md5,29f943a1f55999f719638ee6283617e7"
+                
             ],
             [
-                "summary.csv:md5,1c02f635b996051758a4f7ad9cb5aa66"
+                
             ],
             [
-                "versions.yml:md5,2f0cd6bca6137d3436724c027c712b2e",
-                "versions.yml:md5,45a404e27fec434666b64e1ee1f34542",
-                "versions.yml:md5,7069beda96562e71c8384f0a5cdf0384"
+                "versions.yml:md5,2f0cd6bca6137d3436724c027c712b2e"
             ]
         ],
         "meta": {
             "nf-test": "0.9.3",
             "nextflow": "25.10.0"
         },
-        "timestamp": "2025-11-18T17:54:52.434171"
+        "timestamp": "2025-11-27T16:39:19.7892"
     }
 }

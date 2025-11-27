@@ -20,8 +20,11 @@ nextflow_workflow {
                 input[1] = "GRCh38"
                 input[2] = [pgs_id: "", pgp_id: "", efo_id: ""]
                 input[3] = file("../../../tests/data/PGS000586_hmPOS_GRCh38.txt.gz", checkIfExists: true)
-                input[4] = file("NO_FILE")
-                input[5] = Channel.empty()
+                input[4] = file("CHAIN_NO_FILE") // chain file
+                input[5] = file("ZARR_ZIP_NO_FILE") // zarr archive file
+                input[6] = Channel.value(false) // don't publish the cache
+                input[7] = Channel.value(5000) // variant batch size
+                input[8] = Channel.empty() // versions channel
                 """
             }
         }
@@ -55,8 +58,11 @@ nextflow_workflow {
                 input[1] = "GRCh38"
                 input[2] = [pgs_id: "", pgp_id: "", efo_id: ""]
                 input[3] = file("../../../tests/data/PGS000586_hmPOS_GRCh38.txt.gz", checkIfExists: true)
-                input[4] = file("NO_FILE")
-                input[5] = Channel.empty()
+                input[4] = file("CHAIN_NO_FILE") // chain file
+                input[5] = file("ZARR_ZIP_NO_FILE") // zarr archive file
+                input[6] = Channel.value(false) // don't publish the cache
+                input[7] = Channel.value(5000) // variant batch size
+                input[8] = Channel.empty() // versions channel
                 """
             }
         }
@@ -176,8 +182,11 @@ nextflow_workflow {
                 input[1] = "GRCh38"
                 input[2] = [pgs_id: "", pgp_id: "", efo_id: ""]
                 input[3] = file("../../../tests/data/PGS000586_hmPOS_GRCh38.txt.gz", checkIfExists: true)
-                input[4] = file("NO_FILE")
-                input[5] = Channel.empty()
+                input[4] = file("CHAIN_NO_FILE") // chain file
+                input[5] = file("ZARR_ZIP_NO_FILE") // zarr archive file
+                input[6] = Channel.value(false) // don't publish the cache
+                input[7] = Channel.value(5000) // variant batch size
+                input[8] = Channel.empty() // versions channel
                 """
             }
         }
