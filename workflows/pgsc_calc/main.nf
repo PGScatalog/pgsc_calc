@@ -30,6 +30,7 @@ workflow PGSC_CALC {
     ch_chain_files
     ch_cache // file(genotypes.zarr.zip) value channel
     publish_cache // bool value Channel
+    batch_size // int value Channel
     ch_versions
 
     main:
@@ -47,7 +48,7 @@ workflow PGSC_CALC {
         ch_versions = ch_versions.mix(PGSC_CALC_DOWNLOAD.out.versions)
         ch_scores = PGSC_CALC_DOWNLOAD.out.scorefiles
     } else {
-        log.info "No data requested from PGS Catalog"
+        log.info "No PGS Catalog data requested"
     }
 
     // format all scoring files into a consistent structure
@@ -110,7 +111,8 @@ workflow PGSC_CALC {
     PGSC_CALC_LOAD(
         ch_target_with_index, // meta, path(target), path(bgen_sample), path(target_index)
         ch_formatted_scorefiles, // [scorefile_1, ..., scorefile_n]
-        ch_cache // path(zarr_zip)
+        ch_cache, // path(zarr_zip)
+        batch_size // value(int)
     )
     ch_versions = ch_versions.mix(PGSC_CALC_LOAD.out.versions)
 

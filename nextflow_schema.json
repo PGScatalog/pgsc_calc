@@ -97,6 +97,11 @@
           "pattern": "^.*.chain.gz$|CHAIN_NO_FILE",
           "format": "file-path",
           "description": "Path to liftover chain files, see https://hgdownload.cse.ucsc.edu/goldenpath/hg19/liftOver/"
+        },
+        "variant_batch_size": {
+          "type": "integer",
+          "default": 5000,
+          "description": "How many variants should be stored in each zarr chunk? Larger means more memory usage but potentially faster."
         }
       },
       "fa_icon": "fas fa-dna",

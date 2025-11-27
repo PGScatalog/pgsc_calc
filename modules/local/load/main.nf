@@ -13,6 +13,7 @@ process PGSC_CALC_LOAD {
     tuple val(meta), path(target_genome, arity: '1'), path(bgen_sample_file, arity: '1'), path(target_index, arity: '1')
     path scorefiles, arity: '1.*'
     path zarr_zip, arity: '1'
+    val variant_batch_size // int > 1
 
     output:
     path "cache/genotypes.zarr.zip", arity: '1', emit: "zarr_zip", optional: true
@@ -34,6 +35,7 @@ process PGSC_CALC_LOAD {
       $bgen_sample_arg \
       $zarr_zip_arg \
       --threads $task.cpus \
+      --batch_size $variant_batch_size \
       --verbose
 
     cat <<-END_VERSIONS > versions.yml

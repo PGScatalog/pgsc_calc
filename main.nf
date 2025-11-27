@@ -71,6 +71,9 @@ workflow PGSCATALOG_PGSC_CALC {
     // a singleton value channel (reused by all loading processes)
     ch_cache = Channel.value(file(params.genotype_cache_zip, checkIfExists: true))
 
+    // how many variants are stored in each zarr chunk?
+    ch_batch_size = Channel.value(params.variant_batch_size)
+
     //
     // WORKFLOW: Run pipeline
     //
@@ -82,6 +85,7 @@ workflow PGSCATALOG_PGSC_CALC {
         file(params.chain_files),
         ch_cache,
         ch_publish_cache,
+        ch_batch_size,
         versions
     )
 }
