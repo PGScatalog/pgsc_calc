@@ -102,6 +102,21 @@
       "fa_icon": "fas fa-dna",
       "required": ["target_build"]
     },
+    "matching_options": {
+      "title": "Matching options",
+      "type": "object",
+      "description": "Define how variants are matched across scoring files and target genomes.",
+      "default": "",
+      "properties": {
+        "min_overlap": {
+          "type": "number",
+          "default": 0.75,
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Minimum proportion of variants present in both the score file and input target genomic data"
+        }
+      }
+    },
     "institutional_config_options": {
       "title": "Institutional config options",
       "type": "object",
