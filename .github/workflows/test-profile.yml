@@ -1,0 +1,57 @@
+name: Run test profile
+
+on:
+  push:
+    paths:
+      - "nextflow.config"
+      - "conf/**"
+      - "modules/**"
+      - "subworkflows/**"
+      - "workflows/**"
+      - "main.nf"
+      - "tests/**"
+  pull_request:
+    paths:
+      - "nextflow.config"
+      - "conf/**"
+      - "modules/**"
+      - "subworkflows/**"
+      - "workflows/**"
+      - "main.nf"
+      - "tests/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        profile: [docker]
+
+    name: nf-test (${{ matrix.profile }})
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+
+      - name: Setup Nextflow latest-edge
+        uses: nf-core/setup-nextflow@v1
+        with:
+          version: "latest-edge"
+
+      - name: Run via GitHub integration
+        run: |
+          nextflow run pgscatalog/pgsc_calc \
+            -r ${{ github.sha }} \
+            -profile test,${{ matrix.profile }}
+
+      - name: Run local nextflow script (${{ matrix.profile }})
+        run: |
+          nextflow run main.nf \
+            -profile test,${{ matrix.profile }}
