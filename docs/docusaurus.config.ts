@@ -64,29 +64,10 @@ const config: Config = {
       },
       items: [
         {
-          href: 'https://pgscatalog.org',
-          label: 'PGS Catalog',
-          position: 'right',
-        },
-        {
           href: 'https://github.com/pgscatalog/pgsc_calc',
-          label: 'GitHub',
           position: 'right',
-        },
-        {
-          href: 'https://github.com/PGScatalog/pgsc_calc/releases',
-          label: 'Changelog',
-          position: 'right',
-        },
-        {
-          href: 'https://github.com/pgscatalog/pgsc_calc/issues',
-          label: 'Report a problem',
-          position: 'right',
-        },
-        {
-          href: 'https://github.com/pgscatalog/pgsc_calc/discussions',
-          label: 'Ask a question',
-          position: 'right',
+          className: 'header-github-link',
+          'aria-label': 'GitHub repository',
         },
       ],
     },
