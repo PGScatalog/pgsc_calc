@@ -88,7 +88,7 @@ $ nextflow run main.nf -profile test_full,docker
 
 ## 5. Create a configuration file
 
-This configuration file is customised to work well with very large scale data, like UK Biobank. It's been tested on [PGS000010]((https://www.pgscatalog.org/score/PGS000010/)) and [PGS001229]((https://www.pgscatalog.org/score/PGS001229/)).
+This configuration file is customised to work well with very large scale data, like UK Biobank. It's been tested on [PGS000010](https://www.pgscatalog.org/score/PGS000010/) and [PGS001229](https://www.pgscatalog.org/score/PGS001229/).
 
 ```bash
 $ echo "process {

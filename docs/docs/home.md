@@ -78,7 +78,7 @@ If you want to try the workflow with your own data, have a look at [getting star
 
 ## Changelog
 
-The [changelog page](changelog.md) describes fixes and enhancements for each version.
+The [changelog page](https://github.com/pgscatalog/pgsc_calc/releases) describes fixes and enhancements for each version.
 
 ## Credits
 
