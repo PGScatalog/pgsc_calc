@@ -32,7 +32,7 @@ const sidebars: SidebarsConfig = {
     {
       type: 'link',
       label: 'PGS training 🪄',
-      href: 'https://www.ebi.ac.uk/training/online/courses/polygenic-scores-pgs-catalog/#vf-tabs__section--overview/',
+      href: 'https://www.ebi.ac.uk/training/online/courses/polygenic-scores-pgs-catalog/',
     },
     {
       type: 'link',
