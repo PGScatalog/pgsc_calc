@@ -182,4 +182,4 @@ After the calculation finishes don't forget to [save the results directory to yo
 
 * `dxfuse` works well for smaller scores, which contain hundreds or thousands of variants. For more complex jobs, which can contain millions of variants, consider downloading the genotype data to your cloud workstation to significantly speed up calculation.
 * Consider using [larger instance types](https://documentation.dnanexus.com/developer/api/running-analyses/instance-types#standard-aws-instance-types) so more processes can run in parallel on your local machine.
-* Consider saving the genotype cache to your project workspace to save time on future calculation jobs.
+* Consider saving the [genotype cache to your project workspace to save time on future calculation jobs](../howto/cache.md).

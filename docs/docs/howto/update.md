@@ -1,7 +1,7 @@
 ---
 sidebar_label: Update the PGS Catalog Calculator
 description: How to update pgsc_calc
-sidebar_position: 5
+sidebar_position: 6
 ---
 
 # How do I change the version or update ``pgsc_calc``?

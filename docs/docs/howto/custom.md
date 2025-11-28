@@ -25,7 +25,7 @@ minimal header in the following format:
 
 ```
 #pgs_name=metaGRS_CAD
-#pgs_id=metaGRS_CAD    
+#pgs_id=metaGRS_CAD
 #trait_reported=Coronary artery disease
 #genome_build=GRCh37
 ```
@@ -54,7 +54,7 @@ Set the path of the custom scoring file with the ``--scorefile`` parameter:
 ```bash
 $ nextflow run pgscatalog/pgscalc \
     -r v3-rc1 \
-    -profile <docker/singularity/conda> \    
+    -profile <docker/singularity/conda> \
     --input samplesheet.csv \
     --scorefile scorefile.txt
 ```
