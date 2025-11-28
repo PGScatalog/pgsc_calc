@@ -10,6 +10,7 @@ process PGSC_CALC_SCORE {
     path "genotypes/zarr_???.zip", arity: '1..*' // renames input zarr files
     path "scorefiles/*"          , arity: '1.*' // put scorefiles in a directory
     val publish_cache // bool
+    val variant_batch_size // bool
 
     output:
     path "scores.txt.gz"         , arity: '1', emit: "scores"
@@ -26,7 +27,8 @@ process PGSC_CALC_SCORE {
       --zarr_zip_file genotypes/*.zip \
       --score_paths scorefiles/*.txt.gz \
       --threads $task.cpus \
-      --out_dir out
+      --out_dir out \
+      --batch_size $variant_batch_size
 
     7z a -tzip -mx0 variant_match_logs.zip out/logs/sampleset=*
     mv out/logs/summary.csv .

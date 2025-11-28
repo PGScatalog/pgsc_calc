@@ -121,7 +121,8 @@ workflow PGSC_CALC {
     PGSC_CALC_SCORE(
         ch_score_input,
         ch_formatted_scorefiles,
-        publish_cache
+        publish_cache,
+        batch_size // value(int)
     )
     ch_versions = ch_versions.mix(PGSC_CALC_SCORE.out.versions)
 
