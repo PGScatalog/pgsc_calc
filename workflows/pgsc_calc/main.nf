@@ -98,7 +98,8 @@ workflow PGSC_CALC {
             case 'vcf'  -> file("$projectDir/assets/optional_input/BGEN_SAMPLE_NO_FILE", checkIfExists: true)
             default     -> throw new IllegalArgumentException("Unknown file_format: ${meta.file_format}")
         }
-        [meta, target_path, bgen_sample_path, file(target_path + ext, checkIfExists: true)]
+        def target_index = target_path.resolveSibling(target_path.getName() + ext)
+        [meta, target_path, bgen_sample_path, target_index]
     }
 
     ch_target_with_index = ch_filtered_input.map(addIndex)
