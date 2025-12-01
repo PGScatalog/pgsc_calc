@@ -26,6 +26,7 @@ process PGSC_CALC_SCORE {
     pgsc_calc score \
       --zarr_zip_file genotypes/*.zip \
       --score_paths scorefiles/*.txt.gz \
+      --min_overlap $params.min_overlap \
       --threads $task.cpus \
       --out_dir out \
       --batch_size $variant_batch_size
