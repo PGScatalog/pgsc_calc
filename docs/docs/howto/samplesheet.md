@@ -17,58 +17,27 @@ Samplesheets can be in CSV, TSV, JSON, or YAML format
 
 :::
 
-## Simple samplesheet example
+## Warnings before you get started
 
-A samplesheet can be set up in a spreadsheet program, using the following structure
-
-| sampleset | path                                  | chrom | file_format | genotyping_method | bgen_sample_file                        |
-|-----------|---------------------------------------|-------|-------------|-------------------|-----------------------------------------|
-| 1000G     | tests/data/bgen/PGS000586_GRCh38.bgen |       | bgen        | array             | tests/data/bgen/PGS000586_GRCh38.sample |
-
-
-There are five mandatory columns:
-
-- **sampleset**: A text string (no spaces) referring to the name of a
-  target dataset of genotyping data containing at least one
-  sample/individual. Data from a sampleset may be input as a single
-  file, or split across chromosomes into multiple files.  Scores
-  generated from files with the same sampleset name are combined in
-  later stages of the analysis.
-
-:::warning
+:::warning Preparing your target genomes
 
 - ``pgsc_calc`` works best with cohort data
 - Scores calculated for low sample sizes will generate warnings in the
   output report
 - You should merge your genomes if they are split per individual before
   using ``pgsc_calc``
-  
-:::
-
-- **path**: should be set to the path of the target genome file. Absolute paths are preferred.
-
-:::tip
-
-An index must exist in the same directory for all target genome files (e.g. bgi / csi / tbi files)
 
 :::
 
-- **chrom**: An integer (range 1-22) or string (X, Y). If the target genomic
-  data file contains multiple chromosomes, leave empty. Don't use a mix of empty
-  and integer chromosomes in the same sampleset.
+:::warning Chromosomes
 
-:::note
-
-* X, Y, and MT chromosome support will be added in v3-rc2
+* In the initial release only autosomes are supported (1-22)
+* X, Y, and MT support will be added in the next release
 
 :::
 
-- **format**: The file format of the target genomes. Currently supports
-  ``bgen`` and ``vcf``.
 
-- **genotyping_method**: How were genotypes called? ``array`` or ``wgs``
-
-:::warning
+:::warning Imputation and WGS support
 
 - Array data should be imputed (e.g. TopMed/Michigan) to increase variant density
 - If you use unimputed array data then many scores will probably fail to calculate
@@ -76,19 +45,47 @@ An index must exist in the same directory for all target genome files (e.g. bgi 
 
 :::
 
-And one column which is mandatory when format is ``bgen``:
-
-- **bgen_sample_file**: Path to the BGEN sample file, which contains sample identifiers
-
-## Complex samplesheet example
-
-In the example below, each target genome file is split per chromsoome
-
-:::info
+:::warning Sample batches aren't supported yet, and low sample sizes aren't great
 
 * A target genome must contain every sample in a single file
 * For example, this means that splitting VCFs into batches of 100,000 samples is not supported (chrom1_batch1, chrom1_batch2, ...)
 * This limitation will be removed in a future release candidate
+
+:::
+
+## Samplesheet structure
+
+| Column name       | Mandatory | Description                                                                                                                                                                                                                             |
+|-------------------|-----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| sampleset         | ✅         | A text string (no spaces) referring to the name of a target dataset of genotyping data containing at least one sample/individual. Data from a sampleset may be input as a single file, or split across chromosomes into multiple files. |
+| path              | ✅         | Should be set to the path of the target genome file. Absolute paths are best.                                                                                                                                                           |
+| chrom             | ✅         | An integer (range 1-22) or string (X, Y). If the target genomic data file contains multiple chromosomes, leave empty. Don't use a mix of empty and integer chromosomes in the same sampleset.                                           |
+| format            | ✅         | The file format of the target genomes. Currently supports `bgen` and `vcf`.                                                                                                                                                             |
+| genotyping_method | ✅         | How were genotypes called?  `array` or `wgs`                                                                                                                                                                                            |
+| bgen_sample_file  | ❌         | Path to the BGEN sample file, which contains sample identifiers. Mandatory if format is `bgen`.
+
+## Simple samplesheet example
+
+:::info What's a simple samplesheet?
+
+This example assumes your VCF/BGEN file contains multiple chromosomes and multiple samples.
+
+:::
+
+A samplesheet can be set up in a spreadsheet program, using the following structure:
+
+| sampleset | path                                  | chrom | file_format | genotyping_method | bgen_sample_file                        |
+|-----------|---------------------------------------|-------|-------------|-------------------|-----------------------------------------|
+| 1000G     | tests/data/bgen/PGS000586_GRCh38.bgen |       | bgen        | array             | tests/data/bgen/PGS000586_GRCh38.sample |
+
+
+
+## Complex samplesheet example
+
+:::info What's a complex samplesheet?
+
+* This example assumes each VCF/BGEN file contains one chromosome and multiple samples
+* Each row corresponds to a different chromosome in the same sampleset
 
 :::
 
