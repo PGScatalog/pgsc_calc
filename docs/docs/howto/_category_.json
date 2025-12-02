@@ -3,7 +3,7 @@
   "label": "How to guides",
   "key": "unique-sidebar-item-key",
   "collapsible": true,
-  "collapsed": false,
+  "collapsed": true,
   "className": "red",
   "link": {
     "type": "generated-index",
