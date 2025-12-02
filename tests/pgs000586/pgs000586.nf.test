@@ -1,0 +1,52 @@
+@Grab('org.apache.commons:commons-csv:1.14.1')
+import org.apache.commons.csv.CSVFormat
+import org.apache.commons.csv.CSVParser
+
+nextflow_pipeline {
+
+    name "Test calculated scores"
+    script "../../main.nf"
+
+    test("1000 genomes chr1-22 PGS000586 calculation matches V2") {
+
+        when {
+            params {
+              input = "$projectDir/assets/samplesheet_bgen_ftp.csv"
+              scorefile = "$projectDir/tests/data/PGS000586_hmPOS_GRCh38.txt.gz"
+              target_build = "GRCh38"
+              outdir = "$outputDir"
+            }
+        }
+        then {
+            // parse calculated scores from CSV output
+            def lines = path("$outputDir/scores.txt.gz").linesGzip
+            def parser = CSVParser.parse(
+                lines.join("\n"),
+                CSVFormat.DEFAULT.withFirstRecordAsHeader()
+            )
+            def columnsToKeep = ["sample_id", "score", "score_avg"]
+            def calculated_rows = parser.collect { record ->
+                columnsToKeep.collect { col -> record.get(col) }
+            }
+
+            // parse scores calculated with v2 from CSV reference file
+            def ref_lines = path("$baseDir/tests/pgs000586/data/v2_scores.txt.gz").linesGzip
+            def ref_parser = CSVParser.parse(
+                ref_lines.join("\n"),
+                CSVFormat.DEFAULT.withFirstRecordAsHeader()
+            )
+            def refColumnsToKeep = ["FID", "SUM", "AVG"]
+            def ref_rows = ref_parser.collect { record ->
+                refColumnsToKeep.collect { col -> record.get(col) }
+            }
+
+            // test the pipeline
+            assertAll (
+                { assert workflow.success },
+                { assert calculated_rows.size() == ref_rows.size() },
+                // compare calculated score and average with 6 digits of precision
+                { assert ScoreUtils.roundList(calculated_rows) == ScoreUtils.roundList(ref_rows) }
+            )
+        }
+    }
+}
