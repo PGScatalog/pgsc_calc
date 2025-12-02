@@ -1,0 +1,2 @@
+sampleset,path,chrom,file_format,genotyping_method,bgen_sample_file
+1000G,https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/v3/bgen/PGS000586_GRCh38.bgen,,bgen,array,https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/v3/bgen/PGS000586_GRCh38.sample
