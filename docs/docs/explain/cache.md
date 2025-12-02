@@ -6,13 +6,18 @@ sidebar_position: 3
 
 # The genotypes cache
 
-## Background
+## What the cache is helpful for ✅
 
-When you run the PGS Catalog Calculator cached variants and genotypes are automatically published to the results directory in a file called `genotypes.zarr.zip`.
+* Many variants occur across multiple scoring files PGS scoring files [(like HapMap3)](https://doi.org/10.1371/journal.pgen.1009021), although they have different weights associated with each effect allele
+* The cache can speed up repeated calculations of **different PGS on the same set of files** by skipping both redundant index queries and parsing previously seen variants
+* The speed up affects the `PGSC_CALC LOAD` processes, helping to save [time and energy 🌳](https://www.green-algorithms.org/)
 
-For example, if you've previously calculated [PGS001229](https://www.pgscatalog.org/score/PGS001229/) the cache will contain around 51,000 variants.
+## What the cache doesn't help ❌
 
-Polygenic scores for different traits may contain these variants, but with different effect weights assigned. Using the cache means that these variants don't need to be queried on future runs, saving [time and energy 🌳](https://www.green-algorithms.org/)
+* If you use case is to calculate one PGS on many different target genomes, the cache will:
+    * not provide any speedup
+    * waste storage space on your computer
+* In this case it can be better to set `--publish_cache false`
 
 ## Loading process sequence diagram
 
@@ -29,7 +34,7 @@ sequenceDiagram
     Note over Cache: Avoids re-querying genome index on future runs
 ```
 
-The cache is used to calculate polygenic scores during the scoring process.
+The cache is then used during the `PGSC_CALC SCORE` process.
 
 :::tip How to use the genotype cache
 
