@@ -6,18 +6,13 @@ sidebar_position: 4
 
 # How to reuse cached data
 
-## Background
+:::info What is the cache?
 
-When you run the PGS Catalog Calculator cached variants and genotypes are automatically published to the results directory in a file called `genotypes.zarr.zip`.
+See here for [more details about what the genotypes cache is.](../explain/cache.md)
 
-For example, if you've previously calculated [PGS001229](https://www.pgscatalog.org/score/PGS001229/) the cache will contain around 51,000 variants.
-
-Polygenic scores for different traits may contain these variants, but with different effect weights assigned. Using the cache means that these variants don't need to be queried on future runs, saving [time and energy 🌳](https://www.green-algorithms.org/)
-
-## Reusing the cache
+:::
 
 Just add the `--genotype_cache_zip` parameter after you've calculated a score for the first time:
-
 
 ```
 $ nextflow run pgscatalog/pgsc_calc \
