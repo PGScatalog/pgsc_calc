@@ -20,7 +20,7 @@
     "split VCF should calculate": {
         "content": [
             [
-                "scores.txt.gz:md5,29f943a1f55999f719638ee6283617e7"
+                "scores.txt.gz:md5,3a12761fc26bc5fb72aa0e023be61e8f"
             ],
             [
                 "summary.csv:md5,1c02f635b996051758a4f7ad9cb5aa66"
@@ -56,7 +56,7 @@
             "nf-test": "0.9.3",
             "nextflow": "25.10.0"
         },
-        "timestamp": "2025-11-27T16:40:05.950261"
+        "timestamp": "2025-12-02T15:33:58.907725"
     },
     "unified bgen should calculate": {
         "content": [
