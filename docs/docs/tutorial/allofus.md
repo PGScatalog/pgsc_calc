@@ -86,11 +86,13 @@ Bonjour world!
 ```
 ## 2. Get ready to run `pgsc_calc`
 
+For the next steps you should navigate to a working directory within your workspace, for example: `/home/jupyter/workspaces/[YOUR WORKSPACE]/run_calc/`.
+
 ### 2.1 Create a configuration file
 
 To make a [configuration file](../howto/config.md) for `pgsc_calc`, we will append pipeline-specific settings to the standard nextflow config
-file (` ~/.nextflow/config`) provided by All of Us. These settings are customised to work well with very large scale data, 
-and have been tested on runs with multiple large PGS. 
+file (` ~/.nextflow/config`) provided by All of Us. This configuration will distribute the compute processes using google batch.
+These `pgsc_calc` settings are customised to work well with very large scale data and have been tested on runs with multiple large PGS. 
 
 ```bash
 (enxf) $ echo "process {
@@ -145,4 +147,15 @@ BEGIN { ORS = ""; print " [ "}
 }
 END { print " ] " }
 ' | jq > acaf_samplesheet.json
+```
+
+## 3. Time to run `pgsc_calc`!
+
+Ok, now that you have a config file and a samplesheet you can try to submit a nextflow batch job! 
+
+```bash
+(enxf) $ nextflow run pgscatalog/pgsc_calc -r v3-rc1 -latest \
+    -c v3_config.txt -profile gcb \
+    --input acaf_samplesheet.json --target_build GRCh38 \
+    --pgs_id PGS000018 --min_overlap 0.5
 ```
