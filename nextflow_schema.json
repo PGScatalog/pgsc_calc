@@ -50,7 +50,6 @@
         "scorefile": {
           "type": "string",
           "description": "Path to a local scoring file.",
-          "format": "file-path",
           "fa_icon": "fas fa-file-alt"
         },
         "efo_direct": {
@@ -230,6 +229,9 @@
     },
     {
       "$ref": "#/$defs/compatibility_options"
+    },
+    {
+      "$ref": "#/$defs/matching_options"
     },
     {
       "$ref": "#/$defs/institutional_config_options"
