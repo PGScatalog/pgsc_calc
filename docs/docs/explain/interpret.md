@@ -133,8 +133,6 @@ Explicitly acknowledging uncertainty strengthens reproducibility and responsible
 
 * Abu-El-Haija _et al._ (2023) The clinical application of polygenic risk scores: A points to consider statement of the American College of Medical Genetics and Genomics (ACMG). Genet Med. doi: https://doi.org/10.1016/j.gim.2023.100803
 
-* Choi & O’Reilly (2020)  Polygenic scores in research and clinical practice, Nature Reviews Genetics
-
 * Lambert, S.A. _et al._ (2024) Enhancing the Polygenic Score Catalog with tools for score calculation and ancestry normalization. https://doi.org/10.1038/s41588-024-01937-x
 
 * Lennon, _et al._ (2024) Selection, optimization and validation of ten chronic disease polygenic risk scores for clinical implementation in diverse US populations. Nat Med https://doi.org/10.1038/s41591-024-02796-z
