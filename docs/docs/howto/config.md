@@ -1,7 +1,7 @@
 ---
 sidebar_label: Change default configuration
 description: How to set your own configuration
-sidebar_position: 4
+sidebar_position: 5
 ---
 
 # How to change default configuration
