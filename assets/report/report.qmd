@@ -60,9 +60,15 @@ log_df <- Reduce(dplyr::bind_rows, lapply(log_paths, read_log))
 log_df$sampleset <- gsub("_", " ", log_df$sampleset)  # page breaking issues
 ```
 
-# Workflow metadata
+# 1. Metadata
 
-## Command
+## 1.1 Workflow version
+
+```{r, echo=FALSE}
+message(stringr::str_interp("pgscatalog/pgsc_calc ${params$version}"))
+``` 
+
+## 1.2 Workflow command
 
 ```{bash}
 cat command.txt | fold -w 80 -s | awk -F ' ' 'NR==1 { print "$", $0} NR>1 { print "    " $0}' | sed 's/$/\\/' | sed '$ s/.$//' 
@@ -76,15 +82,7 @@ cat command.txt | fold -w 80 -s | awk -F ' ' 'NR==1 { print "$", $0} NR>1 { prin
 :::
 ```
 
-## Version
-
-```{r, echo=FALSE}
-message(params$version)
-``` 
-
-# Scoring file metadata
-
-## Scoring file summary
+## 1.3 Scoring file metadata
 
 ```{r load_scorefiles}
 json_list <- jsonlite::fromJSON(params$log_scorefiles, simplifyVector = FALSE)
@@ -205,16 +203,18 @@ DT::datatable(
 :::
 ```
 
-# Variant matching 
+# 2. Variant matching 
 
-## Parameters
+## 2.1 Parameters
 
 ```{bash}
 cat params.txt
 ```
 
-```{asis, echo = params$run_ancestry}
-## Reference matching summary
+## 2.2 Reference matching summary
+
+```{asis, echo = !params$run_ancestry}
+This section is empty because `--run_ancestry` was not set.
 ```
 
 ```{r, echo = FALSE, message = FALSE, eval=params$run_ancestry}
@@ -233,7 +233,7 @@ data.frame(reference = params$reference_panel_name, n_target = n_target, n_match
   DT::datatable()
 ```
 
-## Summary
+## 2.3 Summary
 
 ```{r setup_matches}
 log_df %>%
@@ -276,7 +276,7 @@ compat %>%
                   backgroundColor = DT::styleEqual(c(FALSE, TRUE), c('#c2a5cf', '#a6dba0')))
 ```
 
-## Detailed log
+## 2.4 Detailed log
 
 :::{.column-body-outset}
 
@@ -336,9 +336,12 @@ if(params$run_ancestry == TRUE){
 
 :::
 
-```{asis, echo = params$run_ancestry}
-# Genetic Ancestry
+# 3. Genetic ancestry similarity
+
+```{asis, echo = !params$run_ancestry}
+This section is empty because `--run_ancestry` was not set.
 ```
+
 
 ```{r colour_palette, echo = FALSE, eval=params$run_ancestry}
 # source: https://github.com/PGScatalog/PGS_Catalog/blob/master/catalog/static/catalog/pgs.scss#L2493-L2520
@@ -362,10 +365,25 @@ if({params$reference_panel_name} == '1000G'){
 }
 ```
 
+
+## 3.1 Principal Component Analysis table
+
+```{asis, echo = !params$run_ancestry}
+This section is empty because `--run_ancestry` was not set.
+```
+
 ```{r, echo = FALSE, message = FALSE, eval=params$run_ancestry}
 popsim <- readr::read_tsv(gsub("_pgs.", "_popsimilarity.", params$score_path))
 head(popsim)
+```
 
+## 3.2 Principal Component Analysis plots
+
+```{asis, echo = !params$run_ancestry}
+This section is empty because `--run_ancestry` was not set.
+```
+
+```{r, echo = FALSE, message = FALSE, eval=params$run_ancestry}
 new_label_target = paste({params$sampleset}, '(Most Similar Population)')
 new_label_ref = paste0('reference (', {params$reference_panel_name}, ' populations)')
 
@@ -388,8 +406,10 @@ for(pc in seq.int(1,5,2)){
 }
 ```
 
-```{asis, echo = params$run_ancestry}
-## Population similarity summary
+## 3.3 Population similarity summary
+
+```{asis, echo = !params$run_ancestry}
+This section is empty because `--run_ancestry` was not set.
 ```
 
 ```{r, echo = FALSE, message = FALSE, eval=params$run_ancestry}
@@ -415,7 +435,7 @@ pop_summary %>%
   DT::datatable()
 ```
 
-# Scores
+# 4. Scores
 
 ```{r, echo = FALSE, message = FALSE}
 scores <- readr::read_tsv(params$score_path) 
@@ -457,9 +477,9 @@ It's recommended to use `--run_ancestry` with small samplesets to ensure consist
 
 `r n_scores` scores for `r n_samples` samples processed.
 
-### Score data 
+## 4.1 Score data
 
-#### Density plot(s)
+### 4.1.1 Density plot(s)
 
 ```{asis, echo = !LOW_SAMPLE_SIZE}
 ::: {.callout-note}
@@ -511,7 +531,7 @@ long_scores %>%
       labs(x = "PGS (SUM)", y = "Density", title = "PGS Distribution(s)")
 ```
 
-### Get all scores
+## 4.2 Get all scores
 
 All scores can be found in the results directory, at:
 
@@ -523,7 +543,7 @@ stringr::str_glue("{params$sampleset}/score/{params$sampleset}_pgs.txt.gz")
 stringr::str_glue("{params$sampleset}/score/aggregated_scores.txt.gz")
 ```
 
-# Citation
+# 5. Citation
 
 > Samuel A. Lambert, Benjamin Wingfield, Joel T. Gibson, Laurent Gil, Santhi Ramachandran, Florent Yvon, Shirin Saverimuttu, Emily Tinsley, Elizabeth Lewis, Scott C. Ritchie, Jingqin Wu, Rodrigo Canovas, Aoife McMahon, Laura W. Harris, Helen Parkinson, Michael Inouye.
 Enhancing the Polygenic Score Catalog with tools for score calculation and ancestry normalization.
@@ -533,7 +553,7 @@ Nature Genetics (2024) | doi: [10.1038/s41588-024-01937-x](https://doi.org/10.10
 For scores from the PGS Catalog, please remember to cite the original publications from which they came (these are listed in the metadata table).
 :::
 
-## Score licenses
+# 6. Score licenses
 
 ::: {.callout-tip}
 * Scores deposited in the PGS Catalog may have specific license terms
