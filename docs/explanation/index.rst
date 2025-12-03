@@ -7,6 +7,7 @@ Explanation
    :maxdepth: 1
 
    output
+   interpret
    match
    geneticancestry
    plink2
