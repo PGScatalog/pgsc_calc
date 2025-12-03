@@ -25,7 +25,7 @@ The SUM (or normalised) value in ``pgsc_calc`` output reflects an individual’s
 * PGS values are not absolute measures of risk or causation. Even after adjusting PGS distributions for genetic ancestry, the effect size of the PGS might still differ between ancestry groups.
 * Predictive accuracy depends strongly on similarity between the target population and the discovery cohort.
 
-.. note:: Interpretation
+.. note:: **Interpretation**
 
    * Treat PGS as statistical predictors, not diagnostic tests.
    * Individuals with high scores may never develop the phenotype, and individuals with low scores sometimes will.
@@ -47,7 +47,7 @@ Key indicators include:
 * A high proportion of excluded or flipped variants can signal build or reference mismatches.
 * Scores that require reducing the ``--min_overlap`` threshold to calculate should be reviewed carefully.
 
-.. note:: Interpretation
+.. note:: **Interpretation**
 
    Variant matching statistics are direct indicators of dissimilarity from the original PGS and uncertainty.
    A poorly matched score may not reproduce published performance (e.g., explain less variation in the trait) and can yield biased results.
@@ -66,7 +66,7 @@ Each ``pgsc_calc`` run produces a summary HTML report (``report.html``) containi
 
 These components give a quick overview of data quality and interpretability.
 
-.. note:: Interpretation
+.. note:: **Interpretation**
 
    Use these plots and tables to identify potential issues:
 
@@ -82,7 +82,7 @@ These components give a quick overview of data quality and interpretability.
 When run with the ``--run_ancestry`` option, ``pgsc_calc`` produces additional ancestry-aware outputs (``Z_MostSimilarPop``, ``Z_norm1``, ``Z_norm2``).
 These provide normalised scores that can be compared across ancestry groups, improving equity and interpretability.
 
-.. note:: Interpretation
+.. note:: **Interpretation**
 
    Ancestry normalisation helps make scores more comparable across populations, but it introduces its own uncertainties.
    The “Most Similar Population” label is based on statistical similarity in genetic space; it is not a definitive ancestry classification.
@@ -104,7 +104,7 @@ Uncertainty arises from multiple sources, including:
 * Differences between discovery and target populations
 * Technical artefacts in variant matching or imputation
 
-.. note:: Interpretation
+.. note:: **Interpretation**
 
    Communicate PGS results as relative and probabilistic, never as fixed measures of risk.
 
