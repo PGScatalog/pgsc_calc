@@ -43,7 +43,7 @@ Step by step setup
 
 .. note:: Remember to replace ``<docker|singularity|conda>`` one of ``docker``, ``singularity``, or ``conda``
 
-.. warning:: If you have an ARM processor (like Apple sillicon) please check :ref:`arm`      
+.. warning:: If you have an ARM processor (like Apple sillicon) please check :ref:`arm`
 
 
 Please note the test profile genomes are not biologically meaningful, won't
@@ -60,7 +60,7 @@ people. Exciting!
 
 .. warning:: The format of samplesheets changed in v2.0.0 to better accommodate
              extra file formats in the future
-   
+
 .. warning:: You might need to prepare input genomic data before calculating
            polygenic scores, see :ref:`prepare`
 
@@ -100,7 +100,7 @@ parameter:
 
 .. note:: You can also select scores associated with traits (``--efo_id``) and
           publications (``--pgp_id``)
-          
+
 If you would like to use a custom scoring file not published in the PGS Catalog,
 that's OK too (see :ref:`calculate custom`).
 
@@ -136,7 +136,7 @@ download one of our pre-built reference databases:
 
     $ wget https://ftp.ebi.ac.uk/pub/databases/spot/pgs/resources/pgsc_HGDP+1kGP_v1.tar.zst
 
-This database contains a merged 1000 Genomes and Human Genome Diversity Project reference panel, and is the recommended default panel. 
+This database contains a merged 1000 Genomes and Human Genome Diversity Project reference panel, and is the recommended default panel.
 
 You may prefer to use 1000 Genomes only:
 
@@ -159,10 +159,10 @@ they match the scoring file genome build.
         --run_ancestry pgsc_HGDP+1kGP_v1.tar.zst
 
 Congratulations, you've now (`hopefully`) calculated some scores!
-|:partying_face:|
+🥳
 
 .. tip:: Don't include ``--run_ancestry`` if you didn't download the reference database
-         
+
 After the workflow executes successfully, the calculated scores and a summary
 report should be available in the ``results/score/`` directory in your current
 working directory (``$PWD``) by default. If you're interested in more
@@ -174,7 +174,7 @@ If the workflow didn't execute successfully, have a look at the
 with the software you have installed on your computer.
 
 .. _Wray et al. (2013): https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4096801/
-         
+
 4. Next steps & advanced usage
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

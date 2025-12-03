@@ -7,7 +7,7 @@ pgsc_calc makes it simple to scale up polygenic score calculation. If you want
 to calculate multiple scores for your genetic data it will always be faster to
 run the pipeline once with the parallel method described in this
 section. Running the workflow many times, once for each score, will be much
-slower |:man_running:|
+slower 🏃‍♂️
 
 1. Samplesheet setup
 --------------------
@@ -24,7 +24,7 @@ correct genome build, and use your target genomes to calculate scores. For
 example:
 
 .. code-block:: console
-                
+
     --pgs_id PGS001229,PGS000802
 
 .. note:: If you'd like to calculate hundreds of PGS Catalog scoring files
@@ -127,7 +127,7 @@ Setting effect types for variants is not supported with this format (see
         --scorefile "my_custom_scores/*.txt"
 
 Congratulations, you've now calculated multiple scores in parallel!
-|:partying_face:|
+🥳
 
 .. note:: You can set both ``--pgs_id`` and ``--scorefile`` parameters to
           combine scores in the PGS Catalog with your own custom scores
