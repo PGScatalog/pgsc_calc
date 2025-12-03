@@ -57,6 +57,11 @@ const config: Config = {
   ],
 
   themeConfig: {
+    algolia: {
+      appId: 'IZA0ELHGCZ',
+      apiKey: '4a0e549155c27edca3ee73b23ed3fcb1',
+      indexName: 'docs',
+    },
     // Replace with your project's social card
     image: 'img/docusaurus-social-card.jpg',
     colorMode: {
