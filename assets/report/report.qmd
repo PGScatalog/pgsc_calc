@@ -276,6 +276,14 @@ compat %>%
                   backgroundColor = DT::styleEqual(c(FALSE, TRUE), c('#c2a5cf', '#a6dba0')))
 ```
 
+
+::: {.callout-tip title="Interpretation"}
+
+* Low variant overlap or a high proportion of excluded variants may indicate differences in genome build, imputation quality, or allele coding. 
+* Scores with limited variant matching are likely to perform poorly and should be interpreted cautiously.
+
+:::
+
 ## 2.4 Detailed log
 
 :::{.column-body-outset}
@@ -333,6 +341,12 @@ if(params$run_ancestry == TRUE){
         ))
 }
 ```
+:::
+
+::: {.callout-tip title="Interpretation"}
+
+* Strand-ambiguous or multi-allelic variants increase uncertainty in scoring accuracy.
+* Review variant counts and matching types to confirm the score is compatible with your dataset.
 
 :::
 
@@ -406,6 +420,15 @@ for(pc in seq.int(1,5,2)){
 }
 ```
 
+```{asis, echo = params$run_ancestry}
+::: {.callout-tip title="Interpretation"}
+
+* This plot shows how target samples relate to reference populations used for ancestry adjustment.
+* Samples located far from any reference group may have uncertain ancestry assignments and should be reviewed.
+
+:::
+```
+
 ## 3.3 Population similarity summary
 
 ```{asis, echo = !params$run_ancestry}
@@ -434,6 +457,15 @@ write.csv(pop_summary, "pop_summary.csv", quote=FALSE, row.names = FALSE)
 pop_summary %>%
   DT::datatable()
 ```
+
+```{asis, echo = params$run_ancestry}
+::: {.callout-tip title="Interpretation"}
+
+* Population proportions provide context for ancestry-aware scoring.
+
+:::
+```
+
 
 # 4. Scores
 
@@ -531,6 +563,13 @@ long_scores %>%
       labs(x = "PGS (SUM)", y = "Density", title = "PGS Distribution(s)")
 ```
 
+::: {.callout-tip title="Interpretation"}
+
+* These distributions show variation of calculated scores across individuals.
+* Unusually narrow or multimodal distributions may reflect technical issues or population structure rather than biological signals.
+
+:::
+
 ## 4.2 Get all scores
 
 All scores can be found in the results directory, at:
@@ -542,6 +581,12 @@ stringr::str_glue("{params$sampleset}/score/{params$sampleset}_pgs.txt.gz")
 ```{r, eval=!params$run_ancestry, echo=FALSE}
 stringr::str_glue("{params$sampleset}/score/aggregated_scores.txt.gz")
 ```
+
+::: {.callout-tip title="Interpretation"}
+
+* Polygenic scores represent relative, probabilistic estimates of genetic predisposition.
+* They should be interpreted within the context of ancestry, phenotype definition, and sample characteristics, not as absolute risk predictions.
+:::
 
 # 5. Citation
 
@@ -578,3 +623,6 @@ tibble(
     ))
 ```
 
+```{r goodbye}
+message(stringr::str_glue("End of report, finished at {Sys.time()}"))
+```
