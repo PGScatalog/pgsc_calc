@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="PGS Catalog Calculator (pgsc_calc)">
-<meta name="dcterms.date" content="2025-01-14">
+<meta name="dcterms.date" content="2025-12-04">
 
 <title>PGS Catalog Calculator (pgsc_calc) report</title>
 <style>
@@ -5632,7 +5632,7 @@ background-origin: content-box;
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">January 14, 2025</p>
+        <p class="date">December 4, 2025</p>
       </div>
     </div>
     
@@ -5646,30 +5646,35 @@ background-origin: content-box;
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#workflow-metadata" id="toc-workflow-metadata" class="nav-link active" data-scroll-target="#workflow-metadata">Workflow metadata</a>
+  <li><a href="#metadata" id="toc-metadata" class="nav-link active" data-scroll-target="#metadata">1. Metadata</a>
   <ul class="collapse">
-  <li><a href="#command" id="toc-command" class="nav-link" data-scroll-target="#command">Command</a></li>
-  <li><a href="#version" id="toc-version" class="nav-link" data-scroll-target="#version">Version</a></li>
+  <li><a href="#workflow-version" id="toc-workflow-version" class="nav-link" data-scroll-target="#workflow-version">1.1 Workflow version</a></li>
+  <li><a href="#workflow-command" id="toc-workflow-command" class="nav-link" data-scroll-target="#workflow-command">1.2 Workflow command</a></li>
+  <li><a href="#scoring-file-metadata" id="toc-scoring-file-metadata" class="nav-link" data-scroll-target="#scoring-file-metadata">1.3 Scoring file metadata</a></li>
   </ul></li>
-  <li><a href="#scoring-file-metadata" id="toc-scoring-file-metadata" class="nav-link" data-scroll-target="#scoring-file-metadata">Scoring file metadata</a>
+  <li><a href="#variant-matching" id="toc-variant-matching" class="nav-link" data-scroll-target="#variant-matching">2. Variant matching</a>
   <ul class="collapse">
-  <li><a href="#scoring-file-summary" id="toc-scoring-file-summary" class="nav-link" data-scroll-target="#scoring-file-summary">Scoring file summary</a></li>
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">2.1 Parameters</a></li>
+  <li><a href="#reference-matching-summary" id="toc-reference-matching-summary" class="nav-link" data-scroll-target="#reference-matching-summary">2.2 Reference matching summary</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">2.3 Summary</a></li>
+  <li><a href="#detailed-log" id="toc-detailed-log" class="nav-link" data-scroll-target="#detailed-log">2.4 Detailed log</a></li>
   </ul></li>
-  <li><a href="#variant-matching" id="toc-variant-matching" class="nav-link" data-scroll-target="#variant-matching">Variant matching</a>
+  <li><a href="#genetic-ancestry-similarity" id="toc-genetic-ancestry-similarity" class="nav-link" data-scroll-target="#genetic-ancestry-similarity">3. Genetic ancestry similarity</a>
   <ul class="collapse">
-  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
-  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
-  <li><a href="#detailed-log" id="toc-detailed-log" class="nav-link" data-scroll-target="#detailed-log">Detailed log</a></li>
+  <li><a href="#principal-component-analysis-table" id="toc-principal-component-analysis-table" class="nav-link" data-scroll-target="#principal-component-analysis-table">3.1 Principal Component Analysis table</a></li>
+  <li><a href="#principal-component-analysis-plots" id="toc-principal-component-analysis-plots" class="nav-link" data-scroll-target="#principal-component-analysis-plots">3.2 Principal Component Analysis plots</a></li>
+  <li><a href="#population-similarity-summary" id="toc-population-similarity-summary" class="nav-link" data-scroll-target="#population-similarity-summary">3.3 Population similarity summary</a></li>
   </ul></li>
-  <li><a href="#scores" id="toc-scores" class="nav-link" data-scroll-target="#scores">Scores</a>
+  <li><a href="#scores" id="toc-scores" class="nav-link" data-scroll-target="#scores">4. Scores</a>
   <ul class="collapse">
-  <li><a href="#score-data" id="toc-score-data" class="nav-link" data-scroll-target="#score-data">Score data</a></li>
-  <li><a href="#get-all-scores" id="toc-get-all-scores" class="nav-link" data-scroll-target="#get-all-scores">Get all scores</a></li>
-  </ul></li>
-  <li><a href="#citation" id="toc-citation" class="nav-link" data-scroll-target="#citation">Citation</a>
+  <li><a href="#score-data" id="toc-score-data" class="nav-link" data-scroll-target="#score-data">4.1 Score data</a>
   <ul class="collapse">
-  <li><a href="#score-licenses" id="toc-score-licenses" class="nav-link" data-scroll-target="#score-licenses">Score licenses</a></li>
+  <li><a href="#density-plots" id="toc-density-plots" class="nav-link" data-scroll-target="#density-plots">4.1.1 Density plot(s)</a></li>
   </ul></li>
+  <li><a href="#get-all-scores" id="toc-get-all-scores" class="nav-link" data-scroll-target="#get-all-scores">4.2 Get all scores</a></li>
+  </ul></li>
+  <li><a href="#citation" id="toc-citation" class="nav-link" data-scroll-target="#citation">5. Citation</a></li>
+  <li><a href="#score-licenses" id="toc-score-licenses" class="nav-link" data-scroll-target="#score-licenses">6. Score licenses</a></li>
   </ul>
 </nav>
 </div>
@@ -5692,14 +5697,22 @@ Note
 <p>See the online <a href="https://pgsc-calc.readthedocs.io/en/latest/explanation/output.html">documentation</a> for additional explanation of the terms and data presented in this report.</p>
 </div>
 </div>
-<section id="workflow-metadata" class="level1">
-<h1>Workflow metadata</h1>
-<section id="command" class="level2">
-<h2 class="anchored" data-anchor-id="command">Command</h2>
+<section id="metadata" class="level1 page-columns page-full">
+<h1>1. Metadata</h1>
+<section id="workflow-version" class="level2">
+<h2 class="anchored" data-anchor-id="workflow-version">1.1 Workflow version</h2>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>pgscatalog/pgsc_calc 2.2.0</code></pre>
+</div>
+</div>
+</section>
+<section id="workflow-command" class="level2">
+<h2 class="anchored" data-anchor-id="workflow-command">1.2 Workflow command</h2>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> command.txt <span class="kw">|</span> <span class="fu">fold</span> <span class="at">-w</span> 80 <span class="at">-s</span> <span class="kw">|</span> <span class="fu">awk</span> <span class="at">-F</span> <span class="st">&#39; &#39;</span> <span class="st">&#39;NR==1 { print &quot;$&quot;, $0} NR&gt;1 { print &quot;    &quot; $0}&#39;</span> <span class="kw">|</span> <span class="fu">sed</span> <span class="st">&#39;s/$/\\/&#39;</span> <span class="kw">|</span> <span class="fu">sed</span> <span class="st">&#39;$ s/.$//&#39;</span> </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> command.txt <span class="kw">|</span> <span class="fu">fold</span> <span class="at">-w</span> 80 <span class="at">-s</span> <span class="kw">|</span> <span class="fu">awk</span> <span class="at">-F</span> <span class="st">&#39; &#39;</span> <span class="st">&#39;NR==1 { print &quot;$&quot;, $0} NR&gt;1 { print &quot;    &quot; $0}&#39;</span> <span class="kw">|</span> <span class="fu">sed</span> <span class="st">&#39;s/$/\\/&#39;</span> <span class="kw">|</span> <span class="fu">sed</span> <span class="st">&#39;$ s/.$//&#39;</span> </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>$ nextflow run main.nf -profile test,docker,arm</code></pre>
@@ -5725,19 +5738,8 @@ Tip
 </div>
 </div>
 </section>
-<section id="version" class="level2">
-<h2 class="anchored" data-anchor-id="version">Version</h2>
-<div class="cell">
-<div class="cell-output cell-output-stderr">
-<pre><code>2.0.0</code></pre>
-</div>
-</div>
-</section>
-</section>
-<section id="scoring-file-metadata" class="level1 page-columns page-full">
-<h1>Scoring file metadata</h1>
-<section id="scoring-file-summary" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="scoring-file-summary">Scoring file summary</h2>
+<section id="scoring-file-metadata" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="scoring-file-metadata">1.3 Scoring file metadata</h2>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -5812,17 +5814,17 @@ Tip
 <div class="column-body-outset">
 <div class="cell">
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-e2abc968a8a6deb9d312" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-e2abc968a8a6deb9d312">{"x":{"filter":"none","vertical":false,"extensions":["Buttons"],"data":[["<a href=\"https://www.pgscatalog.org/score/PGS001229\">PGS001229<\/a> <br /> <small>GBE_INI50<\/small>","<a href=\"https://www.pgscatalog.org/score/duplicatetest\">duplicatetest<\/a> <br /> <small>duplicatetest<\/small>"],["<a href=\"https://www.pgscatalog.org/publication/PGP000244\">PGP000244<\/a> <br /> <small>Tanigawa Y et al. medRxiv (2021). doi:10.1101/2021.09.02.21262942<\/small>",""],["<u>Reported trait:<\/u>  <br /> <u>Mapped trait(s):<\/u> <a href=\"http://www.ebi.ac.uk/efo/EFO_0004339\">body height<\/a>","<u>Reported trait:<\/u>  <br /> <u>Mapped trait(s):<\/u> <a href=\"http://www.ebi.ac.uk/efo/\"><\/a>"],["51209",""],["<u>Original build:<\/u> GRCh37 <br /> <u>Harmonised build:<\/u> NR","<u>Original build:<\/u> GRCh37 <br /> <u>Harmonised build:<\/u> "],[false,false],[true,true]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th><span title=\"Unique identifier for the polygenic score.\">Polygenic Score ID<\/span><\/th>\n      <th><span title=\"Reference publication for the score.\">Publication<\/span><\/th>\n      <th><span title=\"Traits associated with the score.\">Traits<\/span><\/th>\n      <th><span title=\"Total number of genetic variants (defined in the header)\">Number of variants<\/span><\/th>\n      <th><span title=\"The genome assembly version used.\">Genome build<\/span><\/th>\n      <th><span title=\"Describes if complex non-SNP alleles included in the scoring file, e.g. APOE/HLA. These variants are excluded from the PGS calculation in the current version\">Complex alleles present?<\/span><\/th>\n      <th><span title=\"Describes if the scoring file is compatible with the Calculator. Scores with dosage-specific weights are removed.\">Effect types compatible?<\/span><\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"Bfrtip","buttons":["csv"],"columnDefs":[{"name":"pgs_id","targets":0},{"name":"pgp_id","targets":1},{"name":"trait_display","targets":2},{"name":"n_variants","targets":3},{"name":"genome_build","targets":4},{"name":"has_complex_alleles","targets":5},{"name":"compatible_effect_type","targets":6}],"order":[],"autoWidth":false,"orderClasses":false,"rowCallback":"function(row, data, displayNum, displayIndex, dataIndex) {\nvar value=data[5]; $(this.api().cell(row, 5).node()).css({'background-color':value == false ? \"#a6dba0\" : value == true ? \"#c2a5cf\" : null});\nvar value=data[6]; $(this.api().cell(row, 6).node()).css({'background-color':value == false ? \"#c2a5cf\" : value == true ? \"#a6dba0\" : null});\n}"}},"evals":["options.rowCallback"],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-8620d87d00c0f27a83ae" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-8620d87d00c0f27a83ae">{"x":{"filter":"none","vertical":false,"extensions":["Buttons"],"data":[["<a href=\"https://www.pgscatalog.org/score/duplicatetest\">duplicatetest<\/a> <br /> <small>duplicatetest<\/small>","<a href=\"https://www.pgscatalog.org/score/PGS001229\">PGS001229<\/a> <br /> <small>GBE_INI50<\/small>"],["","<a href=\"https://www.pgscatalog.org/publication/PGP000244\">PGP000244<\/a> <br /> <small>Tanigawa Y et al. medRxiv (2021). doi:10.1101/2021.09.02.21262942<\/small>"],["<u>Reported trait:<\/u>  <br /> <u>Mapped trait(s):<\/u> <a href=\"http://www.ebi.ac.uk/efo/\"><\/a>","<u>Reported trait:<\/u>  <br /> <u>Mapped trait(s):<\/u> <a href=\"http://www.ebi.ac.uk/efo/EFO_0004339\">body height<\/a>"],["","51209"],["<u>Original build:<\/u> GRCh37 <br /> <u>Harmonised build:<\/u> ","<u>Original build:<\/u> GRCh37 <br /> <u>Harmonised build:<\/u> NR"],[false,false],[true,true]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th><span title=\"Unique identifier for the polygenic score.\">Polygenic Score ID<\/span><\/th>\n      <th><span title=\"Reference publication for the score.\">Publication<\/span><\/th>\n      <th><span title=\"Traits associated with the score.\">Traits<\/span><\/th>\n      <th><span title=\"Total number of genetic variants (defined in the header)\">Number of variants<\/span><\/th>\n      <th><span title=\"The genome assembly version used.\">Genome build<\/span><\/th>\n      <th><span title=\"Describes if complex non-SNP alleles included in the scoring file, e.g. APOE/HLA. These variants are excluded from the PGS calculation in the current version\">Complex alleles present?<\/span><\/th>\n      <th><span title=\"Describes if the scoring file is compatible with the Calculator. Scores with dosage-specific weights are removed.\">Effect types compatible?<\/span><\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"Bfrtip","buttons":["csv"],"columnDefs":[{"name":"pgs_id","targets":0},{"name":"pgp_id","targets":1},{"name":"trait_display","targets":2},{"name":"n_variants","targets":3},{"name":"genome_build","targets":4},{"name":"has_complex_alleles","targets":5},{"name":"compatible_effect_type","targets":6}],"order":[],"autoWidth":false,"orderClasses":false,"rowCallback":"function(row, data, displayNum, displayIndex, dataIndex) {\nvar value=data[5]; $(this.api().cell(row, 5).node()).css({'background-color':value == false ? \"#a6dba0\" : value == true ? \"#c2a5cf\" : null});\nvar value=data[6]; $(this.api().cell(row, 6).node()).css({'background-color':value == false ? \"#c2a5cf\" : value == true ? \"#a6dba0\" : null});\n}"}},"evals":["options.rowCallback"],"jsHooks":[]}</script>
 </div>
 </div>
 </div>
 </section>
 </section>
 <section id="variant-matching" class="level1 page-columns page-full">
-<h1>Variant matching</h1>
+<h1>2. Variant matching</h1>
 <section id="parameters" class="level2">
-<h2 class="anchored" data-anchor-id="parameters">Parameters</h2>
+<h2 class="anchored" data-anchor-id="parameters">2.1 Parameters</h2>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -5835,8 +5837,14 @@ min_overlap      : 0.75</code></pre>
 </div>
 </div>
 </section>
+<section id="reference-matching-summary" class="level2">
+<h2 class="anchored" data-anchor-id="reference-matching-summary">2.2 Reference matching summary</h2>
+<div class="cell">
+<p>This section is empty because <code>--run_ancestry</code> was not set.</p>
+</div>
+</section>
 <section id="summary" class="level2">
-<h2 class="anchored" data-anchor-id="summary">Summary</h2>
+<h2 class="anchored" data-anchor-id="summary">2.3 Summary</h2>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -5882,25 +5890,81 @@ min_overlap      : 0.75</code></pre>
 <span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>                  <span class="at">backgroundColor =</span> DT<span class="sc">::</span><span class="fu">styleEqual</span>(<span class="fu">c</span>(<span class="cn">FALSE</span>, <span class="cn">TRUE</span>), <span class="fu">c</span>(<span class="st">&#39;#c2a5cf&#39;</span>, <span class="st">&#39;#a6dba0&#39;</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-df38be50be14b99c380b" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-df38be50be14b99c380b">{"x":{"filter":"none","vertical":false,"extensions":["Buttons"],"data":[["cineca","cineca"],["PGS001229","duplicatetest"],[835,8],[true,true],[93.7,100],[782,8],[53,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Sampleset<\/th>\n      <th>Scoring file<\/th>\n      <th>Number of variants<\/th>\n      <th>Passed matching<\/th>\n      <th>Match %<\/th>\n      <th>Total matched<\/th>\n      <th>Total unmatched<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"Bfrtip","buttons":["csv"],"columnDefs":[{"className":"dt-right","targets":[2,4,5,6]},{"name":"sampleset","targets":0},{"name":"accession","targets":1},{"name":"n_variants","targets":2},{"name":"score_pass","targets":3},{"name":"percent_matched","targets":4},{"name":"n_matched","targets":5},{"name":"n_unmatched","targets":6}],"order":[],"autoWidth":false,"orderClasses":false,"rowCallback":"function(row, data, displayNum, displayIndex, dataIndex) {\nvar value=data[3]; $(this.api().cell(row, 1).node()).css({'background-color':value == false ? \"#c2a5cf\" : value == true ? \"#a6dba0\" : null});\n}"}},"evals":["options.rowCallback"],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-d5b241c95029c669c592" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-d5b241c95029c669c592">{"x":{"filter":"none","vertical":false,"extensions":["Buttons"],"data":[["cineca","cineca"],["PGS001229","duplicatetest"],[835,8],[true,true],[93.7,100],[782,8],[53,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Sampleset<\/th>\n      <th>Scoring file<\/th>\n      <th>Number of variants<\/th>\n      <th>Passed matching<\/th>\n      <th>Match %<\/th>\n      <th>Total matched<\/th>\n      <th>Total unmatched<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"Bfrtip","buttons":["csv"],"columnDefs":[{"className":"dt-right","targets":[2,4,5,6]},{"name":"sampleset","targets":0},{"name":"accession","targets":1},{"name":"n_variants","targets":2},{"name":"score_pass","targets":3},{"name":"percent_matched","targets":4},{"name":"n_matched","targets":5},{"name":"n_unmatched","targets":6}],"order":[],"autoWidth":false,"orderClasses":false,"rowCallback":"function(row, data, displayNum, displayIndex, dataIndex) {\nvar value=data[3]; $(this.api().cell(row, 1).node()).css({'background-color':value == false ? \"#c2a5cf\" : value == true ? \"#a6dba0\" : null});\n}"}},"evals":["options.rowCallback"],"jsHooks":[]}</script>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="Interpretation">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Interpretation
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Low variant overlap or a high proportion of excluded variants may indicate differences in genome build, imputation quality, or allele coding.</li>
+<li>Scores with limited variant matching are likely to perform poorly and should be interpreted cautiously.</li>
+</ul>
 </div>
 </div>
 </section>
 <section id="detailed-log" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="detailed-log">Detailed log</h2>
+<h2 class="anchored" data-anchor-id="detailed-log">2.4 Detailed log</h2>
 <div class="column-body-outset">
 <div class="cell">
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-e85c3fddf63940770320" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-e85c3fddf63940770320">{"x":{"filter":"none","vertical":false,"extensions":["Buttons"],"data":[["cineca","cineca","cineca","cineca"],["PGS001229","PGS001229","PGS001229","duplicatetest"],["matched","excluded","unmatched","matched"],["false","true",null,"false"],["false","false",null,"false"],["false","false","","false"],["false","false","","false"],["false","false","","false"],[782,47,6,8],[93.65000000000001,5.63,0.72,100]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Sampleset<\/th>\n      <th>Scoring file<\/th>\n      <th>Match type<\/th>\n      <th>Ambiguous<\/th>\n      <th>Multiallelic<\/th>\n      <th>Matches strand flip<\/th>\n      <th>Multiple potential matches<\/th>\n      <th>Duplicated matched variants<\/th>\n      <th>n<\/th>\n      <th>%<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"Bfrtip","buttons":["csv"],"columnDefs":[{"className":"dt-right","targets":[8,9]},{"name":"sampleset","targets":0},{"name":"accession","targets":1},{"name":"match_status","targets":2},{"name":"is_ambiguous","targets":3},{"name":"is_multiallelic","targets":4},{"name":"match_flipped","targets":5},{"name":"duplicate_best_match","targets":6},{"name":"duplicate_ID","targets":7},{"name":"n","targets":8},{"name":"percent","targets":9}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-7ee45f25231ef4f8e7e6" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-7ee45f25231ef4f8e7e6">{"x":{"filter":"none","vertical":false,"extensions":["Buttons"],"data":[["cineca","cineca","cineca","cineca"],["PGS001229","PGS001229","PGS001229","duplicatetest"],["matched","excluded","unmatched","matched"],["false","true",null,"false"],["false","false",null,"false"],["false","false","","false"],["false","false","","false"],["false","false","","false"],[782,47,6,8],[93.65000000000001,5.63,0.72,100]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Sampleset<\/th>\n      <th>Scoring file<\/th>\n      <th>Match type<\/th>\n      <th>Ambiguous<\/th>\n      <th>Multiallelic<\/th>\n      <th>Matches strand flip<\/th>\n      <th>Multiple potential matches<\/th>\n      <th>Duplicated matched variants<\/th>\n      <th>n<\/th>\n      <th>%<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"Bfrtip","buttons":["csv"],"columnDefs":[{"className":"dt-right","targets":[8,9]},{"name":"sampleset","targets":0},{"name":"accession","targets":1},{"name":"match_status","targets":2},{"name":"is_ambiguous","targets":3},{"name":"is_multiallelic","targets":4},{"name":"match_flipped","targets":5},{"name":"duplicate_best_match","targets":6},{"name":"duplicate_ID","targets":7},{"name":"n","targets":8},{"name":"percent","targets":9}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="Interpretation">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Interpretation
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Strand-ambiguous or multi-allelic variants increase uncertainty in scoring accuracy.</li>
+<li>Review variant counts and matching types to confirm the score is compatible with your dataset.</li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+<section id="genetic-ancestry-similarity" class="level1">
+<h1>3. Genetic ancestry similarity</h1>
+<div class="cell">
+<p>This section is empty because <code>--run_ancestry</code> was not set.</p>
+</div>
+<section id="principal-component-analysis-table" class="level2">
+<h2 class="anchored" data-anchor-id="principal-component-analysis-table">3.1 Principal Component Analysis table</h2>
+<div class="cell">
+<p>This section is empty because <code>--run_ancestry</code> was not set.</p>
+</div>
+</section>
+<section id="principal-component-analysis-plots" class="level2">
+<h2 class="anchored" data-anchor-id="principal-component-analysis-plots">3.2 Principal Component Analysis plots</h2>
+<div class="cell">
+<p>This section is empty because <code>--run_ancestry</code> was not set.</p>
+</div>
+</section>
+<section id="population-similarity-summary" class="level2">
+<h2 class="anchored" data-anchor-id="population-similarity-summary">3.3 Population similarity summary</h2>
+<div class="cell">
+<p>This section is empty because <code>--run_ancestry</code> was not set.</p>
 </div>
 </section>
 </section>
 <section id="scores" class="level1">
-<h1>Scores</h1>
+<h1>4. Scores</h1>
 <div class="cell">
 <div class="callout callout-style-default callout-tip callout-titled" title="Success">
 <div class="callout-header d-flex align-content-center">
@@ -5919,10 +5983,10 @@ Success
 </div>
 </div>
 <p>2 scores for 2504 samples processed.</p>
-<section id="score-data" class="level3">
-<h3 class="anchored" data-anchor-id="score-data">Score data</h3>
-<section id="density-plots" class="level4">
-<h4 class="anchored" data-anchor-id="density-plots">Density plot(s)</h4>
+<section id="score-data" class="level2">
+<h2 class="anchored" data-anchor-id="score-data">4.1 Score data</h2>
+<section id="density-plots" class="level3">
+<h3 class="anchored" data-anchor-id="density-plots">4.1.1 Density plot(s)</h3>
 <div class="cell">
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -5947,20 +6011,52 @@ Note
 </div>
 </div>
 </div>
+<div class="callout callout-style-default callout-tip callout-titled" title="Interpretation">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Interpretation
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>These distributions show variation of calculated scores across individuals.</li>
+<li>Unusually narrow or multimodal distributions may reflect technical issues or population structure rather than biological signals.</li>
+</ul>
+</div>
+</div>
 </section>
 </section>
-<section id="get-all-scores" class="level3">
-<h3 class="anchored" data-anchor-id="get-all-scores">Get all scores</h3>
+<section id="get-all-scores" class="level2">
+<h2 class="anchored" data-anchor-id="get-all-scores">4.2 Get all scores</h2>
 <p>All scores can be found in the results directory, at:</p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>cineca/score/aggregated_scores.txt.gz</code></pre>
 </div>
 </div>
+<div class="callout callout-style-default callout-tip callout-titled" title="Interpretation">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Interpretation
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Polygenic scores represent relative, probabilistic estimates of genetic predisposition.</li>
+<li>They should be interpreted within the context of ancestry, phenotype definition, and sample characteristics, not as absolute risk predictions.</li>
+</ul>
+</div>
+</div>
 </section>
 </section>
 <section id="citation" class="level1">
-<h1>Citation</h1>
+<h1>5. Citation</h1>
 <blockquote class="blockquote">
 <p>Samuel A. Lambert, Benjamin Wingfield, Joel T. Gibson, Laurent Gil, Santhi Ramachandran, Florent Yvon, Shirin Saverimuttu, Emily Tinsley, Elizabeth Lewis, Scott C. Ritchie, Jingqin Wu, Rodrigo Canovas, Aoife McMahon, Laura W. Harris, Helen Parkinson, Michael Inouye. Enhancing the Polygenic Score Catalog with tools for score calculation and ancestry normalization. Nature Genetics (2024) | doi: <a href="https://doi.org/10.1038/s41588-024-01937-x">10.1038/s41588-024-01937-x</a></p>
 </blockquote>
@@ -5977,8 +6073,9 @@ Important
 <p>For scores from the PGS Catalog, please remember to cite the original publications from which they came (these are listed in the metadata table).</p>
 </div>
 </div>
-<section id="score-licenses" class="level2">
-<h2 class="anchored" data-anchor-id="score-licenses">Score licenses</h2>
+</section>
+<section id="score-licenses" class="level1">
+<h1>6. Score licenses</h1>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -6015,11 +6112,19 @@ Tip
 <span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    ))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-5ce4a540acf1284ef909" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-5ce4a540acf1284ef909">{"x":{"filter":"none","vertical":false,"data":[["1"],["PGS001229"],["PGS obtained from the Catalog should be cited appropriately, and used in accordance with any licensing restrictions set by the authors. See EBI Terms of Use (https://www.ebi.ac.uk/about/terms-of-use/) for additional details."]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>PGS ID<\/th>\n      <th>License text<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"pgs_id","targets":1},{"name":"license_text","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-03fc4637257667b6729f" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-03fc4637257667b6729f">{"x":{"filter":"none","vertical":false,"data":[["1"],["PGS001229"],["PGS obtained from the Catalog should be cited appropriately, and used in accordance with any licensing restrictions set by the authors. See EBI Terms of Use (https://www.ebi.ac.uk/about/terms-of-use/) for additional details."]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>PGS ID<\/th>\n      <th>License text<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"pgs_id","targets":1},{"name":"license_text","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
-</section>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">message</span>(stringr<span class="sc">::</span><span class="fu">str_glue</span>(<span class="st">&quot;End of report, finished at {Sys.time()}&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>End of report, finished at 2025-12-04 11:05:19.012774</code></pre>
+</div>
+</div>
 </section>
 
 </main>
