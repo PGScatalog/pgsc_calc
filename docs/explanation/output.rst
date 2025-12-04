@@ -20,10 +20,6 @@ outputs designed to make PGS analyses transparent, reproducible, and
 interpretable. All output files are written to a results directory
 (--outdir, default ./results/) with the following structure:
 
-The pipeline outputs are written to a results directory (``--outdir``
-default is ``./results/``) with the following structure (generated
-from running the test profile):
-
 .. code-block:: console
 
     results
