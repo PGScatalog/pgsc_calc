@@ -23,12 +23,12 @@ interpretable. All output files are written to a results directory
 .. code-block:: console
 
     results
-    ├── cineca
+    ├── [sampleset name]
     │   ├── match
     │   └── score
     └── pipeline_info
 
-* **cineca** will change depending on the name of your samplset, it's the directory with results for your data
+* **[sampleset name]** will change depending on the name of your samplset, it's the directory with results for your data
 * **match** contains processed scoring files and information on how variants in the scoring files match with variants in the target
 * **score** contains individual level calculated scores and a summary report
 * **pipeline_info** contains nextflow pipeline execution data
@@ -38,7 +38,7 @@ See below for a list of all files generated after running the test profile:
 .. code-block:: console
 
     results
-    ├── cineca
+    ├── [sampleset name]
     │   ├── match
     │   │   ├── cineca_22_additive_0.scorefile.gz
     │   │   ├── cineca_22_additive_1.scorefile.gz
