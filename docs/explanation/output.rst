@@ -18,7 +18,7 @@ Overview
 The PGS Catalog Calculator (pgsc_calc) generates a structured set of
 outputs designed to make PGS analyses transparent, reproducible, and
 interpretable. All output files are written to a results directory
-(--outdir, default ./results/) with the following structure:
+(``--outdir``, default ``./results/``) with the following structure:
 
 .. code-block:: console
 
