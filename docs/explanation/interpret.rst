@@ -8,11 +8,6 @@ The PGS Catalog Calculator (``pgsc_calc``) produces standardised outputs and rep
 
 While `the report explanation describes file structures and field definitions <report.html>`_, this page explains how to read, interpret, and communicate those results responsibly.
 
-.. tip::
-
-   Currently ancestry normalisation is only available in ``pgsc_calc`` v2.
-
-
 1. Interpreting PGS Values
 --------------------------
 
@@ -78,6 +73,10 @@ These components give a quick overview of data quality and interpretability.
 
 4. Ancestry and Normalisation
 -----------------------------
+
+.. tip::
+
+   Currently ancestry normalisation is only available in ``pgsc_calc`` v2.
 
 When run with the ``--run_ancestry`` option, ``pgsc_calc`` produces additional ancestry-aware outputs (``Z_MostSimilarPop``, ``Z_norm1``, ``Z_norm2``).
 These provide normalised scores that can be compared across ancestry groups, improving equity and interpretability.
