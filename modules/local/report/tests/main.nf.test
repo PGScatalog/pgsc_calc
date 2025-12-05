@@ -4,7 +4,7 @@ nextflow_process {
     process "PGSC_CALC_REPORT"
     tag "module"
 
-    test("my test"){
+    test("Test report compiles OK"){
         setup {
             run("PGSC_CALC_FORMAT") {
                 script "../../format/main.nf"
@@ -35,6 +35,8 @@ nextflow_process {
         then {
             assertAll(
                 { assert process.success },
+                // (can't snapshot report - date/time changes)
+                { assert snapshot(process.out.versions).match("versions") }
             )
         }
     }
@@ -58,8 +60,7 @@ nextflow_process {
 
         then {
             assertAll(
-                { assert process.success },
-                { assert snapshot(process.out.versions).match("versions") }
+                { assert process.success }
             )
         }
     }
