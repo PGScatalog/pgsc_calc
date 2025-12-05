@@ -1,7 +1,7 @@
 ---
-sidebar_label: Understanding the report
+sidebar_label: Outputs & report
 description: Report structure and content
 sidebar_position: 1
 ---
 
-# Understanding the report
+# Outputs & report
