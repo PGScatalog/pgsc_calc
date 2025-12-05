@@ -87,7 +87,7 @@ These provide normalised scores that can be compared across ancestry groups, imp
    Ancestry normalisation helps make scores more comparable across populations, but it introduces its own uncertainties.
    The “Most Similar Population” label is based on statistical similarity in genetic space; it is not a definitive ancestry classification.
 
-   Z-scores and percentiles should always be interpreted relative to the specific reference data used.
+   Z-scores and percentiles should always be interpreted relative to the specific reference data used. Percentiles and Z-scores are more interpretable scales for cross-population comparison, but the precision of these adjustments depends on reference population diversity and sample size. The effect size of standardised PGS may still differ between different ancestry groups.
    Read the full documentation to understand what transformations are performed:
 
    https://pgsc-calc.readthedocs.io/en/latest/explanation/geneticancestry.html
