@@ -10,12 +10,11 @@ format:
     anchor-sections: true
 engine: knitr
 params:
-  log_pattern: "*_summary.csv"
-  log_scorefiles: "log_scorefiles.json"
-  score_path: ""
   sampleset: ""
+  score_path: ""
+  log_scorefiles: "log_scorefiles.json"
+  match_log_path: ""
   run_ancestry: false
-  reference_panel_name: ""
   version: ""
 css: logo.css
 ---
@@ -40,10 +39,19 @@ library(readr)
 # prevent plots with small sample sets
 MINIMUM_N_SAMPLES <- 50
 LOW_SAMPLE_SIZE <- TRUE
+
+# check mandatory report parameters
+required <- c("sampleset", "score_path", "match_log_path", "version")
+
+# Identify missing or empty parameters
+missing <- required[sapply(params[required], function(x) is.null(x) || x == "")]
+
+if (length(missing) > 0) {
+  stop("Missing required parameters: ", paste(missing, collapse = ", "))
+}
 ```
 
 ```{r setup_logs, echo=FALSE}
-log_paths <- list.files(pattern = params$log_pattern, full.names = TRUE)
 read_log <- function(path) {
   log <- read.csv(path, stringsAsFactors = FALSE)
   
@@ -51,12 +59,11 @@ read_log <- function(path) {
     log %>%
       mutate(
         is_multiallelic =  factor(is_multiallelic, levels = c("false", "true")),
-        ambiguous = factor(ambiguous, levels = c("false", "true"))
-      ) %>%
-      rename(sampleset = dataset)
+        is_ambiguous = factor(is_ambiguous, levels = c("false", "true"))
+      )
   )
 }
-log_df <- Reduce(dplyr::bind_rows, lapply(log_paths, read_log))
+log_df <- read_log(params$match_log_path)
 log_df$sampleset <- gsub("_", " ", log_df$sampleset)  # page breaking issues
 ```
 
@@ -85,7 +92,7 @@ cat command.txt | fold -w 80 -s | awk -F ' ' 'NR==1 { print "$", $0} NR>1 { prin
 ## 1.3 Scoring file metadata
 
 ```{r load_scorefiles}
-json_list <- jsonlite::fromJSON(params$log_scorefiles, simplifyVector = FALSE)
+json_list <- jsonlite::read_json(params$log_scorefiles)
 
 link_traits <- function(trait_efo, mapped) {
   if (length(trait_efo) == 0) {
@@ -237,13 +244,13 @@ data.frame(reference = params$reference_panel_name, n_target = n_target, n_match
 
 ```{r setup_matches}
 log_df %>%
-  mutate(match_status = forcats::fct_collapse(match_status, matched = "matched", other_level = "unmatched")) %>%
-  group_by(sampleset, accession, match_status, score_pass) %>%
+  mutate(match_summary = forcats::fct_collapse(match_summary, matched = "matched", other_level = "unmatched")) %>%
+  group_by(sampleset, accession, match_summary, is_match_rate_ok) %>%
   count(wt = count) %>%
   group_by(sampleset, accession) %>%
   mutate(percent = round(n / sum(n) * 100, 1), n_variants = sum(n)) %>%
   arrange(accession, desc(percent)) %>%
-  tidyr::pivot_wider(names_from = match_status, values_from = c(n, percent)) %>%
+  tidyr::pivot_wider(names_from = match_summary, values_from = c(n, percent)) %>%
   replace(is.na(.), 0) -> compat
 ```
 
@@ -255,9 +262,9 @@ if (!"n_unmatched" %in% colnames(compat)) {
 }
 
 compat %>%
-  select(sampleset, accession, n_variants, score_pass, percent_matched,
+  select(sampleset, accession, n_variants, is_match_rate_ok, percent_matched,
          n_matched, n_unmatched) %>%
-  mutate(score_pass = as.logical(score_pass)) %>%
+  mutate(is_match_rate_ok = as.logical(is_match_rate_ok)) %>%
   DT::datatable(rownames = FALSE,
                 extensions = 'Buttons',
     options = list(dom = 'Bfrtip',
@@ -266,7 +273,7 @@ compat %>%
       "Sampleset" = "sampleset",
       "Scoring file" = "accession",
       "Number of variants" = "n_variants",
-      "Passed matching" = "score_pass",
+      "Passed matching" = "is_match_rate_ok",
       "Match %" = "percent_matched",
       "Total matched" = "n_matched",
       "Total unmatched" = "n_unmatched"
@@ -318,11 +325,10 @@ if(params$run_ancestry == TRUE){
 } else{
     log_df %>%
       group_by(sampleset, accession) %>%
-      count(match_status, ambiguous, is_multiallelic,match_flipped, duplicate_best_match, duplicate_ID, wt = count) %>%
-      rename(is_ambiguous = ambiguous) %>%
+      count(match_summary, is_multiallelic, is_ambiguous, wt=count) %>%
       mutate(percent = round(n / sum(n) * 100, 2),
-             match_status = forcats::fct_relevel(match_status, "matched", "excluded", "unmatched")) %>%
-      arrange(accession, match_status) %>%
+             match_summary = forcats::fct_relevel(match_summary, "matched", "excluded", "unmatched")) %>%
+      arrange(accession, match_summary) %>%
       mutate(accession = stringr::str_replace_all(accession, "_", " ")) %>%
       DT::datatable(rownames=FALSE,
                     extensions = 'Buttons',
@@ -331,12 +337,9 @@ if(params$run_ancestry == TRUE){
         colnames = c(
           "Sampleset" = "sampleset",
           "Scoring file" = "accession",
-          "Match type" = "match_status",
-          "Multiple potential matches" = "duplicate_best_match",
-          "Duplicated matched variants" = "duplicate_ID",
+          "Match type" = "match_summary",
           "Ambiguous" = "is_ambiguous",
           "Multiallelic" = "is_multiallelic",
-          "Matches strand flip" = "match_flipped",
           "%" = "percent"
         ))
 }
@@ -470,9 +473,9 @@ pop_summary %>%
 # 4. Scores
 
 ```{r, echo = FALSE, message = FALSE}
-scores <- readr::read_tsv(params$score_path) 
+scores <- readr::read_csv(params$score_path) 
 n_scores <- length(unique(scores$PGS))
-n_samples <- length(unique(scores$IID))
+n_samples <- length(unique(scores$sample_id))
 if (n_samples < MINIMUM_N_SAMPLES) {
   LOW_SAMPLE_SIZE <- TRUE
 } else {
@@ -527,12 +530,15 @@ Density plots are disabled for low sample sizes
 
 ```{r density_ancestry, echo=FALSE, message=FALSE, warning=FALSE, eval=(!LOW_SAMPLE_SIZE & params$run_ancestry)}
 # Select which PGS to plot
-uscores <- unique(scores$PGS)
+uscores <- unique(scores$accession)
 uscores_plot <- uscores[1:min(length(uscores), 6)] # plot max 6 PGS
 
 # Plot multiple adjustment methods at once per PGS
 for(current_pgs in uscores_plot){
-  long_scores <- scores %>% select(!percentile_MostSimilarPop) %>% filter(PGS == current_pgs) %>% gather(Method, score, -sampleset, -FID, -IID, -PGS)
+  long_scores <- scores %>% 
+    select(!percentile_MostSimilarPop) %>% 
+    filter(PGS == current_pgs) %>% 
+    gather(Method, score, -sampleset, -FID, -IID, -PGS)
   long_scores %>%
   ggplot(aes(x = score, fill = sampleset)) +
     geom_density(alpha = 0.3) +
@@ -546,17 +552,20 @@ for(current_pgs in uscores_plot){
 ```{r, echo = FALSE, message=FALSE, warning=FALSE, eval=(!LOW_SAMPLE_SIZE & !params$run_ancestry)}
 scores %>%
   ungroup() %>%
-  select(IID, sampleset, PGS, SUM) %>%
+  select(sample_id, sampleset, accession, score) %>%
+  # extract PGS Catalog identifier
   mutate(PGS = ifelse(
-    stringr::str_detect(PGS, "^PGS"),
-    stringr::str_extract(PGS, "^PGS[0-9]{6}"),
+    stringr::str_detect(accession, "^PGS"),
+    stringr::str_extract(accession, "^PGS[0-9]{6}"),
     PGS)) %>%
   group_by(sampleset, PGS) -> long_scores
+
 group_keys(long_scores) %>%
   slice(1:6) -> score_keys
+
 long_scores %>%
   inner_join(score_keys) %>%
-  ggplot(aes(x = SUM, fill = sampleset)) +
+  ggplot(aes(x = score, fill = sampleset)) +
       geom_density(alpha = 0.3) +
       facet_wrap(~PGS, ncol = 2, scales = "free") +
       theme_bw() +
@@ -579,7 +588,7 @@ stringr::str_glue("{params$sampleset}/score/{params$sampleset}_pgs.txt.gz")
 ```
 
 ```{r, eval=!params$run_ancestry, echo=FALSE}
-stringr::str_glue("{params$sampleset}/score/aggregated_scores.txt.gz")
+stringr::str_glue("results/scores.txt.gz")
 ```
 
 ::: {.callout-tip title="Interpretation"}
