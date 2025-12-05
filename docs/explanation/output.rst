@@ -100,13 +100,12 @@ profile is described in :doc:`getting started  <../getting-started>`.
     **Figure 1. Report Section 1 (Metadata).**
 
 **Section 2 (Variant matching)** reports how the variants in the target
-sampleset match the other data. Table 1 (reference matching summary)
+sampleset match the other data. The table in Section 2.2 ("Reference matching summary")
 describes the number of variants in the target dataset that overlap
-with the reference panel (only present with ``--run_ancestry``). Table
-2 provides a summary of the number and percentage of variants within
+with the reference panel (only present with ``--run_ancestry``). The table in section 2.3 ("Summary") provides a summary of the number and percentage of variants within
 each score that have been matched, and whether that score passed the
 ``--min_overlap`` threshold (Passed Matching column) for
-calculation. Table 3 provides a more detailed log of variant matches
+calculation. The table in Section 2.4 ("Detailed log") provides a more detailed log of variant matches
 broken down by types of variants (e.g., strand ambiguous,
 multiallelic, duplicates) for the matched, excluded, and unmatched
 variants (see match/ section for details):
@@ -120,11 +119,11 @@ variants (see match/ section for details):
 **Section 3 (Genetic Ancestry/Similarity)** describes the results of the
 genetic ancestry analysis of the target genotypes with the reference
 panel data. It first displays a snippet of the
-``[sampleset]_popsimilarity.txt.gz`` file for reference. A visual
+``[sampleset]_popsimilarity.txt.gz`` file for reference in a table in Section 3.1 ("Principal Component Analysis table"). A visual
 display of the projection of the target data into the reference panel
-PCA space is plotted for the first 6 PCs, where the target samples are
+PCA space is plotted for the first 6 PCs in Section 3.2 ("Principal Component Analysis plots"), where the target samples are
 coloured according to the population that they are most similar to in
-the reference panel. A table describing the distribution of ancestries
+the reference panel. A table in Section 3.3 ("Population similarity summary") describing the distribution of ancestries
 within the reference panel and proportions of the target samples who
 are most similar to those populations is also provided.
 
@@ -147,7 +146,7 @@ are most similar to those populations is also provided.
 
 
 **Section 4 (Scores)** describes the number of scores that were calculated
-successfully. A visual display of the PGS distribution for a set of
+successfully. In Section 4.1.1 ("Density plot(s)") a visual display of the PGS distribution for a set of
 example score(s) (up to 6) is provided in the Density plot panel which
 can be helpful for looking at the distributions of the scores in the
 target and reference dataset and how it changes for difference PGS
