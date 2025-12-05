@@ -91,7 +91,7 @@ Example reports of the :download:`the test profile
 <../_static/example_report.html>` are available to view. The test
 profile is described in :doc:`getting started  <../getting-started>`.
 
-Section 1 (Metadata) of the report reproduces the nextflow command, and scoring file metadata (imported from the PGS Catalog for each PGS ID) describing the scoring files that were applied to your sampleset(s):
+**Section 1 (Metadata)** of the report reproduces the nextflow command, and scoring file metadata (imported from the PGS Catalog for each PGS ID) describing the scoring files that were applied to your sampleset(s):
 
 .. figure:: screenshots/section1.png
     :width: 600
@@ -99,7 +99,7 @@ Section 1 (Metadata) of the report reproduces the nextflow command, and scoring 
 
     **Figure 1. Report Section 1 (Metadata).**
 
-Section 2 (Variant matching) reports how the variants in the target
+**Section 2 (Variant matching)** reports how the variants in the target
 sampleset match the other data. Table 1 (reference matching summary)
 describes the number of variants in the target dataset that overlap
 with the reference panel (only present with ``--run_ancestry``). Table
@@ -117,7 +117,7 @@ variants (see match/ section for details):
 
     **Figure 2. Report Section 2 (Variant Matching) Example of variant matching summaries in the pgsc_calc report.**
 
-Section 3 (Genetic Ancestry/Similarity) describes the results of the
+**Section 3 (Genetic Ancestry/Similarity)** describes the results of the
 genetic ancestry analysis of the target genotypes with the reference
 panel data. It first displays a snippet of the
 ``[sampleset]_popsimilarity.txt.gz`` file for reference. A visual
@@ -146,7 +146,7 @@ are most similar to those populations is also provided.
     It is important to visually inspect the PCA to make sure that it looks correct (placing the reference populations correctly), and that the projection of individuals from the target dataset looks sensible.
 
 
-Section 4 (Scores) describes the number of scores that were calculated
+**Section 4 (Scores)** describes the number of scores that were calculated
 successfully. A visual display of the PGS distribution for a set of
 example score(s) (up to 6) is provided in the Density plot panel which
 can be helpful for looking at the distributions of the scores in the
