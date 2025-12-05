@@ -40,10 +40,10 @@ See below for a list of all files generated after running the test profile:
     results
     ├── [sampleset name]
     │   ├── match
-    │   │   ├── cineca_22_additive_0.scorefile.gz
-    │   │   ├── cineca_22_additive_1.scorefile.gz
-    │   │   ├── cineca_log.csv.gz
-    │   │   ├── cineca_summary.csv
+    │   │   ├── [sampleset name]_22_additive_0.scorefile.gz
+    │   │   ├── [sampleset name]_22_additive_1.scorefile.gz
+    │   │   ├── [sampleset name]_log.csv.gz
+    │   │   ├── [sampleset name]_summary.csv
     │   │   └── versions.yml
     │   └── score
     │       ├── aggregated_scores.txt.gz
