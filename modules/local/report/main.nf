@@ -10,7 +10,7 @@ process PGSC_CALC_REPORT {
     val(sampleset)
     path "scores.txt.gz", arity: '1'
     path "log_scorefiles.json", arity: '1'
-    path "match_summary.txt", arity: '1'
+    path "match_summary.csv", arity: '1'
     tuple val(keep_multiallelic), val(keep_ambiguous), val(min_overlap) // bool, bool, float
     path(report_path, arity: '4') // 4 files expected: report, css, background image x2
 
@@ -31,8 +31,10 @@ process PGSC_CALC_REPORT {
     echo "min_overlap      : $min_overlap"       >> params.txt
 
     quarto render report.qmd -M "self-contained:true" \
-        -P score_path:"scores.txt.gz" \
         -P sampleset:$sampleset \
+        -P score_path:\$PWD/scores.txt.gz \
+        -P log_scorefiles:\$PWD/log_scorefiles.json \
+        -P match_log_path:\$PWD/match_summary.csv \
         -P version:$workflow.manifest.version \
         -o report.html
 
