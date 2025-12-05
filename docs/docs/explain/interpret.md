@@ -13,12 +13,6 @@ The PGS Catalog Calculator (`pgsc_calc`) produces standardised outputs and repor
 
 While [the report explanation describes file structures and field definitions](report.md), this page explains how to read, interpret, and communicate those results responsibly.
 
-:::tip
-
-Currently ancestry normalisation is only available in `pgsc_calc` v2
-
-:::
-
 ## 1. Interpreting PGS Values
 
 A polygenic score represents a relative estimate of genetic predisposition, derived by summing the effects of many genetic variants weighted by their estimated effect sizes.
@@ -83,6 +77,12 @@ Use these plots and tables to identify potential issues:
 :::
 
 ## 4. Ancestry and Normalisation
+
+:::tip
+
+Currently ancestry normalisation is only available in `pgsc_calc` v2
+
+:::
 
 When run with the `--run_ancestry` option, `pgsc_calc` produces additional ancestry-aware outputs (`Z_MostSimilarPop`, `Z_norm1`, `Z_norm2`).
 These provide normalised scores that can be compared across ancestry groups, improving equity and interpretability.
