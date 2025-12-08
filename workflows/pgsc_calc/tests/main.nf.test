@@ -24,7 +24,10 @@ nextflow_workflow {
                 input[5] = file("ZARR_ZIP_NO_FILE") // zarr archive file
                 input[6] = Channel.value(false) // don't publish the cache
                 input[7] = Channel.value(5000) // variant batch size
-                input[8] = Channel.empty() // versions channel
+                input[8] = 0.75 // min overlap
+                input[9] = false // match multiallelic
+                input[10] = false // match ambiguous
+                input[11] = Channel.empty() // versions channel
                 """
             }
         }
@@ -62,7 +65,10 @@ nextflow_workflow {
                 input[5] = file("ZARR_ZIP_NO_FILE") // zarr archive file
                 input[6] = Channel.value(false) // don't publish the cache
                 input[7] = Channel.value(5000) // variant batch size
-                input[8] = Channel.empty() // versions channel
+                input[8] = 0.75 // min overlap
+                input[9] = false // match multiallelic
+                input[10] = false // match ambiguous
+                input[11] = Channel.empty() // versions channel
                 """
             }
         }
@@ -186,7 +192,10 @@ nextflow_workflow {
                 input[5] = file("ZARR_ZIP_NO_FILE") // zarr archive file
                 input[6] = Channel.value(false) // don't publish the cache
                 input[7] = Channel.value(5000) // variant batch size
-                input[8] = Channel.empty() // versions channel
+                input[8] = 0.75 // min overlap
+                input[9] = false // match multiallelic
+                input[10] = false // match ambiguous
+                input[11] = Channel.empty() // versions channel
                 """
             }
         }

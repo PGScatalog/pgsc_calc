@@ -118,6 +118,14 @@
           "minimum": 0,
           "maximum": 1,
           "description": "Minimum proportion of variants present in both the score file and input target genomic data"
+        },
+        "keep_multiallelic": {
+          "type": "boolean",
+          "description": "Allow matches of scoring file variants to multiallelic variants in the target dataset"
+        },
+        "keep_ambiguous": {
+          "type": "boolean",
+          "description": "Keep matches of scoring file variants to strand ambiguous variants (e.g. A/T and C/G SNPs) in the target dataset. This assumes the scoring file and target dataset report variants on the same strand."
         }
       }
     },

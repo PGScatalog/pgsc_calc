@@ -71,8 +71,12 @@ workflow PGSCATALOG_PGSC_CALC {
     // a singleton value channel (reused by all loading processes)
     ch_cache = Channel.value(file(params.genotype_cache_zip, checkIfExists: true))
 
+    // pgsc_calc score parameters
     // how many variants are stored in each zarr chunk?
     ch_batch_size = Channel.value(params.variant_batch_size)
+    ch_min_overlap = Channel.value(params.min_overlap)
+    ch_keep_ambiguous = Channel.value(params.keep_ambiguous)
+    ch_keep_multiallelic = Channel.value(params.keep_multiallelic)
 
     //
     // WORKFLOW: Run pipeline
@@ -86,6 +90,9 @@ workflow PGSCATALOG_PGSC_CALC {
         ch_cache,
         ch_publish_cache,
         ch_batch_size,
+        ch_min_overlap,
+        ch_keep_ambiguous,
+        ch_keep_multiallelic,
         versions
     )
 }

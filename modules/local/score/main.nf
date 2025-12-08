@@ -11,6 +11,9 @@ process PGSC_CALC_SCORE {
     path "scorefiles/*"          , arity: '1.*' // put scorefiles in a directory
     val publish_cache // bool
     val variant_batch_size // bool
+    val min_overlap // float
+    val keep_ambiguous // bool
+    val keep_multiallelic // bool
 
     output:
     path "scores.txt.gz"         , arity: '1', emit: "scores"
@@ -20,13 +23,17 @@ process PGSC_CALC_SCORE {
     path "versions.yml"          , arity: '1', emit: "versions"
 
     script:
+    def ambig_arg = keep_ambiguous    ? '--keep_ambiguous'    : ''
+    def multi_arg = keep_multiallelic ? '--keep_multiallelic' : ''
     """
     mkdir out
 
     pgsc_calc score \
       --zarr_zip_file genotypes/*.zip \
       --score_paths scorefiles/*.txt.gz \
-      --min_overlap $params.min_overlap \
+      --min_overlap $min_overlap \
+      $ambig_arg \
+      $multi_arg \
       --threads $task.cpus \
       --out_dir out \
       --batch_size $variant_batch_size
