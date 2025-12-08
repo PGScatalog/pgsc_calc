@@ -23,9 +23,12 @@
                 "scores.txt.gz:md5,3a12761fc26bc5fb72aa0e023be61e8f"
             ],
             [
-                "summary.csv:md5,1c02f635b996051758a4f7ad9cb5aa66"
+                [
+                    "summary.csv:md5,1c02f635b996051758a4f7ad9cb5aa66"
+                ]
             ],
             [
+                "versions.yml:md5,1ab1c443f20433e5f292087c1c164091",
                 "versions.yml:md5,2f0cd6bca6137d3436724c027c712b2e",
                 "versions.yml:md5,45a404e27fec434666b64e1ee1f34542",
                 "versions.yml:md5,7069beda96562e71c8384f0a5cdf0384",
@@ -56,7 +59,7 @@
             "nf-test": "0.9.3",
             "nextflow": "25.10.0"
         },
-        "timestamp": "2025-12-02T15:33:58.907725"
+        "timestamp": "2025-12-08T12:20:46.490593"
     },
     "unified bgen should calculate": {
         "content": [
