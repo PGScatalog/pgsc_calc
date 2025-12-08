@@ -31,8 +31,11 @@ workflow PGSC_CALC {
     scorefile
     ch_chain_files
     ch_cache // file(genotypes.zarr.zip) value channel
-    publish_cache // bool value Channel
-    batch_size // int value Channel
+    publish_cache // bool value channel
+    batch_size // int value channel
+    ch_min_overlap // float value channel
+    ch_keep_ambiguous // bool value channel
+    ch_keep_multiallelic // bool value channel
     ch_versions
 
     main:
@@ -125,7 +128,10 @@ workflow PGSC_CALC {
         ch_score_input,
         ch_formatted_scorefiles,
         publish_cache,
-        batch_size // value(int)
+        batch_size, // value(int)
+        ch_min_overlap, // value(float)
+        ch_keep_ambiguous, // value(bool)
+        ch_keep_multiallelic // value(bool)
     )
     ch_versions = ch_versions.mix(PGSC_CALC_SCORE.out.versions)
 
