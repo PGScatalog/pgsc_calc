@@ -12,6 +12,8 @@ include { PGSC_CALC_DOWNLOAD } from '../..//modules/local/download'
 include { PGSC_CALC_FORMAT   } from '../..//modules/local/format'
 include { PGSC_CALC_LOAD     } from '../..//modules/local/load'
 include { PGSC_CALC_SCORE    } from '../..//modules/local/score'
+include { PGSC_CALC_REPORT    } from '../..//modules/local/report'
+
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -127,10 +129,30 @@ workflow PGSC_CALC {
     )
     ch_versions = ch_versions.mix(PGSC_CALC_SCORE.out.versions)
 
+    // create some value channels for the report
+    ch_sampleset = ch_target_with_index.map{ it[0].sampleset }.first()
+    ch_scores = PGSC_CALC_SCORE.out.scores.collect()
+    ch_score_log = PGSC_CALC_FORMAT.out.log_scorefiles.collect()
+    ch_match_summary = PGSC_CALC_SCORE.out.summary_log.collect()
+    // TODO: add skip_ambiguous / skip_multiallelic parameters
+    ch_match_parameters = Channel.of([false, false, params.min_overlap])
+    ch_report_files = Channel.fromPath("$baseDir/assets/report/*", checkIfExists: true).collect()
+
+    PGSC_CALC_REPORT (
+        ch_sampleset,
+        ch_scores,
+        ch_score_log,
+        ch_match_summary,
+        ch_match_parameters,
+        ch_report_files
+    )
+    ch_versions = ch_versions.mix(PGSC_CALC_REPORT.out.versions)
+
     emit:
-    summary_log = PGSC_CALC_SCORE.out.summary_log // Channel: file(summary_log)
+    summary_log = ch_match_summary // Channel: file(summary_log)
     variant_match_log = PGSC_CALC_SCORE.out.logs  // Channel: file(zip_archive)
     scores = PGSC_CALC_SCORE.out.scores           // Channel: file(csv.gz)
+    report = PGSC_CALC_REPORT.out.report
     versions = ch_versions                        // Channel: [version1, version2, ...]
 }
 
