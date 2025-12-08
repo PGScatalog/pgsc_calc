@@ -97,10 +97,10 @@ profile is described in :doc:`getting started  <../getting-started>`.
     :width: 600
     :alt: Report Section 1 (Metadata)
 
-    **Figure 1. Report Section 1 (Metadata).**
+    **Report Section 1 (Metadata).**
 
 **Section 2 (Variant matching)** reports how the variants in the target
-sampleset match the other data. The table in Section 2.2 ("Reference matching summary")
+sampleset match the variants in the scoring files. The table in Section 2.2 ("Reference matching summary")
 describes the number of variants in the target dataset that overlap
 with the reference panel (only present with ``--run_ancestry``). The table in section 2.3 ("Summary") provides a summary of the number and percentage of variants within
 each score that have been matched, and whether that score passed the
@@ -114,7 +114,7 @@ variants (see match/ section for details):
     :width: 600
     :alt: Report Section 2 (variant matching)
 
-    **Figure 2. Report Section 2 (Variant Matching) Example of variant matching summaries in the pgsc_calc report.**
+    **Report Section 2 (Variant Matching) Example of variant matching summaries in the pgsc_calc report.**
 
 **Section 3 (Genetic Ancestry/Similarity)** describes the results of the
 genetic ancestry analysis of the target genotypes with the reference
@@ -131,14 +131,7 @@ are most similar to those populations is also provided.
     :width: 600
     :alt: Report Section 3 (Genetic Ancestry Similarity)
 
-    **Figure 3. Report Section 3 (Genetic Ancestry Similarity). Visualisation of genetic ancestry analysis.**
-
-.. figure:: screenshots/section3_1.png
-    :width: 600
-    :alt: Report Section 3 (Genetic Ancestry Similarity)
-
-    **Figure 4. Report Section 3 (Genetic Ancestry Similarity). Population similarity table.**
-
+    **Report Section 3 (Genetic Ancestry Similarity). Visualisation of genetic ancestry analysis.**
 
 .. note:: **Interpretation**
 
@@ -156,7 +149,7 @@ adjustment methods:
     :width: 600
     :alt: Report Section 4 (Scores)
 
-    **Figure 5. Example scores section including plots of PGS distributions.**
+    **Example scores section including plots of PGS distributions.**
 
 Plots are only created in the report if 50 or more samples are present in the target genomes.
 
