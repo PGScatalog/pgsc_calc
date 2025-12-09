@@ -103,10 +103,12 @@ These `pgsc_calc` settings are customised to work well with very large scale dat
     withName: 'PGSC_CALC_LOAD' {
         cpus = 1
         memory = { 40.GB * task.attempt }
+        time   = { 6.h  * task.attempt }
     }
     withName: 'PGSC_CALC_SCORE' {
         cpus = 4
         memory = { 80.GB * task.attempt }
+        time   = { 8.h  * task.attempt }
     }
 }
 params {
@@ -119,6 +121,8 @@ params {
 
 `variant_batch_size` controls the number of variants processed at a time (it's the size of each [Zarr array chunk](https://zarr.readthedocs.io/en/stable/quick-start/)). 
 Larger chunk sizes will use more RAM but may improve performance when calculating very large scores containing millions of variants.
+
+For larger scoring files you may need to edit the `google.batch.bootDiskSize` parameter in `gcp` profile, for large jobs 375 GB should be sufficient. 
 
 :::
 
