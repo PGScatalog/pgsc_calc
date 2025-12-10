@@ -325,7 +325,7 @@ if(params$run_ancestry == TRUE){
 } else{
     log_df %>%
       group_by(sampleset, accession) %>%
-      count(match_summary, is_multiallelic, is_ambiguous, wt=count) %>%
+      count(match_summary, is_multiallelic, is_ambiguous, match_flipped, wt=count) %>%
       mutate(percent = round(n / sum(n) * 100, 2),
              match_summary = forcats::fct_relevel(match_summary, "matched", "excluded", "unmatched")) %>%
       arrange(accession, match_summary) %>%
@@ -340,6 +340,7 @@ if(params$run_ancestry == TRUE){
           "Match type" = "match_summary",
           "Ambiguous" = "is_ambiguous",
           "Multiallelic" = "is_multiallelic",
+          "Matches strand flip" = "match_flipped",          
           "%" = "percent"
         ))
 }
