@@ -158,7 +158,7 @@ END { print " ] " }
 Ok, now that you have a config file and a samplesheet you can try to submit a nextflow batch job! 
 
 ```bash
-(enxf) $ nextflow run pgscatalog/pgsc_calc -r v3-rc1 -latest \
+(enxf) $ nextflow run pgscatalog/pgsc_calc -r v3-alpha.1 -latest \
     -c v3_config.txt -profile gcb \
     --input acaf_samplesheet.json --target_build GRCh38 \
     --pgs_id PGS000018 --min_overlap 0.5

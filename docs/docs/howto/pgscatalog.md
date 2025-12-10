@@ -73,7 +73,7 @@ PGS, trait, and publication IDs can be combined to calculate multiple polygenic 
 
 ```bash
 $ nextflow run pgscatalog/pgscalc \
-    -r v3-rc1 \
+    -r v3-alpha.1 \
     -profile <docker/singularity/conda> \    
     --input samplesheet.csv \
     --pgs_id PGS001229 \

@@ -43,7 +43,7 @@ The workflow performs the following steps:
 3. Calculate some polygenic scores using test data:
 
 ```bash
-$ nextflow run pgscatalog/pgsc_calc -r v3-rc1 -profile test,<docker/singularity/conda>
+$ nextflow run pgscatalog/pgsc_calc -r v3-alpha.1 -profile test,<docker/singularity/conda>
 ```
 
 The workflow should output something like:

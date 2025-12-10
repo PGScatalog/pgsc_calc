@@ -40,7 +40,7 @@ For larger jobs requesting more memory and time can be useful, but allocating mo
 Save this file as `my_custom_config.config` and include it using Nextflow's `-c` parameter:
 
 ```
-$ nextflow run pgscatalog/pgsc_calc -r v3-rc1 -c my_custom_config ...
+$ nextflow run pgscatalog/pgsc_calc -r v3-alpha.1 -c my_custom_config ...
 ```
 
 ## Example: HPC cluster (SLURM)

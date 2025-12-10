@@ -24,7 +24,7 @@ and/or user-defined PGS/PRS.
 * `pgsc_calc` has always used plink2 ❤️ to calculate polygenic scores
 * We have developed a Python package [`pgscatalog.calc`](https://github.com/PGScatalog/pygscatalog/) to replace plink2 in `pgsc_calc`
 * This will make it simpler to support new ways of calculating PGS, like WGS data
-* `v3-rc1` only implements basic PGS calculation on autosomes for VCF and BGEN files
+* `v3-alpha.1` only implements basic PGS calculation on autosomes for VCF and BGEN files
 * We plan to publish release candidates which add support for plink1/2 data, WGS data, and ancestry normalisation 
 * **Release candidates are pre-release software that may break unexpectedly in the future**
 

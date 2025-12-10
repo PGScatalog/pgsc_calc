@@ -30,7 +30,7 @@ $ ./nextflow run hello
 3. Run the ``pgsc_calc`` test profile:
 
 ```
-$ nextflow run pgscatalog/pgsc_calc -r v3-rc1 -profile test,<docker|singularity|conda>
+$ nextflow run pgscatalog/pgsc_calc -r v3-alpha.1 -profile test,<docker|singularity|conda>
 ```
 
 :::info
@@ -119,7 +119,7 @@ GRCh38 and you want to use a scoring file in the PGS Catalog:
 ```
 $ nextflow run pgscatalog/pgsc_calc \
   -profile <docker/singularity/apptainer/conda> \
-  -r v3-rc1 \
+  -r v3-alpha.1 \
   --input samplesheet.csv \
   --target_build GRCh38 \
   --pgs_id PGS001229

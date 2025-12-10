@@ -121,7 +121,7 @@ workflow.onComplete {
 }
 
 workflow.onError {
-    log.error "Pipeline failed. Please refer to troubleshooting docs: https://pgsc-calc.readthedocs.io/en/v3-rc1/"
+    log.error "Pipeline failed. Please refer to troubleshooting docs: https://pgsc-calc.readthedocs.io/en/v3-alpha.1/"
 }
 
 /*

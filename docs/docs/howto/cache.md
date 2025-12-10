@@ -16,7 +16,7 @@ Just add the `--genotype_cache_zip` parameter after you've calculated a score fo
 
 ```
 $ nextflow run pgscatalog/pgsc_calc \
-  -r v3-rc1 \
+  -r v3-alpha.1 \
   --input samplesheet.csv \
   --target_build GRCh38 \
   --genotype_cache_zip <PATH/TO/genotypes.zarr.zip>

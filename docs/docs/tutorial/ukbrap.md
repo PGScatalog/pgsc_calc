@@ -76,7 +76,7 @@ Hola world!
 ## 4. Set up `pgsc_calc`
 
 ```bash
-$ git clone -b v3-rc1 https://github.com/PGScatalog/pgsc_calc.git
+$ git clone -b v3-alpha.1 https://github.com/PGScatalog/pgsc_calc.git
 $ cd pgsc_calc
 $ nextflow run main.nf -profile test_full,docker
 ...
