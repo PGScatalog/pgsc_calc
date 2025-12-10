@@ -1,8 +1,7 @@
 # pgscatalog/pgsc_calc
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new/pgscatalog/pgsc_calc)
-[![GitHub Actions CI Status](https://github.com/pgscatalog/pgsc_calc/actions/workflows/nf-test.yml/badge.svg)](https://github.com/pgscatalog/pgsc_calc/actions/workflows/nf-test.yml)
-[![GitHub Actions Linting Status](https://github.com/pgscatalog/pgsc_calc/actions/workflows/linting.yml/badge.svg)](https://github.com/pgscatalog/pgsc_calc/actions/workflows/linting.yml)[![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.XXXXXXX-1073c8?labelColor=000000)](https://doi.org/10.5281/zenodo.XXXXXXX)
+[![GitHub Actions CI Status](https://github.com/pgscatalog/pgsc_calc/actions/workflows/nf-test.yml/badge.svg)](https://github.com/pgscatalog/pgsc_calc/actions/workflows/nf-test.yml)[
+![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.5970794-1073c8?labelColor=000000)](https://doi.org/10.5281/zenodo.5970794)
 [![nf-test](https://img.shields.io/badge/unit_tests-nf--test-337ab7.svg)](https://www.nf-test.com)
 
 [![Nextflow](https://img.shields.io/badge/version-%E2%89%A525.04.0-green?style=flat&logo=nextflow&logoColor=white&color=%230DC09D&link=https%3A%2F%2Fnextflow.io)](https://www.nextflow.io/)
@@ -28,6 +27,9 @@ and/or user-defined PGS/PRS.
 * `v3-rc1` only implements basic PGS calculation on autosomes for VCF and BGEN files
 * We plan to publish release candidates which add support for plink1/2 data, WGS data, and ancestry normalisation 
 * **Release candidates are pre-release software that may break unexpectedly in the future**
+
+> [!TIP]
+> Breaking changes have been made from v2. Things may not work as you expect. Please see [the documentation](https://pgsc-calc.readthedocs.io/en/v3-alpha.1/). 
 
 ## Pipeline summary 
 
@@ -79,7 +81,7 @@ details.
 
 ## Documentation
 
-[Full documentation is available on Read the Docs](https://pgsc-calc.readthedocs.io/)
+[Full documentation is available on Read the Docs](https://pgsc-calc.readthedocs.io/en/v3-alpha.1/)
 
 ## Credits
 
