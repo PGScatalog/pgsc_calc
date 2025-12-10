@@ -88,7 +88,7 @@ $ nextflow run main.nf -profile test_full,docker
 
 ## 5. Create a configuration file
 
-This configuration file is customised to work well with very large scale data, like UK Biobank. It's been tested on [PGS000010](https://www.pgscatalog.org/score/PGS000010/) and [PGS001229](https://www.pgscatalog.org/score/PGS001229/).
+This [configuration file](../howto/config.md) is customised to work well with very large scale data, like UK Biobank. It's been tested on [PGS000010](https://www.pgscatalog.org/score/PGS000010/) and [PGS001229](https://www.pgscatalog.org/score/PGS001229/).
 
 ```bash
 $ echo "process {
@@ -119,7 +119,7 @@ params {
 
 ## 6. Prepare a samplesheet
 
-This will set up a samplesheet for numeric chromosomes for [TopMed imputed data](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=21007) in JSON format:
+This will set up a [samplesheet](../howto/samplesheet.md) for numeric chromosomes for [TopMed imputed data](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=21007) in JSON format:
 
 ```bash
 $ find "${HOME}/mount/${PROJECT_NAME}/Bulk/Imputation/Imputation from genotype (TOPmed)" -regex '.*c[0-9]+.*.bgen' \
