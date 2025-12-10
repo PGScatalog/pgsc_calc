@@ -28,9 +28,9 @@ interpretable. All output files are written to a results directory
 results
 ├── genotypes.zarr.zip
 ├── pipeline_info
-├── report.html         (summary report)
-├── scores.txt.gz       (calculated PGS)
-├── summary.csv         ()
+├── report.html
+├── scores.txt.gz
+├── summary.csv
 └── variant_match_logs.zip
 ```
 
