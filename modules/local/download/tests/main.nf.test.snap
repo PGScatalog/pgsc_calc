@@ -8,7 +8,7 @@
                     ]
                 ],
                 "1": [
-                    "versions.yml:md5,0037d029b7fb43e982cb72a985089279"
+                    "versions.yml:md5,6695395cb3002263e72bbbfcfc1c45be"
                 ],
                 "scorefiles": [
                     [
@@ -16,7 +16,7 @@
                     ]
                 ],
                 "versions": [
-                    "versions.yml:md5,0037d029b7fb43e982cb72a985089279"
+                    "versions.yml:md5,6695395cb3002263e72bbbfcfc1c45be"
                 ]
             }
         ],
@@ -24,7 +24,7 @@
             "nf-test": "0.9.3",
             "nextflow": "25.10.0"
         },
-        "timestamp": "2025-11-14T11:44:27.932409"
+        "timestamp": "2025-12-10T16:54:32.384639"
     },
     "Should download two scoring files in build GRCh37": {
         "content": [
@@ -36,7 +36,7 @@
                     ]
                 ],
                 "1": [
-                    "versions.yml:md5,0037d029b7fb43e982cb72a985089279"
+                    "versions.yml:md5,6695395cb3002263e72bbbfcfc1c45be"
                 ],
                 "scorefiles": [
                     [
@@ -45,7 +45,7 @@
                     ]
                 ],
                 "versions": [
-                    "versions.yml:md5,0037d029b7fb43e982cb72a985089279"
+                    "versions.yml:md5,6695395cb3002263e72bbbfcfc1c45be"
                 ]
             }
         ],
@@ -53,7 +53,7 @@
             "nf-test": "0.9.3",
             "nextflow": "25.10.0"
         },
-        "timestamp": "2025-11-14T11:44:35.375721"
+        "timestamp": "2025-12-10T16:54:39.611824"
     },
     "Should download scoring files with publication ID": {
         "content": [
@@ -66,7 +66,7 @@
                     ]
                 ],
                 "1": [
-                    "versions.yml:md5,0037d029b7fb43e982cb72a985089279"
+                    "versions.yml:md5,6695395cb3002263e72bbbfcfc1c45be"
                 ],
                 "scorefiles": [
                     [
@@ -76,7 +76,7 @@
                     ]
                 ],
                 "versions": [
-                    "versions.yml:md5,0037d029b7fb43e982cb72a985089279"
+                    "versions.yml:md5,6695395cb3002263e72bbbfcfc1c45be"
                 ]
             }
         ],
@@ -84,6 +84,6 @@
             "nf-test": "0.9.3",
             "nextflow": "25.10.0"
         },
-        "timestamp": "2025-11-14T11:44:42.565309"
+        "timestamp": "2025-12-10T16:54:46.616571"
     }
 }

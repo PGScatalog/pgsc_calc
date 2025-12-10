@@ -2,25 +2,25 @@
     "Test formatting PGS000586": {
         "content": [
             [
-                "versions.yml:md5,b759501275e842262c55ca4ebdf8a0cb"
+                "versions.yml:md5,57d27d5734592f8120fc15c56d56662b"
             ]
         ],
         "meta": {
             "nf-test": "0.9.3",
             "nextflow": "25.10.0"
         },
-        "timestamp": "2025-11-14T15:43:07.377203"
+        "timestamp": "2025-12-10T16:55:06.804004"
     },
     "Test stub": {
         "content": [
             [
-                "versions.yml:md5,b759501275e842262c55ca4ebdf8a0cb"
+                "versions.yml:md5,57d27d5734592f8120fc15c56d56662b"
             ]
         ],
         "meta": {
             "nf-test": "0.9.3",
             "nextflow": "25.10.0"
         },
-        "timestamp": "2025-11-14T15:43:18.630008"
+        "timestamp": "2025-12-10T16:55:18.250264"
     }
 }

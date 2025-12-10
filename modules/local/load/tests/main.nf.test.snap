@@ -2,61 +2,61 @@
     "Test bgen stub": {
         "content": [
             [
-                "versions.yml:md5,ca2b6ca2fb9419ca9b54d0eb39ee8ace"
+                "versions.yml:md5,87d53dfd0e6bbd66b69ce8a68a3c92b9"
             ]
         ],
         "meta": {
             "nf-test": "0.9.3",
             "nextflow": "25.10.0"
         },
-        "timestamp": "2025-11-18T12:04:51.235357"
+        "timestamp": "2025-12-10T16:55:50.713069"
     },
     "Test load 1000G bgen PGS000315": {
         "content": [
             [
-                "versions.yml:md5,ca2b6ca2fb9419ca9b54d0eb39ee8ace"
+                "versions.yml:md5,87d53dfd0e6bbd66b69ce8a68a3c92b9"
             ]
         ],
         "meta": {
             "nf-test": "0.9.3",
             "nextflow": "25.10.0"
         },
-        "timestamp": "2025-11-18T12:04:36.927945"
+        "timestamp": "2025-12-10T16:55:36.693365"
     },
     "Test vcf stub": {
         "content": [
             [
-                "versions.yml:md5,ca2b6ca2fb9419ca9b54d0eb39ee8ace"
+                "versions.yml:md5,87d53dfd0e6bbd66b69ce8a68a3c92b9"
             ]
         ],
         "meta": {
             "nf-test": "0.9.3",
             "nextflow": "25.10.0"
         },
-        "timestamp": "2025-11-18T12:04:57.493151"
+        "timestamp": "2025-12-10T16:55:56.921499"
     },
     "Test load 1000G VCF PGS000315": {
         "content": [
             [
-                "versions.yml:md5,ca2b6ca2fb9419ca9b54d0eb39ee8ace"
+                "versions.yml:md5,87d53dfd0e6bbd66b69ce8a68a3c92b9"
             ]
         ],
         "meta": {
             "nf-test": "0.9.3",
             "nextflow": "25.10.0"
         },
-        "timestamp": "2025-11-18T12:04:28.985703"
+        "timestamp": "2025-12-10T16:55:28.882025"
     },
     "Cached load should work": {
         "content": [
             [
-                "versions.yml:md5,ca2b6ca2fb9419ca9b54d0eb39ee8ace"
+                "versions.yml:md5,87d53dfd0e6bbd66b69ce8a68a3c92b9"
             ]
         ],
         "meta": {
             "nf-test": "0.9.3",
             "nextflow": "25.10.0"
         },
-        "timestamp": "2025-11-18T12:04:44.944923"
+        "timestamp": "2025-12-10T16:55:44.528708"
     }
 }

@@ -2,25 +2,25 @@
     "Should calculate PGS000315 on 1000 genomes": {
         "content": [
             [
-                "versions.yml:md5,a537f70ae5ce9e46a4657bb683657fac"
+                "versions.yml:md5,de683bb29b43473addabe7faf8d86825"
             ]
         ],
         "meta": {
             "nf-test": "0.9.3",
             "nextflow": "25.10.0"
         },
-        "timestamp": "2025-11-18T12:20:27.257768"
+        "timestamp": "2025-12-10T16:56:21.067721"
     },
     "versions": {
         "content": [
             [
-                "versions.yml:md5,a537f70ae5ce9e46a4657bb683657fac"
+                "versions.yml:md5,de683bb29b43473addabe7faf8d86825"
             ]
         ],
         "meta": {
             "nf-test": "0.9.3",
             "nextflow": "25.10.0"
         },
-        "timestamp": "2025-11-18T12:20:33.376268"
+        "timestamp": "2025-12-10T16:56:27.20156"
     }
 }
