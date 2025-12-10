@@ -1,5 +1,5 @@
-sampleset,accession,match_summary,is_ambiguous,is_multiallelic,count,fraction,match_rate,is_match_rate_ok
-1000G,PGS000586_hmPOS_GRCh38,matched,false,false,809,0.79,0.79,true
-1000G,PGS000586_hmPOS_GRCh38,unmatched,,,76,0.07,0.79,true
-1000G,PGS000586_hmPOS_GRCh38,unmatched,false,false,2,0.00,0.79,true
-1000G,PGS000586_hmPOS_GRCh38,excluded,true,false,136,0.13,0.79,true
+sampleset,accession,match_summary,is_ambiguous,is_multiallelic,match_flipped,count,fraction,match_rate,is_match_rate_ok
+1000G,PGS000586_hmPOS_GRCh38,matched,false,false,0,809,0.79,0.79,true
+1000G,PGS000586_hmPOS_GRCh38,unmatched,,,0,76,0.07,0.79,true
+1000G,PGS000586_hmPOS_GRCh38,unmatched,false,false,0,2,0.00,0.79,true
+1000G,PGS000586_hmPOS_GRCh38,excluded,true,false,0,136,0.13,0.79,true
