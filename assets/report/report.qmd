@@ -475,7 +475,7 @@ pop_summary %>%
 
 ```{r, echo = FALSE, message = FALSE}
 scores <- readr::read_csv(params$score_path) 
-n_scores <- length(unique(scores$PGS))
+n_scores <- length(unique(scores$accession))
 n_samples <- length(unique(scores$sample_id))
 if (n_samples < MINIMUM_N_SAMPLES) {
   LOW_SAMPLE_SIZE <- TRUE
