@@ -4,8 +4,8 @@ process PGSC_CALC_FORMAT {
 
     conda "${moduleDir}/environment.yml"
     container "${workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container
-        ? 'oras://ghcr.io/pgscatalog/pygscatalog:pgscatalog-utils-2.0.1-singularity'
-        : 'docker.io/pgscatalog/pgscatalog-calc:0.1.2'}"
+        ? 'oras://ghcr.io/pgscatalog/pygscatalog:pgscatalog-utils-v3-alpha.1-singularity'
+        : 'ghcr.io/pgscatalog/pygscatalog:pgscatalog-utils-v3-alpha.1'}"
 
     input:
     path raw_scores, arity: '1.*'

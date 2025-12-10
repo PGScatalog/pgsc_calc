@@ -3,8 +3,8 @@ process PGSC_CALC_SCORE {
 
     conda "${moduleDir}/environment.yml"
     container "${workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container
-        ? 'oras://pgscatalog/pgscatalog-calc:0.1.1'
-        : 'docker.io/pgscatalog/pgscatalog-calc:0.1.2'}"
+        ? 'oras://ghcr.io/pgscatalog/pygscatalog:pgscatalog-utils-v3-alpha.1-singularity'
+        : 'ghcr.io/pgscatalog/pygscatalog:pgscatalog-utils-v3-alpha.1'}"
 
     input:
     path "genotypes/zarr_???.zip", arity: '1..*' // renames input zarr files

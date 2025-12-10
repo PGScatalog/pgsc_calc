@@ -2,4 +2,4 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - bioconda::pgscatalog.utils=2.0.1
+  - bioconda::pgscatalog.utils=3.0.1-alpha.1
