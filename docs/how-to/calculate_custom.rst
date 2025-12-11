@@ -26,7 +26,7 @@ minimal header in the following format:
 Header::
 
     #pgs_name=metaGRS_CAD
-    #pgs_id=metaGRS_CAD    
+    #pgs_id=metaGRS_CAD
     #trait_reported=Coronary artery disease
     #genome_build=GRCh37
 
@@ -80,7 +80,7 @@ files need extra work:
 .. _`scoring file format v2.0`: https://www.pgscatalog.org/downloads/#scoring_header
 
 .. note:: The ``other_allele`` column is optional but recommended
-          
+
 3. Calculate!
 ~~~~~~~~~~~~
 
@@ -89,15 +89,15 @@ Set the path of the custom scoring file with the ``--scorefile`` parameter:
 .. code-block:: console
 
     $ nextflow run pgscatalog/pgscalc \
-        -profile <docker/singularity/conda> \    
+        -profile <docker/singularity/conda> \
         --input samplesheet.csv \
         --scorefile scorefile.txt
 
-Congratulations, you've now calculated some scores using your custom scoring file! |:partying_face:|
+Congratulations, you've now calculated some scores using your custom scoring file! 🥳
 
 After the workflow executes successfully, the calculated scores and a summary
 report should be available in the ``results/`` directory by default. If
 you're interested in more information, see :ref:`interpret`.
 
 If the workflow didn't execute successfully, have a look at the
-:ref:`troubleshoot` section. 
+:ref:`troubleshoot` section.

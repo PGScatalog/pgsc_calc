@@ -5,7 +5,7 @@
 
 The ``pgsc_calc`` workflow makes it easy to calculate a :term:`polygenic score`
 (PGS) using scoring files published in the `Polygenic Score (PGS) Catalog`_
-|:dna:| and/or custom scoring files.
+🧬 and/or custom scoring files.
 
 The calculator workflow automates PGS downloads from the Catalog, variant
 matching between scoring files and target genotyping samplesets, and the
