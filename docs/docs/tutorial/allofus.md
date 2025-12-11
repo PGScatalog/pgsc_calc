@@ -96,19 +96,28 @@ These `pgsc_calc` settings are customised to work well with very large scale dat
 
 ```bash
 (enxf) $ echo "process {
+    withName: 'PGSC_CALC_DOWNLOAD' {
+        container = "docker.io/pgscatalog/pygscatalog:pgscatalog-utils-v3-alpha.1"
+    }
     withName: 'PGSC_CALC_FORMAT' {
         cpus = 2
         memory = { 10.GB * task.attempt }
+        container = "docker.io/pgscatalog/pygscatalog:pgscatalog-utils-v3-alpha.1"
     }
     withName: 'PGSC_CALC_LOAD' {
         cpus = 1
         memory = { 40.GB * task.attempt }
         time   = { 6.h  * task.attempt }
+        container = "docker.io/pgscatalog/pygscatalog:pgscatalog-utils-v3-alpha.1"
     }
     withName: 'PGSC_CALC_SCORE' {
         cpus = 4
         memory = { 80.GB * task.attempt }
         time   = { 8.h  * task.attempt }
+        container = "docker.io/pgscatalog/pygscatalog:pgscatalog-utils-v3-alpha.1"
+    }
+    withName: 'PGSC_CALC_REPORT' {
+        container = "docker.io/pgscatalog/report:2-beta"
     }
 }
 params {
