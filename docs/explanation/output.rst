@@ -133,6 +133,12 @@ are most similar to those populations is also provided.
 
     **Report Section 3 (Genetic Ancestry Similarity). Visualisation of genetic ancestry analysis.**
 
+.. figure:: screenshots/section3_1.png
+    :width: 600
+    :alt: Report Section 3 (Population similarity table)
+
+    **Report Section 3 (Genetic Ancestry Similarity). Population similarity table.**
+
 .. note:: **Interpretation**
 
     It is important to visually inspect the PCA to make sure that it looks correct (placing the reference populations correctly), and that the projection of individuals from the target dataset looks sensible.
