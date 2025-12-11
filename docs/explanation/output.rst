@@ -131,7 +131,7 @@ are most similar to those populations is also provided.
     :width: 600
     :alt: Report Section 3 (Genetic Ancestry Similarity)
 
-    **Report Section 3 (Genetic Ancestry Similarity). Visualisation of genetic ancestry analysis.**
+    **Report Section 3 (Genetic Ancestry Similarity). Visualisation of genetic ancestry analysis (one of three PCAs shown).**
 
 .. figure:: screenshots/section3_1.png
     :width: 600
