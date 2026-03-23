@@ -35,7 +35,7 @@ class SamplesheetParser {
         parsed.build = this.target_build
         parsed.chrom = truncateChrom(json)
 
-        if (parsed.is_vcf) {
+        if (parsed.is_vcf || parsed.is_bcf) {
           return [parsed, [json.geno]]
         } else {
           return [parsed, [json.geno, json.variants, json.pheno]]
@@ -56,6 +56,7 @@ class SamplesheetParser {
         flags.is_vcf = false
         flags.is_bfile = false
         flags.is_pfile = false
+        flags.is_bcf = false
 
         switch (row.format) {
             case "pfile":
@@ -66,6 +67,10 @@ class SamplesheetParser {
                 break
             case "vcf":
                 flags.is_vcf = true
+                break
+            case "bcf":
+                flags.is_vcf = true
+                flags.is_bcf = true
                 break
             default:
                 Nextflow.error("Invalid format: ${row.format}")
@@ -94,6 +99,9 @@ class SamplesheetParser {
                 // gzip compression gets picked up later
                 suffix = [variants: ".vcf", geno: ".vcf", pheno: ".vcf"]
                 break
+            case "bcf":
+                suffix = [variants: ".bcf", geno: ".bcf", pheno: ".bcf"]
+                break
             default:
                 Nextflow.error("Invalid format: ${row.format}")
         }
@@ -118,7 +126,7 @@ class SamplesheetParser {
         }
 
         def path_list
-        if (row.format != "vcf") {
+        if (row.format != "vcf" && row.format != "bcf") {
             def other_paths = suffix.subMap(["geno", "pheno"]).collect { k, v ->
                 Nextflow.file(resolved_path + v, checkIfExists: true)
             }

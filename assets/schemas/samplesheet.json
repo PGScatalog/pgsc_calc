@@ -38,7 +38,8 @@
         "enum": [
           "pfile",
           "bfile",
-          "vcf"
+          "vcf",
+          "bcf"
         ]
       },
       "vcf_genotype_field": {
