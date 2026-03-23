@@ -133,7 +133,7 @@ class SamplesheetParser {
 
     private def resolvePath(path) {
         // paths in a CSV samplesheet might be relative, and should be resolved from the samplesheet path
-        def is_absolute = path.startsWith('/') // isAbsolute() was causing weird issues
+        def is_absolute = path.startsWith('/') || path.matches('^[a-zA-Z][a-zA-Z0-9+.-]*://.*') // isAbsolute() was causing weird issues
 
         def resolved_path
         if (is_absolute) {
