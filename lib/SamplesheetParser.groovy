@@ -133,7 +133,14 @@ class SamplesheetParser {
 
     private def resolvePath(path) {
         // paths in a CSV samplesheet might be relative, and should be resolved from the samplesheet path
-        def is_absolute = path.startsWith('/') || path.matches('^[a-zA-Z][a-zA-Z0-9+.-]*://.*') // isAbsolute() was causing weird issues
+        def is_cloud_uri = path.matches('^[a-zA-Z][a-zA-Z0-9+.-]*://.*')
+        def is_absolute = path.startsWith('/') // isAbsolute() was causing weird issues
+
+        if (is_cloud_uri) {
+            // cloud URIs (gs://, s3://) are already absolute, return as string
+            // so that suffix concatenation works downstream
+            return path
+        }
 
         def resolved_path
         if (is_absolute) {
