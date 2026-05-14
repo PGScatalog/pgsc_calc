@@ -6,4 +6,4 @@ channels:
 dependencies:
   - pgscatalog.core=1.0.1
   - pgscatalog.match=0.4.0
-  - pgscatalog.calc=0.3.0
+  - pgscatalog.calc=0.3.1
