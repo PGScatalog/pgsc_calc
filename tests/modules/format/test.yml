@@ -70,4 +70,4 @@
         - "effect_weight"
     - path: output/format/versions.yml
       contains:
-        - "pgscatalog.core: 1.1.0"
+        - "pgscatalog.core: 1.1.1"
