@@ -139,7 +139,7 @@ jobs:
 
   ancestry_vcf_singularity:
     needs: [preload_ancestry, preload_singularity]
-    uses: ./.github/workflows/ancestry.yml
+    uses: ./.github/workflows/ancestry-vcf.yml
     with:
       container-cache-key: ${{ needs.preload_singularity.outputs.cache-key }}
       ancestry-cache-key: ${{ needs.preload_ancestry.outputs.cache-key }}
