@@ -32,6 +32,8 @@ jobs:
         uses: actions/checkout@v4
 
       - uses: nf-core/setup-nextflow@v2
+        with:
+          version: 25.10.0
 
       - name: Restore docker images
         id: restore-docker
@@ -97,6 +99,8 @@ jobs:
         uses: actions/checkout@v4
 
       - uses: nf-core/setup-nextflow@v2
+        with:
+          version: 25.10.0
 
       - name: Restore singularity setup
         id: restore-singularity-setup

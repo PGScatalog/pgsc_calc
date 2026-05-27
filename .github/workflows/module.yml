@@ -30,6 +30,8 @@ jobs:
         uses: actions/checkout@v4
 
       - uses: nf-core/setup-nextflow@v2
+        with:
+          version: 25.10.0
 
       - name: Restore docker images
         id: restore-docker
@@ -64,7 +66,6 @@ jobs:
             /home/runner/pytest_workflow_*/*/log.out
             /home/runner/pytest_workflow_*/*/log.err
             /home/runner/pytest_workflow_*/*/work
-            !/home/runner/pytest_workflow_*/*/work/conda
             !/home/runner/pytest_workflow_*/*/work/singularity
 
   singularity:
@@ -78,6 +79,8 @@ jobs:
         uses: actions/checkout@v4
 
       - uses: nf-core/setup-nextflow@v2
+        with:
+          version: 25.10.0
 
       - name: Singularity install with defaults
         uses: singularityhub/install-singularity@main
@@ -109,5 +112,4 @@ jobs:
             /home/runner/pytest_workflow_*/*/log.out
             /home/runner/pytest_workflow_*/*/log.err
             /home/runner/pytest_workflow_*/*/work
-            !/home/runner/pytest_workflow_*/*/work/conda
             !/home/runner/pytest_workflow_*/*/work/singularity
