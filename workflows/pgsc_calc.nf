@@ -1,127 +1,4 @@
 /*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    PRINT PARAMS SUMMARY
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
-
-include { validateParameters; paramsSummaryLog; paramsSummaryMap } from 'plugin/nf-schema'
-
-
-def logo = NfcoreTemplate.logo(workflow, params.monochrome_logs)
-def citation = '\n' + WorkflowMain.citation(workflow) + '\n'
-def summary_params = paramsSummaryMap(workflow)
-
-// Print parameter summary log to screen
-log.info logo + paramsSummaryLog(workflow) + citation
-
-WorkflowPgscCalc.initialise(params, log)
-
-// new approach to validating parameters
-// TODO: this causes a weird file error in some environments, disable for now
-// validateParameters()
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    DEBUG OPTIONS TO HALT WORKFLOW EXECUTION
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
-
-def run_ancestry_bootstrap = true
-def run_input_check = true
-def run_make_compatible = true
-def run_match = true
-def run_ancestry_assign = true
-def run_ancestry_adjust = true
-def run_apply_score = true
-def run_report = true
-
-if (params.only_bootstrap) {
-    run_ancestry_bootstrap = true
-    run_input_check = false
-    run_make_compatible = false
-    run_match = false
-    run_ancestry_assign = false
-    run_ancestry_adjust = true
-    run_apply_score = false
-    run_report = false
-}
-
-if (params.only_input) {
-    run_ancestry_bootstrap = true
-    run_input_check = true
-    run_make_compatible = false
-    run_match = false
-    run_ancestry_assign = false
-    run_apply_score = false
-    run_report = false
-}
-
-if (params.only_projection) {
-    run_ancestry_bootstrap = true
-    run_input_check = true
-    run_make_compatible = true
-    run_match = true
-    run_ancestry_assign = true
-    run_apply_score = false
-    run_report = false
-}
-
-if (params.only_compatible) {
-    run_ancestry_bootstrap = true
-    run_input_check = true
-    run_make_compatible = true
-    run_match = false
-    run_ancestry_assign = true
-    run_apply_score = false
-    run_report = false
-}
-
-if (params.only_match) {
-    run_ancestry_bootstrap = true
-    run_input_check = true
-    run_make_compatible = true
-    run_match = true
-    run_ancestry_assign = true
-    run_apply_score = false
-    run_report = false
-}
-
-if (params.only_score) {
-    run_ancestry_bootstrap = true
-    run_input_check = true
-    run_make_compatible = true
-    run_match = true
-    run_ancestry_assign = true
-    run_apply_score = true
-    run_report = false
-}
-
-// always run ancestry if the reference database path is set
-// (even if --skip_ancestry is true)
-if (params.run_ancestry) {
-    run_ancestry_assign = true
-    run_ancestry_adjust = true
-} else if (params.skip_ancestry) {
-    run_ancestry_assign = false
-    run_ancestry_adjust = false
-}
-
-// don't try to bootstrap if we're not estimating or adjusting
-if (!run_ancestry_assign && !run_ancestry_adjust) {
-    run_ancestry_bootstrap = false
-}
-
-if (workflow.profile.contains("test")) {
-    if (params.run_ancestry) {
-        error "ERROR: The test profile isn't compatible with --run_ancestry. Please use real data."
-    }
-}
-
-if (params.parallel) {
-  log.info "INFO: --parallel parameter is deprecated: jobs are automatically parallelised by default"
-}
-
-/*
 ========================================================================================
     IMPORT LOCAL MODULES/SUBWORKFLOWS
 ========================================================================================
@@ -146,6 +23,101 @@ include { DUMPSOFTWAREVERSIONS } from '../modules/local/dumpsoftwareversions'
 
 workflow PGSCCALC {
     ch_versions = Channel.empty()
+
+    run_ancestry_bootstrap = true
+    run_input_check = true
+    run_make_compatible = true
+    run_match = true
+    run_ancestry_assign = true
+    run_ancestry_adjust = true
+    run_apply_score = true
+    run_report = true
+
+    if (params.only_bootstrap) {
+        run_ancestry_bootstrap = true
+        run_input_check = false
+        run_make_compatible = false
+        run_match = false
+        run_ancestry_assign = false
+        run_ancestry_adjust = true
+        run_apply_score = false
+        run_report = false
+    }
+
+    if (params.only_input) {
+        run_ancestry_bootstrap = true
+        run_input_check = true
+        run_make_compatible = false
+        run_match = false
+        run_ancestry_assign = false
+        run_apply_score = false
+        run_report = false
+    }
+
+    if (params.only_projection) {
+        run_ancestry_bootstrap = true
+        run_input_check = true
+        run_make_compatible = true
+        run_match = true
+        run_ancestry_assign = true
+        run_apply_score = false
+        run_report = false
+    }
+
+    if (params.only_compatible) {
+        run_ancestry_bootstrap = true
+        run_input_check = true
+        run_make_compatible = true
+        run_match = false
+        run_ancestry_assign = true
+        run_apply_score = false
+        run_report = false
+    }
+
+    if (params.only_match) {
+        run_ancestry_bootstrap = true
+        run_input_check = true
+        run_make_compatible = true
+        run_match = true
+        run_ancestry_assign = true
+        run_apply_score = false
+        run_report = false
+    }
+
+    if (params.only_score) {
+        run_ancestry_bootstrap = true
+        run_input_check = true
+        run_make_compatible = true
+        run_match = true
+        run_ancestry_assign = true
+        run_apply_score = true
+        run_report = false
+    }
+
+    // always run ancestry if the reference database path is set
+    // (even if --skip_ancestry is true)
+    if (params.run_ancestry) {
+        run_ancestry_assign = true
+        run_ancestry_adjust = true
+    } else if (params.skip_ancestry) {
+        run_ancestry_assign = false
+        run_ancestry_adjust = false
+    }
+
+    // don't try to bootstrap if we're not estimating or adjusting
+    if (!run_ancestry_assign && !run_ancestry_adjust) {
+        run_ancestry_bootstrap = false
+    }
+
+    if (workflow.profile.contains("test")) {
+        if (params.run_ancestry) {
+            error "ERROR: The test profile isn't compatible with --run_ancestry. Please use real data."
+        }
+    }
+
+    if (params.parallel) {
+        log.info "INFO: --parallel parameter is deprecated: jobs are automatically parallelised by default"
+    }
 
     // some workflows require an optional input
     // let's make one, and reuse it where possible
@@ -199,7 +171,7 @@ workflow PGSCCALC {
     }
 
     if (!params.scorefile && accessions.every { it.value == "" }) {
-        Nextflow.error("No valid accessions or scoring files provided. Please double check --pgs_id, --pgp_id, --trait_efo, or --scorefile parameters")
+        error "No valid accessions or scoring files provided. Please double check --pgs_id, --pgp_id, --trait_efo, or --scorefile parameters"
     }
 
     //
@@ -378,30 +350,6 @@ workflow PGSCCALC {
     DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
-}
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    COMPLETION EMAIL AND SUMMARY
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
-
-workflow.onComplete {
-    if (params.email || params.email_on_fail) {
-        NfcoreTemplate.email(workflow, params, summary_params, projectDir, log)
-    }
-    NfcoreTemplate.dump_parameters(workflow, params)
-    NfcoreTemplate.summary(workflow, params, log)
-    if (params.hook_url) {
-        NfcoreTemplate.IM_notification(workflow, params, summary_params, projectDir, log)
-    }
-}
-
-workflow.onError {
-    if (workflow.errorReport.contains("Process requirement exceeds available memory")) {
-        println("🛑 Default resources exceed availability 🛑 ")
-        println("💡 See here on how to configure pipeline: https://nf-co.re/docs/usage/configuration#tuning-workflow-resources 💡")
-    }
 }
 
 /*

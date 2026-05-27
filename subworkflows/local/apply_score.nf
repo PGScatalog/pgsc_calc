@@ -1,7 +1,6 @@
 //
 // Apply a validated scoring file to the QC'd target genomic data
 //
-import java.util.zip.GZIPInputStream
 
 include { RELABEL_SCOREFILES } from '../../modules/local/ancestry/relabel_scorefiles'
 include { RELABEL_AFREQ } from '../../modules/local/ancestry/relabel_afreq'
@@ -156,7 +155,7 @@ workflow APPLY_SCORE {
     scores = SCORE_AGGREGATE.out.scores
 }
 
-def annotate_scorefiles(ArrayList scorefiles) {
+def annotate_scorefiles(scorefiles) {
     // INPUT:
     // [[meta], [scorefile_1, ..., scorefile_n]] -> flat list
     // OUTPUT:
@@ -197,7 +196,7 @@ def annotate_scorefiles(ArrayList scorefiles) {
     }
 }
 
-def annotate_genomic(ArrayList target) {
+def annotate_genomic(target) {
     // INPUT:
     // [[meta], [pgen_path, psam_path, pvar_path]]
     // OUTPUT:
@@ -213,26 +212,29 @@ def annotate_genomic(ArrayList target) {
     def psam = paths[sample.indexOf(true)]
 
     def n = -1 // skip header
-    psam.eachLine { n++ }
+    psam.eachLine { _line -> n += 1 }
     meta.n_samples = n
 
     return [meta, paths]
 }
 
-def count_scores(InputStream f) {
+def count_scores(f) {
     // count number of calculated scores in a gzipped plink .scorefile
-    // try-with-resources block automatically closes streams
-    try (buffered = new BufferedReader(new InputStreamReader(new GZIPInputStream(f)))) {
-        def n_extra_cols = 2 // ID, effect_allele
-        def n_scores = buffered.readLine().split("\t").length - n_extra_cols
-        assert n_scores > 0 : "Counting scores failed, please check scoring file"
-        return n_scores
+    return f.withCloseable { input_stream ->
+        new java.util.zip.GZIPInputStream(input_stream).withCloseable { gzip_stream ->
+            new java.io.BufferedReader(new java.io.InputStreamReader(gzip_stream)).withCloseable { buffered ->
+                def n_extra_cols = 2 // ID, effect_allele
+                def n_scores = buffered.readLine().split("\t").length - n_extra_cols
+                assert n_scores > 0 : "Counting scores failed, please check scoring file"
+                n_scores
+            }
+        }
     }
 }
 
-def annotate_chrom(ArrayList it) {
+def annotate_chrom(chrom_entry) {
     // extract chrom from filename prefix and add to hashmap
-    def meta = [:].plus(it.first())
-    meta.chrom = it.last().getBaseName().tokenize('_')[1]
-    return [meta, it.last()]
+    def meta = [:].plus(chrom_entry.first())
+    meta.chrom = chrom_entry.last().getBaseName().tokenize('_')[1]
+    return [meta, chrom_entry.last()]
 }
