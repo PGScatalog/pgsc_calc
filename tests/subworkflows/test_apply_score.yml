@@ -17,7 +17,7 @@
         - "SUM"
     - path: output/score/versions.yml
       contains:
-        - "pgscatalog.calc: 0.3.0"
+        - "pgscatalog.calc: 0.3.1"
       must_not_contain:
         - "percentile_MostSimilarPop"
         - "Z_MostSimilarPop"
