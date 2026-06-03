@@ -33,6 +33,12 @@ process SCORE_REPORT {
     def args = task.ext.args ?: ''
     run_ancestry = params.run_ancestry ? true : false
     """
+    # Create minimal Quarto yaml file to prevent parent directories search
+    cat > _quarto.yml << 'EOF'
+    project:
+      type: default
+    EOF
+
     export TMPDIR=\$PWD # tmpdir must always be writable for quarto
     echo $workflow.commandLine > command.txt
     

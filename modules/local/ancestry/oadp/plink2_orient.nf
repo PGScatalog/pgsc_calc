@@ -6,8 +6,7 @@ process PLINK2_ORIENT {
 
     tag "$meta.id"
 
-    cachedir = params.genotypes_cache ? file(params.genotypes_cache) : workDir
-    storeDir cachedir / "ancestry" / "orient"
+    storeDir ((params.genotypes_cache ? file(params.genotypes_cache) : workDir) / "ancestry" / "orient")
 
     conda "${task.ext.conda}"
 

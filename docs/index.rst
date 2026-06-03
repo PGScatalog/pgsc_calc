@@ -32,7 +32,7 @@ The workflow performs the following steps:
   computation of multiple PGS.
 - Matches variants in the scoring files against variants in the target dataset (in plink bfile/pfile or VCF format).
 - Calculates PGS for all samples (linear sum of weights and dosages).
-- Creates a summary report to visualize score distributions and pipeline metadata (variant matching QC).
+- Creates a summary report to visualise score distributions and pipeline metadata (variant matching QC).
 
 And optionally has additional functionality to:
 
@@ -42,7 +42,7 @@ And optionally has additional functionality to:
 
 .. tip:: To enable these optional steps, see :ref:`ancestry`
 
-See `Features under development`_ section for information about planned updates.
+See `Current development focus`_ section for information about planned updates.
 
 
 The workflow relies on open source scientific software, including:
@@ -125,14 +125,13 @@ The `Changelog page`_ describes fixes and enhancements for each version.
 .. _`Changelog page`: https://github.com/PGScatalog/pgsc_calc/releases
 
 
-Features under development
---------------------------
+Current development focus
+-------------------------
 
-These are some of the fetures and improvements we're planning for the ``pgsc_calc``:
+These are some of the features and improvements we're planning for the ``pgsc_calc``:
 
-- Further optimizations to the PCA & ancestry similarity analysis steps focused on improving automatic QC
-- Performance improvements to make ``pgsc_calc`` work with 1000s of scoring files in paralell (e.g. integration
-  with `OmicsPred`_)
+- Further optimisations to the PCA & ancestry similarity analysis steps focused on improving automatic QC
+- Continued performance improvements for large scoring-file collections and `OmicsPred`_ workloads
 
 .. _OmicsPred: https://www.omicspred.org
 
@@ -144,7 +143,7 @@ collaboration between the University of Cambridge’s Department of Public Healt
 and Primary Care (Michael Inouye, Samuel Lambert) and the European
 Bioinformatics Institute (Helen Parkinson, Laura Harris).
 
-The pipeline seeks to provide a standardized workflow for PGS calculation and
+The pipeline seeks to provide a standardised workflow for PGS calculation and
 ancestry inference implemented in nextflow derived from an existing set of
 tools/scripts developed by Inouye lab (Rodrigo Canovas, Scott Ritchie, Jingqin
 Wu) and PGS Catalog teams (Samuel Lambert, Laurent Gil).

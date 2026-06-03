@@ -33,7 +33,6 @@ process MATCH_COMBINE {
     scoremeta = [:]
     scoremeta.id = "$meta.id"
 
-    script:
     if (shared.name == "NO_FILE")
         """
         export POLARS_MAX_THREADS=$task.cpus

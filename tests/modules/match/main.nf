@@ -8,6 +8,7 @@ include { MATCH_VARIANTS } from '../../../modules/local/match_variants'
 include { MATCH_COMBINE }  from '../../../modules/local/match_combine'
 
 workflow testmatch {
+    main:
     // test a single score (one effect weight)
     bim = file("assets/examples/target_genomes/cineca_synthetic_subset.bim", checkIfExists: true)
     bed = file("assets/examples/target_genomes/cineca_synthetic_subset.bed", checkIfExists: true)
@@ -39,6 +40,7 @@ workflow testmatch {
 }
 
 workflow testmatchcombine {
+    main:
     // match combine can be optionally constrained by a list of variants in a
     // reference panel (don't test this here)
     ref_intersection = Channel.of(file('NO_FILE'))

@@ -15,7 +15,7 @@ workflow testmultipleaccessions {
     target_build = 'GRCh37'
     accessions = [pgs_id: 'PGS000001 PGS000002',
                   pgp_id: 'PGP000001',
-                  trait_efo: 'EFO_0004214']
+                  trait_efo: 'MONDO_0005350']
 
     DOWNLOAD_SCOREFILES(accessions, target_build)
 }

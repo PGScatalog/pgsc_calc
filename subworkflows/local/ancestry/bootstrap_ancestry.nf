@@ -73,18 +73,18 @@ workflow BOOTSTRAP_ANCESTRY {
 }
 
 
-def drop_meta_keys(ArrayList it) {
+def drop_meta_keys(entry) {
     // input: [[meta hashmap], [file1, file2, file3]]
     // cloning is important when modifying the hashmap
-    def m = [:].plus(it.first())
+    def m = [:].plus(entry.first())
     // dropping keys simplifies joining with build specific reference data
     m.remove('type')
     m.remove('is_pfile')
-    return [m, it.last()]
+    return [m, entry.last()]
 }
 
 
-def create_ref_input_channel(LinkedHashMap row) {
+def create_ref_input_channel(row) {
     def meta = [:]
     meta.id = row.reference
     meta.build = row.build
@@ -99,11 +99,11 @@ def create_ref_input_channel(LinkedHashMap row) {
     return [meta, file(row.url, checkIfExists: true)]
 }
 
-def check_relabelled_size(ArrayList it) {
+def check_relabelled_size(entry) {
     // short explanation:
     // check that the PLINK2_RELABEL process hasn't accidentally picked up more
     // than one geno, pheno, and variant file. this shouldn't ever happen.
-    assert it.size() == 2, "Multiple files detected in RELABEL_PVAR output. Check the storeDir!"
+    assert entry.size() == 2 : "Multiple files detected in RELABEL_PVAR output. Check the storeDir!"
 
     // long explanation:
     // the output file names are dynamic, and use variables defined in the
