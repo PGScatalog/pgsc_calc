@@ -13,7 +13,8 @@ process SCORE_REPORT {
         "${task.ext.docker}${task.ext.docker_version}" }"
 
     input:
-    tuple val(meta), path(scorefile), path(score_log), path(match_summary), path(ancestry)
+    tuple val(meta), path(scorefile), path(match_summary), path(ancestry)
+    path log_scorefiles, stageAs: "???_log_scorefile.json"
     path intersect_count
     val reference_panel_name
     path(report_path, arity: '4') // 4 files expected: report, css, background image x2

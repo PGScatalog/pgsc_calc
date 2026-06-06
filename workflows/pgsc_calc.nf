@@ -180,21 +180,21 @@ workflow PGSCCALC {
 
     if (run_input_check) {
         // flatten the score channel
-        ch_scorefiles = ch_scores.collect()
+        ch_scorefiles = ch_scores.flatten()
         // chain files are optional input
-        Channel.fromPath(optional_input).set { chain_files }
+        chain_files = Channel.empty()
         if (params.hg19_chain && params.hg38_chain) {
             Channel.fromPath(params.hg19_chain, checkIfExists: true)
                 .mix(Channel.fromPath(params.hg38_chain, checkIfExists: true))
-                .collect()
                 .set { chain_files }
         }
+        ch_chain_files = chain_files.ifEmpty { optional_input }.collect()
 
         INPUT_CHECK (
             params.input,
             params.format,
             ch_scorefiles,
-            chain_files
+            ch_chain_files
         )
         ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
     }

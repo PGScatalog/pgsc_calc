@@ -85,7 +85,8 @@ cat command.txt | fold -w 80 -s | awk -F ' ' 'NR==1 { print "$", $0} NR>1 { prin
 ## 1.3 Scoring file metadata
 
 ```{r load_scorefiles}
-json_list <- jsonlite::fromJSON(params$log_scorefiles, simplifyVector = FALSE)
+json_files <- list.files(pattern = "\\.json$", full.names = TRUE)
+json_list <- lapply(json_files, jsonlite::fromJSON, simplifyVector = FALSE) |> unlist(recursive = FALSE)
 
 link_traits <- function(trait_efo, mapped) {
   if (length(trait_efo) == 0) {

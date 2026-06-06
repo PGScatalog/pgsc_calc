@@ -12,11 +12,8 @@ workflow MATCH {
     main:
     ch_versions = Channel.empty()
 
-    // convert to a nested list of length 1 [[scorefile1_path, scorefile2_path]]
-    scorefiles = scorefile.collect { [it] }
-
     variants
-        .combine(scorefiles)
+        .combine(scorefile)
         .dump(tag: 'match_variants_input', pretty: true)
         .set { ch_variants }
 
@@ -54,7 +51,7 @@ workflow MATCH {
 
     combine_meta
         .concat( ch_matches.matches.collect() )
-        .concat( scorefile )
+        .concat( scorefile.collect() )
         .concat( ch_intersection_grouped.intersections.collect() )
         .buffer( size: 4 )
         .dump ( tag: 'match_combine_input', pretty: true )

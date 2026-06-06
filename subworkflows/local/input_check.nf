@@ -9,7 +9,7 @@ workflow INPUT_CHECK {
     take:
     input_path // file: /path/to/samplesheet.csv
     format // csv or JSON
-    scorefile // flat list of paths
+    scorefile // queue channel of paths
     chain_files
 
     main:
