@@ -7,7 +7,7 @@ process FILTER_VARIANTS {
 
     conda "${task.ext.conda}"
 
-    storeDir ((params.genotypes_cache ? file(params.genotypes_cache) : workDir) / "ancestry" / "filter")
+    storeDir { (params.genotypes_cache ? file(params.genotypes_cache) : workDir).resolve("ancestry/filter/${meta.id}") }
 
     container "${ workflow.containerEngine == 'singularity' &&
         !task.ext.singularity_pull_docker_container ?

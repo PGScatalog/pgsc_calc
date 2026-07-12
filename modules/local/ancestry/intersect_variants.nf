@@ -5,7 +5,7 @@ process INTERSECT_VARIANTS {
 
     tag "$meta.id chromosome $meta.chrom"
 
-    storeDir ((params.genotypes_cache ? file(params.genotypes_cache) : workDir) / "ancestry" / "intersected")
+    storeDir { (params.genotypes_cache ? file(params.genotypes_cache) : workDir).resolve("ancestry/intersected/${meta.id}/${meta.chrom}") }
 
     conda "${task.ext.conda}"
 

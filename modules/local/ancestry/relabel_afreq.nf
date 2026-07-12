@@ -5,7 +5,7 @@ process RELABEL_AFREQ {
 
     tag "$meta.id $meta.effect_type $target_format"
 
-    storeDir ((params.genotypes_cache ? file(params.genotypes_cache) : workDir) / "ancestry" / "relabel" / "afreq")
+    storeDir { (params.genotypes_cache ? file(params.genotypes_cache) : workDir).resolve("ancestry/relabel/afreq/${meta.id}") }
 
     conda "${task.ext.conda}"
 

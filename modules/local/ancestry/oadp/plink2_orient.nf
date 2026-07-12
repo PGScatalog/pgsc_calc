@@ -6,7 +6,7 @@ process PLINK2_ORIENT {
 
     tag "$meta.id"
 
-    storeDir ((params.genotypes_cache ? file(params.genotypes_cache) : workDir) / "ancestry" / "orient")
+    storeDir { (params.genotypes_cache ? file(params.genotypes_cache) : workDir).resolve("ancestry/orient/${meta.id}") }
 
     conda "${task.ext.conda}"
 
@@ -40,7 +40,7 @@ process PLINK2_ORIENT {
         --bed $geno \
         --fam $pheno \
         --bim $variants \
-        --alt1-allele $ref_variants 5 2 \
+        --a1-allele $ref_variants 5 2 \
         --make-bed \
         --out $output
 
