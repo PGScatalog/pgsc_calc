@@ -6,7 +6,7 @@ process PLINK2_RELABELBIM {
 
     tag "$meta.id chromosome $meta.chrom"
 
-    storeDir ((params.genotypes_cache ? file(params.genotypes_cache) : workDir) / "genomes" / "relabelled")
+    storeDir { (params.genotypes_cache ? file(params.genotypes_cache) : workDir).resolve("genomes/${meta.id}/relabelled/${meta.chrom}") }
 
     conda "${task.ext.conda}"
 

@@ -6,7 +6,7 @@ process FRAPOSA_PCA {
     tag "reference"
     // permanently derive a PCA for each reference - sampleset combination
     
-    storeDir ((params.genotypes_cache ? file(params.genotypes_cache) : workDir) / "ancestry" / "fraposa" / "pca")
+    storeDir { (params.genotypes_cache ? file(params.genotypes_cache) : workDir).resolve("ancestry/fraposa/pca/${meta.id}") }
 
     conda "${task.ext.conda}"
 
