@@ -31,6 +31,7 @@ process PLINK2_VCF {
     def prefix = task.ext.suffix ? "${meta.id}_${task.ext.suffix}" : "${meta.id}"
     def mem_mb = task.memory.toMega()
     def dosage_options = meta.vcf_import_dosage ? 'dosage=DS' : ''
+    def input_flag = meta.is_bcf ? "--bcf" : "--vcf"
     // rewriting genotypes, so use --max-alleles instead of using generic ID
     def set_ma_missing = params.keep_multiallelic ? '' : '--max-alleles 2'
     def chrom_filter = meta.chrom == "ALL" ? "--chr 1-22, X, Y, XY" : "--chr ${meta.chrom}" // filter to canonical/stated chromosome
@@ -47,7 +48,7 @@ process PLINK2_VCF {
         --freq \\
         --missing vcols=fmissdosage,fmiss \\
         $args \\
-        --vcf $vcf $dosage_options \\
+        $input_flag $vcf $dosage_options \\
         --allow-extra-chr $chrom_filter \\
         --make-pgen vzs pvar-cols="-xheader,-maybequal,-maybefilter,-maybeinfo,-maybecm" \\
         --out ${output}

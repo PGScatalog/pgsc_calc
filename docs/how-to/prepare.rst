@@ -26,6 +26,7 @@ Supported file formats
 The following file formats are currently supported:
 
 - VCF
+- BCF (binary VCF)
 - Plink 1 file set (``.bed / .bim / .fam``)
 - Plink 2 file set (``.pgen / .pvar / .psam``)
 

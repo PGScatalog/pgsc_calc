@@ -56,7 +56,7 @@ There are four mandatory columns:
   and integer chromosomes in the same sample.
 
 - **format**: The file format of the target genomes. Currently supports
-  ``pfile``, ``bfile``, or ``vcf``.
+  ``pfile``, ``bfile``, ``vcf``, or ``bcf``.
 
 Notes
 ~~~~~
@@ -79,7 +79,7 @@ Setting genotype field
 ~~~~~~~~~~~~~~~~~~~~~~
 
 .. note:: This is an optional process that is only applicable for some types of
-          VCF data
+          VCF or BCF data
           
 There is one optional column:
 
