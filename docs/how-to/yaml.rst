@@ -36,7 +36,8 @@ Run pgsc_calc with YAML file
 The workflow will now run with the parameters you set up in YAML. See 
 :ref:`param ref` for a full description of parameters you can set. 
 
-.. note:: If you prefer JSON, you can `convert the YAML to JSON`_ and it should work
-          fine
+.. note:: If you prefer JSON, you can use `JSON Formatter's converter`_ or
+          `JSONViewerTool's YAML to JSON converter`_, and it should work fine
 
-.. _`convert the YAML to JSON`: https://jsonformatter.org/yaml-to-json    
+.. _`JSON Formatter's converter`: https://jsonformatter.org/yaml-to-json
+.. _`JSONViewerTool's YAML to JSON converter`: https://jsonviewertool.com/yaml-to-json
