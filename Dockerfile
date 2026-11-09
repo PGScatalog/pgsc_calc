@@ -1,5 +1,6 @@
 # Test runtime for the alpha.2 Nextflow integration. Build from this directory:
-# docker build --platform linux/amd64 -t pgscatalog/pgsc_calc:9aa7015 .
+# docker buildx build --platform linux/amd64 \
+#     -t pgscatalog/pgsc_calc:v3-blob --push .
 # The workflow and analysis inputs are mounted at runtime, not baked into the image.
 FROM condaforge/miniforge3:25.3.1-0
 
@@ -17,10 +18,10 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Keep every runtime tool on PATH without per-task environment solving.
-# Use linux/amd64 for the Bioconda bgen-cpp package.
+# Quarto 1.4.550 has no linux-aarch64 build; 1.9.38 supports both architectures.
 RUN mamba install -y --override-channels -c conda-forge -c bioconda \
         python=3.12 nextflow=25.10.0 bgen-cpp p7zip \
-        quarto=1.4.550 r-jsonlite r-dplyr r-tidyr r-stringr r-purrr \
+        'quarto>=1.9.38,<2' r-jsonlite r-dplyr r-tidyr r-stringr r-purrr \
         r-ggplot2 r-dt r-tibble r-forcats r-readr \
     && conda list --explicit > /opt/conda-packages.txt \
     && mamba clean -afy
