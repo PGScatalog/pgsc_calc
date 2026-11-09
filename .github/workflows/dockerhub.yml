@@ -1,6 +1,9 @@
 name: Build and push Docker Hub image
 
 on:
+  push:
+    branches:
+      - v3-alpha.2
   workflow_dispatch:
     inputs:
       tag:
@@ -13,8 +16,11 @@ permissions:
   contents: read
 
 concurrency:
-  group: dockerhub-${{ inputs.tag }}
+  group: dockerhub-${{ inputs.tag || 'v3-blob' }}
   cancel-in-progress: false
+
+env:
+  IMAGE_TAG: ${{ inputs.tag || 'v3-blob' }}
 
 jobs:
   build:
@@ -25,8 +31,6 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Validate image tag
-        env:
-          IMAGE_TAG: ${{ inputs.tag }}
         run: |
           if [[ ! "$IMAGE_TAG" =~ ^[a-zA-Z0-9_][a-zA-Z0-9_.-]{0,127}$ ]]; then
             echo "Invalid Docker image tag" >&2
@@ -50,13 +54,12 @@ jobs:
           file: Dockerfile
           platforms: linux/amd64
           push: true
-          tags: pgscatalog/pgsc_calc:${{ inputs.tag }}
+          tags: pgscatalog/pgsc_calc:${{ env.IMAGE_TAG }}
           cache-from: type=gha,scope=pgsc-calc-amd64
           cache-to: type=gha,mode=max,scope=pgsc-calc-amd64
 
       - name: Record published image
         env:
-          IMAGE_TAG: ${{ inputs.tag }}
           IMAGE_DIGEST: ${{ steps.build.outputs.digest }}
         run: |
           printf 'Published pgscatalog/pgsc_calc:%s\n\nDigest: %s\n' \
