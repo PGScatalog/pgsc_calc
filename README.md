@@ -19,27 +19,29 @@ files from the [Polygenic Score (PGS) Catalog](https://www.pgscatalog.org/)
 and/or user-defined PGS/PRS.
 
 
-## v3 release candidate 1 notes
+## v3-alpha.2 integration candidate
 
-* `pgsc_calc` has always used plink2 ❤️ to calculate polygenic scores
-* We have developed a Python package [`pgscatalog.calc`](https://github.com/PGScatalog/pygscatalog/) to replace plink2 in `pgsc_calc`
-* This will make it simpler to support new ways of calculating PGS, like WGS data
-* `v3-alpha.1` only implements basic PGS calculation on autosomes for VCF and BGEN files
-* We plan to publish release candidates which add support for plink1/2 data, WGS data, and ancestry normalisation 
-* **Release candidates are pre-release software that may break unexpectedly in the future**
+This candidate replaces plink2 scoring with the Python `pgscatalog.calc` stages.
+It accepts one sampleset per run, including technical sample batches and
+chromosome partitions in VCF or BGEN format. Missing calls use allele frequencies
+pooled across the sampleset. Scoring files with X or Y variants require an explicit
+sex map; ploidy comes from the observed calls.
 
-> [!TIP]
-> Breaking changes have been made from v2. Things may not work as you expect. Please see [the documentation](https://pgsc-calc.readthedocs.io/en/v3-alpha.1/). 
+The supported launch runs bundled Nextflow and its tasks inside one offline image.
+Local validation is described in [the offline guide](docs/docs/howto/offline-v3.md).
+HPC/TRE acceptance remains pending. Standalone Conda and cross-node execution are
+outside the candidate's validated scope.
 
-## Pipeline summary 
+## Pipeline summary
 
-The workflow performs the following steps:
+* Format local Catalog or custom scoring files, with local liftover chains when needed.
+* Load each target shard and validate sample coverage.
+* Match all technical batches for each chromosome, then apply `min_overlap` across the sampleset.
+* Score each shard and combine its contributions into final scores.
+* Publish matching logs, sex-check TSVs, an HTML report and an optional unified cache.
 
-* Downloading scoring files using the PGS Catalog API in a specified genome build (GRCh37 and GRCh38).
-* Reading custom scoring files (and performing a liftover if genotyping data is in a different build).
-* Automatically combines and creates scoring files for efficient parallel computation of multiple PGS
-    - Matching variants in the scoring files against variants in the target dataset (in VCF/BGEN formats)
-* Calculates PGS for all samples (linear sum of weights and dosages)
+Prepare Catalog downloads before offline execution. The existing online download
+interface is retained for other launch modes.
 
 ### PGS applications and libraries
 
@@ -55,33 +57,19 @@ If you want a simpler way of working with PGS, ignore this section and continue 
 
 ## Quick start
 
-1. Install
-[`Nextflow`](https://www.nextflow.io/docs/latest/getstarted.html#installation)
-(`>=23.10.0`)
+Follow the [offline launch and validation guide](docs/docs/howto/offline-v3.md) to
+build the local candidate or run a published candidate image with local analysis
+inputs. Nextflow, its plugin and all task tools are bundled; no host Nextflow
+installation or nested container engine is needed.
 
-2. Install [`Docker`](https://docs.docker.com/engine/installation/) or
-[`Singularity (v3.8.3 minimum)`](https://www.sylabs.io/guides/3.0/user-guide/)
-(please only use [`Conda`](https://conda.io/miniconda.html) as a last resort)
-
-3. Download the pipeline and test it on a minimal dataset with a single command:
-
-    ```console
-    nextflow run pgscatalog/pgsc_calc -profile test,<docker/singularity/conda>
-    ```
-
-4. Start running your own analysis!
-
-    ```console
-    nextflow run pgscatalog/pgsc_calc -profile <docker/singularity/conda> --input samplesheet.csv --pgs_id PGS001229
-    ```
-
-See [getting
-started](https://pgsc-calc.readthedocs.io/en/latest/getting-started.html) for more
-details.
+The image publication step is separate from local validation. Use the published
+candidate digest for HPC/TRE acceptance, and retain the writable work directory
+for `-resume`.
 
 ## Documentation
 
-[Full documentation is available on Read the Docs](https://pgsc-calc.readthedocs.io/en/v3-alpha.1/)
+See the [alpha.2 offline guide](docs/docs/howto/offline-v3.md) for the launch model,
+samplesheet declarations, sex maps, cache compatibility and test commands.
 
 ## Credits
 
