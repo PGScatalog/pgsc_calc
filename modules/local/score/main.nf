@@ -1,70 +1,23 @@
 process PGSC_CALC_SCORE {
     label 'process_single'
-
-    conda "${moduleDir}/environment.yml"
-    container "${workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container
-        ? 'oras://ghcr.io/pgscatalog/pygscatalog:pgscatalog-utils-v3-alpha.1-singularity'
-        : 'ghcr.io/pgscatalog/pygscatalog:pgscatalog-utils-v3-alpha.1'}"
-
+    container 'pgscatalog/pgsc_calc:v3-alpha.2'
+    tag "${meta.sampleset}/${meta.chrom}/${meta.shard}"
     input:
-    path "genotypes/zarr_???.zip", arity: '1..*' // renames input zarr files
-    path "scorefiles/*"          , arity: '1.*' // put scorefiles in a directory
-    val publish_cache // bool
-    val variant_batch_size // bool
-    val min_overlap // float
-    val keep_ambiguous // bool
-    val keep_multiallelic // bool
-
+    tuple val(meta), path(cache)
+    path table
+    path 'scorefiles/*'
     output:
-    path "scores.txt.gz"         , arity: '1', emit: "scores"
-    path "summary.csv"           , arity: '1', emit: "summary_log"
-    path "variant_match_logs.zip", arity: '1', emit: "logs"
-    path "genotypes.zarr.zip"    , optional: true, emit: "cache"
-    path "versions.yml"          , arity: '1', emit: "versions"
-
+    path 'out/partial_scores.parquet', emit: partials
+    path 'versions.yml', emit: versions
     script:
-    def ambig_arg = keep_ambiguous    ? '--keep_ambiguous'    : ''
-    def multi_arg = keep_multiallelic ? '--keep_multiallelic' : ''
+    def memory = Math.max(1, (task.memory.toMega() / 1024.0 * 0.75).intValue())
     """
-    mkdir out
-
-    pgsc_calc score \
-      --zarr_zip_file genotypes/*.zip \
-      --score_paths scorefiles/*.txt.gz \
-      --min_overlap $min_overlap \
-      $ambig_arg \
-      $multi_arg \
-      --threads $task.cpus \
-      --out_dir out \
-      --batch_size $variant_batch_size
-
-    7z a -tzip -mx0 variant_match_logs.zip out/logs/sampleset=*
-    mv out/logs/summary.csv .
-    mv out/scores.txt.gz .
-
-    # create a unified cache
-
-    if $publish_cache; then
-        cd out # don't want out/ to be in the archive
-        7z a -tzip -mx0 ../genotypes.zarr.zip genotypes.zarr
-        cd ..
-    fi
+    pgsc_calc score --zarr_zip_file '$cache' --match_table '$table' --score_paths scorefiles/* \
+      --threads $task.cpus --max_memory_gb $memory --out_dir out
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        pgscatalog.calc: \$(echo \$(python -c 'import pgscatalog.calc; print(pgscatalog.calc.__version__)'))
-    END_VERSIONS
-    """
-
-    stub:
-    """
-    touch scores.txt.gz
-    touch variant_match_logs.zip
-    touch summary.csv
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        pgscatalog.calc: \$(echo \$(python -c 'import pgscatalog.calc; print(pgscatalog.calc.__version__)'))
+        pgscatalog.calc: \$(python -c 'import pgscatalog.calc; print(pgscatalog.calc.__version__)')
     END_VERSIONS
     """
 }

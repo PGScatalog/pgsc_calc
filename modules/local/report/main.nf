@@ -2,16 +2,14 @@ process PGSC_CALC_REPORT {
     label 'process_single'
 
     conda "${moduleDir}/environment.yml"
-    container "${workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container
-        ? 'oras://ghcr.io/pgscatalog/report:2-beta-singularity'
-        : 'ghcr.io/pgscatalog/report:2-beta'}"
+    container 'pgscatalog/pgsc_calc:v3-alpha.2'
 
     input:
     val(sampleset)
     path "scores.txt.gz", arity: '1'
     path "log_scorefiles.json", arity: '1'
     path "match_summary.csv", arity: '1'
-    tuple val(keep_multiallelic), val(keep_ambiguous), val(min_overlap) // bool, bool, float
+    tuple val(keep_multiallelic), val(keep_ambiguous), val(min_overlap), val(ignore_strand_flips) // bool, bool, float
     path(report_path, arity: '4') // 4 files expected: report, css, background image x2
 
     output:
@@ -24,10 +22,14 @@ process PGSC_CALC_REPORT {
     script:
     """
     export TMPDIR=\$PWD # tmpdir must always be writable for quarto
-    echo $workflow.commandLine > command.txt
+    export XDG_CACHE_HOME=\$PWD/.cache XDG_DATA_HOME=\$PWD/.local/share
+    cat <<'END_COMMAND' > command.txt
+    $workflow.commandLine
+    END_COMMAND
 
     echo "keep_multiallelic: $keep_multiallelic" > params.txt
     echo "keep_ambiguous   : $keep_ambiguous"    >> params.txt
+    echo "ignore_strand_flips: $ignore_strand_flips" >> params.txt
     echo "min_overlap      : $min_overlap"       >> params.txt
 
     quarto render report.qmd -M "self-contained:true" \

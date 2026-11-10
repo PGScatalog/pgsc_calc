@@ -3,9 +3,7 @@ process PGSC_CALC_FORMAT {
     tag "${raw_scores}"
 
     conda "${moduleDir}/environment.yml"
-    container "${workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container
-        ? 'oras://ghcr.io/pgscatalog/pygscatalog:pgscatalog-utils-v3-alpha.1-singularity'
-        : 'ghcr.io/pgscatalog/pygscatalog:pgscatalog-utils-v3-alpha.1'}"
+    container 'pgscatalog/pgsc_calc:v3-alpha.2'
 
     input:
     path raw_scores, arity: '1.*'
@@ -15,7 +13,6 @@ process PGSC_CALC_FORMAT {
     output:
     path "formatted/normalised_*.{txt,txt.gz}", arity: "1..*", emit: scorefiles
     path "formatted/log_scorefiles.json", arity: "1", emit: log_scorefiles
-    path "chroms.txt", arity: "1", emit: chroms
     path "versions.yml", arity: "1", emit: versions
 
     when:
@@ -24,7 +21,7 @@ process PGSC_CALC_FORMAT {
     script:
     // add liftover argument if the chain file exists
     // (only applies to custom scoring files)
-    def liftover = chain_file.name != 'CHAIN_NO_FILE' ? " -c \$PWD" : ''
+    def liftover = chain_file.name != 'CHAIN_NO_FILE' ? " --liftover -c \$PWD" : ''
     """
     mkdir formatted
 
@@ -36,9 +33,6 @@ process PGSC_CALC_FORMAT {
         $liftover \
         -v
 
-    # capture chromosomes in scoring files
-    zcat formatted/normalised_* | cut -f 1 | sort | uniq | grep -v 'chr_name' > chroms.txt
-
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         pgscatalog.core: \$(echo \$(python -c 'import pgscatalog.core; print(pgscatalog.core.__version__)'))
@@ -49,7 +43,6 @@ process PGSC_CALC_FORMAT {
     """
     mkdir formatted
     touch formatted/normalised_PGS001229_hmPOS_GRCh38.txt.gz formatted/log_scorefiles.json
-    seq 1 22 > chroms.txt
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

@@ -4,9 +4,7 @@ process PGSC_CALC_DOWNLOAD {
     label 'process_single'
 
     conda "${moduleDir}/environment.yml"
-    container "${workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container
-        ? 'oras://ghcr.io/pgscatalog/pygscatalog:pgscatalog-utils-v3-alpha.1-singularity'
-        : 'ghcr.io/pgscatalog/pygscatalog:pgscatalog-utils-v3-alpha.1'}"
+    container 'pgscatalog/pgsc_calc:v3-alpha.2'
 
     input:
     val(meta)

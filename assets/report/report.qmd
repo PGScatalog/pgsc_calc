@@ -488,12 +488,10 @@ if (n_samples < MINIMUM_N_SAMPLES) {
 ```{asis, echo = (LOW_SAMPLE_SIZE && !params$run_ancestry)}
 
 ::: {.callout-important title="Warning: small sampleset size (n < 50) detected"}
-* plink2 uses allele frequency data to [mean impute](https://www.cog-genomics.org/plink/2.0/score) the dosages of missing genotypes
-* Currently `pgsc_calc` disables mean-imputation in these small sample sets to make sure that the calculated PGS is as consistent with the genotype data as possible
-* With a small sample size, the resulting score sums may be inconsistent between samples
-* The average `([scorename]_AVG)` may be more applicable as it calculates an average weighting over all genotypes present
+* Missing dosages are imputed using allele counts pooled across the sampleset's technical batches and observed ploidies.
+* Imputation requires at least 50 distinct samples. A smaller sampleset can be scored only when no matched dosages need imputation.
+* Missing calls do not increase the observed allele count. Variants with no called alleles anywhere in the sampleset cannot supply an imputation frequency.
 
-It's recommended to use `--run_ancestry` with small samplesets to ensure consistent calculation of score sums (e.g. 1000G Genomes).
 :::
 
 ```
@@ -558,7 +556,7 @@ scores %>%
   mutate(PGS = ifelse(
     stringr::str_detect(accession, "^PGS"),
     stringr::str_extract(accession, "^PGS[0-9]{6}"),
-    PGS)) %>%
+    accession)) %>%
   group_by(sampleset, PGS) -> long_scores
 
 group_keys(long_scores) %>%

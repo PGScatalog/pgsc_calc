@@ -14,6 +14,12 @@ include { PGSC_CALC_LOAD     } from '../..//modules/local/load'
 include { PGSC_CALC_SCORE    } from '../..//modules/local/score'
 include { PGSC_CALC_REPORT    } from '../..//modules/local/report'
 
+include { PGSC_CALC_MATCH } from '../../modules/local/match'
+include { PGSC_CALC_MATCH_COMBINE } from '../../modules/local/match_combine'
+include { PGSC_CALC_SCORE_COMBINE } from '../../modules/local/score_combine'
+include { PGSC_CALC_CACHE_PACK } from '../../modules/local/cache_pack'
+include { PGSC_CALC_CHECK_SAMPLES } from '../../modules/local/check_samples'
+
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -31,11 +37,7 @@ workflow PGSC_CALC {
     scorefile
     ch_chain_files
     ch_cache // file(genotypes.zarr.zip) value channel
-    publish_cache // bool value channel
     batch_size // int value channel
-    ch_min_overlap // float value channel
-    ch_keep_ambiguous // bool value channel
-    ch_keep_multiallelic // bool value channel
     ch_versions
 
     main:
@@ -73,23 +75,6 @@ workflow PGSC_CALC {
     )
     ch_versions = ch_versions.mix(PGSC_CALC_FORMAT.out.versions)
 
-    // don't launch jobs for chromosomes which aren't in the scoring files
-    // first, get a set of chromosomes found in all scoring files
-    PGSC_CALC_FORMAT.out.chroms.map { it.readLines().toSet() }.set { ch_chromosomes }
-
-    // now filter target genomes to match this set
-    ch_input.combine(ch_chromosomes).filter{ meta, target_path, sample_path, validChroms ->
-        if ( meta.chrom == [] )
-            return true
-
-        // check target genome chromosome is present in scoring files
-        return meta.chrom.toString() in validChroms
-    }.map {
-        // drop validChroms from the list
-        it.removeLast()
-        return it
-    }.set { ch_filtered_input }
-
     // automatically add index files
     // it's important that index files are input to the process so they are staged correctly
     def addIndex = { meta, target_path, sample_path ->
@@ -107,7 +92,7 @@ workflow PGSC_CALC {
         [meta, target_path, bgen_sample_path, target_index]
     }
 
-    ch_target_with_index = ch_filtered_input.map(addIndex)
+    ch_target_with_index = ch_input.map(addIndex)
 
 
     // make value (singleton) channels for scorefiles and the cache
@@ -118,30 +103,37 @@ workflow PGSC_CALC {
         ch_target_with_index, // meta, path(target), path(bgen_sample), path(target_index)
         ch_formatted_scorefiles, // [scorefile_1, ..., scorefile_n]
         ch_cache, // path(zarr_zip)
-        batch_size // value(int)
+        batch_size, // value(int)
+        file(params.sex_map, checkIfExists: true)
     )
     ch_versions = ch_versions.mix(PGSC_CALC_LOAD.out.versions)
 
-    // scoring is a single process
-    ch_score_input = PGSC_CALC_LOAD.out.zarr_zip.collect()
-    PGSC_CALC_SCORE(
-        ch_score_input,
-        ch_formatted_scorefiles,
-        publish_cache,
-        batch_size, // value(int)
-        ch_min_overlap, // value(float)
-        ch_keep_ambiguous, // value(bool)
-        ch_keep_multiallelic // value(bool)
-    )
-    ch_versions = ch_versions.mix(PGSC_CALC_SCORE.out.versions)
+    // Every LOAD reports its samples, including shards with no requested variants.
+    PGSC_CALC_CHECK_SAMPLES(PGSC_CALC_LOAD.out.loaded.map { meta, cache -> cache }.collect())
+    ch_loaded = PGSC_CALC_LOAD.out.loaded.combine(PGSC_CALC_CHECK_SAMPLES.out.validated)
+        .filter { meta, cache, validated -> cache.resolve('genotypes.zarr.zip').exists() }
+        .map { meta, cache, validated -> [meta, cache.resolve('genotypes.zarr.zip')] }
+    PGSC_CALC_MATCH(ch_loaded.map { meta, cache -> [meta.chrom, cache] }.groupTuple(), ch_formatted_scorefiles)
+    ch_sampleset = ch_target_with_index.map { it[0].sampleset }.first()
+    PGSC_CALC_MATCH_COMBINE(
+        PGSC_CALC_MATCH.out.matches.map { chrom, matches, samples -> matches }.collect(),
+        PGSC_CALC_MATCH.out.matches.map { chrom, matches, samples -> samples }.collect(),
+        ch_formatted_scorefiles, ch_sampleset)
+    PGSC_CALC_SCORE(ch_loaded, PGSC_CALC_MATCH_COMBINE.out.table, ch_formatted_scorefiles)
+    PGSC_CALC_SCORE_COMBINE(PGSC_CALC_SCORE.out.partials.collect())
+    if (params.publish_cache) {
+        PGSC_CALC_CACHE_PACK(ch_loaded.map { meta, cache -> cache }.collect())
+    }
+    ch_versions = ch_versions.mix(PGSC_CALC_MATCH.out.versions)
+        .mix(PGSC_CALC_MATCH_COMBINE.out.versions)
+        .mix(PGSC_CALC_SCORE.out.versions)
+        .mix(PGSC_CALC_SCORE_COMBINE.out.versions)
 
     // create some value channels for the report
-    ch_sampleset = ch_target_with_index.map{ it[0].sampleset }.first()
-    ch_scores = PGSC_CALC_SCORE.out.scores.collect()
+    ch_scores = PGSC_CALC_SCORE_COMBINE.out.scores.collect()
     ch_score_log = PGSC_CALC_FORMAT.out.log_scorefiles.collect()
-    ch_match_summary = PGSC_CALC_SCORE.out.summary_log.collect()
-    // TODO: add skip_ambiguous / skip_multiallelic parameters
-    ch_match_parameters = Channel.of([false, false, params.min_overlap])
+    ch_match_summary = PGSC_CALC_MATCH_COMBINE.out.summary_log.collect()
+    ch_match_parameters = Channel.value([params.keep_multiallelic, params.keep_ambiguous, params.min_overlap, params.ignore_strand_flips])
     ch_report_files = Channel.fromPath("$baseDir/assets/report/*", checkIfExists: true).collect()
 
     PGSC_CALC_REPORT (
@@ -156,8 +148,8 @@ workflow PGSC_CALC {
 
     emit:
     summary_log = ch_match_summary // Channel: file(summary_log)
-    variant_match_log = PGSC_CALC_SCORE.out.logs  // Channel: file(zip_archive)
-    scores = PGSC_CALC_SCORE.out.scores           // Channel: file(csv.gz)
+    variant_match_log = PGSC_CALC_MATCH_COMBINE.out.logs  // Channel: file(zip_archive)
+    scores = PGSC_CALC_SCORE_COMBINE.out.scores           // Channel: file(csv.gz)
     report = PGSC_CALC_REPORT.out.report
     versions = ch_versions                        // Channel: [version1, version2, ...]
 }

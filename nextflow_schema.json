@@ -10,7 +10,10 @@
       "type": "object",
       "fa_icon": "fas fa-terminal",
       "description": "Define where the pipeline should find input data and save output data.",
-      "required": ["input", "outdir"],
+      "required": [
+        "input",
+        "outdir"
+      ],
       "properties": {
         "input": {
           "type": "string",
@@ -74,7 +77,14 @@
         "publish_dir_mode": {
           "type": "string",
           "default": "copy",
-          "enum": ["copy", "copyNoFollow", "link", "move", "relink", "symlink"],
+          "enum": [
+            "copy",
+            "copyNoFollow",
+            "link",
+            "move",
+            "relink",
+            "symlink"
+          ],
           "description": "The file publishing method",
           "fa_icon": "fas fa-upload"
         }
@@ -89,7 +99,10 @@
         "target_build": {
           "type": "string",
           "description": "Genome build of target genomes.",
-          "enum": ["GRCh37", "GRCh38"]
+          "enum": [
+            "GRCh37",
+            "GRCh38"
+          ]
         },
         "chain_files": {
           "type": "string",
@@ -104,7 +117,9 @@
         }
       },
       "fa_icon": "fas fa-dna",
-      "required": ["target_build"]
+      "required": [
+        "target_build"
+      ]
     },
     "matching_options": {
       "title": "Matching options",
@@ -122,6 +137,17 @@
         "keep_multiallelic": {
           "type": "boolean",
           "description": "Allow matches of scoring file variants to multiallelic variants in the target dataset"
+        },
+        "ignore_strand_flips": {
+          "type": "boolean",
+          "default": false,
+          "description": "Exclude strand-flipped matches."
+        },
+        "sex_map": {
+          "type": "string",
+          "format": "file-path",
+          "exists": true,
+          "description": "Tab-separated sample_id and sex declarations: 0 unknown, 1 male, 2 female. Required for X or Y scoring variants."
         },
         "keep_ambiguous": {
           "type": "boolean",
@@ -217,7 +243,10 @@
           "hidden": true
         },
         "help": {
-          "type": ["boolean", "string"],
+          "type": [
+            "boolean",
+            "string"
+          ],
           "description": "Display the help message."
         },
         "help_full": {

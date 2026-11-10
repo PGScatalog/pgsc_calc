@@ -12,13 +12,21 @@
         "type": "string",
         "pattern": "^\\S+$",
         "errorMessage": "sampleset must be a non-empty string without spaces",
-        "meta": ["sampleset"]
+        "meta": [
+          "sampleset"
+        ]
       },
       "chrom": {
-        "type": ["string", "integer", "null"],
-        "pattern": "^(?:[1-9]|1[0-9]|2[0-2]|X|Y|MT)$",
-        "errorMessage": "chrom must be a human autosome in range 1 - 22, X, Y, or MT",
-        "meta": ["chrom"]
+        "type": [
+          "string",
+          "integer",
+          "null"
+        ],
+        "pattern": "^(?:chr)?0*(?:[1-9]|1[0-9]|2[0-6]|X|Y|XY|M|MT|ALL)$",
+        "errorMessage": "chrom must name a human chromosome or be empty for whole-genome input",
+        "meta": [
+          "chrom"
+        ]
       },
       "path": {
         "type": "string",
@@ -29,37 +37,75 @@
       },
       "file_format": {
         "type": "string",
-        "enum": ["vcf", "bgen"],
+        "enum": [
+          "vcf",
+          "bgen"
+        ],
         "errorMessage": "file_format must be either 'vcf' or 'bgen'",
-        "meta": ["file_format"]
+        "meta": [
+          "file_format"
+        ]
       },
       "genotyping_method": {
         "type": "string",
-        "enum": ["array", "wgs"],
+        "enum": [
+          "array",
+          "wgs"
+        ],
         "errorMessage": "genotyping_method must be either 'array' or 'wgs'",
-        "meta": ["genotyping_method"]
+        "meta": [
+          "genotyping_method"
+        ]
       },
       "bgen_sample_file": {
         "type": "string",
         "format": "file-path",
         "exists": true,
         "pattern": "^([\\S\\s]*\\/)?[^\\s\\/]+\\.sample$",
-        "errorMessage": "bgen_sample_file must point to a .sample file",
+        "errorMessage": "bgen_sample_file must point to a .sample file"
+      },
+      "absent_variants": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "enum": [
+          "unobserved",
+          "homref",
+          null
+        ],
+        "description": "What does it mean when a variant is absent from this file?",
+        "meta": [
+          "absent_variants"
+        ]
       }
     },
-    "required": ["sampleset", "path", "file_format", "genotyping_method"],
+    "required": [
+      "sampleset",
+      "path",
+      "file_format",
+      "genotyping_method"
+    ],
     "additionalProperties": false,
     "allOf": [
       {
         "if": {
-          "properties": { "file_format": { "const": "bgen" } }
+          "properties": {
+            "file_format": {
+              "const": "bgen"
+            }
+          }
         },
         "then": {
-          "required": ["bgen_sample_file"]
+          "required": [
+            "bgen_sample_file"
+          ]
         },
         "else": {
           "not": {
-            "required": ["bgen_sample_file"]
+            "required": [
+              "bgen_sample_file"
+            ]
           }
         }
       }
