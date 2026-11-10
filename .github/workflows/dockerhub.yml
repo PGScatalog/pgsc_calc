@@ -9,18 +9,18 @@ on:
       tag:
         description: Docker Hub image tag
         required: true
-        default: v3-blob
+        default: v3-alpha.2
         type: string
 
 permissions:
   contents: read
 
 concurrency:
-  group: dockerhub-${{ inputs.tag || 'v3-blob' }}
+  group: dockerhub-${{ inputs.tag || 'v3-alpha.2' }}
   cancel-in-progress: false
 
 env:
-  IMAGE_TAG: ${{ inputs.tag || 'v3-blob' }}
+  IMAGE_TAG: ${{ inputs.tag || 'v3-alpha.2' }}
 
 jobs:
   build:
@@ -61,6 +61,7 @@ jobs:
         with:
           context: .
           file: Dockerfile
+          build-args: WORKFLOW_REVISION=${{ github.sha }}
           platforms: linux/${{ matrix.arch }}
           outputs: type=image,name=pgscatalog/pgsc_calc,push-by-digest=true,name-canonical=true,push=true
           cache-from: type=gha,scope=pgsc-calc-${{ matrix.arch }}

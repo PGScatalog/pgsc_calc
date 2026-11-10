@@ -1,0 +1,6 @@
+.git
+work
+results
+.nextflow*
+workflows/pgsc_calc/prototype_v3
+**/__pycache__

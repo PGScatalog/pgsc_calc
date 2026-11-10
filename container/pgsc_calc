@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+export NXF_OFFLINE=true
+export NXF_SECRETS_FILE="${NXF_SECRETS_FILE:-$PWD/.nextflow/secrets/store.json}"
+exec nextflow run /opt/pgsc_calc/main.nf -profile offline "$@"
