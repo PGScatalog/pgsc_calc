@@ -12,7 +12,7 @@ nextflow_pipeline {
         when {
             params {
               input = "$projectDir/assets/samplesheet_bgen_ftp.csv"
-              scorefile = "$projectDir/tests/data/PGS000586_hmPOS_GRCh38.txt.gz"
+              scorefile = "$projectDir/tests/pgs000586/PGS000586_autosomes.txt.gz"
               target_build = "GRCh38"
               outdir = "$outputDir"
             }
@@ -45,7 +45,7 @@ nextflow_pipeline {
                 { assert workflow.success },
                 { assert calculated_rows.size() == ref_rows.size() },
                 // compare calculated score and average with 6 digits of precision
-                { assert ScoreUtils.roundList(calculated_rows) == ScoreUtils.roundList(ref_rows) }
+                { ScoreUtils.assertScoresMatch(calculated_rows, ref_rows) }
             )
         }
     }

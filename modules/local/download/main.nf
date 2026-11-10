@@ -19,7 +19,7 @@ process PGSC_CALC_DOWNLOAD {
 
     script:
     def accession_args = meta.pgs_id   ? "-i $meta.pgs_id"  : ""
-    def traits_args = meta.trait_efo   ? "-t $meta.trait_efo"  : ""
+    def traits_args = meta.efo_id   ? "-t $meta.efo_id"  : ""
     def publication_args = meta.pgp_id ? "-p $meta.pgp_id": ""
     def efo_direct = params.efo_direct ? '-e' : ''
 

@@ -10,7 +10,7 @@ nextflow_process {
             process {
                 """
                 input[0] = Channel.fromPath("../../../tests/data/PGS000586_hmPOS_GRCh38.txt.gz", checkIfExists: true)
-                input[1] = Channel.fromPath("NO_FILE")
+                input[1] = Channel.value(file("$baseDir/assets/optional_input/CHAIN_NO_FILE"))
                 input[2] = Channel.from("GRCh38")
                 """
             }
@@ -19,7 +19,7 @@ nextflow_process {
         then {
             assertAll(
                 { assert process.success },
-                { assert snapshot(process.out.versions).match() }
+                { assert process.out.scorefiles[0].size() == 1 }
             )
         }
     }
@@ -30,7 +30,7 @@ nextflow_process {
             process {
                 """
                 input[0] = Channel.fromPath("../../../tests/data/PGS000586_hmPOS_GRCh38.txt.gz", checkIfExists: true)
-                input[1] = Channel.fromPath("NO_FILE")
+                input[1] = Channel.value(file("$baseDir/assets/optional_input/CHAIN_NO_FILE"))
                 input[2] = Channel.from("GRCh37")
                 """
             }
@@ -49,7 +49,7 @@ nextflow_process {
             process {
                 """
                 input[0] = Channel.fromPath("../../../tests/data/PGS000586_hmPOS_GRCh38.txt.gz", checkIfExists: true)
-                input[1] = Channel.fromPath("NO_FILE")
+                input[1] = Channel.value(file("$baseDir/assets/optional_input/CHAIN_NO_FILE"))
                 input[2] = Channel.from("GRCh37")
                 """
             }
@@ -58,7 +58,7 @@ nextflow_process {
         then {
             assertAll(
                 { assert process.success },
-                { assert snapshot(process.out.versions).match() }
+                { assert process.out.scorefiles[0].size() == 1 }
             )
         }
     }

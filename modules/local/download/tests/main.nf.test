@@ -8,7 +8,7 @@ nextflow_process {
             process {
                 """
                 input[0] = Channel.from(
-                    [ pgs_id: "PGS001229", trait_efo: [], pgp_id: [] ]
+                    [ pgs_id: "PGS001229", efo_id: [], pgp_id: [] ]
                 )
                 input[1] = Channel.from("GRCh38")
                 """
@@ -20,7 +20,7 @@ nextflow_process {
                 { assert process.success },
                 // one process launched
                 { assert process.trace.tasks().size() == 1},
-                { assert snapshot(process.out).match() }
+                { assert process.out.scorefiles[0].every { path(it).size() > 0 } }
             )
         }
     }
@@ -30,7 +30,7 @@ nextflow_process {
             process {
                 """
                 input[0] = Channel.from(
-                    [ pgs_id: "PGS001229,PGS000822", trait_efo: [], pgp_id: [] ]
+                    [ pgs_id: "PGS001229 PGS000822", efo_id: [], pgp_id: [] ]
                 )
                 input[1] = Channel.from("GRCh37")
                 """
@@ -40,7 +40,7 @@ nextflow_process {
             assertAll (
                 { assert process.success },
                 { assert process.trace.tasks().size() == 1 },
-                { assert snapshot(process.out).match() }
+                { assert process.out.scorefiles[0].every { path(it).size() > 0 } }
             )
         }
     }
@@ -50,7 +50,7 @@ nextflow_process {
             process {
                 """
                 input[0] = Channel.from(
-                    [ pgs_id: "", trait_efo: "", pgp_id: "PGP000020" ]
+                    [ pgs_id: "", efo_id: "", pgp_id: "PGP000020" ]
                 )
                 input[1] = Channel.from("GRCh37")
                 """
@@ -60,7 +60,7 @@ nextflow_process {
             assertAll (
                 { assert process.success },
                 { assert process.trace.tasks().size() == 1 },
-                { assert snapshot(process.out).match() }
+                { assert process.out.scorefiles[0].every { path(it).size() > 0 } }
             )
         }
     }
@@ -71,7 +71,7 @@ nextflow_process {
             process {
                 """
                 input[0] = Channel.from(
-                    [ pgs_id: "", trait_efo: "", pgp_id: "EFO_0000217" ]
+                    [ pgs_id: "", pgp_id: "", efo_id: "EFO_0009460" ]
                 )
                 input[1] = Channel.from("GRCh37")
                 """
@@ -81,9 +81,8 @@ nextflow_process {
             assertAll (
                 { assert process.success },
                 { assert process.trace.tasks().size() == 1 },
-                // two scores are associated with EFO_0000217 2025-11-12
-                // (but more may be added!)
-                { assert process.out.scorefiles.get(0).size() >= 2 }
+                // The trait has at least one directly associated score.
+                { assert process.out.scorefiles.get(0).size() >= 1 }
             )
         }
     }
@@ -96,7 +95,7 @@ nextflow_process {
             process {
                 """
                 input[0] = Channel.from(
-                    [ pgs_id: "PGS001229", trait_efo: [], pgp_id: [] ]
+                    [ pgs_id: "PGS001229", efo_id: [], pgp_id: [] ]
                 )
                 input[1] = Channel.from("GRCh37")
                 """

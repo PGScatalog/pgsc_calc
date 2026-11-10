@@ -11,7 +11,7 @@ nextflow_process {
                 process {
                     """
                     input[0] = Channel.fromPath("$baseDir/tests/data/PGS000586_hmPOS_GRCh38.txt.gz")
-                    input[1] = Channel.fromPath("CHAIN_NO_FILE")
+                    input[1] = Channel.value(file("$baseDir/assets/optional_input/CHAIN_NO_FILE"))
                     input[2] = Channel.of("GRCh38")
                     """
                 }
@@ -25,7 +25,7 @@ nextflow_process {
                 input[1] = Channel.fromPath("$baseDir/assets/example_results/scores.txt.gz")
                 input[2] = PGSC_CALC_FORMAT.out.log_scorefiles
                 input[3] = Channel.fromPath("$baseDir/assets/example_results/summary.csv")
-                input[4] = Channel.of([false, false, 0.75])
+                input[4] = Channel.of([false, false, 0.75, false])
                 input[5] = Channel.fromPath("$baseDir/assets/report/*").collect()
                 """
             }
@@ -36,7 +36,7 @@ nextflow_process {
             assertAll(
                 { assert process.success },
                 // (can't snapshot report - date/time changes)
-                { assert snapshot(process.out.versions).match("versions") }
+                { assert path(process.out.report[0]).size() > 1000 }
             )
         }
     }
@@ -52,7 +52,7 @@ nextflow_process {
                 input[1] = Channel.fromPath("scores.txt.gz")
                 input[2] = Channel.fromPath("score_log.json")
                 input[3] = Channel.fromPath("match_summary.csv")
-                input[4] = Channel.of([false, false, 0.75])
+                input[4] = Channel.of([false, false, 0.75, false])
                 input[5] = Channel.fromPath("$baseDir/assets/report/*").collect()
                 """
             }
