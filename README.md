@@ -8,6 +8,44 @@ validation are still in progress. The image includes Nextflow, the workflow and
 its tools. It runs on one machine, with separate tasks for loading, matching and
 scoring. You do not need to install Nextflow on the host.
 
+## Workflow overview
+
+This directed acyclic graph (DAG) shows the task dependencies for an offline run.
+Loading and scoring run once per genotype shard (an input file); matching groups
+the loaded shards by chromosome.
+
+```mermaid
+flowchart TD
+    scores["Local scoring files"] --> format["FORMAT: prepare scoring files"]
+    inputs["Samplesheet, genotypes and indexes"] --> load["LOAD: load or reuse genotypes"]
+    cache["Previous genotype cache (optional)"] -.-> load
+    sex["Sex map (when required)"] -.-> load
+    format --> load
+    load --> check["CHECK_SAMPLES: check sample consistency"]
+    load --> validated["Validated genotype caches"]
+    check --> validated
+    validated --> match["MATCH: match variants per chromosome"]
+    format --> match
+    match --> match_combine["MATCH_COMBINE: combine matches and check overlap"]
+    format --> match_combine
+    match_combine --> score["SCORE: calculate scores per shard"]
+    validated --> score
+    format --> score
+    score --> combine["SCORE_COMBINE: combine partial scores"]
+    combine --> results["scores.txt.gz"]
+    combine --> report["REPORT: build the HTML report"]
+    format -->|Scoring file log| report
+    match_combine -->|Matching summary| report
+    match_combine --> logs["summary.csv and variant_match_logs.zip"]
+    report --> html["report.html"]
+    validated --> pack["CACHE_PACK: publish cache (optional)"]
+    pack --> archive["genotypes.zarr.zip"]
+```
+
+Solid arrows show task dependencies and outputs. Dashed arrows show optional or
+conditional inputs. Cache publication runs independently of scoring and is enabled
+by default. Reusing a cache loads any additional positions needed by the scores.
+
 ## Run with Docker
 
 ### 1. Prepare your inputs
