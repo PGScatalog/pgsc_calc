@@ -1,108 +1,209 @@
-# pgscatalog/pgsc_calc
+# pgsc_calc v3-alpha.2
 
-[![GitHub Actions CI Status](https://github.com/pgscatalog/pgsc_calc/actions/workflows/nf-test.yml/badge.svg)](https://github.com/pgscatalog/pgsc_calc/actions/workflows/nf-test.yml)[
-![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.5970794-1073c8?labelColor=000000)](https://doi.org/10.5281/zenodo.5970794)
-[![nf-test](https://img.shields.io/badge/unit_tests-nf--test-337ab7.svg)](https://www.nf-test.com)
+Calculate polygenic scores from local [PGS Catalog](https://www.pgscatalog.org/)
+or custom scoring files and indexed VCF or BGEN genotypes.
 
-[![Nextflow](https://img.shields.io/badge/version-%E2%89%A525.04.0-green?style=flat&logo=nextflow&logoColor=white&color=%230DC09D&link=https%3A%2F%2Fnextflow.io)](https://www.nextflow.io/)
-[![nf-core template version](https://img.shields.io/badge/nf--core_template-3.4.1-green?style=flat&logo=nfcore&logoColor=white&color=%2324B064&link=https%3A%2F%2Fnf-co.re)](https://github.com/nf-core/tools/releases/tag/3.4.1)
-[![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
-[![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)
-[![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/docs/)
-[![Launch on Seqera Platform](https://img.shields.io/badge/Launch%20%F0%9F%9A%80-Seqera%20Platform-%234256e7)](https://cloud.seqera.io/launch?pipeline=https://github.com/pgscatalog/pgsc_calc)
+**This is an alpha branch.** Local integration tests pass; large-scale and TRE
+validation are still in progress. The image includes Nextflow, the workflow and
+its tools. It runs on one machine, with separate tasks for loading, matching and
+scoring. You do not need to install Nextflow on the host.
 
-## Introduction
+## Run with Docker
 
-`pgsc_calc` is a bioinformatics best-practice analysis pipeline for calculating
-polygenic [risk] scores on samples with imputed genotypes using existing scoring
-files from the [Polygenic Score (PGS) Catalog](https://www.pgscatalog.org/)
-and/or user-defined PGS/PRS.
+### 1. Prepare your inputs
 
+Create an `input/` directory containing:
 
-## v3-alpha.2 integration candidate
+- genotype files and their indexes: `.vcf.gz` with `.vcf.gz.csi`, or `.bgen` with `.bgen.bgi`
+- a `.sample` file for each BGEN input
+- scoring files in `input/scores/`, downloaded before the run
+- `input/samplesheet.csv`, using paths **inside the container**
 
-This candidate replaces plink2 scoring with the Python `pgscatalog.calc` stages.
-It accepts one sampleset per run, including technical sample batches and
-chromosome partitions in VCF or BGEN format. Missing calls use allele frequencies
-pooled across the sampleset. Scoring files with X or Y variants require an explicit
-sex map; ploidy comes from the observed calls.
+For VCF, start with:
 
-The supported launch runs bundled Nextflow and its tasks inside one offline image.
-Local validation is described in [the offline guide](docs/docs/howto/offline-v3.md).
-HPC/TRE acceptance remains pending. Standalone Conda and cross-node execution are
-outside the candidate's validated scope.
+```csv
+sampleset,chrom,path,file_format,genotyping_method
+cohort,1,/input/chr1.vcf.gz,vcf,wgs
+cohort,2,/input/chr2.vcf.gz,vcf,wgs
+```
 
-## Pipeline summary
+For BGEN, add the sample-file column:
 
-* Format local Catalog or custom scoring files, with local liftover chains when needed.
-* Load each target shard and validate sample coverage.
-* Match all technical batches for each chromosome, then apply `min_overlap` across the sampleset.
-* Score each shard and combine its contributions into final scores.
-* Publish matching logs, sex-check TSVs, an HTML report and an optional unified cache.
+```csv
+sampleset,chrom,path,file_format,genotyping_method,bgen_sample_file
+cohort,1,/input/chr1.bgen,bgen,array,/input/cohort.sample
+cohort,2,/input/chr2.bgen,bgen,array,/input/cohort.sample
+```
 
-Prepare Catalog downloads before offline execution. The existing online download
-interface is retained for other launch modes.
+Use one sampleset per run. Technical sample batches from the same callset can
+share its label; independently called cohorts need separate runs. Leave `chrom`
+empty for whole-genome files. Use `array` or `wgs` to describe your inputs.
 
-### PGS applications and libraries
+Missing calls use allele frequencies pooled across the sampleset. Sparse inputs
+where an absent variant means a homozygous-reference call are not yet supported.
 
-`pgsc_calc` uses applications and libraries internally developed at the PGS Catalog, which can do helpful things like:
+If any scoring file contains X or Y variants, also supply a tab-separated sex map
+with `sample_id` and `sex` columns. Include every sample, using `0` for unknown,
+`1` for male and `2` for female. Add `--sex_map /input/sex.tsv` to the command below.
 
-* Query the PGS Catalog to bulk download scoring files in a specific genome build
-* Match variants from scoring files to target variants
-* Adjust calculated PGS in the context of genetic ancestry
+### 2. Run the workflow
 
-If you want to write Python code to work with PGS, [check out the `pygscatalog` repository to learn more](https://github.com/PGScatalog/pygscatalog).
+Use a successfully published [alpha.2 image build](https://github.com/PGScatalog/pgsc_calc/actions/workflows/dockerhub.yml).
+The tag changes as this branch develops. Record its digest for repeatable runs.
 
-If you want a simpler way of working with PGS, ignore this section and continue below to learn more about `pgsc_calc`.
+```bash
+docker pull pgscatalog/pgsc_calc:v3-alpha.2
+mkdir -p work results
 
-## Quick start
+docker run --rm --network none \
+  -v "$PWD/input:/input:ro" \
+  -v "$PWD/work:/work" -v "$PWD/results:/results" -w /work \
+  pgscatalog/pgsc_calc:v3-alpha.2 \
+  pgsc_calc_workflow \
+  --input /input/samplesheet.csv \
+  --scorefile '/input/scores/*.txt.gz' \
+  --target_build GRCh38 --outdir /results
+```
 
-Follow the [offline launch and validation guide](docs/docs/howto/offline-v3.md) to
-build the local candidate or run a published candidate image with local analysis
-inputs. Nextflow, its plugin and all task tools are bundled; no host Nextflow
-installation or nested container engine is needed.
+Set `--target_build` to your genotype build: `GRCh37` or `GRCh38`. Use matching
+Catalog scoring files. Custom scores that need liftover also require local chain
+files; see the [offline guide](docs/docs/howto/offline-v3.md).
 
-The image publication step is separate from local validation. Use the published
-candidate digest for HPC/TRE acceptance, and retain the writable work directory
-for `-resume`.
+The run makes no network requests. `--pgs_id`, `--pgp_id` and `--efo_id` downloads
+are unavailable through this offline launcher.
 
-## Documentation
+### 3. Check and keep the outputs
 
-See the [alpha.2 offline guide](docs/docs/howto/offline-v3.md) for the launch model,
-samplesheet declarations, sex maps, cache compatibility and test commands.
+A successful run writes these files to `results/`:
 
-## Credits
+| File | Contents |
+| --- | --- |
+| `scores.txt.gz` | Scores for each sample |
+| `report.html` | Matching summaries and score distributions |
+| `summary.csv` and `variant_match_logs.zip` | Matching results |
+| `genotypes.zarr.zip` | Reusable genotype cache, published by default |
+| `sex_check/` | Sex-check results, when produced |
 
-pgscatalog/pgsc_calc is developed as part of the PGS Catalog project, a
-collaboration between the University of Cambridge’s Department of Public Health
-and Primary Care (Michael Inouye, Samuel Lambert) and the European
-Bioinformatics Institute (Helen Parkinson, Laura Harris).
+Keep `work/`, including its hidden `.nextflow` directory, to resume interrupted
+runs. Repeat the same command with `-resume`. Files in `results/` alone do not
+mean that the run succeeded: cache publication failure also fails the run.
 
-The pipeline seeks to provide a standardized workflow for PGS calculation and
-ancestry inference implemented in nextflow derived from an existing set of
-tools/scripts developed by Inouye lab (Rodrigo Canovas, Scott Ritchie, Jingqin
-Wu) and PGS Catalog teams (Samuel Lambert, Laurent Gil).
+## Reuse the cache for more scores
 
-The adaptation of the codebase, nextflow implementation, and PGS Catalog features
-are written by Benjamin Wingfield, Samuel Lambert, Laurent Gil with additional input
-from Aoife McMahon (EBI). Development of new features, testing, and code review
-is ongoing including Inouye lab members (Rodrigo Canovas, Scott Ritchie) and others. If 
-you use the tool we ask you to cite our paper describing software and updated PGS Catalog resource:
+Keep the original genotype, index and sample files available. Create new work and
+results directories, mount the previous results read-only, and pass the cache:
 
-- >Lambert, Wingfield _et al._ (2024) Enhancing the Polygenic Score Catalog with tools for score 
-  calculation and ancestry normalization. Nature Genetics.
-  doi:[10.1038/s41588-024-01937-x](https://doi.org/10.1038/s41588-024-01937-x).
+```bash
+mkdir -p work-next results-next
+docker run --rm --network none \
+  -v "$PWD/input:/input:ro" -v "$PWD/results:/previous:ro" \
+  -v "$PWD/work-next:/work" -v "$PWD/results-next:/results" -w /work \
+  pgscatalog/pgsc_calc:v3-alpha.2 \
+  pgsc_calc_workflow \
+  --input /input/samplesheet.csv --scorefile '/input/scores/*.txt.gz' \
+  --target_build GRCh38 --outdir /results \
+  --genotype_cache_zip /previous/genotypes.zarr.zip
+```
 
-This pipeline is distrubuted under an [Apache License](LICENSE) amd uses code and 
-infrastructure developed and maintained by the [nf-core](https://nf-co.re) community 
-(Ewels *et al. Nature Biotech* (2020) doi:[10.1038/s41587-020-0439-x](https://doi.org/10.1038/s41587-020-0439-x)), 
-reused here under the [MIT license](https://github.com/nf-core/tools/blob/master/LICENSE).
+Existing genotypes are reused; additional positions are loaded as needed. The
+expanded cache goes into `results-next/`, leaving the supplied archive unchanged.
+Allow disk space for both archives and temporary files.
 
-Additional references of open-source tools and data used in this pipeline are described in
-[`CITATIONS.md`](CITATIONS.md).
+Cache reuse checks input sizes and modification times. Preserve timestamps when
+copying unchanged inputs. If metadata differs or the cache version is unsupported,
+run without `--genotype_cache_zip` to create a new cache. Use
+`--publish_cache false` only if you do not want a reusable archive.
 
-This work has received funding from EMBL-EBI core funds, the Baker Institute,
-the University of Cambridge, Health Data Research UK (HDRUK), and the European
-Union’s Horizon 2020 research and innovation programme under grant agreement No
-101016775 INTERVENE.
-[10.1038/s41587-020-0439-x](https://dx.doi.org/10.1038/s41587-020-0439-x).
+## Run in a trusted research environment
+
+Start with a small cohort and a few scores. Use the same image digest for all
+validation runs. Allocate CPU, RAM and local disk for the **whole workflow**:
+this alpha runs its tasks within one machine, not across cloud workers or cluster
+nodes. Supply a local Nextflow configuration with `-c` to set task resources.
+
+The routes below follow platform interfaces but have not yet been validated in
+UK Biobank or All of Us. Keep restricted data and outputs within your workspace.
+
+### UK Biobank Research Analysis Platform
+
+Use [Swiss Army Knife with a Docker image](https://documentation.dnanexus.com/user/running-apps-and-workflows/running-apps-and-applets).
+For an internet-restricted project, prepare an amd64 image archive on a connected
+machine, then upload it through your project's approved route:
+
+```bash
+docker pull --platform linux/amd64 pgscatalog/pgsc_calc:v3-alpha.2
+docker image save --platform linux/amd64 \
+  -o pgsc_calc-v3-alpha.2.tar pgscatalog/pgsc_calc:v3-alpha.2
+dx upload pgsc_calc-v3-alpha.2.tar
+```
+
+For a first autosomal BGEN test, select your project with `dx select`. Adjust the
+project paths below to your genotype, index, sample and scoring files. The command
+creates a samplesheet using the files downloaded onto the worker:
+
+```bash
+dx run app-swiss-army-knife \
+  -iimage_file=pgsc_calc-v3-alpha.2.tar \
+  -iin=inputs/chr22.bgen -iin=inputs/chr22.bgen.bgi \
+  -iin=inputs/cohort.sample -iin=inputs/score.txt.gz \
+  -icmd='set -e
+printf "sampleset,chrom,path,file_format,genotyping_method,bgen_sample_file\ncohort,22,%s/chr22.bgen,bgen,array,%s/cohort.sample\n" "$PWD" "$PWD" > samplesheet.csv
+pgsc_calc_workflow --input "$PWD/samplesheet.csv" \
+  --scorefile "$PWD/score.txt.gz" --target_build GRCh37 \
+  --outdir "$PWD/results"' \
+  --destination /pgsc_calc-test/
+```
+
+Confirm the genome build, select suitable job resources when prompted, and check
+which new files Swiss Army Knife will upload. This one-chromosome example needs
+scores with sufficient overlap; use all relevant chromosomes for a full analysis.
+For repeated large runs, use an applet that explicitly preserves results, cache
+archives and any work files needed for resume. See
+[DNAnexus Docker image handling](https://documentation.dnanexus.com/developer/apps/dependency-management/using-docker-images).
+
+### All of Us Researcher Workbench
+
+Use the workspace's [Cromwell or Nextflow batch workflow interface](https://support.researchallofus.org/hc/en-us/articles/4811899197076-Workflows-in-the-All-of-Us-Researcher-Workbench-Nextflow-and-Cromwell)
+to run the image as **one outer task**. The bundled Nextflow runs locally inside
+that task; do not start another Docker container inside it.
+
+1. Set the outer task's container to the published `pgscatalog/pgsc_calc:v3-alpha.2`
+   digest and allocate its CPU, RAM and disk.
+2. Declare every genotype, index, sample, scoring and optional sex-map file as a
+   task input so the platform downloads it to the worker. Create the samplesheet
+   using those local paths; the bundled launcher rejects `gs://` paths.
+3. In the task's writable working directory, invoke:
+
+   ```bash
+   pgsc_calc_workflow --input "$PWD/samplesheet.csv" \
+     --scorefile "$PWD/score.txt.gz" --target_build GRCh38 \
+     --outdir "$PWD/results"
+   ```
+
+4. Declare the files in `results/` as outer-task outputs so the platform saves
+   them to the workspace bucket. Preserve Nextflow work and state separately if
+   you need resume after the worker is removed.
+
+This repository does not yet provide a tested All of Us submission wrapper.
+Use the platform tutorial to configure the outer task and file transfers.
+
+## Further guidance
+
+- [Offline configuration, Apptainer and local tests](docs/docs/howto/offline-v3.md)
+- [Validation evidence and remaining release work](docs/v3-alpha2-validation.md)
+- [Python tools and libraries](https://github.com/PGScatalog/pygscatalog)
+
+## Cite and acknowledge
+
+Developed by the PGS Catalog team at the University of Cambridge and EMBL-EBI,
+with contributions from the Inouye lab and the wider community.
+
+Please cite Lambert, Wingfield *et al.* (2024), [Enhancing the Polygenic Score
+Catalog with tools for score calculation and ancestry normalization](https://doi.org/10.1038/s41588-024-01937-x).
+The paper describes the published software; this branch contains ongoing v3 work.
+
+Distributed under the [Apache 2.0 licence](LICENSE), with infrastructure derived
+from [nf-core](https://nf-co.re). See [additional citations](CITATIONS.md).
+
+Supported by EMBL-EBI, the Baker Institute, the University of Cambridge, Health
+Data Research UK and EU Horizon 2020 grant 101016775 (INTERVENE).
