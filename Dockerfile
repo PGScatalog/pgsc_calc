@@ -6,7 +6,7 @@ FROM condaforge/miniforge3:25.3.1-0
 
 COPY --from=ghcr.io/astral-sh/uv:0.9.8 /uv /usr/local/bin/uv
 
-ARG PYGSCATALOG_COMMIT=9aa7015eb1a46af9e2f88fbb03baeb25a89dbbe7
+ARG PYGSCATALOG_COMMIT=3753260d5628b139ab0f6890dbb238056127d625
 LABEL org.opencontainers.image.description="PGS Catalog alpha.2 integration test runtime" \
       org.opencontainers.image.source="https://github.com/PGScatalog/pygscatalog" \
       org.opencontainers.image.revision="${PYGSCATALOG_COMMIT}"
